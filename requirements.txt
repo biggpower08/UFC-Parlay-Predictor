@@ -1,0 +1,15 @@
+pandas
+numpy
+kagglehub
+scikit-learn
+joblib
+pyyaml
+fastapi
+uvicorn
+httpx
+beautifulsoup4
+playwright
+apscheduler
+psycopg[binary]
+SQLAlchemy
+alembic

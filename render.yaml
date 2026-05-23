@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: ufc-predictor-api
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "alembic upgrade head && uvicorn ufc_predictor.api.app:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: UFC_PREDICTOR_DATA_DIR
+        value: /opt/render/project/src/ufc_predictor/data
+      - key: FRONTEND_ORIGINS
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO

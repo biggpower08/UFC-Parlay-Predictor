@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+ufc_predictor/ui/.next/
+ufc_predictor/ui/out/
+ufc_predictor/ui/dist/
+ufc_predictor/ui/release/
+app/frontend/.next/
+app/frontend/out/
+app/frontend/node_modules/
+ufc_predictor/data/processed/scrape_cache/
+*.log
+.env
+.env.local
