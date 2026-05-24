@@ -1,0 +1,80 @@
+# Qualitative note -> feature flag mappings for feedback/retraining
+categories:
+  injury:
+    flag: injury_flag
+    keywords:
+      - injured
+      - injury
+      - hurt
+      - damaged
+      - compromised physically
+  short_notice:
+    flag: short_notice_flag
+    keywords:
+      - short notice
+      - late replacement
+      - replacement
+      - stepped up on short notice
+  bad_weight_cut:
+    flag: weight_cut_issue_flag
+    keywords:
+      - bad weight cut
+      - weight cut
+      - missed weight
+      - drained
+      - dehydration
+  stylistic_mismatch:
+    flag: stylistic_mismatch_flag
+    keywords:
+      - stylistic mismatch
+      - bad matchup
+      - wrong style
+      - style mismatch
+  cardio_issue:
+    flag: cardio_issue_flag
+    keywords:
+      - cardio
+      - gassed
+      - tired
+      - endurance
+      - faded
+  layoff_concern:
+    flag: layoff_concern_flag
+    keywords:
+      - layoff
+      - ring rust
+      - inactive
+      - long layoff
+      - time off
+  age_decline:
+    flag: age_decline_flag
+    keywords:
+      - age
+      - older
+      - decline
+      - past prime
+      - aging
+  chin_decline:
+    flag: chin_decline_flag
+    keywords:
+      - chin
+      - chin gone
+      - glass chin
+      - chin cracked
+      - knocked out easily
+  momentum:
+    flag: momentum_flag
+    keywords:
+      - momentum
+      - hot streak
+      - on a roll
+      - confidence
+      - winning streak
+  home_crowd:
+    flag: home_crowd_flag
+    keywords:
+      - home crowd
+      - home advantage
+      - crowd
+      - hostile territory
+      - arena advantage

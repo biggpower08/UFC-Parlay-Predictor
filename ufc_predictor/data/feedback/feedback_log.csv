@@ -1,0 +1,5 @@
+prediction_id,fighter_a,fighter_b,predicted_winner,actual_winner,confidence,was_correct,user_notes,timestamp
+52afdf58-384c-4c17-b42c-4b47644fb159,Alex Pereira,Jon Jones,Jon Jones,Jon Jones,0.9508,True,,2026-05-18T19:13:05.283532+00:00
+a41c45cb-5c4e-4f76-8322-61464d76d8ec,Jon Jones,Stipe Miocic,Jon Jones,Jon Jones,0.9445,True,,2026-05-19T03:10:05.037510+00:00
+a94b7e49-7243-42a0-9d5b-48e4496f181e,Alexander Volkanovski,Islam Makhachev,Islam Makhachev,Islam Makhachev,0.8475982199083175,True,,2026-05-19T18:27:59.719628+00:00
+2df24775-e74a-4c61-97b1-c90d108beb1f,Jon Jones,Stipe Miocic,Jon Jones,Jon Jones,0.8710940390789892,True,,2026-05-22T23:17:25.661194+00:00
