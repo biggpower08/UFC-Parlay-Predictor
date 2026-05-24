@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 from ufc_predictor import __version__
 from ufc_predictor.agents.orchestrator import FighterResolutionError, refresh_all, resolve_fighter
-from ufc_predictor.config import settings
 from ufc_predictor.db.schema import init_db, using_postgres
 from ufc_predictor.db.repository import resolve_name, save_prediction, search_fighters
 from ufc_predictor.feedback.feedback_handler import save_feedback
@@ -24,8 +23,7 @@ logger = get_logger(__name__)
 app = FastAPI(title="UFC Predictor API", version=__version__)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.FRONTEND_ORIGINS,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],

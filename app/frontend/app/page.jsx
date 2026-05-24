@@ -1,15 +1,15 @@
 "use client";
 
-import { Activity, Brain, RefreshCw, Search, ShieldCheck } from "lucide-react";
+import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 const API_CANDIDATES = Array.from(
   new Set(
     [
-      process.env.NEXT_PUBLIC_API_BASE,
-      "/api",
       process.env.NEXT_PUBLIC_API_URL,
       "https://ufc-parlay-predictor-cte8.onrender.com",
+      process.env.NEXT_PUBLIC_API_BASE,
+      "/api",
     ].filter(Boolean),
   ),
 );
@@ -216,10 +216,6 @@ export default function App() {
           <div className={health?.ok ? "status online" : "status offline"}>
             <Activity size={18} />
             {health?.ok ? "Engine connected" : "Engine offline"}
-          </div>
-          <div className={health?.ollama?.available && health?.ollama?.model_loaded ? "status online" : "status"}>
-            <Brain size={18} />
-            {health?.ollama?.available && health?.ollama?.model_loaded ? "Ollama ready" : "Ollama unavailable"}
           </div>
         </div>
       </header>
