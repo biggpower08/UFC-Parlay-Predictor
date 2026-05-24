@@ -3,7 +3,30 @@
 import { Activity, Brain, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "/api";
+const API_CANDIDATES = Array.from(
+  new Set(
+    [
+      process.env.NEXT_PUBLIC_API_URL,
+      process.env.NEXT_PUBLIC_API_BASE,
+      "/api",
+    ].filter(Boolean),
+  ),
+);
+
+async function apiFetch(path, options = {}) {
+  const errors = [];
+  for (const base of API_CANDIDATES) {
+    const url = `${base.replace(/\/$/, "")}${path}`;
+    try {
+      const response = await fetch(url, options);
+      if (response.status < 500) return response;
+      errors.push(`${url}: ${response.status} ${response.statusText}`);
+    } catch (error) {
+      errors.push(`${url}: ${error.message}`);
+    }
+  }
+  throw new Error(errors.join(" | "));
+}
 
 export default function App() {
   const [fighterA, setFighterA] = useState("Islam Makhachev");
@@ -28,7 +51,7 @@ export default function App() {
 
   async function checkHealth() {
     try {
-      const response = await fetch(`${API_BASE}/health`, { cache: "no-store" });
+      const response = await apiFetch("/health", { cache: "no-store" });
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
       setHealth({ ...data, ok: true });
@@ -46,7 +69,7 @@ export default function App() {
     }
     setSearching((current) => ({ ...current, [slot]: true }));
     try {
-      const response = await fetch(`${API_BASE}/fighters/search?q=${encodeURIComponent(value)}`);
+      const response = await apiFetch(`/fighters/search?q=${encodeURIComponent(value)}`);
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
       setSuggestions((s) => ({ ...s, [slot]: data.fighters || [] }));
@@ -70,7 +93,7 @@ export default function App() {
       const resolvedB = await resolveBeforePrediction("b", fighterB);
       if (!resolvedB) return;
 
-      const response = await fetch(`${API_BASE}/predict`, {
+      const response = await apiFetch("/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -111,7 +134,7 @@ export default function App() {
   async function resolveBeforePrediction(slot, value) {
     let data;
     try {
-      const response = await fetch(`${API_BASE}/fighters/resolve?q=${encodeURIComponent(value)}`);
+      const response = await apiFetch(`/fighters/resolve?q=${encodeURIComponent(value)}`);
       if (!response.ok) throw new Error(await readApiError(response));
       data = await response.json();
     } catch (error) {
@@ -159,7 +182,7 @@ export default function App() {
     if (!result) return;
     const predicted = result.prediction.winner;
     const actual = wasCorrect ? predicted : window.prompt("Actual winner?") || "";
-    await fetch(`${API_BASE}/feedback`, {
+    await apiFetch("/feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
