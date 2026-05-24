@@ -1,7 +1,12 @@
+const DEFAULT_BACKEND_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://ufc-parlay-predictor-cte8.onrender.com"
+    : "http://127.0.0.1:8000";
+
 const BACKEND_URL =
   process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://127.0.0.1:8000";
+  DEFAULT_BACKEND_URL;
 
 export const dynamic = "force-dynamic";
 

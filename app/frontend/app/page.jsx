@@ -9,6 +9,7 @@ const API_CANDIDATES = Array.from(
       process.env.NEXT_PUBLIC_API_BASE,
       "/api",
       process.env.NEXT_PUBLIC_API_URL,
+      "https://ufc-parlay-predictor-cte8.onrender.com",
     ].filter(Boolean),
   ),
 );
