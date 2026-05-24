@@ -6,9 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 const API_CANDIDATES = Array.from(
   new Set(
     [
-      process.env.NEXT_PUBLIC_API_URL,
       process.env.NEXT_PUBLIC_API_BASE,
       "/api",
+      process.env.NEXT_PUBLIC_API_URL,
     ].filter(Boolean),
   ),
 );
