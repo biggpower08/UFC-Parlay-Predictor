@@ -2,6 +2,8 @@
 
 import math
 import time
+from datetime import date, datetime
+from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -97,12 +99,20 @@ def version():
 
 @app.get("/fighters/search")
 def fighters_search(q: str, limit: int = 12):
-    return {"fighters": _clean(search_fighters(q, limit=limit))}
+    try:
+        return {"fighters": _clean(search_fighters(q, limit=limit))}
+    except Exception as exc:
+        logger.exception("Fighter search failed query=%s", q)
+        raise HTTPException(status_code=500, detail=f"Fighter search failed: {exc}") from exc
 
 
 @app.get("/fighters/resolve")
 def fighters_resolve(q: str):
-    return _clean(resolve_name(q))
+    try:
+        return _clean(resolve_name(q))
+    except Exception as exc:
+        logger.exception("Fighter resolve failed query=%s", q)
+        raise HTTPException(status_code=500, detail=f"Fighter resolve failed: {exc}") from exc
 
 
 @app.post("/predict")
@@ -190,4 +200,6 @@ def _clean(value):
             return None
     except Exception:
         pass
+    if isinstance(value, (datetime, date, UUID)):
+        return str(value)
     return value

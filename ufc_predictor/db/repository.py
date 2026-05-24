@@ -3,7 +3,7 @@
 import json
 import sqlite3
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from difflib import SequenceMatcher
 
 import pandas as pd
@@ -17,6 +17,8 @@ from ufc_predictor.utils.weight_classes import detect_weight_class
 
 
 FIGHTERS_TABLE = "fighters"
+INTEGER_COLUMNS = {"wins", "losses", "draws"}
+DATE_COLUMNS = {"date_of_birth"}
 
 
 def _utc_now() -> str:
@@ -57,6 +59,7 @@ def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
     out = df.copy()
     name_col = find_name_column(out)
     out["normalized_name"] = out[name_col].astype(str).map(normalize_name)
+    out = out.drop_duplicates(subset=["normalized_name"], keep="first")
     out["_search_name"] = out["normalized_name"]
     if "elo" not in out.columns:
         out["elo"] = settings.ELO_INITIAL
@@ -69,14 +72,17 @@ def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
         engine = get_engine()
         db_columns = [col["name"] for col in inspect(engine).get_columns(FIGHTERS_TABLE)]
         out_db = out[[col for col in out.columns if col in db_columns and col != "id"]].copy()
-        out_db = out_db.where(pd.notna(out_db), None)
-        if replace and table_exists(FIGHTERS_TABLE):
-            with engine.begin() as conn:
-                conn.execute(text(f"DELETE FROM {FIGHTERS_TABLE}"))
-            out_db.to_sql(FIGHTERS_TABLE, engine, if_exists="append", index=False)
-        else:
-            out_db.to_sql(FIGHTERS_TABLE, engine, if_exists="append", index=False)
+        records = [_clean_db_record(record) for record in out_db.to_dict(orient="records")]
+        columns = list(records[0].keys()) if records else list(out_db.columns)
+        placeholders = ", ".join(f":{col}" for col in columns)
+        column_list = ", ".join(columns)
+        insert_sql = text(f"INSERT INTO {FIGHTERS_TABLE} ({column_list}) VALUES ({placeholders})")
         with engine.begin() as conn:
+            if replace and table_exists(FIGHTERS_TABLE):
+                conn.execute(text(f"DELETE FROM {FIGHTERS_TABLE}"))
+            if records:
+                for start in range(0, len(records), 500):
+                    conn.execute(insert_sql, records[start : start + 500])
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_normalized_name ON fighters(normalized_name)"))
         return out
 
@@ -92,9 +98,30 @@ def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
 def get_fighters_df() -> pd.DataFrame:
     initialize_database()
     if using_postgres():
-        return pd.read_sql_query(f"SELECT * FROM {FIGHTERS_TABLE}", get_engine())
+        with get_engine().begin() as conn:
+            rows = conn.execute(text(f"SELECT * FROM {FIGHTERS_TABLE}")).mappings().all()
+        return pd.DataFrame([dict(row) for row in rows])
     with connect() as conn:
         return pd.read_sql_query(f"SELECT * FROM {FIGHTERS_TABLE}", conn)
+
+
+def _clean_db_record(record: dict) -> dict:
+    clean = {}
+    for key, value in record.items():
+        if pd.isna(value):
+            clean[key] = None
+            continue
+        if key in INTEGER_COLUMNS:
+            clean[key] = int(value)
+            continue
+        if key in DATE_COLUMNS:
+            if isinstance(value, date):
+                clean[key] = value
+            else:
+                clean[key] = str(value)[:10] if str(value).strip() else None
+            continue
+        clean[key] = value
+    return clean
 
 
 def search_fighters(query: str, limit: int = 12) -> list[dict]:
