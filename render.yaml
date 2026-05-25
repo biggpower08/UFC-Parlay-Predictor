@@ -4,7 +4,7 @@ services:
     runtime: python
     plan: free
     rootDir: .
-    buildCommand: "pip install -r requirements.txt && cd app/frontend && npm ci && npm run build"
+    buildCommand: "pip install -r requirements.txt && cd app/frontend && npm ci && npm run build && cd ../.. && rm -rf ufc_predictor/static_app && mkdir -p ufc_predictor/static_app && cp -R app/frontend/out/. ufc_predictor/static_app/"
     startCommand: "if [ -d alembic ]; then alembic upgrade head; else python -c \"from ufc_predictor.db.schema import init_db; init_db()\"; fi && uvicorn ufc_predictor.api.app:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /health
     envVars:

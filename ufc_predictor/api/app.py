@@ -24,7 +24,7 @@ from ufc_predictor.utils.weight_classes import detect_weight_class, same_weight_
 
 logger = get_logger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-FRONTEND_DIST_DIR = PROJECT_ROOT / "app" / "frontend" / "out"
+FRONTEND_DIST_DIR = Path(__file__).resolve().parents[1] / "static_app"
 
 app = FastAPI(title="UFC Predictor API", version=__version__)
 app.add_middleware(
