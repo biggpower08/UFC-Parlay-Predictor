@@ -7,6 +7,7 @@ from pathlib import Path
 from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -16,14 +17,14 @@ from ufc_predictor.agents.orchestrator import FighterResolutionError, refresh_al
 from ufc_predictor.db.schema import init_db, using_postgres
 from ufc_predictor.db.repository import resolve_name, save_prediction, search_fighters
 from ufc_predictor.feedback.feedback_handler import save_feedback
-from ufc_predictor.models.llm.ollama_analyst import get_ollama_status
 from ufc_predictor.models.sklearn.predictor import model_available
 from ufc_predictor.pipeline import run_prediction
 from ufc_predictor.utils.logger import get_logger
 from ufc_predictor.utils.weight_classes import detect_weight_class, same_weight_class
 
 logger = get_logger(__name__)
-FRONTEND_DIST_DIR = Path(__file__).resolve().parents[2] / "app" / "frontend" / "out"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+FRONTEND_DIST_DIR = PROJECT_ROOT / "app" / "frontend" / "out"
 
 app = FastAPI(title="UFC Predictor API", version=__version__)
 app.add_middleware(
@@ -88,7 +89,10 @@ def health():
         "version": __version__,
         "database": "postgres" if using_postgres() else "sqlite",
         "sklearn_model": model_available(),
-        "ollama": get_ollama_status(),
+        "frontend": {
+            "available": FRONTEND_DIST_DIR.exists(),
+            "path": str(FRONTEND_DIST_DIR),
+        },
     }
 
 
@@ -193,6 +197,30 @@ def feedback(request: FeedbackRequest):
 @app.post("/refresh")
 def refresh(force_refresh: bool = False):
     return {"refreshed": True, **refresh_all(force_refresh=force_refresh)}
+
+
+@app.get("/", include_in_schema=False)
+def frontend_root():
+    index_path = FRONTEND_DIST_DIR / "index.html"
+    if index_path.exists():
+        return HTMLResponse(index_path.read_text(encoding="utf-8"))
+    return HTMLResponse(
+        """
+        <!doctype html>
+        <html>
+          <head><title>UFC Predictor</title></head>
+          <body style="margin:0;background:#071019;color:#edf8ff;font-family:system-ui;display:grid;min-height:100vh;place-items:center;">
+            <main style="max-width:720px;padding:32px;">
+              <h1>UFC Predictor backend is online</h1>
+              <p>The frontend build was not found on this Render deploy.</p>
+              <p>Check the Render build log for the frontend build step, then redeploy.</p>
+              <p><a style="color:#24f6ff" href="/api/health">Open API health</a></p>
+            </main>
+          </body>
+        </html>
+        """,
+        status_code=503,
+    )
 
 
 if FRONTEND_DIST_DIR.exists():
