@@ -41,6 +41,8 @@ def upgrade() -> None:
             average_submissions_attempted_per_15_minutes double precision,
             elo double precision default 1000,
             peak_elo double precision default 1000,
+            elo_version text default 'v1',
+            elo_computed_at timestamptz,
             weight_class text,
             updated_at timestamptz not null default now()
         )
@@ -48,6 +50,8 @@ def upgrade() -> None:
     )
     op.execute("create index if not exists idx_fighters_name_trgm on fighters using gin (normalized_name gin_trgm_ops)")
     op.execute("create index if not exists idx_fighters_nickname on fighters (nickname)")
+    op.execute("alter table fighters add column if not exists elo_version text default 'v1'")
+    op.execute("alter table fighters add column if not exists elo_computed_at timestamptz")
 
     op.execute(
         """
@@ -76,6 +80,7 @@ def upgrade() -> None:
             normalized_name text not null,
             elo double precision not null,
             peak_elo double precision not null,
+            elo_version text not null default 'v1',
             computed_at timestamptz not null default now()
         )
         """

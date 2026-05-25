@@ -87,6 +87,8 @@ def init_db(db_path=None) -> None:
                         average_submissions_attempted_per_15_minutes DOUBLE PRECISION,
                         elo DOUBLE PRECISION DEFAULT 1000,
                         peak_elo DOUBLE PRECISION DEFAULT 1000,
+                        elo_version TEXT DEFAULT 'v1',
+                        elo_computed_at TIMESTAMPTZ,
                         weight_class TEXT,
                         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
                     )
@@ -95,6 +97,8 @@ def init_db(db_path=None) -> None:
             )
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_name_trgm ON fighters USING gin (normalized_name gin_trgm_ops)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_nickname ON fighters (nickname)"))
+            conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_version TEXT DEFAULT 'v1'"))
+            conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_computed_at TIMESTAMPTZ"))
             conn.execute(
                 text(
                     """
@@ -169,6 +173,7 @@ def init_db(db_path=None) -> None:
                         normalized_name TEXT NOT NULL,
                         elo DOUBLE PRECISION NOT NULL,
                         peak_elo DOUBLE PRECISION NOT NULL,
+                        elo_version TEXT NOT NULL DEFAULT 'v1',
                         computed_at TIMESTAMPTZ NOT NULL DEFAULT now()
                     )
                     """

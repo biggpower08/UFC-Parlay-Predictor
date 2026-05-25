@@ -6,10 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 const API_CANDIDATES = Array.from(
   new Set(
     [
-      process.env.NEXT_PUBLIC_API_URL,
-      "https://ufc-parlay-predictor-cte8.onrender.com",
-      process.env.NEXT_PUBLIC_API_BASE,
       "/api",
+      process.env.NEXT_PUBLIC_API_URL,
+      process.env.NEXT_PUBLIC_API_BASE,
     ].filter(Boolean),
   ),
 );
@@ -46,7 +45,13 @@ export default function App() {
   useEffect(() => {
     checkHealth();
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+        .catch(() => {});
+    }
+    if ("caches" in window) {
+      caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {});
     }
   }, []);
 

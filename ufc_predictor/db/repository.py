@@ -65,6 +65,10 @@ def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
         out["elo"] = settings.ELO_INITIAL
     if "peak_elo" not in out.columns:
         out["peak_elo"] = out["elo"]
+    if "elo_version" not in out.columns:
+        out["elo_version"] = "v1"
+    if "elo_computed_at" not in out.columns:
+        out["elo_computed_at"] = _utc_now()
     if "weight_class" not in out.columns:
         out["weight_class"] = out.apply(detect_weight_class, axis=1)
     settings.DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -265,7 +269,7 @@ def upsert_fighter(record: dict) -> pd.Series:
     return new_row.iloc[0]
 
 
-def update_elo_columns(elo_by_search: dict, peak_elo: dict | None = None) -> None:
+def update_elo_columns(elo_by_search: dict, peak_elo: dict | None = None, elo_version: str = "v1") -> None:
     initialize_database()
     df = get_fighters_df()
     name_col = find_name_column(df)
@@ -274,6 +278,8 @@ def update_elo_columns(elo_by_search: dict, peak_elo: dict | None = None) -> Non
     df["peak_elo"] = df[name_col].map(
         lambda n: peak_elo.get(n, elo_by_search.get(normalize_name(n), settings.ELO_INITIAL))
     )
+    df["elo_version"] = elo_version
+    df["elo_computed_at"] = _utc_now()
     save_fighters_df(df, replace=True)
 
 

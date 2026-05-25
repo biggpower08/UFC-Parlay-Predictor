@@ -56,6 +56,8 @@ FIGHTER_COLUMNS = [
     "average_submissions_attempted_per_15_minutes",
     "elo",
     "peak_elo",
+    "elo_version",
+    "elo_computed_at",
     "weight_class",
     "updated_at",
 ]
@@ -137,6 +139,8 @@ def prepare_fighters_and_elo(fights: pd.DataFrame) -> tuple[pd.DataFrame, pd.Dat
         lambda name: peak_elo.get(name, elo_by_search.get(normalize_name(name), settings.ELO_INITIAL))
     )
     fighters["weight_class"] = fighters.apply(detect_weight_class, axis=1)
+    fighters["elo_version"] = "v1"
+    fighters["elo_computed_at"] = utc_now()
     fighters["updated_at"] = utc_now()
 
     for col in FIGHTER_COLUMNS:
@@ -151,6 +155,7 @@ def prepare_fighters_and_elo(fights: pd.DataFrame) -> tuple[pd.DataFrame, pd.Dat
                 "normalized_name": normalize_name(fighter_name),
                 "elo": elo,
                 "peak_elo": peak_elo.get(fighter_name, elo),
+                "elo_version": "v1",
                 "computed_at": utc_now(),
             }
         )
@@ -207,7 +212,7 @@ def import_fights(conn, df: pd.DataFrame) -> None:
 def import_elo_history(conn, df: pd.DataFrame) -> None:
     if df.empty:
         return
-    columns = ["fighter_name", "normalized_name", "elo", "peak_elo", "computed_at"]
+    columns = ["fighter_name", "normalized_name", "elo", "peak_elo", "elo_version", "computed_at"]
     sql = f"insert into fighter_elo_history ({','.join(columns)}) values ({','.join(['%s'] * len(columns))})"
     conn.cursor().executemany(sql, rows(df, columns))
 

@@ -17,8 +17,6 @@ http://localhost:5173
 
 Production:
 
-- Deploy this folder to Vercel.
-- Set `NEXT_PUBLIC_API_URL` to the hosted Render backend URL.
-- Set `NEXT_PUBLIC_SUPABASE_URL` to the Supabase project URL.
-- Set `NEXT_PUBLIC_SUPABASE_ANON_KEY` to the Supabase anon key.
-- Leave `NEXT_PUBLIC_API_BASE` empty in production unless you intentionally want the local proxy.
+- Preferred: Render builds this folder as a static export and FastAPI serves `app/frontend/out`.
+- Vercel is optional as a backup, not the primary production host.
+- The app calls same-origin `/api` first, so the single Render app does not need cross-site API wiring.

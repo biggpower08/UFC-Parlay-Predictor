@@ -1,6 +1,6 @@
 # UFC Predictor
 
-Installable UFC/MMA prediction PWA with a FastAPI backend and Supabase Postgres production database.
+Installable UFC/MMA prediction PWA served by FastAPI on Render with a Supabase Postgres production database.
 
 ## Production Deploy
 
@@ -24,9 +24,9 @@ python scripts/import_supabase.py
 
 Import source CSV data, not the local SQLite cache. Do not upload `fighters.db` or model pickle files to Supabase.
 
-### 2. Backend on Render
+### 2. Full app on Render
 
-Render uses `render.yaml`.
+Render uses `render.yaml`. The Render service builds the frontend static app and serves it from the FastAPI backend, so the public app and API share one URL.
 
 Set these Render environment variables:
 
@@ -48,13 +48,15 @@ alembic upgrade head && uvicorn ufc_predictor.api.app:app --host 0.0.0.0 --port 
 Health checks:
 
 ```text
+GET /api/health
 GET /health
-GET /version
 ```
 
-### 3. Frontend on Vercel
+### 3. Optional frontend on Vercel
 
-Vercel source directory:
+Vercel is optional while stabilizing. The preferred production URL is the Render app URL.
+
+If you still deploy Vercel as a backup, use source directory:
 
 ```text
 app/frontend
@@ -76,7 +78,21 @@ app/frontend/public/service-worker.js
 app/frontend/public/icon.svg
 ```
 
-After deploying, open the Vercel site in a browser and use the browser install option to add it to desktop or phone.
+After deploying the single Render app, open the Render URL in a browser and use the browser install option to add it to desktop or phone.
+
+## Live Database Updates
+
+After setting `DATABASE_URL`, run:
+
+```bash
+python scripts/update_live_database.py --apply-schema
+```
+
+To compare the current Elo engine with the staged v2 placeholder:
+
+```bash
+python scripts/compare_elo_versions.py
+```
 
 ## Local Run
 

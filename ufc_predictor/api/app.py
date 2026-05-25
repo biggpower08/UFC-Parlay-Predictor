@@ -3,10 +3,12 @@
 import math
 import time
 from datetime import date, datetime
+from pathlib import Path
 from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from ufc_predictor import __version__
@@ -21,6 +23,7 @@ from ufc_predictor.utils.logger import get_logger
 from ufc_predictor.utils.weight_classes import detect_weight_class, same_weight_class
 
 logger = get_logger(__name__)
+FRONTEND_DIST_DIR = Path(__file__).resolve().parents[2] / "app" / "frontend" / "out"
 
 app = FastAPI(title="UFC Predictor API", version=__version__)
 app.add_middleware(
@@ -77,6 +80,7 @@ async def log_requests(request: Request, call_next):
     return response
 
 
+@app.get("/api/health")
 @app.get("/health")
 def health():
     return {
@@ -88,6 +92,7 @@ def health():
     }
 
 
+@app.get("/api/version")
 @app.get("/version")
 def version():
     return {
@@ -97,6 +102,7 @@ def version():
     }
 
 
+@app.get("/api/fighters/search")
 @app.get("/fighters/search")
 def fighters_search(q: str, limit: int = 12):
     try:
@@ -106,6 +112,7 @@ def fighters_search(q: str, limit: int = 12):
         raise HTTPException(status_code=500, detail=f"Fighter search failed: {exc}") from exc
 
 
+@app.get("/api/fighters/resolve")
 @app.get("/fighters/resolve")
 def fighters_resolve(q: str):
     try:
@@ -115,6 +122,7 @@ def fighters_resolve(q: str):
         raise HTTPException(status_code=500, detail=f"Fighter resolve failed: {exc}") from exc
 
 
+@app.post("/api/predict")
 @app.post("/predict")
 def predict(request: PredictRequest):
     try:
@@ -168,20 +176,27 @@ def predict(request: PredictRequest):
     return payload
 
 
+@app.post("/api/compare")
 @app.post("/compare")
 def compare(request: PredictRequest):
     return predict(request)
 
 
+@app.post("/api/feedback")
 @app.post("/feedback")
 def feedback(request: FeedbackRequest):
     record = save_feedback(request.dict())
     return {"saved": True, "feedback": _clean(record)}
 
 
+@app.post("/api/refresh")
 @app.post("/refresh")
 def refresh(force_refresh: bool = False):
     return {"refreshed": True, **refresh_all(force_refresh=force_refresh)}
+
+
+if FRONTEND_DIST_DIR.exists():
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST_DIR, html=True), name="frontend")
 
 
 def _clean(value):
