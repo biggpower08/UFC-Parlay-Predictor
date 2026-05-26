@@ -12,11 +12,12 @@ Base URLs:
 ```json
 {
   "ok": true,
+  "database": "postgres",
+  "database_ready": true,
   "sklearn_model": true,
-  "ollama": {
-    "available": true,
-    "model_loaded": true,
-    "error": null
+  "prediction_ready": true,
+  "frontend": {
+    "available": true
   }
 }
 ```

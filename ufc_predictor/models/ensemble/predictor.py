@@ -1,4 +1,4 @@
-"""Weighted winner ensemble for sklearn, Elo, and optional Ollama."""
+"""Weighted winner ensemble for sklearn, Elo, and optional private analyst."""
 
 from ufc_predictor.config import settings
 from ufc_predictor.models.elo.elo_engine import expected_score
@@ -23,26 +23,22 @@ def predict_ensemble(f1, f2, comparison: dict) -> dict:
     if settings.USE_ELO_FALLBACK:
         signals["elo"] = {"prob_a": elo_prob, "available": True}
 
-    llm = analyze_matchup(
-        stats1,
-        stats2,
-        comparison,
-        signals.get("sklearn", {}).get("prob_a"),
-        elo_prob,
-    )
-    signals["llm"] = {
-        "available": bool(llm.get("available")),
-        "model_loaded": bool(llm.get("model_loaded")),
-        "error": llm.get("error"),
-    }
-    if llm.get("available"):
-        llm_prob = _winner_to_prob(llm["winner"], name1, name2, llm["confidence"])
-        signals["llm"] = {"prob_a": llm_prob, **signals["llm"], **llm}
+    if settings.USE_LLM_ANALYST:
+        llm = analyze_matchup(
+            stats1,
+            stats2,
+            comparison,
+            signals.get("sklearn", {}).get("prob_a"),
+            elo_prob,
+        )
+        if llm.get("available"):
+            llm_prob = _winner_to_prob(llm["winner"], name1, name2, llm["confidence"])
+            signals["llm"] = {"prob_a": llm_prob, **llm}
 
     prob_a = _weighted_probability(signals)
     winner = _winner_from_probability(prob_a, name1, name2)
 
-    if _is_sklearn_close(signals) and "llm" in signals:
+    if _is_sklearn_close(signals) and signals.get("llm", {}).get("available"):
         winner = signals["llm"]["winner"]
         prob_a = signals["llm"]["prob_a"]
 
@@ -99,9 +95,8 @@ def _reasoning(name1, name2, prob_a, elo_prob, signals, comparison) -> str:
         parts.append(f"Sklearn signal {signals['sklearn']['prob_a']:.0%}; drivers: {contrib}.")
     parts.append(f"Elo signal {elo_prob:.0%}.")
     if signals.get("llm", {}).get("available"):
-        parts.append(f"Ollama: {signals['llm']['reasoning']}")
+        parts.append(f"Analyst signal: {signals['llm']['reasoning']}")
     else:
-        error = signals.get("llm", {}).get("error") or "not available"
-        parts.append(f"Ollama unavailable: {error}. Decision used data models only.")
+        parts.append("Decision used the statistical model and Elo signals.")
     parts.append(comparison["matchup"])
     return " ".join(parts)

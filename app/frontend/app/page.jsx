@@ -60,7 +60,7 @@ export default function App() {
       const response = await apiFetch("/health", { cache: "no-store" });
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
-      setHealth({ ...data, ok: true });
+      setHealth({ ...data, ok: Boolean(data.prediction_ready) });
       setMessage("");
     } catch (error) {
       setHealth({ ok: false });
@@ -259,7 +259,7 @@ export default function App() {
             setSuggestions((s) => ({ ...s, b: [] }));
           }}
         />
-        <button className="predict-button" onClick={predict} disabled={loading || health?.ok === false}>
+        <button className="predict-button" onClick={predict} disabled={loading || health?.prediction_ready === false}>
           {loading ? <RefreshCw className="spin" size={20} /> : <Activity size={20} />}
           {loading ? "Analyzing" : "Predict Fight"}
         </button>
@@ -288,7 +288,7 @@ export default function App() {
       {message && (
         <div className="message">
           <span>{message}</span>
-          {health?.ok === false && <button onClick={checkHealth}>Retry connection</button>}
+          {health?.prediction_ready === false && <button onClick={checkHealth}>Retry connection</button>}
         </div>
       )}
 
@@ -307,11 +307,11 @@ export default function App() {
             </div>
             <div>
               <strong>Local database</strong>
-              <span>{health?.ok ? "Connected" : "Waiting"}</span>
+              <span>{health?.database_ready ? "Connected" : "Waiting"}</span>
             </div>
             <div>
-              <strong>Web fill-in</strong>
-              <span>{health?.ok ? "Available" : "Waiting"}</span>
+              <strong>Prediction model</strong>
+              <span>{health?.sklearn_model ? "Available" : "Waiting"}</span>
             </div>
           </div>
         </section>
@@ -446,9 +446,10 @@ function StatsPanel({ comparison }) {
 }
 
 function SignalGrid({ signals }) {
+  const visibleSignals = Object.entries(signals).filter(([name]) => name !== "llm");
   return (
     <div className="signal-grid">
-      {Object.entries(signals).map(([name, signal]) => (
+      {visibleSignals.map(([name, signal]) => (
         <div className="signal" key={name}>
           <span>{name}</span>
           <strong>{Math.round((signal.prob_a || 0.5) * 100)}%</strong>

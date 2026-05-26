@@ -11,10 +11,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from sqlalchemy import text
 
 from ufc_predictor import __version__
 from ufc_predictor.agents.orchestrator import FighterResolutionError, refresh_all, resolve_fighter
-from ufc_predictor.db.schema import init_db, using_postgres
+from ufc_predictor.db.schema import get_engine, init_db, using_postgres
 from ufc_predictor.db.repository import resolve_name, save_prediction, search_fighters
 from ufc_predictor.feedback.feedback_handler import save_feedback
 from ufc_predictor.models.sklearn.predictor import model_available
@@ -84,11 +85,15 @@ async def log_requests(request: Request, call_next):
 @app.get("/api/health")
 @app.get("/health")
 def health():
+    db_ready = _database_ready()
+    sklearn_ready = model_available()
     return {
-        "ok": True,
+        "ok": db_ready and sklearn_ready,
         "version": __version__,
         "database": "postgres" if using_postgres() else "sqlite",
-        "sklearn_model": model_available(),
+        "database_ready": db_ready,
+        "sklearn_model": sklearn_ready,
+        "prediction_ready": db_ready and sklearn_ready,
         "frontend": {
             "available": FRONTEND_DIST_DIR.exists(),
             "path": str(FRONTEND_DIST_DIR),
@@ -162,7 +167,16 @@ def predict(request: PredictRequest):
             },
         )
 
-    comparison, prediction, summary = run_prediction(fighter_a, fighter_b)
+    try:
+        comparison, prediction, summary = run_prediction(fighter_a, fighter_b)
+    except Exception as exc:
+        logger.exception(
+            "Prediction failed fighter_a=%s fighter_b=%s",
+            fighter_a.get("name", request.fighter_a),
+            fighter_b.get("name", request.fighter_b),
+        )
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {type(exc).__name__}: {exc}") from exc
+
     payload = _clean(
         {
             "comparison": comparison,
@@ -200,6 +214,7 @@ def refresh(force_refresh: bool = False):
 
 
 @app.get("/", include_in_schema=False)
+@app.head("/", include_in_schema=False)
 def frontend_root():
     index_path = FRONTEND_DIST_DIR / "index.html"
     if index_path.exists():
@@ -246,3 +261,13 @@ def _clean(value):
     if isinstance(value, (datetime, date, UUID)):
         return str(value)
     return value
+
+
+def _database_ready() -> bool:
+    try:
+        with get_engine().connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return True
+    except Exception:
+        logger.exception("Database health check failed")
+        return False

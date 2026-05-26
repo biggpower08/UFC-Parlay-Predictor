@@ -70,6 +70,7 @@ CLOSE_CALL_ELO_THRESHOLD = 0.06
 ENSEMBLE_WEIGHTS = {"sklearn": 0.55, "elo": 0.20, "llm": 0.25}
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+USE_LLM_ANALYST = os.getenv("USE_LLM_ANALYST", "false").lower() in {"1", "true", "yes", "on"}
 
 # Logging
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
