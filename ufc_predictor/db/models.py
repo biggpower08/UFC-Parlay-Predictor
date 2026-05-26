@@ -54,6 +54,11 @@ class Fight(Base):
     round = Column(Text)
     time = Column(Text)
     source_hash = Column(Text, unique=True)
+    event_date = Column(DateTime(timezone=False))
+    weight_class = Column(Text)
+    source = Column(Text, default="local_csv")
+    source_url = Column(Text)
+    scraped_at = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -106,3 +111,67 @@ class ScrapeCache(Base):
     raw_json = Column(JSONB, nullable=False)
     confidence = Column(Float, default=0)
     fetched_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Event(Base):
+    __tablename__ = "events"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+    normalized_name = Column(Text, unique=True, index=True)
+    event_date = Column(DateTime(timezone=False))
+    location = Column(Text)
+    source = Column(Text, default="ufcstats")
+    source_url = Column(Text)
+    source_hash = Column(Text, unique=True)
+    scraped_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class FighterRanking(Base):
+    __tablename__ = "fighter_rankings"
+
+    id = Column(Integer, primary_key=True)
+    fighter_name = Column(Text, nullable=False)
+    normalized_name = Column(Text, index=True)
+    ranking_type = Column(Text, index=True)
+    weight_class = Column(Text)
+    rank = Column(Integer, nullable=False)
+    elo = Column(Float, nullable=False)
+    peak_elo = Column(Float)
+    fights_count = Column(Integer, default=0)
+    wins = Column(Integer, default=0)
+    losses = Column(Integer, default=0)
+    generated_at = Column(DateTime(timezone=True), server_default=func.now())
+    source = Column(Text, default="elo_v1")
+
+
+class FighterWeightClassHistory(Base):
+    __tablename__ = "fighter_weight_class_history"
+
+    id = Column(Integer, primary_key=True)
+    fighter_name = Column(Text, nullable=False)
+    normalized_name = Column(Text, index=True)
+    weight_class = Column(Text, nullable=False)
+    fights_count = Column(Integer, default=0)
+    first_seen = Column(DateTime(timezone=False))
+    last_seen = Column(DateTime(timezone=False))
+    inferred_from_fights = Column(Boolean, default=True, nullable=False)
+    confidence = Column(Float, default=0)
+    generated_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class SyncRun(Base):
+    __tablename__ = "sync_runs"
+
+    id = Column(Integer, primary_key=True)
+    source = Column(Text, nullable=False)
+    status = Column(Text, nullable=False)
+    started_at = Column(DateTime(timezone=True), server_default=func.now())
+    finished_at = Column(DateTime(timezone=True))
+    dry_run = Column(Boolean, default=False, nullable=False)
+    events_seen = Column(Integer, default=0)
+    fights_seen = Column(Integer, default=0)
+    fighters_seen = Column(Integer, default=0)
+    message = Column(Text)

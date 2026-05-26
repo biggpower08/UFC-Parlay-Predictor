@@ -151,11 +151,21 @@ def init_db(db_path=None) -> None:
                         round TEXT,
                         time TEXT,
                         source_hash TEXT UNIQUE,
+                        event_date DATE,
+                        weight_class TEXT,
+                        source TEXT DEFAULT 'local_csv',
+                        source_url TEXT,
+                        scraped_at TIMESTAMPTZ,
                         created_at TIMESTAMPTZ DEFAULT now()
                     )
                     """
                 )
             )
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS event_date DATE"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS weight_class TEXT"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'local_csv'"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS source_url TEXT"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS scraped_at TIMESTAMPTZ"))
             conn.execute(
                 text(
                     """
@@ -196,9 +206,103 @@ def init_db(db_path=None) -> None:
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_fighter_2_event ON fights (fighter_2, event)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_event_created_at ON fights (event, created_at)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_created_at ON fights (created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_weight_class ON fights (weight_class)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_fighter_a_created_at ON predictions (fighter_a, created_at)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_fighter_b_created_at ON predictions (fighter_b, created_at)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_created_at ON predictions (created_at)"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS events (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL UNIQUE,
+                        event_date DATE,
+                        location TEXT,
+                        source TEXT NOT NULL DEFAULT 'ufcstats',
+                        source_url TEXT,
+                        source_hash TEXT UNIQUE,
+                        scraped_at TIMESTAMPTZ,
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_events_event_date ON events (event_date)"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fighter_rankings (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        fighter_name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL,
+                        ranking_type TEXT NOT NULL,
+                        weight_class TEXT,
+                        rank INTEGER NOT NULL,
+                        elo DOUBLE PRECISION NOT NULL,
+                        peak_elo DOUBLE PRECISION,
+                        fights_count INTEGER DEFAULT 0,
+                        wins INTEGER DEFAULT 0,
+                        losses INTEGER DEFAULT 0,
+                        generated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        source TEXT NOT NULL DEFAULT 'elo_v1'
+                    )
+                    """
+                )
+            )
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_rankings_type_rank ON fighter_rankings (ranking_type, rank)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_rankings_weight_class ON fighter_rankings (weight_class)"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fighter_weight_class_history (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        fighter_name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL,
+                        weight_class TEXT NOT NULL,
+                        fights_count INTEGER DEFAULT 0,
+                        first_seen DATE,
+                        last_seen DATE,
+                        inferred_from_fights BOOLEAN NOT NULL DEFAULT true,
+                        confidence DOUBLE PRECISION DEFAULT 0,
+                        generated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS sync_runs (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        source TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        finished_at TIMESTAMPTZ,
+                        dry_run BOOLEAN NOT NULL DEFAULT false,
+                        events_seen INTEGER DEFAULT 0,
+                        fights_seen INTEGER DEFAULT 0,
+                        fighters_seen INTEGER DEFAULT 0,
+                        message TEXT
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS scraper_sources (
+                        source TEXT PRIMARY KEY,
+                        base_url TEXT NOT NULL,
+                        enabled BOOLEAN NOT NULL DEFAULT true,
+                        last_success_at TIMESTAMPTZ,
+                        last_error TEXT,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
         return
 
     with connect(db_path) as conn:
@@ -238,10 +342,28 @@ def init_db(db_path=None) -> None:
                 result TEXT,
                 method TEXT,
                 round TEXT,
-                time TEXT
+                time TEXT,
+                source_hash TEXT UNIQUE,
+                event_date TEXT,
+                weight_class TEXT,
+                source TEXT DEFAULT 'local_csv',
+                source_url TEXT,
+                scraped_at TEXT
             )
             """
         )
+        for stmt in (
+            "ALTER TABLE fights ADD COLUMN source_hash TEXT",
+            "ALTER TABLE fights ADD COLUMN event_date TEXT",
+            "ALTER TABLE fights ADD COLUMN weight_class TEXT",
+            "ALTER TABLE fights ADD COLUMN source TEXT DEFAULT 'local_csv'",
+            "ALTER TABLE fights ADD COLUMN source_url TEXT",
+            "ALTER TABLE fights ADD COLUMN scraped_at TEXT",
+        ):
+            try:
+                conn.execute(stmt)
+            except sqlite3.OperationalError:
+                pass
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS fighter_elo_history (
@@ -257,4 +379,86 @@ def init_db(db_path=None) -> None:
         )
         conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_normalized_name ON fighter_elo_history (normalized_name)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL UNIQUE,
+                event_date TEXT,
+                location TEXT,
+                source TEXT NOT NULL DEFAULT 'ufcstats',
+                source_url TEXT,
+                source_hash TEXT UNIQUE,
+                scraped_at TEXT,
+                created_at TEXT,
+                updated_at TEXT
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_events_event_date ON events (event_date)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fighter_rankings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fighter_name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL,
+                ranking_type TEXT NOT NULL,
+                weight_class TEXT,
+                rank INTEGER NOT NULL,
+                elo REAL NOT NULL,
+                peak_elo REAL,
+                fights_count INTEGER DEFAULT 0,
+                wins INTEGER DEFAULT 0,
+                losses INTEGER DEFAULT 0,
+                generated_at TEXT,
+                source TEXT NOT NULL DEFAULT 'elo_v1'
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_rankings_type_rank ON fighter_rankings (ranking_type, rank)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fighter_weight_class_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fighter_name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL,
+                weight_class TEXT NOT NULL,
+                fights_count INTEGER DEFAULT 0,
+                first_seen TEXT,
+                last_seen TEXT,
+                inferred_from_fights INTEGER NOT NULL DEFAULT 1,
+                confidence REAL DEFAULT 0,
+                generated_at TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sync_runs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source TEXT NOT NULL,
+                status TEXT NOT NULL,
+                started_at TEXT,
+                finished_at TEXT,
+                dry_run INTEGER NOT NULL DEFAULT 0,
+                events_seen INTEGER DEFAULT 0,
+                fights_seen INTEGER DEFAULT 0,
+                fighters_seen INTEGER DEFAULT 0,
+                message TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS scraper_sources (
+                source TEXT PRIMARY KEY,
+                base_url TEXT NOT NULL,
+                enabled INTEGER NOT NULL DEFAULT 1,
+                last_success_at TEXT,
+                last_error TEXT,
+                updated_at TEXT
+            )
+            """
+        )
         conn.commit()

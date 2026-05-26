@@ -20,6 +20,8 @@ from ufc_predictor.db.repository import resolve_name, save_prediction, search_fi
 from ufc_predictor.feedback.feedback_handler import save_feedback
 from ufc_predictor.models.sklearn.predictor import model_available
 from ufc_predictor.pipeline import run_prediction
+from ufc_predictor.rankings.generator import query_elo_history, query_rankings
+from ufc_predictor.utils.helpers import normalize_name
 from ufc_predictor.utils.logger import get_logger
 from ufc_predictor.utils.weight_classes import detect_weight_class, same_weight_class
 
@@ -150,6 +152,32 @@ def fighters_resolve(q: str):
         raise HTTPException(status_code=500, detail=f"Fighter resolve failed: {exc}") from exc
     finally:
         _log_timing("fighters.resolve", start, query=q)
+
+
+@app.get("/api/rankings")
+@app.get("/rankings")
+def rankings(type: str = "overall_current_elo", weight_class: str | None = None, limit: int = 50):
+    start = time.perf_counter()
+    try:
+        return {"rankings": _clean(query_rankings(type, weight_class=weight_class, limit=limit))}
+    except Exception as exc:
+        logger.exception("Rankings query failed type=%s weight_class=%s", type, weight_class)
+        raise HTTPException(status_code=500, detail=f"Rankings query failed: {exc}") from exc
+    finally:
+        _log_timing("rankings.query", start, type=type, weight_class=weight_class, limit=limit)
+
+
+@app.get("/api/fighters/{fighter_key}/elo-history")
+@app.get("/fighters/{fighter_key}/elo-history")
+def fighter_elo_history(fighter_key: str, limit: int = 100):
+    start = time.perf_counter()
+    normalized = _resolve_fighter_history_key(fighter_key)
+    if not normalized:
+        raise HTTPException(status_code=404, detail="Fighter not found")
+    try:
+        return {"fighter": normalized, "elo_history": _clean(query_elo_history(normalized, limit=limit))}
+    finally:
+        _log_timing("fighters.elo_history", start, fighter=fighter_key, limit=limit)
 
 
 @app.post("/api/predict")
@@ -309,6 +337,29 @@ def _database_ready() -> bool:
         return False
     finally:
         _log_timing("health.database", start)
+
+
+def _resolve_fighter_history_key(value: str) -> str | None:
+    normalized = normalize_name(value)
+    try:
+        with get_engine().begin() as conn:
+            row = conn.execute(
+                text(
+                    """
+                    select normalized_name
+                    from fighters
+                    where normalized_name = :normalized
+                       or lower(cast(id as text)) = lower(:raw)
+                    limit 1
+                    """
+                ),
+                {"normalized": normalized, "raw": value},
+            ).mappings().fetchone()
+        if row:
+            return row["normalized_name"]
+    except Exception:
+        logger.exception("Fighter history key lookup failed value=%s", value)
+    return normalized or None
 
 
 def _timed_call(label: str, func, *args, **kwargs):
