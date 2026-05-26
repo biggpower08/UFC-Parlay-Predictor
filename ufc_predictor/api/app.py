@@ -47,6 +47,7 @@ class PredictRequest(BaseModel):
     confirmed_a: bool = False
     confirmed_b: bool = False
     allow_cross_division: bool = False
+    debug: bool = False
 
 
 class FeedbackRequest(BaseModel):
@@ -209,6 +210,8 @@ def predict(request: PredictRequest):
             "summary": summary,
         }
     )
+    if not request.debug:
+        payload["prediction"].pop("diagnostics", None)
     prediction_id = _timed_call(
         "predict.save_prediction",
         save_prediction,

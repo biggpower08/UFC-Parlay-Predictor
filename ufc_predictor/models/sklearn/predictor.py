@@ -112,12 +112,24 @@ def predict_matchup(fighter_a_row, fighter_b_row, note_flags_a=None, note_flags_
         return None
     pipeline = bundle["pipeline"]
     feats = build_matchup_features(fighter_a_row, fighter_b_row, note_flags_a, note_flags_b)
+    expected_features = bundle.get("feature_names") or FEATURE_NAMES
+    missing_features = [name for name in expected_features if name not in feats]
+    extra_features = [name for name in feats if name not in expected_features]
     X = features_to_vector(feats).reshape(1, -1)
     prob_a = float(pipeline.predict_proba(X)[0][1])
     return {
         "prob_a_wins": prob_a,
         "prob_b_wins": 1 - prob_a,
         "features": feats,
+        "diagnostics": {
+            "expected_features": list(expected_features),
+            "actual_features": list(FEATURE_NAMES),
+            "missing_features": missing_features,
+            "extra_features": extra_features,
+            "elo_features_present": all(name in feats for name in ("delta_elo", "elo_expected_a")),
+            "delta_elo": feats.get("delta_elo"),
+            "elo_expected_a": feats.get("elo_expected_a"),
+        },
     }
 
 

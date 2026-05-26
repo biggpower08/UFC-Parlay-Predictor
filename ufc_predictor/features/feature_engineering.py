@@ -121,11 +121,15 @@ def extract_stats(fighter_row):
     name = fighter_row.get(name_col, "Unknown")
     elo = safe_float(fighter_row.get("elo", get_elo_for_row(fighter_row)), settings.ELO_INITIAL)
     elo_fights_count = int(safe_float(fighter_row.get("elo_fights_count"), 0))
-    elo_source = str(
-        fighter_row.get("elo_source")
-        or ("computed" if elo_fights_count > 0 or elo != settings.ELO_INITIAL else "baseline")
-    )
-    elo_available = elo_source == "computed" and (elo_fights_count > 0 or elo != settings.ELO_INITIAL)
+    elo_source_raw = str(fighter_row.get("elo_source") or "").strip().lower()
+    has_real_elo_value = elo != settings.ELO_INITIAL
+    has_elo_history_marker = elo_fights_count > 0
+    if elo_source_raw == "computed" or has_real_elo_value or has_elo_history_marker:
+        elo_source = "computed"
+        elo_available = True
+    else:
+        elo_source = "baseline"
+        elo_available = False
 
     return {
         "Name": name,
