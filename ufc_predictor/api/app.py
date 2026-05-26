@@ -20,6 +20,7 @@ from ufc_predictor.db.repository import resolve_name, save_prediction, search_fi
 from ufc_predictor.feedback.feedback_handler import save_feedback
 from ufc_predictor.models.sklearn.predictor import model_available
 from ufc_predictor.pipeline import run_prediction
+from ufc_predictor.data.sync import get_sync_status
 from ufc_predictor.rankings.generator import query_elo_history, query_rankings
 from ufc_predictor.utils.helpers import normalize_name
 from ufc_predictor.utils.logger import get_logger
@@ -178,6 +179,18 @@ def fighter_elo_history(fighter_key: str, limit: int = 100):
         return {"fighter": normalized, "elo_history": _clean(query_elo_history(normalized, limit=limit))}
     finally:
         _log_timing("fighters.elo_history", start, fighter=fighter_key, limit=limit)
+
+
+@app.get("/api/internal/sync/status")
+def internal_sync_status(source: str = "ufcstats"):
+    start = time.perf_counter()
+    try:
+        return get_sync_status(source)
+    except Exception as exc:
+        logger.exception("Sync status query failed source=%s", source)
+        raise HTTPException(status_code=500, detail=f"Sync status query failed: {exc}") from exc
+    finally:
+        _log_timing("sync.status", start, source=source)
 
 
 @app.post("/api/predict")

@@ -297,8 +297,30 @@ def init_db(db_path=None) -> None:
                         base_url TEXT NOT NULL,
                         enabled BOOLEAN NOT NULL DEFAULT true,
                         last_success_at TIMESTAMPTZ,
+                        last_failed_at TIMESTAMPTZ,
                         last_error TEXT,
+                        challenge_detected BOOLEAN NOT NULL DEFAULT false,
+                        consecutive_failures INTEGER NOT NULL DEFAULT 0,
+                        last_status_code INTEGER,
+                        average_fetch_ms DOUBLE PRECISION,
                         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS last_failed_at TIMESTAMPTZ"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS challenge_detected BOOLEAN NOT NULL DEFAULT false"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS consecutive_failures INTEGER NOT NULL DEFAULT 0"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS last_status_code INTEGER"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS average_fetch_ms DOUBLE PRECISION"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS sync_locks (
+                        lock_name TEXT PRIMARY KEY,
+                        owner TEXT NOT NULL,
+                        started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        expires_at TIMESTAMPTZ NOT NULL
                     )
                     """
                 )
@@ -456,8 +478,34 @@ def init_db(db_path=None) -> None:
                 base_url TEXT NOT NULL,
                 enabled INTEGER NOT NULL DEFAULT 1,
                 last_success_at TEXT,
+                last_failed_at TEXT,
                 last_error TEXT,
+                challenge_detected INTEGER NOT NULL DEFAULT 0,
+                consecutive_failures INTEGER NOT NULL DEFAULT 0,
+                last_status_code INTEGER,
+                average_fetch_ms REAL,
                 updated_at TEXT
+            )
+            """
+        )
+        for stmt in (
+            "ALTER TABLE scraper_sources ADD COLUMN last_failed_at TEXT",
+            "ALTER TABLE scraper_sources ADD COLUMN challenge_detected INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE scraper_sources ADD COLUMN consecutive_failures INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE scraper_sources ADD COLUMN last_status_code INTEGER",
+            "ALTER TABLE scraper_sources ADD COLUMN average_fetch_ms REAL",
+        ):
+            try:
+                conn.execute(stmt)
+            except sqlite3.OperationalError:
+                pass
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sync_locks (
+                lock_name TEXT PRIMARY KEY,
+                owner TEXT NOT NULL,
+                started_at TEXT NOT NULL,
+                expires_at TEXT NOT NULL
             )
             """
         )

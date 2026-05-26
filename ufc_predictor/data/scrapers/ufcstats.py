@@ -8,24 +8,20 @@ so sync jobs do not hammer UFCStats during repeated local tests.
 from __future__ import annotations
 
 import hashlib
-import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
-from urllib.parse import urlparse
 
-import httpx
 from bs4 import BeautifulSoup
 
 from ufc_predictor.config import settings
+from ufc_predictor.data.fetchers.errors import ParseError
+from ufc_predictor.data.fetchers.playwright_fetcher import PlaywrightFetcher
+from ufc_predictor.data.fetchers.requests_fetcher import RequestsFetcher
 from ufc_predictor.utils.helpers import normalize_name
-from ufc_predictor.utils.logger import get_logger
-
-logger = get_logger(__name__)
 
 BASE_URL = "http://ufcstats.com"
 COMPLETED_EVENTS_URL = f"{BASE_URL}/statistics/events/completed?page=all"
-USER_AGENT = "UFC-Predictor/2.0 (+https://github.com/biggpower08/UFC-Parlay-Predictor)"
+USER_AGENT = settings.SCRAPER_USER_AGENT
 
 
 @dataclass(frozen=True)
@@ -94,44 +90,15 @@ class ScrapedFighterProfile:
 class UFCStatsClient:
     def __init__(
         self,
-        timeout: float = 15.0,
-        retries: int = 2,
-        sleep_seconds: float = 0.75,
-        cache_dir: Path | None = None,
+        fetcher=None,
+        fetcher_name: str | None = None,
+        cache_only: bool = False,
         force_refresh: bool = False,
     ) -> None:
-        self.timeout = timeout
-        self.retries = retries
-        self.sleep_seconds = sleep_seconds
-        self.cache_dir = cache_dir or settings.SCRAPE_CACHE_DIR / "http" / "ufcstats"
-        self.force_refresh = force_refresh
-        self.headers = {"User-Agent": USER_AGENT}
+        self.fetcher = fetcher or build_fetcher(fetcher_name or settings.SCRAPER_FETCHER, cache_only=cache_only, force_refresh=force_refresh)
 
     def fetch(self, url: str) -> str:
-        cache_path = self._cache_path(url)
-        if cache_path.is_file() and not self.force_refresh:
-            text = cache_path.read_text(encoding="utf-8")
-            if not _looks_like_browser_challenge(text):
-                return text
-
-        last_error: Exception | None = None
-        for attempt in range(1, self.retries + 2):
-            try:
-                with httpx.Client(timeout=self.timeout, headers=self.headers, follow_redirects=True) as client:
-                    response = client.get(url)
-                    response.raise_for_status()
-                text = response.text
-                if _looks_like_browser_challenge(text):
-                    raise RuntimeError("UFCStats returned a browser JavaScript challenge instead of scrapeable HTML")
-                cache_path.parent.mkdir(parents=True, exist_ok=True)
-                cache_path.write_text(text, encoding="utf-8")
-                time.sleep(self.sleep_seconds)
-                return text
-            except Exception as exc:  # pragma: no cover - network failures vary
-                last_error = exc
-                logger.warning("UFCStats fetch failed url=%s attempt=%s error=%s", url, attempt, exc)
-                time.sleep(min(5.0, self.sleep_seconds * attempt))
-        raise RuntimeError(f"Could not fetch UFCStats page {url}: {last_error}")
+        return self.fetcher.fetch(url).text
 
     def fetch_completed_events(self, limit: int | None = None) -> list[ScrapedEvent]:
         events = parse_completed_events(self.fetch(COMPLETED_EVENTS_URL))
@@ -140,11 +107,13 @@ class UFCStatsClient:
     def fetch_event_fights(self, event: ScrapedEvent) -> list[ScrapedFight]:
         return parse_event_fights(self.fetch(event.url), event)
 
-    def _cache_path(self, url: str) -> Path:
-        parsed = urlparse(url)
-        slug = hashlib.sha256(url.encode("utf-8")).hexdigest()
-        suffix = Path(parsed.path).name or "index"
-        return self.cache_dir / f"{suffix}-{slug}.html"
+
+def build_fetcher(name: str, cache_only: bool = False, force_refresh: bool = False):
+    if name == "requests":
+        return RequestsFetcher(cache_only=cache_only, force_refresh=force_refresh)
+    if name == "playwright":
+        return PlaywrightFetcher(cache_only=cache_only, force_refresh=force_refresh)
+    raise ValueError(f"Unknown fetcher: {name}")
 
 
 def parse_completed_events(html: str) -> list[ScrapedEvent]:
@@ -171,6 +140,8 @@ def parse_completed_events(html: str) -> list[ScrapedEvent]:
     # Fallback for older/simple UFCStats markup.
     for link in soup.select("a.b-link.b-link_style_black[href*='/event-details/']"):
         events.append(ScrapedEvent(name=_clean_text(link.get_text(" ", strip=True)), url=link["href"].strip()))
+    if not events:
+        raise ParseError("No UFCStats events found in response")
     return events
 
 
@@ -206,6 +177,8 @@ def parse_event_fights(html: str, event: ScrapedEvent) -> list[ScrapedFight]:
                 source_url=row.get("data-link") or event.url,
             )
         )
+    if not fights:
+        raise ParseError(f"No fights found for event {event.name}")
     return fights
 
 
@@ -274,11 +247,6 @@ def _parse_date(value: str | None) -> str | None:
 
 def _clean_text(value: str | None) -> str:
     return " ".join(str(value or "").replace("\xa0", " ").split())
-
-
-def _looks_like_browser_challenge(html: str) -> bool:
-    text = html.lower()
-    return "checking your browser" in text or "requires javascript" in text
 
 
 def utc_now() -> str:

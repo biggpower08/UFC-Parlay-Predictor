@@ -175,3 +175,28 @@ class SyncRun(Base):
     fights_seen = Column(Integer, default=0)
     fighters_seen = Column(Integer, default=0)
     message = Column(Text)
+
+
+class ScraperSource(Base):
+    __tablename__ = "scraper_sources"
+
+    source = Column(Text, primary_key=True)
+    base_url = Column(Text, nullable=False)
+    enabled = Column(Boolean, default=True, nullable=False)
+    last_success_at = Column(DateTime(timezone=True))
+    last_failed_at = Column(DateTime(timezone=True))
+    last_error = Column(Text)
+    challenge_detected = Column(Boolean, default=False, nullable=False)
+    consecutive_failures = Column(Integer, default=0, nullable=False)
+    last_status_code = Column(Integer)
+    average_fetch_ms = Column(Float)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class SyncLock(Base):
+    __tablename__ = "sync_locks"
+
+    lock_name = Column(Text, primary_key=True)
+    owner = Column(Text, nullable=False)
+    started_at = Column(DateTime(timezone=True), server_default=func.now())
+    expires_at = Column(DateTime(timezone=True), nullable=False)

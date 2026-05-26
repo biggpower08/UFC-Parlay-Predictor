@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-import json
-from datetime import datetime, timezone
+import socket
+import uuid
+from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 from sqlalchemy import text
@@ -19,6 +21,10 @@ logger = get_logger(__name__)
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def utc_now_dt() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 def upsert_events(events, dry_run: bool = False) -> int:
@@ -309,6 +315,158 @@ def record_sync_run(source: str, status: str, dry_run: bool, counts: dict, messa
         conn.commit()
 
 
+def update_source_health(
+    source: str,
+    base_url: str,
+    status: str,
+    error: str = "",
+    challenged: bool = False,
+    status_code: int | None = None,
+    fetch_ms: float | None = None,
+) -> None:
+    init_db()
+    now = utc_now()
+    success = status == "healthy"
+    payload = {
+        "source": source,
+        "base_url": base_url,
+        "enabled": True,
+        "last_success_at": now if success else None,
+        "last_failed_at": None if success else now,
+        "last_error": None if success else error[:2000],
+        "challenge_detected": challenged,
+        "last_status_code": status_code,
+        "average_fetch_ms": fetch_ms,
+        "updated_at": now,
+    }
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    insert into scraper_sources
+                        (source, base_url, enabled, last_success_at, last_failed_at, last_error,
+                         challenge_detected, consecutive_failures, last_status_code, average_fetch_ms, updated_at)
+                    values
+                        (:source, :base_url, :enabled, :last_success_at, :last_failed_at, :last_error,
+                         :challenge_detected, case when :last_failed_at is null then 0 else 1 end,
+                         :last_status_code, :average_fetch_ms, :updated_at)
+                    on conflict (source) do update set
+                        base_url = excluded.base_url,
+                        last_success_at = coalesce(excluded.last_success_at, scraper_sources.last_success_at),
+                        last_failed_at = coalesce(excluded.last_failed_at, scraper_sources.last_failed_at),
+                        last_error = excluded.last_error,
+                        challenge_detected = excluded.challenge_detected,
+                        consecutive_failures = case
+                            when excluded.last_failed_at is null then 0
+                            else scraper_sources.consecutive_failures + 1
+                        end,
+                        last_status_code = excluded.last_status_code,
+                        average_fetch_ms = excluded.average_fetch_ms,
+                        updated_at = excluded.updated_at
+                    """
+                ),
+                payload,
+            )
+        return
+    with connect() as conn:
+        existing = conn.execute("select consecutive_failures from scraper_sources where source = ?", (source,)).fetchone()
+        failures = 0 if success else ((existing["consecutive_failures"] if existing else 0) + 1)
+        conn.execute(
+            """
+            insert or replace into scraper_sources
+                (source, base_url, enabled, last_success_at, last_failed_at, last_error,
+                 challenge_detected, consecutive_failures, last_status_code, average_fetch_ms, updated_at)
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                source,
+                base_url,
+                1,
+                payload["last_success_at"] if success else (None if not existing else conn.execute("select last_success_at from scraper_sources where source = ?", (source,)).fetchone()["last_success_at"]),
+                payload["last_failed_at"],
+                payload["last_error"],
+                1 if challenged else 0,
+                failures,
+                status_code,
+                fetch_ms,
+                now,
+            ),
+        )
+        conn.commit()
+
+
+def get_sync_status(source: str = "ufcstats") -> dict:
+    init_db()
+    if using_postgres():
+        with get_engine().begin() as conn:
+            source_row = conn.execute(text("select * from scraper_sources where source = :source"), {"source": source}).mappings().fetchone()
+            last_run = conn.execute(text("select * from sync_runs order by started_at desc limit 1")).mappings().fetchone()
+            last_success = conn.execute(text("select * from sync_runs where status in ('success', 'succeeded') order by started_at desc limit 1")).mappings().fetchone()
+            rankings = conn.execute(text("select max(generated_at) as generated_at from fighter_rankings")).mappings().fetchone()
+            elo = conn.execute(text("select max(computed_at) as computed_at from fighter_elo_history")).mappings().fetchone()
+        return _status_payload(source_row, last_run, last_success, rankings, elo)
+    with connect() as conn:
+        source_row = conn.execute("select * from scraper_sources where source = ?", (source,)).fetchone()
+        last_run = conn.execute("select * from sync_runs order by started_at desc limit 1").fetchone()
+        last_success = conn.execute("select * from sync_runs where status in ('success', 'succeeded') order by started_at desc limit 1").fetchone()
+        rankings = conn.execute("select max(generated_at) as generated_at from fighter_rankings").fetchone()
+        elo = conn.execute("select max(computed_at) as computed_at from fighter_elo_history").fetchone()
+    return _status_payload(source_row, last_run, last_success, rankings, elo)
+
+
+@contextmanager
+def sync_lock(lock_name: str = "ufcstats_sync", ttl_minutes: int = 30, dry_run: bool = False):
+    if dry_run:
+        yield {"locked": False, "owner": "dry-run"}
+        return
+    owner = f"{socket.gethostname()}-{uuid.uuid4()}"
+    if not acquire_sync_lock(lock_name, owner, ttl_minutes):
+        raise RuntimeError(f"Sync lock is already held: {lock_name}")
+    try:
+        yield {"locked": True, "owner": owner}
+    finally:
+        release_sync_lock(lock_name, owner)
+
+
+def acquire_sync_lock(lock_name: str, owner: str, ttl_minutes: int = 30) -> bool:
+    init_db()
+    now = utc_now_dt()
+    expires = now + timedelta(minutes=ttl_minutes)
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(text("delete from sync_locks where expires_at < now()"))
+            try:
+                conn.execute(
+                    text("insert into sync_locks (lock_name, owner, started_at, expires_at) values (:lock_name, :owner, :started_at, :expires_at)"),
+                    {"lock_name": lock_name, "owner": owner, "started_at": now, "expires_at": expires},
+                )
+                return True
+            except Exception:
+                return False
+    with connect() as conn:
+        conn.execute("delete from sync_locks where expires_at < ?", (now.isoformat(),))
+        try:
+            conn.execute(
+                "insert into sync_locks (lock_name, owner, started_at, expires_at) values (?, ?, ?, ?)",
+                (lock_name, owner, now.isoformat(), expires.isoformat()),
+            )
+            conn.commit()
+            return True
+        except Exception:
+            return False
+
+
+def release_sync_lock(lock_name: str, owner: str) -> None:
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(text("delete from sync_locks where lock_name = :lock_name and owner = :owner"), {"lock_name": lock_name, "owner": owner})
+        return
+    with connect() as conn:
+        conn.execute("delete from sync_locks where lock_name = ? and owner = ?", (lock_name, owner))
+        conn.commit()
+
+
 def load_fights_table() -> pd.DataFrame:
     init_db()
     if using_postgres():
@@ -317,3 +475,25 @@ def load_fights_table() -> pd.DataFrame:
         return pd.DataFrame([dict(row) for row in rows])
     with connect() as conn:
         return pd.read_sql_query("select * from fights", conn)
+
+
+def _status_payload(source_row, last_run, last_success, rankings, elo) -> dict:
+    def as_dict(row):
+        return dict(row) if row is not None else None
+
+    source = as_dict(source_row)
+    if source and source.get("challenge_detected"):
+        source["status"] = "challenged"
+    elif source and source.get("last_success_at"):
+        source["status"] = "healthy"
+    elif source and source.get("last_failed_at"):
+        source["status"] = "unavailable"
+    else:
+        source = source or {"status": "unknown"}
+    return {
+        "source": source,
+        "last_sync_run": as_dict(last_run),
+        "last_successful_sync": as_dict(last_success),
+        "last_rankings_generated_at": (dict(rankings).get("generated_at") if rankings else None),
+        "last_elo_computed_at": (dict(elo).get("computed_at") if elo else None),
+    }

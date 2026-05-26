@@ -73,6 +73,18 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 USE_LLM_ANALYST = os.getenv("USE_LLM_ANALYST", "false").lower() in {"1", "true", "yes", "on"}
 
+# Scraper / sync
+ENABLE_LIVE_SYNC = os.getenv("ENABLE_LIVE_SYNC", "false").lower() in {"1", "true", "yes", "on"}
+SYNC_SECRET = os.getenv("SYNC_SECRET", "")
+SCRAPER_FETCHER = os.getenv("SCRAPER_FETCHER", "requests")
+SCRAPER_RATE_LIMIT_SECONDS = float(os.getenv("SCRAPER_RATE_LIMIT_SECONDS", "0.75"))
+SCRAPER_CACHE_DIR = Path(os.getenv("SCRAPER_CACHE_DIR", SCRAPE_CACHE_DIR / "http"))
+SCRAPER_USER_AGENT = os.getenv(
+    "SCRAPER_USER_AGENT",
+    "UFC-Predictor/2.0 (+https://github.com/biggpower08/UFC-Parlay-Predictor)",
+)
+SCRAPER_MAX_RESPONSE_BYTES = int(os.getenv("SCRAPER_MAX_RESPONSE_BYTES", "3000000"))
+
 # Logging
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
