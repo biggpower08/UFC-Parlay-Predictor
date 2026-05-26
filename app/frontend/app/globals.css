@@ -17,20 +17,6 @@ body {
     linear-gradient(135deg, #071019 0%, #101820 52%, #190c21 100%);
 }
 
-#boot-fallback {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  display: grid;
-  place-items: center;
-  color: #24f6ff;
-  background: #071019;
-}
-
-#boot-fallback p {
-  padding: 16px;
-}
-
 button,
 input {
   font: inherit;

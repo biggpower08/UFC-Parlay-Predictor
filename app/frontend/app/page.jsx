@@ -81,9 +81,12 @@ export default function App() {
   const [fighterMeta, setFighterMeta] = useState({ a: null, b: null });
   const [allowCrossDivision, setAllowCrossDivision] = useState(false);
   const [searching, setSearching] = useState({ a: false, b: false });
+  const [activeSearchSlot, setActiveSearchSlot] = useState(null);
   const debouncedFighterA = useDebouncedValue(fighterA, 300);
   const debouncedFighterB = useDebouncedValue(fighterB, 300);
   const latestSearch = useRef({ a: "", b: "" });
+  const userEditedSearch = useRef({ a: false, b: false });
+  const appRef = useRef(null);
 
   const searchFighters = useCallback(async (slot, value) => {
     const trimmed = value.trim();
@@ -106,6 +109,12 @@ export default function App() {
 
   useEffect(() => {
     checkHealth();
+    const closeSearchOnOutsideClick = (event) => {
+      if (!event.target.closest?.(".fighter-input")) {
+        setActiveSearchSlot(null);
+      }
+    };
+    document.addEventListener("pointerdown", closeSearchOnOutsideClick);
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .getRegistrations()
@@ -115,15 +124,20 @@ export default function App() {
     if ("caches" in window) {
       caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {});
     }
+    return () => document.removeEventListener("pointerdown", closeSearchOnOutsideClick);
   }, []);
 
   useEffect(() => {
-    searchFighters("a", debouncedFighterA);
-  }, [debouncedFighterA, searchFighters]);
+    if (activeSearchSlot === "a" && userEditedSearch.current.a && debouncedFighterA === fighterA) {
+      searchFighters("a", debouncedFighterA);
+    }
+  }, [activeSearchSlot, debouncedFighterA, fighterA, searchFighters]);
 
   useEffect(() => {
-    searchFighters("b", debouncedFighterB);
-  }, [debouncedFighterB, searchFighters]);
+    if (activeSearchSlot === "b" && userEditedSearch.current.b && debouncedFighterB === fighterB) {
+      searchFighters("b", debouncedFighterB);
+    }
+  }, [activeSearchSlot, debouncedFighterB, fighterB, searchFighters]);
 
   async function checkHealth(force = false) {
     try {
@@ -200,6 +214,7 @@ export default function App() {
       const best = data.candidates?.[0] || null;
       if (slot === "a") setFighterA(data.resolved_name);
       if (slot === "b") setFighterB(data.resolved_name);
+      setActiveSearchSlot(null);
       if (best) {
         setFighterMeta((current) => ({ ...current, [slot]: best }));
       }
@@ -222,8 +237,47 @@ export default function App() {
     if (picked) {
       setFighterMeta((current) => ({ ...current, [resolver.slot]: picked }));
     }
+    setActiveSearchSlot(null);
     setResolver(null);
     setMessage(`${name} selected. Press Predict again.`);
+  }
+
+  function closeSearch(slot) {
+    setActiveSearchSlot((current) => (current === slot ? null : current));
+  }
+
+  function pickFighter(slot, fighter) {
+    const name = fighter.name;
+    if (slot === "a") setFighterA(name);
+    if (slot === "b") setFighterB(name);
+    userEditedSearch.current[slot] = false;
+    latestSearch.current[slot] = "";
+    setFighterMeta((current) => ({ ...current, [slot]: fighter || null }));
+    setSuggestions((current) => ({ ...current, [slot]: [] }));
+    closeSearch(slot);
+  }
+
+  function handleFighterInput(slot, value) {
+    if (slot === "a") setFighterA(value);
+    if (slot === "b") setFighterB(value);
+    userEditedSearch.current[slot] = true;
+    setActiveSearchSlot(slot);
+  }
+
+  function handleFighterKeyDown(slot, event) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const first = suggestions[slot]?.[0];
+    if (first && activeSearchSlot === slot) {
+      pickFighter(slot, first);
+      return;
+    }
+    closeSearch(slot);
+  }
+
+  function handleFighterBlur(slot, event) {
+    if (event.currentTarget.contains(event.relatedTarget)) return;
+    closeSearch(slot);
   }
 
   function knownWeightClassMismatch() {
@@ -260,7 +314,7 @@ export default function App() {
   }, [result]);
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" ref={appRef}>
       <header className="topbar">
         <div>
           <p className="eyebrow">Local AI Fight Lab</p>
@@ -278,33 +332,29 @@ export default function App() {
         <FighterInput
           label="Fighter A"
           value={fighterA}
-          onChange={(v) => {
-            setFighterA(v);
+          onChange={(v) => handleFighterInput("a", v)}
+          onFocus={() => {
+            if (userEditedSearch.current.a && suggestions.a.length > 0) setActiveSearchSlot("a");
           }}
-          suggestions={suggestions.a}
+          onBlur={(event) => handleFighterBlur("a", event)}
+          onKeyDown={(event) => handleFighterKeyDown("a", event)}
+          suggestions={activeSearchSlot === "a" ? suggestions.a : []}
           searching={searching.a}
-          onPick={(name) => {
-            const picked = suggestions.a.find((fighter) => fighter.name === name);
-            setFighterA(name);
-            setFighterMeta((current) => ({ ...current, a: picked || null }));
-            setSuggestions((s) => ({ ...s, a: [] }));
-          }}
+          onPick={(fighter) => pickFighter("a", fighter)}
         />
         <div className="versus">VS</div>
         <FighterInput
           label="Fighter B"
           value={fighterB}
-          onChange={(v) => {
-            setFighterB(v);
+          onChange={(v) => handleFighterInput("b", v)}
+          onFocus={() => {
+            if (userEditedSearch.current.b && suggestions.b.length > 0) setActiveSearchSlot("b");
           }}
-          suggestions={suggestions.b}
+          onBlur={(event) => handleFighterBlur("b", event)}
+          onKeyDown={(event) => handleFighterKeyDown("b", event)}
+          suggestions={activeSearchSlot === "b" ? suggestions.b : []}
           searching={searching.b}
-          onPick={(name) => {
-            const picked = suggestions.b.find((fighter) => fighter.name === name);
-            setFighterB(name);
-            setFighterMeta((current) => ({ ...current, b: picked || null }));
-            setSuggestions((s) => ({ ...s, b: [] }));
-          }}
+          onPick={(fighter) => pickFighter("b", fighter)}
         />
         <button className="predict-button" onClick={predict} disabled={loading || health?.prediction_ready === false}>
           {loading ? <RefreshCw className="spin" size={20} /> : <Activity size={20} />}
@@ -452,18 +502,28 @@ async function readApiError(response) {
   }
 }
 
-const FighterInput = memo(function FighterInput({ label, value, onChange, suggestions, searching, onPick }) {
+const FighterInput = memo(function FighterInput({
+  label,
+  value,
+  onChange,
+  onFocus,
+  onBlur,
+  onKeyDown,
+  suggestions,
+  searching,
+  onPick,
+}) {
   return (
-    <label className="fighter-input">
+    <label className="fighter-input" onBlur={onBlur}>
       <span>{label}</span>
       <div className="input-wrap">
         <Search size={18} />
-        <input value={value} onChange={(e) => onChange(e.target.value)} />
+        <input value={value} onChange={(e) => onChange(e.target.value)} onFocus={onFocus} onKeyDown={onKeyDown} />
       </div>
       {suggestions.length > 0 && (
         <div className="suggestions">
           {suggestions.map((fighter) => (
-            <button key={fighter.name} onClick={() => onPick(fighter.name)}>
+            <button key={fighter.name} type="button" onClick={() => onPick(fighter)}>
               <span>{fighter.name}</span>
               <small>{fighter.weight_class || `${fighter.wins ?? 0}-${fighter.losses ?? 0}`}</small>
             </button>

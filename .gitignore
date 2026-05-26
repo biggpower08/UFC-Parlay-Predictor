@@ -1,5 +1,6 @@
 __pycache__/
 *.pyc
+.pytest_cache/
 .next/
 .venv/
 .venv312/
@@ -14,6 +15,7 @@ app/frontend/out/
 app/frontend/node_modules/
 build/python_deps/
 ufc_predictor/data/processed/scrape_cache/
+ufc_predictor/static_app/
 *.log
 .env
 .env.local
