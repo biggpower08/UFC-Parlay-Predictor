@@ -10,6 +10,7 @@ def predict_ensemble(f1, f2, comparison: dict) -> dict:
     stats1, stats2 = comparison["stats1"], comparison["stats2"]
     name1, name2 = stats1["Name"], stats2["Name"]
     elo_prob = expected_score(stats1["Elo"], stats2["Elo"])
+    elo_available = bool(stats1.get("Elo Available") and stats2.get("Elo Available"))
 
     signals = {}
     sklearn_prediction = predict_matchup(f1, f2) if settings.USE_SKLEARN_MODEL else None
@@ -21,7 +22,7 @@ def predict_ensemble(f1, f2, comparison: dict) -> dict:
         }
 
     if settings.USE_ELO_FALLBACK:
-        signals["elo"] = {"prob_a": elo_prob, "available": True}
+        signals["elo"] = {"prob_a": elo_prob, "available": elo_available}
 
     if settings.USE_LLM_ANALYST:
         llm = analyze_matchup(
@@ -93,7 +94,10 @@ def _reasoning(name1, name2, prob_a, elo_prob, signals, comparison) -> str:
         top = signals["sklearn"].get("top_features") or []
         contrib = ", ".join(f"{n} ({v:+.2f})" for n, v in top) if top else "mixed features"
         parts.append(f"Sklearn signal {signals['sklearn']['prob_a']:.0%}; drivers: {contrib}.")
-    parts.append(f"Elo signal {elo_prob:.0%}.")
+    if signals.get("elo", {}).get("available"):
+        parts.append(f"Elo signal {elo_prob:.0%}.")
+    else:
+        parts.append("Elo signal unavailable; using starting baseline only.")
     if signals.get("llm", {}).get("available"):
         parts.append(f"Analyst signal: {signals['llm']['reasoning']}")
     else:

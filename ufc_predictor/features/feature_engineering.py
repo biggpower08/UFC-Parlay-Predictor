@@ -1,12 +1,14 @@
 """Master fighter table, stat extraction, and comparison logic."""
 
+from datetime import datetime, timezone
+
 import pandas as pd
 
 from ufc_predictor.config import settings
 from ufc_predictor.data_sources.fights import load_fights
 from ufc_predictor.db import repository
 from ufc_predictor.data_sources.rankings import division_point_dominance, p4p_rankings
-from ufc_predictor.models.elo.elo_engine import compute_elo_ratings, get_fighter_elo
+from ufc_predictor.models.elo.elo_engine import build_elo_fight_counts, compute_elo_ratings, get_fighter_elo
 from ufc_predictor.utils.helpers import (
     find_name_column,
     get_stat,
@@ -39,6 +41,7 @@ def get_elo_tables():
         "elo_ratings": elo_ratings,
         "peak_elo": peak_elo,
         "elo_by_search": elo_by_search,
+        "fight_counts": build_elo_fight_counts(fights_elo),
     }
     return _elo_cache
 
@@ -84,13 +87,19 @@ def build_master_df(force_refresh=False):
     elo_data = get_elo_tables()
     elo_by_search = elo_data["elo_by_search"]
     peak = elo_data["peak_elo"]
+    fight_counts = elo_data["fight_counts"]
     master["elo"] = master["_search_name"].map(elo_by_search).fillna(settings.ELO_INITIAL)
     master["peak_elo"] = master[name_col].map(
         lambda n: peak.get(n, elo_by_search.get(normalize_name(n), settings.ELO_INITIAL))
     )
+    master["elo_fights_count"] = master["_search_name"].map(fight_counts).fillna(0).astype(int)
+    master["elo_source"] = master["elo_fights_count"].map(lambda count: "computed" if int(count) > 0 else "baseline")
+    computed_at = datetime.now(timezone.utc).isoformat()
+    master["elo_computed_at"] = master["elo_source"].map(lambda source: None if source == "baseline" else computed_at)
 
     _master_cache = master
     repository.save_fighters_df(master, replace=True)
+    repository.replace_elo_history(elo_data["elo_ratings"], peak, settings.ELO_ENGINE_VERSION)
     return master.copy()
 
 
@@ -111,11 +120,21 @@ def extract_stats(fighter_row):
     name_col = find_name_column(fighter_row.to_frame().T)
     name = fighter_row.get(name_col, "Unknown")
     elo = safe_float(fighter_row.get("elo", get_elo_for_row(fighter_row)), settings.ELO_INITIAL)
+    elo_fights_count = int(safe_float(fighter_row.get("elo_fights_count"), 0))
+    elo_source = str(
+        fighter_row.get("elo_source")
+        or ("computed" if elo_fights_count > 0 or elo != settings.ELO_INITIAL else "baseline")
+    )
+    elo_available = elo_source == "computed" and (elo_fights_count > 0 or elo != settings.ELO_INITIAL)
 
     return {
         "Name": name,
         "Record": _format_record(fighter_row),
         "Elo": round(elo, 1),
+        "Elo Available": elo_available,
+        "Elo Source": elo_source,
+        "Elo Last Updated": _fmt_optional(fighter_row.get("elo_computed_at")),
+        "Elo Fights": elo_fights_count,
         "Peak Elo": round(safe_float(fighter_row.get("peak_elo"), elo), 1),
         "P4P Rank": _fmt_optional(fighter_row.get("rank_p4p")),
         "P4P Points": _fmt_optional(fighter_row.get("points_p4p")),
@@ -211,9 +230,9 @@ def compare_fighters(f1, f2):
 
 def _strengths_weaknesses(stats_self, stats_opp, style_self):
     strengths, weaknesses = [], []
-    if stats_self["Elo"] > stats_opp["Elo"] + 25:
+    if stats_self.get("Elo Available") and stats_opp.get("Elo Available") and stats_self["Elo"] > stats_opp["Elo"] + 25:
         strengths.append(f"Higher Elo ({stats_self['Elo']} vs {stats_opp['Elo']})")
-    elif stats_self["Elo"] < stats_opp["Elo"] - 25:
+    elif stats_self.get("Elo Available") and stats_opp.get("Elo Available") and stats_self["Elo"] < stats_opp["Elo"] - 25:
         weaknesses.append(f"Lower Elo ({stats_self['Elo']} vs {stats_opp['Elo']})")
     if stats_self["SLpM"] >= stats_opp["SLpM"] * 1.1:
         strengths.append("Higher SLpM")
@@ -227,7 +246,9 @@ def _strengths_weaknesses(stats_self, stats_opp, style_self):
 
 
 def _matchup_text(name1, name2, style1, style2, stats1, stats2):
+    elo_text_1 = stats1["Elo"] if stats1.get("Elo Available") else "baseline"
+    elo_text_2 = stats2["Elo"] if stats2.get("Elo Available") else "baseline"
     return (
-        f"{name1} ({style1['label']}, Elo {stats1['Elo']}) vs "
-        f"{name2} ({style2['label']}, Elo {stats2['Elo']})."
+        f"{name1} ({style1['label']}, Elo {elo_text_1}) vs "
+        f"{name2} ({style2['label']}, Elo {elo_text_2})."
     )

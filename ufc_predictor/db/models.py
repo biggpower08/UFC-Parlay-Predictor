@@ -36,6 +36,8 @@ class Fighter(Base):
     peak_elo = Column(Float, default=1000)
     elo_version = Column(Text, default="v1")
     elo_computed_at = Column(DateTime(timezone=True))
+    elo_fights_count = Column(Integer, default=0)
+    elo_source = Column(Text, default="baseline")
     weight_class = Column(Text)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 

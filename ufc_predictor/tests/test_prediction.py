@@ -33,6 +33,8 @@ class TestPredictionPipeline(unittest.TestCase):
         comp = compare_fighters(self.f1, self.f2)
         self.assertIn("stats1", comp)
         self.assertIn("Elo", comp["stats1"])
+        self.assertIn("Elo Available", comp["stats1"])
+        self.assertIn("Elo Source", comp["stats1"])
 
     def test_run_prediction(self):
         comp, pred, summary = run_prediction(self.f1, self.f2)

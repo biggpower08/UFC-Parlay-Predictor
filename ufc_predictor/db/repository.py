@@ -19,7 +19,7 @@ from ufc_predictor.utils.weight_classes import detect_weight_class
 
 
 FIGHTERS_TABLE = "fighters"
-INTEGER_COLUMNS = {"wins", "losses", "draws"}
+INTEGER_COLUMNS = {"wins", "losses", "draws", "elo_fights_count"}
 DATE_COLUMNS = {"date_of_birth"}
 FIGHTERS_CACHE_TTL_SECONDS = 60
 logger = get_logger(__name__)
@@ -81,7 +81,16 @@ def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
     if "elo_version" not in out.columns:
         out["elo_version"] = "v1"
     if "elo_computed_at" not in out.columns:
-        out["elo_computed_at"] = _utc_now()
+        out["elo_computed_at"] = None
+    if "elo_fights_count" not in out.columns:
+        out["elo_fights_count"] = 0
+    if "elo_source" not in out.columns:
+        out["elo_source"] = out.apply(
+            lambda row: "computed"
+            if safe_int(row.get("elo_fights_count")) > 0 or safe_float(row.get("elo"), settings.ELO_INITIAL) != settings.ELO_INITIAL
+            else "baseline",
+            axis=1,
+        )
     if "weight_class" not in out.columns:
         out["weight_class"] = out.apply(detect_weight_class, axis=1)
     settings.DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
@@ -162,7 +171,19 @@ def find_fighter_candidates(query: str, limit: int = 8) -> list[dict]:
     if not normalized:
         return []
     df = get_fighters_df()
-    for col in ("nickname", "wins", "losses", "draws", "stance", "weight_in_kg", "reach_in_cm", "elo"):
+    for col in (
+        "nickname",
+        "wins",
+        "losses",
+        "draws",
+        "stance",
+        "weight_in_kg",
+        "reach_in_cm",
+        "elo",
+        "elo_fights_count",
+        "elo_source",
+        "elo_computed_at",
+    ):
         if col not in df.columns:
             df[col] = None
     name_col = find_name_column(df)
@@ -198,6 +219,9 @@ def find_fighter_candidates(query: str, limit: int = 8) -> list[dict]:
         "weight_class",
         "reach_in_cm",
         "elo",
+        "elo_fights_count",
+        "elo_source",
+        "elo_computed_at",
         "_score",
         "_match_type",
     ]
@@ -295,18 +319,124 @@ def upsert_fighter(record: dict) -> pd.Series:
     return new_row.iloc[0]
 
 
-def update_elo_columns(elo_by_search: dict, peak_elo: dict | None = None, elo_version: str = "v1") -> None:
+def update_elo_columns(
+    elo_by_search: dict,
+    peak_elo: dict | None = None,
+    elo_version: str = "v1",
+    fight_counts: dict | None = None,
+    computed_at: str | None = None,
+) -> None:
     initialize_database()
     df = get_fighters_df()
     name_col = find_name_column(df)
     peak_elo = peak_elo or {}
+    fight_counts = fight_counts or {}
+    computed_at = computed_at or _utc_now()
     df["elo"] = df["normalized_name"].map(elo_by_search).fillna(settings.ELO_INITIAL)
     df["peak_elo"] = df[name_col].map(
         lambda n: peak_elo.get(n, elo_by_search.get(normalize_name(n), settings.ELO_INITIAL))
     )
+    df["elo_fights_count"] = df["normalized_name"].map(fight_counts).fillna(0).astype(int)
+    df["elo_source"] = df["elo_fights_count"].map(lambda count: "computed" if int(count) > 0 else "baseline")
     df["elo_version"] = elo_version
-    df["elo_computed_at"] = _utc_now()
+    df["elo_computed_at"] = df["elo_source"].map(lambda source: computed_at if source == "computed" else None)
     save_fighters_df(df, replace=True)
+    logger.info(
+        "Updated latest Elo columns fighters=%s computed=%s baseline=%s version=%s",
+        len(df),
+        int((df["elo_source"] == "computed").sum()),
+        int((df["elo_source"] == "baseline").sum()),
+        elo_version,
+    )
+
+
+def replace_elo_history(
+    elo_ratings: dict,
+    peak_elo: dict | None = None,
+    elo_version: str = "v1",
+    computed_at: str | None = None,
+) -> int:
+    """Replace the latest Elo snapshot for one engine version.
+
+    The table stores a rerunnable snapshot per Elo version, so refreshing the same
+    version deletes stale rows before inserting the newly computed ratings.
+    """
+    init_db()
+    peak_elo = peak_elo or {}
+    computed_at = computed_at or _utc_now()
+    rows = [
+        {
+            "fighter_name": fighter_name,
+            "normalized_name": normalize_name(fighter_name),
+            "elo": float(elo),
+            "peak_elo": float(peak_elo.get(fighter_name, elo)),
+            "elo_version": elo_version,
+            "computed_at": computed_at,
+        }
+        for fighter_name, elo in elo_ratings.items()
+    ]
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(
+                text("DELETE FROM fighter_elo_history WHERE elo_version = :elo_version"),
+                {"elo_version": elo_version},
+            )
+            if rows:
+                conn.execute(
+                    text(
+                        """
+                        INSERT INTO fighter_elo_history
+                            (fighter_name, normalized_name, elo, peak_elo, elo_version, computed_at)
+                        VALUES
+                            (:fighter_name, :normalized_name, :elo, :peak_elo, :elo_version, :computed_at)
+                        """
+                    ),
+                    rows,
+                )
+        logger.info("Replaced Elo history rows=%s version=%s", len(rows), elo_version)
+        return len(rows)
+
+    with connect() as conn:
+        conn.execute("DELETE FROM fighter_elo_history WHERE elo_version = ?", (elo_version,))
+        conn.executemany(
+            """
+            INSERT INTO fighter_elo_history
+                (fighter_name, normalized_name, elo, peak_elo, elo_version, computed_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (
+                    row["fighter_name"],
+                    row["normalized_name"],
+                    row["elo"],
+                    row["peak_elo"],
+                    row["elo_version"],
+                    row["computed_at"],
+                )
+                for row in rows
+            ],
+        )
+        conn.commit()
+    logger.info("Replaced Elo history rows=%s version=%s", len(rows), elo_version)
+    return len(rows)
+
+
+def safe_int(value, default: int = 0) -> int:
+    try:
+        if pd.isna(value):
+            return default
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_float(value, default: float = 0.0) -> float:
+    try:
+        if pd.isna(value):
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def _invalidate_fighters_cache() -> None:

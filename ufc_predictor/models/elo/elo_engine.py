@@ -97,6 +97,23 @@ def compute_elo_ratings(
     return ufcfights, elo_ratings, peak_elo_ratings, elo_by_search
 
 
+def build_elo_fight_counts(fights_elo: pd.DataFrame) -> dict[str, int]:
+    """Count completed Elo-tracked fights per normalized fighter name."""
+    counts: dict[str, int] = {}
+    if fights_elo is None or fights_elo.empty:
+        return counts
+    for _, row in fights_elo.iterrows():
+        result = str(row.get("result", "")).lower().strip().split("\n")[0]
+        if result not in {"win", "draw"}:
+            continue
+        for col in ("fighter_1", "fighter_2"):
+            name = row.get(col)
+            key = normalize_name(name)
+            if key:
+                counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
 def get_fighter_elo(fighter_name, elo_by_search, default=None):
     default = default or settings.ELO_INITIAL
     return elo_by_search.get(normalize_name(fighter_name), default)

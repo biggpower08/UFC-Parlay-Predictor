@@ -29,12 +29,18 @@ create table if not exists fighters (
     peak_elo double precision default 1000,
     elo_version text default 'v1',
     elo_computed_at timestamptz,
+    elo_fights_count integer default 0,
+    elo_source text default 'baseline',
     weight_class text,
     updated_at timestamptz not null default now()
 );
 
 create index if not exists idx_fighters_name_trgm on fighters using gin (normalized_name gin_trgm_ops);
 create index if not exists idx_fighters_nickname on fighters (nickname);
+create index if not exists idx_fighters_elo_source on fighters (elo_source);
+
+alter table fighters add column if not exists elo_fights_count integer default 0;
+alter table fighters add column if not exists elo_source text default 'baseline';
 
 create table if not exists fights (
     id uuid primary key default gen_random_uuid(),

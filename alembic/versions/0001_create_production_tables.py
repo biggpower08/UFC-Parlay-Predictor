@@ -43,6 +43,8 @@ def upgrade() -> None:
             peak_elo double precision default 1000,
             elo_version text default 'v1',
             elo_computed_at timestamptz,
+            elo_fights_count integer default 0,
+            elo_source text default 'baseline',
             weight_class text,
             updated_at timestamptz not null default now()
         )
@@ -52,6 +54,8 @@ def upgrade() -> None:
     op.execute("create index if not exists idx_fighters_nickname on fighters (nickname)")
     op.execute("alter table fighters add column if not exists elo_version text default 'v1'")
     op.execute("alter table fighters add column if not exists elo_computed_at timestamptz")
+    op.execute("alter table fighters add column if not exists elo_fights_count integer default 0")
+    op.execute("alter table fighters add column if not exists elo_source text default 'baseline'")
 
     op.execute(
         """

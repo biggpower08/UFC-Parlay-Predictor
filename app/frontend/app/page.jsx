@@ -537,15 +537,20 @@ const FighterInput = memo(function FighterInput({
 
 const StatsPanel = memo(function StatsPanel({ comparison }) {
   const rows = ["Elo", "Record", "Weight Class", "SLpM", "Str Acc %", "SApM", "Str Def %", "TD Avg", "TD Acc %", "TD Def %", "Reach (cm)", "Stance"];
+  const valueFor = (stats, row) => {
+    if (row !== "Elo") return stats[row];
+    if (stats["Elo Available"]) return stats.Elo;
+    return stats["Elo Source"] === "baseline" ? "1000 starting baseline" : "Not available";
+  };
   return (
     <section className="panel stats-grid">
       <h2>{comparison.stats1.Name}</h2>
       <h2>{comparison.stats2.Name}</h2>
       {rows.map((row) => (
         <div className="stat-row" key={row}>
-          <span>{comparison.stats1[row]}</span>
+          <span>{valueFor(comparison.stats1, row)}</span>
           <b>{row}</b>
-          <span>{comparison.stats2[row]}</span>
+          <span>{valueFor(comparison.stats2, row)}</span>
         </div>
       ))}
     </section>

@@ -109,7 +109,7 @@ def _danger_text(stats_self, stats_opp):
         return "dealing with the range and first-contact exchanges"
     if stats_opp["Sub Avg"] > stats_self["Sub Avg"] + 0.5:
         return "giving up a scramble that turns into a submission look"
-    if stats_opp["Elo"] > stats_self["Elo"] + 40:
+    if stats_self.get("Elo Available") and stats_opp.get("Elo Available") and stats_opp["Elo"] > stats_self["Elo"] + 40:
         return "letting the more proven fighter settle into rhythm"
     return "small mistakes snowballing in a fight that looks competitive on paper"
 

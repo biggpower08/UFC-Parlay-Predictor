@@ -29,7 +29,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ufc_predictor.config import settings
-from ufc_predictor.models.elo.elo_engine import compute_elo_ratings
+from ufc_predictor.models.elo.elo_engine import build_elo_fight_counts, compute_elo_ratings
 from ufc_predictor.utils.helpers import normalize_name
 from ufc_predictor.utils.weight_classes import detect_weight_class
 
@@ -58,6 +58,8 @@ FIGHTER_COLUMNS = [
     "peak_elo",
     "elo_version",
     "elo_computed_at",
+    "elo_fights_count",
+    "elo_source",
     "weight_class",
     "updated_at",
 ]
@@ -134,14 +136,18 @@ def prepare_fighters_and_elo(fights: pd.DataFrame) -> tuple[pd.DataFrame, pd.Dat
     fighters["normalized_name"] = fighters["name"].map(normalize_name)
 
     _fights_elo, elo_ratings, peak_elo, elo_by_search = compute_elo_ratings(fights)
+    fight_counts = build_elo_fight_counts(_fights_elo)
     fighters["elo"] = fighters["normalized_name"].map(elo_by_search).fillna(settings.ELO_INITIAL)
     fighters["peak_elo"] = fighters["name"].map(
         lambda name: peak_elo.get(name, elo_by_search.get(normalize_name(name), settings.ELO_INITIAL))
     )
     fighters["weight_class"] = fighters.apply(detect_weight_class, axis=1)
-    fighters["elo_version"] = "v1"
-    fighters["elo_computed_at"] = utc_now()
-    fighters["updated_at"] = utc_now()
+    fighters["elo_fights_count"] = fighters["normalized_name"].map(fight_counts).fillna(0).astype(int)
+    fighters["elo_source"] = fighters["elo_fights_count"].map(lambda count: "computed" if int(count) > 0 else "baseline")
+    fighters["elo_version"] = settings.ELO_ENGINE_VERSION
+    computed_at = utc_now()
+    fighters["elo_computed_at"] = fighters["elo_source"].map(lambda source: computed_at if source == "computed" else None)
+    fighters["updated_at"] = computed_at
 
     for col in FIGHTER_COLUMNS:
         if col not in fighters.columns:
@@ -155,8 +161,8 @@ def prepare_fighters_and_elo(fights: pd.DataFrame) -> tuple[pd.DataFrame, pd.Dat
                 "normalized_name": normalize_name(fighter_name),
                 "elo": elo,
                 "peak_elo": peak_elo.get(fighter_name, elo),
-                "elo_version": "v1",
-                "computed_at": utc_now(),
+                "elo_version": settings.ELO_ENGINE_VERSION,
+                "computed_at": computed_at,
             }
         )
     return fighters[FIGHTER_COLUMNS], pd.DataFrame(elo_rows)
@@ -212,6 +218,7 @@ def import_fights(conn, df: pd.DataFrame) -> None:
 def import_elo_history(conn, df: pd.DataFrame) -> None:
     if df.empty:
         return
+    conn.execute("delete from fighter_elo_history where elo_version = %s", (settings.ELO_ENGINE_VERSION,))
     columns = ["fighter_name", "normalized_name", "elo", "peak_elo", "elo_version", "computed_at"]
     sql = f"insert into fighter_elo_history ({','.join(columns)}) values ({','.join(['%s'] * len(columns))})"
     conn.cursor().executemany(sql, rows(df, columns))

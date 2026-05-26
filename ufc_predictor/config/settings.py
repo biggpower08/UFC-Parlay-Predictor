@@ -58,6 +58,7 @@ SOURCE_PRIORITY = ["ufcstats", "tapology", "sherdog", "wikipedia"]
 # Elo
 ELO_INITIAL = 1000
 ELO_K_FACTOR = 40
+ELO_ENGINE_VERSION = "v1"
 
 # Retrain
 RETRAIN_FEEDBACK_THRESHOLD = 10
