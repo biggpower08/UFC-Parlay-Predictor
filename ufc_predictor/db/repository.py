@@ -2,6 +2,7 @@
 
 import json
 import sqlite3
+import time
 import uuid
 from datetime import date, datetime, timezone
 from difflib import SequenceMatcher
@@ -13,12 +14,17 @@ from sqlalchemy import text
 from ufc_predictor.config import settings
 from ufc_predictor.db.schema import connect, get_engine, init_db, table_exists as schema_table_exists, using_postgres
 from ufc_predictor.utils.helpers import find_name_column, normalize_name
+from ufc_predictor.utils.logger import get_logger
 from ufc_predictor.utils.weight_classes import detect_weight_class
 
 
 FIGHTERS_TABLE = "fighters"
 INTEGER_COLUMNS = {"wins", "losses", "draws"}
 DATE_COLUMNS = {"date_of_birth"}
+FIGHTERS_CACHE_TTL_SECONDS = 60
+logger = get_logger(__name__)
+_initialized = False
+_fighters_cache: tuple[float, pd.DataFrame] | None = None
 
 
 def _utc_now() -> str:
@@ -26,9 +32,15 @@ def _utc_now() -> str:
 
 
 def initialize_database(force_import: bool = False) -> None:
+    global _initialized
+    if _initialized and not force_import:
+        return
+    start = time.perf_counter()
     init_db()
     if force_import or not table_exists(FIGHTERS_TABLE) or not _table_has_rows(FIGHTERS_TABLE):
         import_fighters_csv()
+    _initialized = True
+    _log_timing("repository.initialize_database", start)
 
 
 def table_exists(table_name: str) -> bool:
@@ -56,6 +68,7 @@ def import_fighters_csv(path=None) -> pd.DataFrame:
 
 
 def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
+    _invalidate_fighters_cache()
     out = df.copy()
     name_col = find_name_column(out)
     out["normalized_name"] = out[name_col].astype(str).map(normalize_name)
@@ -101,12 +114,22 @@ def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
 
 def get_fighters_df() -> pd.DataFrame:
     initialize_database()
+    global _fighters_cache
+    if _fighters_cache and time.monotonic() - _fighters_cache[0] < FIGHTERS_CACHE_TTL_SECONDS:
+        return _fighters_cache[1].copy()
+    start = time.perf_counter()
     if using_postgres():
         with get_engine().begin() as conn:
             rows = conn.execute(text(f"SELECT * FROM {FIGHTERS_TABLE}")).mappings().all()
-        return pd.DataFrame([dict(row) for row in rows])
+        df = pd.DataFrame([dict(row) for row in rows])
+        _fighters_cache = (time.monotonic(), df)
+        _log_timing("repository.get_fighters_df", start, rows=len(df))
+        return df.copy()
     with connect() as conn:
-        return pd.read_sql_query(f"SELECT * FROM {FIGHTERS_TABLE}", conn)
+        df = pd.read_sql_query(f"SELECT * FROM {FIGHTERS_TABLE}", conn)
+    _fighters_cache = (time.monotonic(), df)
+    _log_timing("repository.get_fighters_df", start, rows=len(df))
+    return df.copy()
 
 
 def _clean_db_record(record: dict) -> dict:
@@ -133,6 +156,7 @@ def search_fighters(query: str, limit: int = 12) -> list[dict]:
 
 
 def find_fighter_candidates(query: str, limit: int = 8) -> list[dict]:
+    start = time.perf_counter()
     initialize_database()
     normalized = normalize_name(query)
     if not normalized:
@@ -177,7 +201,9 @@ def find_fighter_candidates(query: str, limit: int = 8) -> list[dict]:
         "_score",
         "_match_type",
     ]
-    return matches[columns].to_dict(orient="records")
+    result = matches[columns].to_dict(orient="records")
+    _log_timing("repository.find_fighter_candidates", start, query=query, matches=len(result))
+    return result
 
 
 def resolve_name(query: str) -> dict:
@@ -281,6 +307,17 @@ def update_elo_columns(elo_by_search: dict, peak_elo: dict | None = None, elo_ve
     df["elo_version"] = elo_version
     df["elo_computed_at"] = _utc_now()
     save_fighters_df(df, replace=True)
+
+
+def _invalidate_fighters_cache() -> None:
+    global _fighters_cache
+    _fighters_cache = None
+
+
+def _log_timing(label: str, start: float, **fields) -> None:
+    elapsed_ms = round((time.perf_counter() - start) * 1000, 2)
+    extra = " ".join(f"{key}={value}" for key, value in fields.items() if value is not None)
+    logger.info("timing %s elapsed_ms=%s%s", label, elapsed_ms, f" {extra}" if extra else "")
 
 
 def save_scrape_cache(normalized_name: str, source: str, url: str, raw: dict, confidence: float) -> None:

@@ -1,7 +1,7 @@
 "use client";
 
 import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const API_CANDIDATES = Array.from(
   new Set(
@@ -12,6 +12,11 @@ const API_CANDIDATES = Array.from(
     ].filter(Boolean),
   ),
 );
+
+const RESPONSE_CACHE = new Map();
+const HEALTH_TTL_MS = 60_000;
+const SEARCH_TTL_MS = 5 * 60_000;
+const RESOLVE_TTL_MS = 5 * 60_000;
 
 async function apiFetch(path, options = {}) {
   const errors = [];
@@ -28,6 +33,41 @@ async function apiFetch(path, options = {}) {
   throw new Error(errors.join(" | "));
 }
 
+async function apiFetchJson(path, options = {}) {
+  const { ttl = 0, force = false, ...fetchOptions } = options;
+  const cacheKey = `${path}:${JSON.stringify(fetchOptions.body || "")}`;
+  const cached = RESPONSE_CACHE.get(cacheKey);
+  if (!force && ttl > 0 && cached && Date.now() - cached.createdAt < ttl) {
+    return cached.promise;
+  }
+
+  const promise = apiFetch(path, fetchOptions)
+    .then(async (response) => {
+      if (!response.ok) throw new Error(await readApiError(response));
+      return response.json();
+    })
+    .catch((error) => {
+      RESPONSE_CACHE.delete(cacheKey);
+      throw error;
+    });
+
+  if (ttl > 0) {
+    RESPONSE_CACHE.set(cacheKey, { createdAt: Date.now(), promise });
+  }
+  return promise;
+}
+
+function useDebouncedValue(value, delayMs) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(timer);
+  }, [value, delayMs]);
+
+  return debounced;
+}
+
 export default function App() {
   const [fighterA, setFighterA] = useState("Islam Makhachev");
   const [fighterB, setFighterB] = useState("Alex Pereira");
@@ -41,6 +81,28 @@ export default function App() {
   const [fighterMeta, setFighterMeta] = useState({ a: null, b: null });
   const [allowCrossDivision, setAllowCrossDivision] = useState(false);
   const [searching, setSearching] = useState({ a: false, b: false });
+  const debouncedFighterA = useDebouncedValue(fighterA, 300);
+  const debouncedFighterB = useDebouncedValue(fighterB, 300);
+  const latestSearch = useRef({ a: "", b: "" });
+
+  const searchFighters = useCallback(async (slot, value) => {
+    const trimmed = value.trim();
+    latestSearch.current[slot] = trimmed;
+    if (trimmed.length < 2) {
+      setSuggestions((s) => ({ ...s, [slot]: [] }));
+      return;
+    }
+    setSearching((current) => ({ ...current, [slot]: true }));
+    try {
+      const data = await apiFetchJson(`/fighters/search?q=${encodeURIComponent(trimmed)}`, { ttl: SEARCH_TTL_MS });
+      if (latestSearch.current[slot] !== trimmed) return;
+      setSuggestions((s) => ({ ...s, [slot]: data.fighters || [] }));
+    } catch (error) {
+      setMessage(`Search failed: ${error.message}`);
+    } finally {
+      setSearching((current) => ({ ...current, [slot]: false }));
+    }
+  }, []);
 
   useEffect(() => {
     checkHealth();
@@ -55,34 +117,23 @@ export default function App() {
     }
   }, []);
 
-  async function checkHealth() {
+  useEffect(() => {
+    searchFighters("a", debouncedFighterA);
+  }, [debouncedFighterA, searchFighters]);
+
+  useEffect(() => {
+    searchFighters("b", debouncedFighterB);
+  }, [debouncedFighterB, searchFighters]);
+
+  async function checkHealth(force = false) {
     try {
-      const response = await apiFetch("/health", { cache: "no-store" });
-      if (!response.ok) throw new Error(await readApiError(response));
-      const data = await response.json();
+      const path = force ? "/health?force=true" : "/health";
+      const data = await apiFetchJson(path, { cache: "no-store", ttl: HEALTH_TTL_MS, force });
       setHealth({ ...data, ok: Boolean(data.prediction_ready) });
       setMessage("");
     } catch (error) {
       setHealth({ ok: false });
       setMessage(`Prediction engine is not connected: ${error.message}`);
-    }
-  }
-
-  async function searchFighters(slot, value) {
-    if (value.trim().length < 2) {
-      setSuggestions((s) => ({ ...s, [slot]: [] }));
-      return;
-    }
-    setSearching((current) => ({ ...current, [slot]: true }));
-    try {
-      const response = await apiFetch(`/fighters/search?q=${encodeURIComponent(value)}`);
-      if (!response.ok) throw new Error(await readApiError(response));
-      const data = await response.json();
-      setSuggestions((s) => ({ ...s, [slot]: data.fighters || [] }));
-    } catch (error) {
-      setMessage(`Search failed: ${error.message}`);
-    } finally {
-      setSearching((current) => ({ ...current, [slot]: false }));
     }
   }
 
@@ -140,9 +191,7 @@ export default function App() {
   async function resolveBeforePrediction(slot, value) {
     let data;
     try {
-      const response = await apiFetch(`/fighters/resolve?q=${encodeURIComponent(value)}`);
-      if (!response.ok) throw new Error(await readApiError(response));
-      data = await response.json();
+      data = await apiFetchJson(`/fighters/resolve?q=${encodeURIComponent(value)}`, { ttl: RESOLVE_TTL_MS });
     } catch (error) {
       setMessage(`Name check failed: ${error.message}`);
       return null;
@@ -231,7 +280,6 @@ export default function App() {
           value={fighterA}
           onChange={(v) => {
             setFighterA(v);
-            searchFighters("a", v);
           }}
           suggestions={suggestions.a}
           searching={searching.a}
@@ -248,7 +296,6 @@ export default function App() {
           value={fighterB}
           onChange={(v) => {
             setFighterB(v);
-            searchFighters("b", v);
           }}
           suggestions={suggestions.b}
           searching={searching.b}
@@ -288,7 +335,7 @@ export default function App() {
       {message && (
         <div className="message">
           <span>{message}</span>
-          {health?.prediction_ready === false && <button onClick={checkHealth}>Retry connection</button>}
+          {health?.prediction_ready === false && <button onClick={() => checkHealth(true)}>Retry connection</button>}
         </div>
       )}
 
@@ -405,7 +452,7 @@ async function readApiError(response) {
   }
 }
 
-function FighterInput({ label, value, onChange, suggestions, searching, onPick }) {
+const FighterInput = memo(function FighterInput({ label, value, onChange, suggestions, searching, onPick }) {
   return (
     <label className="fighter-input">
       <span>{label}</span>
@@ -426,9 +473,9 @@ function FighterInput({ label, value, onChange, suggestions, searching, onPick }
       {searching && <small className="searching">Searching...</small>}
     </label>
   );
-}
+});
 
-function StatsPanel({ comparison }) {
+const StatsPanel = memo(function StatsPanel({ comparison }) {
   const rows = ["Elo", "Record", "Weight Class", "SLpM", "Str Acc %", "SApM", "Str Def %", "TD Avg", "TD Acc %", "TD Def %", "Reach (cm)", "Stance"];
   return (
     <section className="panel stats-grid">
@@ -443,9 +490,9 @@ function StatsPanel({ comparison }) {
       ))}
     </section>
   );
-}
+});
 
-function SignalGrid({ signals }) {
+const SignalGrid = memo(function SignalGrid({ signals }) {
   const visibleSignals = Object.entries(signals).filter(([name]) => name !== "llm");
   return (
     <div className="signal-grid">
@@ -457,4 +504,4 @@ function SignalGrid({ signals }) {
       ))}
     </div>
   );
-}
+});

@@ -1,6 +1,7 @@
 """Sklearn logistic regression predictor."""
 
 import json
+from functools import lru_cache
 
 import numpy as np
 
@@ -16,6 +17,7 @@ from ufc_predictor.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
+@lru_cache(maxsize=1)
 def model_available() -> bool:
     if not settings.LATEST_MODEL_PKL.is_file():
         return False
@@ -27,6 +29,7 @@ def model_available() -> bool:
     return True
 
 
+@lru_cache(maxsize=1)
 def load_model():
     if not model_available():
         return None
@@ -44,6 +47,8 @@ def save_model(bundle: dict):
 
     settings.MODELS_DIR.mkdir(parents=True, exist_ok=True)
     joblib.dump(bundle, settings.LATEST_MODEL_PKL)
+    model_available.cache_clear()
+    load_model.cache_clear()
     logger.info("Model saved to %s", settings.LATEST_MODEL_PKL)
 
 
@@ -98,6 +103,7 @@ def save_weights(pipeline, metrics=None):
     if metrics is not None:
         with open(settings.MODEL_METRICS_JSON, "w", encoding="utf-8") as f:
             json.dump(metrics, f, indent=2)
+    load_model_weights.cache_clear()
 
 
 def predict_matchup(fighter_a_row, fighter_b_row, note_flags_a=None, note_flags_b=None):
@@ -116,12 +122,21 @@ def predict_matchup(fighter_a_row, fighter_b_row, note_flags_a=None, note_flags_
 
 
 def explain_top_features(prediction, top_n=3):
-    if prediction is None or not settings.MODEL_WEIGHTS_JSON.is_file():
+    if prediction is None:
         return []
-    with open(settings.MODEL_WEIGHTS_JSON, encoding="utf-8") as f:
-        w = json.load(f)
+    w = load_model_weights()
+    if not w:
+        return []
     coefs = w.get("coefficients", {})
     feats = prediction["features"]
     contribs = [(n, feats[n] * coefs[n]) for n in FEATURE_NAMES if n in coefs]
     contribs.sort(key=lambda x: abs(x[1]), reverse=True)
     return contribs[:top_n]
+
+
+@lru_cache(maxsize=1)
+def load_model_weights() -> dict:
+    if not settings.MODEL_WEIGHTS_JSON.is_file():
+        return {}
+    with open(settings.MODEL_WEIGHTS_JSON, encoding="utf-8") as f:
+        return json.load(f)

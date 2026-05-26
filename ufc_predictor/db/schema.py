@@ -97,6 +97,11 @@ def init_db(db_path=None) -> None:
             )
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_name_trgm ON fighters USING gin (normalized_name gin_trgm_ops)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_nickname ON fighters (nickname)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_normalized_name ON fighters (normalized_name)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_name_lower ON fighters (lower(name))"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_nickname_lower ON fighters (lower(nickname))"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_nickname_trgm ON fighters USING gin (nickname gin_trgm_ops)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_weight_class ON fighters (weight_class)"))
             conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_version TEXT DEFAULT 'v1'"))
             conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_computed_at TIMESTAMPTZ"))
             conn.execute(
@@ -180,6 +185,15 @@ def init_db(db_path=None) -> None:
                 )
             )
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_normalized_name ON fighter_elo_history (normalized_name)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_fighter_name ON fighter_elo_history (fighter_name)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_fighter_1_event ON fights (fighter_1, event)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_fighter_2_event ON fights (fighter_2, event)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_event_created_at ON fights (event, created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_created_at ON fights (created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_fighter_a_created_at ON predictions (fighter_a, created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_fighter_b_created_at ON predictions (fighter_b, created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_created_at ON predictions (created_at)"))
         return
 
     with connect(db_path) as conn:

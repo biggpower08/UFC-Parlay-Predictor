@@ -26,6 +26,9 @@ from ufc_predictor.utils.weight_classes import detect_weight_class, same_weight_
 logger = get_logger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 FRONTEND_DIST_DIR = Path(__file__).resolve().parents[1] / "static_app"
+HEALTH_CACHE_TTL_SECONDS = 45
+_health_cache: dict | None = None
+_health_cache_time = 0.0
 
 app = FastAPI(title="UFC Predictor API", version=__version__)
 app.add_middleware(
@@ -84,10 +87,16 @@ async def log_requests(request: Request, call_next):
 
 @app.get("/api/health")
 @app.get("/health")
-def health():
+def health(force: bool = False):
+    global _health_cache, _health_cache_time
+    now = time.monotonic()
+    if not force and _health_cache and now - _health_cache_time < HEALTH_CACHE_TTL_SECONDS:
+        return _health_cache
+
+    start = time.perf_counter()
     db_ready = _database_ready()
     sklearn_ready = model_available()
-    return {
+    payload = {
         "ok": db_ready and sklearn_ready,
         "version": __version__,
         "database": "postgres" if using_postgres() else "sqlite",
@@ -99,6 +108,10 @@ def health():
             "path": str(FRONTEND_DIST_DIR),
         },
     }
+    _health_cache = payload
+    _health_cache_time = now
+    _log_timing("health", start)
+    return payload
 
 
 @app.get("/api/version")
@@ -114,33 +127,45 @@ def version():
 @app.get("/api/fighters/search")
 @app.get("/fighters/search")
 def fighters_search(q: str, limit: int = 12):
+    start = time.perf_counter()
     try:
-        return {"fighters": _clean(search_fighters(q, limit=limit))}
+        fighters = _timed_call("fighters.search.db", search_fighters, q, limit=limit)
+        return {"fighters": _clean(fighters)}
     except Exception as exc:
         logger.exception("Fighter search failed query=%s", q)
         raise HTTPException(status_code=500, detail=f"Fighter search failed: {exc}") from exc
+    finally:
+        _log_timing("fighters.search", start, query=q, limit=limit)
 
 
 @app.get("/api/fighters/resolve")
 @app.get("/fighters/resolve")
 def fighters_resolve(q: str):
+    start = time.perf_counter()
     try:
-        return _clean(resolve_name(q))
+        return _clean(_timed_call("fighters.resolve.db", resolve_name, q))
     except Exception as exc:
         logger.exception("Fighter resolve failed query=%s", q)
         raise HTTPException(status_code=500, detail=f"Fighter resolve failed: {exc}") from exc
+    finally:
+        _log_timing("fighters.resolve", start, query=q)
 
 
 @app.post("/api/predict")
 @app.post("/predict")
 def predict(request: PredictRequest):
+    start = time.perf_counter()
     try:
-        fighter_a = resolve_fighter(
+        fighter_a = _timed_call(
+            "predict.resolve_fighter_a",
+            resolve_fighter,
             request.fighter_a,
             allow_scrape=request.allow_scrape,
             confirmed=request.confirmed_a,
         )
-        fighter_b = resolve_fighter(
+        fighter_b = _timed_call(
+            "predict.resolve_fighter_b",
+            resolve_fighter,
             request.fighter_b,
             allow_scrape=request.allow_scrape,
             confirmed=request.confirmed_b,
@@ -168,7 +193,7 @@ def predict(request: PredictRequest):
         )
 
     try:
-        comparison, prediction, summary = run_prediction(fighter_a, fighter_b)
+        comparison, prediction, summary = _timed_call("predict.pipeline", run_prediction, fighter_a, fighter_b)
     except Exception as exc:
         logger.exception(
             "Prediction failed fighter_a=%s fighter_b=%s",
@@ -184,13 +209,16 @@ def predict(request: PredictRequest):
             "summary": summary,
         }
     )
-    prediction_id = save_prediction(
+    prediction_id = _timed_call(
+        "predict.save_prediction",
+        save_prediction,
         comparison["stats1"]["Name"],
         comparison["stats2"]["Name"],
         prediction,
         payload,
     )
     payload["prediction_id"] = prediction_id
+    _log_timing("predict.total", start, fighter_a=comparison["stats1"]["Name"], fighter_b=comparison["stats2"]["Name"])
     return payload
 
 
@@ -203,8 +231,12 @@ def compare(request: PredictRequest):
 @app.post("/api/feedback")
 @app.post("/feedback")
 def feedback(request: FeedbackRequest):
-    record = save_feedback(request.dict())
-    return {"saved": True, "feedback": _clean(record)}
+    start = time.perf_counter()
+    try:
+        record = _timed_call("feedback.save", save_feedback, request.dict())
+        return {"saved": True, "feedback": _clean(record)}
+    finally:
+        _log_timing("feedback.total", start)
 
 
 @app.post("/api/refresh")
@@ -264,6 +296,7 @@ def _clean(value):
 
 
 def _database_ready() -> bool:
+    start = time.perf_counter()
     try:
         with get_engine().connect() as conn:
             conn.execute(text("SELECT 1"))
@@ -271,3 +304,19 @@ def _database_ready() -> bool:
     except Exception:
         logger.exception("Database health check failed")
         return False
+    finally:
+        _log_timing("health.database", start)
+
+
+def _timed_call(label: str, func, *args, **kwargs):
+    start = time.perf_counter()
+    try:
+        return func(*args, **kwargs)
+    finally:
+        _log_timing(label, start)
+
+
+def _log_timing(label: str, start: float, **fields) -> None:
+    elapsed_ms = round((time.perf_counter() - start) * 1000, 2)
+    extra = " ".join(f"{key}={value}" for key, value in fields.items() if value is not None)
+    logger.info("timing %s elapsed_ms=%s%s", label, elapsed_ms, f" {extra}" if extra else "")
