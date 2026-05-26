@@ -187,20 +187,50 @@ def find_fighter_candidates(query: str, limit: int = 8) -> list[dict]:
         if col not in df.columns:
             df[col] = None
     name_col = find_name_column(df)
+    search_df = df.copy()
+    search_df["_name_key"] = search_df.get("normalized_name", search_df[name_col]).fillna("").astype(str)
+    if "normalized_name" not in search_df.columns:
+        search_df["_name_key"] = search_df[name_col].fillna("").astype(str).map(normalize_name)
+    search_df["_nick_key"] = search_df["nickname"].fillna("").astype(str).map(normalize_name)
+
     rows = []
-    for _, row in df.iterrows():
-        name = str(row.get(name_col) or "")
-        nickname = str(row.get("nickname") or "")
-        name_key = normalize_name(name)
-        nick_key = normalize_name(nickname)
-        score, match_type = _match_score(normalized, name_key, nick_key)
-        if score <= 0:
-            continue
+    seen = set()
+
+    def add_row(row, score: float, match_type: str) -> None:
+        key = row.get("normalized_name") or row.get("_name_key") or normalize_name(row.get(name_col))
+        if not key or key in seen:
+            return
+        seen.add(key)
         item = row.to_dict()
         item["weight_class"] = detect_weight_class(row)
         item["_score"] = score
         item["_match_type"] = match_type
         rows.append(item)
+
+    exact_name = search_df["_name_key"] == normalized
+    exact_nick = search_df["_nick_key"] == normalized
+    for _, row in search_df.loc[exact_name].iterrows():
+        add_row(row, 1.0, "exact_name")
+    for _, row in search_df.loc[exact_nick].iterrows():
+        add_row(row, 0.98, "exact_nickname")
+
+    partial_name = search_df["_name_key"].str.contains(normalized, regex=False, na=False)
+    partial_nick = search_df["_nick_key"].str.contains(normalized, regex=False, na=False)
+    for _, row in search_df.loc[partial_name].iterrows():
+        score = _partial_score(normalized, str(row["_name_key"]), 0.96, 0.86)
+        add_row(row, score, "partial_name")
+    for _, row in search_df.loc[partial_nick].iterrows():
+        score = _partial_score(normalized, str(row["_nick_key"]), 0.94, 0.84)
+        add_row(row, score, "partial_nickname")
+
+    if len(rows) < limit and len(normalized) >= 3:
+        for _, row in search_df.iterrows():
+            key = row.get("normalized_name") or row.get("_name_key")
+            if key in seen:
+                continue
+            score, match_type = _match_score(normalized, str(row["_name_key"]), str(row["_nick_key"]))
+            if score > 0:
+                add_row(row, score, match_type)
     if not rows:
         return []
     matches = pd.DataFrame(rows).sort_values(
@@ -270,9 +300,9 @@ def _match_score(query: str, name_key: str, nick_key: str) -> tuple[float, str]:
     if nick_key and query == nick_key:
         return 0.98, "exact_nickname"
     if query in name_key:
-        return 0.92 - min(0.2, (len(name_key) - len(query)) / 100), "partial_name"
+        return _partial_score(query, name_key, 0.96, 0.86), "partial_name"
     if nick_key and query in nick_key:
-        return 0.90 - min(0.2, (len(nick_key) - len(query)) / 100), "partial_nickname"
+        return _partial_score(query, nick_key, 0.94, 0.84), "partial_nickname"
 
     name_score = SequenceMatcher(None, query, name_key).ratio()
     nick_score = SequenceMatcher(None, query, nick_key).ratio() if nick_key else 0
@@ -281,6 +311,12 @@ def _match_score(query: str, name_key: str, nick_key: str) -> tuple[float, str]:
     if nick_score > name_score:
         return nick_score * 0.86, "fuzzy_nickname"
     return name_score * 0.86, "fuzzy_name"
+
+
+def _partial_score(query: str, value: str, prefix_base: float, contains_base: float) -> float:
+    if value.startswith(query) or any(part.startswith(query) for part in value.split()):
+        return prefix_base - min(0.12, (len(value) - len(query)) / 160)
+    return contains_base - min(0.16, (len(value) - len(query)) / 120)
 
 
 def get_fighter_by_name(name: str) -> pd.Series | None:
