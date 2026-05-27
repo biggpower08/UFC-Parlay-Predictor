@@ -1,0 +1,5 @@
+event,fighter_1,fighter_2,result,method,round,time
+UFC Test 1,Alpha Fighter,Beta Fighter,win,KO/TKO,1,2:00
+UFC Test 1,Alpha Fighter,Beta Fighter,win,KO/TKO,1,2:00
+UFC Test 2,Gamma Fighter,Delta Fighter,draw,U-DEC,3,5:00
+UFC Test 3,Echo Fighter,Foxtrot Fighter,nc,No Contest,2,1:00

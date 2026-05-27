@@ -29,7 +29,7 @@ def _database_url() -> str:
 @lru_cache(maxsize=1)
 def get_engine() -> Engine:
     if using_postgres():
-        return create_engine(_database_url(), pool_pre_ping=True)
+        return create_engine(_database_url(), pool_pre_ping=True, connect_args={"prepare_threshold": None})
     settings.DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     return create_engine(f"sqlite:///{settings.FIGHTERS_DB}", future=True)
 
@@ -199,6 +199,7 @@ def init_db(db_path=None) -> None:
                 )
             )
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_normalized_name ON fighter_elo_history (normalized_name)"))
+            conn.execute(text("ALTER TABLE fighter_elo_history ADD COLUMN IF NOT EXISTS elo_version TEXT NOT NULL DEFAULT 'v1'"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_fighter_name ON fighter_elo_history (fighter_name)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_elo_source ON fighters (elo_source)"))
@@ -399,6 +400,10 @@ def init_db(db_path=None) -> None:
             )
             """
         )
+        try:
+            conn.execute("ALTER TABLE fighter_elo_history ADD COLUMN elo_version TEXT NOT NULL DEFAULT 'v1'")
+        except sqlite3.OperationalError:
+            pass
         conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_normalized_name ON fighter_elo_history (normalized_name)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)")
         conn.execute(
