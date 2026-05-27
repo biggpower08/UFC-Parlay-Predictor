@@ -6,7 +6,7 @@ from datetime import date, datetime
 from pathlib import Path
 from uuid import UUID
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -15,6 +15,8 @@ from sqlalchemy import text
 
 from ufc_predictor import __version__
 from ufc_predictor.agents.orchestrator import FighterResolutionError, refresh_all, resolve_fighter
+from ufc_predictor.analysis import build_fight_analysis
+from ufc_predictor.config import settings
 from ufc_predictor.db.schema import get_engine, init_db, using_postgres
 from ufc_predictor.db.repository import resolve_name, save_prediction, search_fighters
 from ufc_predictor.feedback.feedback_handler import save_feedback
@@ -182,7 +184,8 @@ def fighter_elo_history(fighter_key: str, limit: int = 100):
 
 
 @app.get("/api/internal/sync/status")
-def internal_sync_status(source: str = "ufcstats"):
+def internal_sync_status(source: str = "ufcstats", x_sync_secret: str | None = Header(default=None)):
+    _require_sync_secret(x_sync_secret)
     start = time.perf_counter()
     try:
         return get_sync_status(source)
@@ -236,6 +239,8 @@ def predict(request: PredictRequest):
 
     try:
         comparison, prediction, summary = _timed_call("predict.pipeline", run_prediction, fighter_a, fighter_b)
+        analysis = _timed_call("predict.analysis", build_fight_analysis, comparison, prediction)
+        summary = analysis["summary"]
     except Exception as exc:
         logger.exception(
             "Prediction failed fighter_a=%s fighter_b=%s",
@@ -249,6 +254,7 @@ def predict(request: PredictRequest):
             "comparison": comparison,
             "prediction": prediction,
             "summary": summary,
+            "analysis": analysis,
         }
     )
     if not request.debug:
@@ -387,3 +393,10 @@ def _log_timing(label: str, start: float, **fields) -> None:
     elapsed_ms = round((time.perf_counter() - start) * 1000, 2)
     extra = " ".join(f"{key}={value}" for key, value in fields.items() if value is not None)
     logger.info("timing %s elapsed_ms=%s%s", label, elapsed_ms, f" {extra}" if extra else "")
+
+
+def _require_sync_secret(token: str | None) -> None:
+    if not settings.SYNC_SECRET:
+        raise HTTPException(status_code=404, detail="Internal sync API is not enabled.")
+    if token != settings.SYNC_SECRET:
+        raise HTTPException(status_code=401, detail="Invalid sync token.")

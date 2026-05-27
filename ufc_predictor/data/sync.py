@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import socket
 import uuid
+import json
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 
@@ -277,6 +278,10 @@ def record_sync_run(source: str, status: str, dry_run: bool, counts: dict, messa
         "events_seen": counts.get("events", 0),
         "fights_seen": counts.get("fights", 0),
         "fighters_seen": counts.get("fighters", 0),
+        "inserted_count": counts.get("inserted", 0),
+        "updated_count": counts.get("updated", 0),
+        "skipped_count": counts.get("skipped", 0),
+        "failed_count": counts.get("failed", 0),
         "message": message[:2000],
     }
     if using_postgres():
@@ -285,9 +290,11 @@ def record_sync_run(source: str, status: str, dry_run: bool, counts: dict, messa
                 text(
                     """
                     insert into sync_runs
-                        (source, status, started_at, finished_at, dry_run, events_seen, fights_seen, fighters_seen, message)
+                        (source, status, started_at, finished_at, dry_run, events_seen, fights_seen, fighters_seen,
+                         inserted_count, updated_count, skipped_count, failed_count, message)
                     values
-                        (:source, :status, :started_at, :finished_at, :dry_run, :events_seen, :fights_seen, :fighters_seen, :message)
+                        (:source, :status, :started_at, :finished_at, :dry_run, :events_seen, :fights_seen, :fighters_seen,
+                         :inserted_count, :updated_count, :skipped_count, :failed_count, :message)
                     """
                 ),
                 payload,
@@ -297,8 +304,9 @@ def record_sync_run(source: str, status: str, dry_run: bool, counts: dict, messa
         conn.execute(
             """
             insert into sync_runs
-                (source, status, started_at, finished_at, dry_run, events_seen, fights_seen, fighters_seen, message)
-            values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (source, status, started_at, finished_at, dry_run, events_seen, fights_seen, fighters_seen,
+                 inserted_count, updated_count, skipped_count, failed_count, message)
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 payload["source"],
@@ -309,6 +317,10 @@ def record_sync_run(source: str, status: str, dry_run: bool, counts: dict, messa
                 payload["events_seen"],
                 payload["fights_seen"],
                 payload["fighters_seen"],
+                payload["inserted_count"],
+                payload["updated_count"],
+                payload["skipped_count"],
+                payload["failed_count"],
                 payload["message"],
             ),
         )
@@ -405,14 +417,16 @@ def get_sync_status(source: str = "ufcstats") -> dict:
             last_success = conn.execute(text("select * from sync_runs where status in ('success', 'succeeded') order by started_at desc limit 1")).mappings().fetchone()
             rankings = conn.execute(text("select max(generated_at) as generated_at from fighter_rankings")).mappings().fetchone()
             elo = conn.execute(text("select max(computed_at) as computed_at from fighter_elo_history")).mappings().fetchone()
-        return _status_payload(source_row, last_run, last_success, rankings, elo)
+            active_lock = conn.execute(text("select * from sync_locks where expires_at > now() order by started_at desc limit 1")).mappings().fetchone()
+        return _status_payload(source_row, last_run, last_success, rankings, elo, active_lock)
     with connect() as conn:
         source_row = conn.execute("select * from scraper_sources where source = ?", (source,)).fetchone()
         last_run = conn.execute("select * from sync_runs order by started_at desc limit 1").fetchone()
         last_success = conn.execute("select * from sync_runs where status in ('success', 'succeeded') order by started_at desc limit 1").fetchone()
         rankings = conn.execute("select max(generated_at) as generated_at from fighter_rankings").fetchone()
         elo = conn.execute("select max(computed_at) as computed_at from fighter_elo_history").fetchone()
-    return _status_payload(source_row, last_run, last_success, rankings, elo)
+        active_lock = conn.execute("select * from sync_locks where expires_at > ? order by started_at desc limit 1", (utc_now(),)).fetchone()
+    return _status_payload(source_row, last_run, last_success, rankings, elo, active_lock)
 
 
 @contextmanager
@@ -438,8 +452,8 @@ def acquire_sync_lock(lock_name: str, owner: str, ttl_minutes: int = 30) -> bool
             conn.execute(text("delete from sync_locks where expires_at < now()"))
             try:
                 conn.execute(
-                    text("insert into sync_locks (lock_name, owner, started_at, expires_at) values (:lock_name, :owner, :started_at, :expires_at)"),
-                    {"lock_name": lock_name, "owner": owner, "started_at": now, "expires_at": expires},
+                    text("insert into sync_locks (lock_name, owner, started_at, expires_at, metadata) values (:lock_name, :owner, :started_at, :expires_at, :metadata)"),
+                    {"lock_name": lock_name, "owner": owner, "started_at": now, "expires_at": expires, "metadata": {"kind": "scheduled_sync"}},
                 )
                 return True
             except Exception:
@@ -448,8 +462,8 @@ def acquire_sync_lock(lock_name: str, owner: str, ttl_minutes: int = 30) -> bool
         conn.execute("delete from sync_locks where expires_at < ?", (now.isoformat(),))
         try:
             conn.execute(
-                "insert into sync_locks (lock_name, owner, started_at, expires_at) values (?, ?, ?, ?)",
-                (lock_name, owner, now.isoformat(), expires.isoformat()),
+                "insert into sync_locks (lock_name, owner, started_at, expires_at, metadata) values (?, ?, ?, ?, ?)",
+                (lock_name, owner, now.isoformat(), expires.isoformat(), json.dumps({"kind": "scheduled_sync"})),
             )
             conn.commit()
             return True
@@ -477,7 +491,7 @@ def load_fights_table() -> pd.DataFrame:
         return pd.read_sql_query("select * from fights", conn)
 
 
-def _status_payload(source_row, last_run, last_success, rankings, elo) -> dict:
+def _status_payload(source_row, last_run, last_success, rankings, elo, active_lock=None) -> dict:
     def as_dict(row):
         return dict(row) if row is not None else None
 
@@ -496,4 +510,5 @@ def _status_payload(source_row, last_run, last_success, rankings, elo) -> dict:
         "last_successful_sync": as_dict(last_success),
         "last_rankings_generated_at": (dict(rankings).get("generated_at") if rankings else None),
         "last_elo_computed_at": (dict(elo).get("computed_at") if elo else None),
+        "active_lock": as_dict(active_lock),
     }

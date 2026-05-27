@@ -525,8 +525,15 @@ export default function App() {
             <section className="panel prediction-panel">
               <div className="analyst-read">
                 <span>Analyst read</span>
-                <p>{result.summary}</p>
+                <p>{result.analysis?.summary || result.summary}</p>
               </div>
+              {result.analysis && (
+                <div className="analysis-badges">
+                  <span>{result.analysis.confidence_label}</span>
+                  <span>{result.analysis.volatility_label} volatility</span>
+                  <span>{result.analysis.data_quality_label} data</span>
+                </div>
+              )}
               <div className="winner">
                 <ShieldCheck size={28} />
                 <span>{result.prediction.winner}</span>
@@ -536,7 +543,7 @@ export default function App() {
               </div>
               <p className="confidence-label">{confidence}% confidence</p>
               <p className="reasoning">{result.prediction.reasoning}</p>
-              <SignalGrid signals={result.prediction.signals || {}} />
+              {result.analysis && <AnalysisPanel analysis={result.analysis} />}
             </section>
           )}
           {activeTab === "feedback" && (
@@ -626,15 +633,31 @@ const StatsPanel = memo(function StatsPanel({ comparison }) {
   );
 });
 
-const SignalGrid = memo(function SignalGrid({ signals }) {
-  const visibleSignals = Object.entries(signals).filter(([name]) => name !== "llm");
+const AnalysisPanel = memo(function AnalysisPanel({ analysis }) {
   return (
-    <div className="signal-grid">
-      {visibleSignals.map(([name, signal]) => (
-        <div className="signal" key={name}>
-          <span>{name}</span>
-          <strong>{Math.round((signal.prob_a || 0.5) * 100)}%</strong>
+    <div className="analysis-panel">
+      {analysis.warnings?.length > 0 && (
+        <div className="analysis-warnings">
+          {analysis.warnings.map((warning) => (
+            <p key={warning}>{warning}</p>
+          ))}
         </div>
+      )}
+      {analysis.drivers?.length > 0 && (
+        <div className="driver-grid">
+          {analysis.drivers.map((driver) => (
+            <div className="driver" key={driver.label}>
+              <span>{driver.label}</span>
+              <p>{driver.explanation}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      {analysis.sections?.map((section, index) => (
+        <details className="analysis-section" key={section.title} open={index < 2}>
+          <summary>{section.title}</summary>
+          <p>{section.body}</p>
+        </details>
       ))}
     </div>
   );

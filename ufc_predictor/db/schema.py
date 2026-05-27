@@ -285,6 +285,10 @@ def init_db(db_path=None) -> None:
                         events_seen INTEGER DEFAULT 0,
                         fights_seen INTEGER DEFAULT 0,
                         fighters_seen INTEGER DEFAULT 0,
+                        inserted_count INTEGER DEFAULT 0,
+                        updated_count INTEGER DEFAULT 0,
+                        skipped_count INTEGER DEFAULT 0,
+                        failed_count INTEGER DEFAULT 0,
                         message TEXT
                     )
                     """
@@ -314,6 +318,13 @@ def init_db(db_path=None) -> None:
             conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS consecutive_failures INTEGER NOT NULL DEFAULT 0"))
             conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS last_status_code INTEGER"))
             conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS average_fetch_ms DOUBLE PRECISION"))
+            for stmt in (
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS inserted_count INTEGER DEFAULT 0",
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS updated_count INTEGER DEFAULT 0",
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS skipped_count INTEGER DEFAULT 0",
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS failed_count INTEGER DEFAULT 0",
+            ):
+                conn.execute(text(stmt))
             conn.execute(
                 text(
                     """
@@ -321,11 +332,13 @@ def init_db(db_path=None) -> None:
                         lock_name TEXT PRIMARY KEY,
                         owner TEXT NOT NULL,
                         started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-                        expires_at TIMESTAMPTZ NOT NULL
+                        expires_at TIMESTAMPTZ NOT NULL,
+                        metadata JSONB
                     )
                     """
                 )
             )
+            conn.execute(text("ALTER TABLE sync_locks ADD COLUMN IF NOT EXISTS metadata JSONB"))
         return
 
     with connect(db_path) as conn:
@@ -472,6 +485,10 @@ def init_db(db_path=None) -> None:
                 events_seen INTEGER DEFAULT 0,
                 fights_seen INTEGER DEFAULT 0,
                 fighters_seen INTEGER DEFAULT 0,
+                inserted_count INTEGER DEFAULT 0,
+                updated_count INTEGER DEFAULT 0,
+                skipped_count INTEGER DEFAULT 0,
+                failed_count INTEGER DEFAULT 0,
                 message TEXT
             )
             """
@@ -510,8 +527,20 @@ def init_db(db_path=None) -> None:
                 lock_name TEXT PRIMARY KEY,
                 owner TEXT NOT NULL,
                 started_at TEXT NOT NULL,
-                expires_at TEXT NOT NULL
+                expires_at TEXT NOT NULL,
+                metadata TEXT
             )
             """
         )
+        for stmt in (
+            "ALTER TABLE sync_locks ADD COLUMN metadata TEXT",
+            "ALTER TABLE sync_runs ADD COLUMN inserted_count INTEGER DEFAULT 0",
+            "ALTER TABLE sync_runs ADD COLUMN updated_count INTEGER DEFAULT 0",
+            "ALTER TABLE sync_runs ADD COLUMN skipped_count INTEGER DEFAULT 0",
+            "ALTER TABLE sync_runs ADD COLUMN failed_count INTEGER DEFAULT 0",
+        ):
+            try:
+                conn.execute(stmt)
+            except sqlite3.OperationalError:
+                pass
         conn.commit()

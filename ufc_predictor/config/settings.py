@@ -72,6 +72,10 @@ ENSEMBLE_WEIGHTS = {"sklearn": 0.55, "elo": 0.20, "llm": 0.25}
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 USE_LLM_ANALYST = os.getenv("USE_LLM_ANALYST", "false").lower() in {"1", "true", "yes", "on"}
+ENABLE_AI_SUMMARY = os.getenv("ENABLE_AI_SUMMARY", "false").lower() in {"1", "true", "yes", "on"}
+AI_SUMMARY_PROVIDER = os.getenv("AI_SUMMARY_PROVIDER", "none")
+AI_SUMMARY_MODEL = os.getenv("AI_SUMMARY_MODEL", "")
+AI_SUMMARY_TIMEOUT_SECONDS = float(os.getenv("AI_SUMMARY_TIMEOUT_SECONDS", "10"))
 
 # Scraper / sync
 ENABLE_LIVE_SYNC = os.getenv("ENABLE_LIVE_SYNC", "false").lower() in {"1", "true", "yes", "on"}

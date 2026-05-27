@@ -38,6 +38,9 @@ class TestApiPredictionDiagnostics(unittest.TestCase):
         )
 
         self.assertNotIn("diagnostics", payload["prediction"])
+        self.assertIn("analysis", payload)
+        self.assertIn("sections", payload["analysis"])
+        self.assertTrue(payload["analysis"]["summary"])
 
 
 if __name__ == "__main__":

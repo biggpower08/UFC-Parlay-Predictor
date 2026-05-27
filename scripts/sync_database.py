@@ -63,7 +63,7 @@ def main() -> int:
         print("Targeted fighter profile sync is intentionally not enabled yet.")
         print("Use fight result sync first; profile enrichment should stay limited and manually reviewed.")
 
-    counts = {"events": 0, "fights": 0, "fighters": 0, "rankings": 0}
+    counts = {"events": 0, "fights": 0, "fighters": 0, "rankings": 0, "inserted": 0, "updated": 0, "skipped": 0, "failed": 0}
     status = "succeeded"
     message = ""
 
@@ -83,6 +83,7 @@ def main() -> int:
                     logger.info("sync parsed event=%s fights=%s", event.name, len(event_fights))
                 except FetchError as exc:
                     status = "partial"
+                    counts["failed"] += 1
                     message = f"{message} Event failed: {event.name}: {exc}".strip()
                     logger.warning("sync event_failed event=%s error=%s", event.name, exc)
 
@@ -90,6 +91,8 @@ def main() -> int:
             counts["fights"] = upsert_fights(fights, dry_run=args.dry_run)
             if not args.skip_fighters:
                 counts["fighters"] = upsert_fighters_from_fights(fights, dry_run=args.dry_run)
+            counts["inserted"] = counts["events"] + counts["fights"] + counts["fighters"]
+            counts["skipped"] = max(0, len(events) - counts["events"])
 
             if not args.dry_run and fights:
                 if not args.skip_elo:
@@ -97,6 +100,17 @@ def main() -> int:
                 if not args.skip_rankings:
                     ranking_result = generate_rankings()
                     counts["rankings"] = int(ranking_result.get("rankings", 0))
+            logger.info(
+                "sync counts source=%s status=%s events=%s fights=%s fighters=%s inserted=%s skipped=%s failed=%s",
+                args.source,
+                status,
+                counts["events"],
+                counts["fights"],
+                counts["fighters"],
+                counts["inserted"],
+                counts["skipped"],
+                counts["failed"],
+            )
 
         if not args.dry_run:
             update_source_health(args.source, BASE_URL, "healthy")

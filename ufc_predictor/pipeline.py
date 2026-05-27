@@ -1,6 +1,7 @@
 """Prediction pipeline, reporting, and fighter selection."""
 
 from ufc_predictor.config import settings
+from ufc_predictor.analysis import build_fight_analysis
 from ufc_predictor.features.feature_engineering import (
     analyze_style,
     build_master_df,
@@ -39,7 +40,8 @@ def _pick_one(df, label):
 def run_prediction(f1, f2):
     comparison = compare_fighters(f1, f2)
     prediction = _generate_prediction(f1, f2, comparison)
-    summary = _generate_summary(comparison, prediction)
+    analysis = build_fight_analysis(comparison, prediction)
+    summary = analysis["summary"]
     logger.info(
         "Prediction %s vs %s -> %s",
         comparison["stats1"]["Name"],
@@ -54,21 +56,7 @@ def _generate_prediction(f1, f2, comparison):
 
 
 def _generate_summary(comparison, prediction):
-    s1, s2 = comparison["stats1"], comparison["stats2"]
-    n1, n2 = s1["Name"], s2["Name"]
-    prob_a = prediction.get("prob_a", 0.5)
-    lean = _model_lean_text(n1, n2, prob_a)
-    path1 = _win_condition_text(s1, s2, comparison["style1"])
-    path2 = _win_condition_text(s2, s1, comparison["style2"])
-    danger1 = _danger_text(s1, s2)
-    danger2 = _danger_text(s2, s1)
-    return (
-        f"This profiles as a {comparison['style1']['label']} vs "
-        f"{comparison['style2']['label']} matchup, with {n1} trying to win through "
-        f"{path1} and {n2} needing {path2}. The biggest danger for {n1} is {danger1}; "
-        f"for {n2}, it is {danger2}. {lean}, but this is MMA, so the read should stay "
-        f"measured rather than absolute."
-    )
+    return build_fight_analysis(comparison, prediction)["summary"]
 
 
 def _model_lean_text(name1, name2, prob_a):

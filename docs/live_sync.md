@@ -64,8 +64,8 @@ Refresh Elo without scraping:
 
 None of these are required for normal app startup.
 
-- `ENABLE_LIVE_SYNC=false`: reserved for protected future sync endpoints.
-- `SYNC_SECRET`: reserved for protected internal sync endpoints.
+- `ENABLE_LIVE_SYNC=false`: keeps future manual sync triggers disabled by default.
+- `SYNC_SECRET`: enables protected internal sync status endpoints when set.
 - `SCRAPER_FETCHER=requests`: default fetcher. Optional value: `playwright`.
 - `SCRAPER_RATE_LIMIT_SECONDS=1.0`: delay between live requests.
 - `SCRAPER_CACHE_DIR`: override scraper cache folder.
@@ -74,15 +74,17 @@ None of these are required for normal app startup.
 
 ## Render Cron Recommendation
 
-Do not enable a recurring live sync until manual runs are stable.
+Do not enable a recurring live sync until manual runs are stable and source health is not repeatedly `challenged`.
 
 When ready, use a Render Cron Job instead of making normal users trigger scraping:
 
 ```bash
-python scripts/sync_database.py --recent-days 14
+python scripts/sync_database.py --recent-days 14 --fetcher requests
 ```
 
 If UFCStats challenge pages are frequent, keep the cron disabled and use manual/cache imports.
+
+Recommended early schedule: once per day during off-peak hours. Avoid hourly scraping unless repeated manual checks show the source is healthy.
 
 ## Inspect Sync State
 
@@ -90,6 +92,17 @@ Latest sync runs:
 
 ```sql
 select source, status, dry_run, events_seen, fights_seen, fighters_seen, started_at, finished_at, message
+from sync_runs
+order by started_at desc
+limit 20;
+```
+
+Expanded sync counts:
+
+```sql
+select source, status, events_seen, fights_seen, fighters_seen,
+       inserted_count, updated_count, skipped_count, failed_count,
+       started_at, finished_at, message
 from sync_runs
 order by started_at desc
 limit 20;

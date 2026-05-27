@@ -174,6 +174,10 @@ class SyncRun(Base):
     events_seen = Column(Integer, default=0)
     fights_seen = Column(Integer, default=0)
     fighters_seen = Column(Integer, default=0)
+    inserted_count = Column(Integer, default=0)
+    updated_count = Column(Integer, default=0)
+    skipped_count = Column(Integer, default=0)
+    failed_count = Column(Integer, default=0)
     message = Column(Text)
 
 
@@ -200,3 +204,4 @@ class SyncLock(Base):
     owner = Column(Text, nullable=False)
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     expires_at = Column(DateTime(timezone=True), nullable=False)
+    metadata_json = Column("metadata", JSONB)
