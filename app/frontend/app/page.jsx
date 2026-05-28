@@ -81,7 +81,6 @@ export default function App() {
   const [message, setMessage] = useState("");
   const [resolver, setResolver] = useState(null);
   const [fighterMeta, setFighterMeta] = useState({ a: null, b: null });
-  const [allowCrossDivision, setAllowCrossDivision] = useState(false);
   const [searching, setSearching] = useState({ a: false, b: false });
   const [activeSearchSlot, setActiveSearchSlot] = useState(null);
   const debouncedFighterA = useDebouncedValue(fighterAQuery, 300);
@@ -167,10 +166,6 @@ export default function App() {
         setMessage("Search for and select two different fighters first.");
         return;
       }
-      if (knownWeightClassMismatch() && !allowCrossDivision) {
-        setMessage("These fighters are listed in different weight classes. Turn on cross-division matchups to continue.");
-        return;
-      }
       const resolvedA = await resolveBeforePrediction("a", selectedFighterA.name);
       if (!resolvedA) return;
       const resolvedB = await resolveBeforePrediction("b", selectedFighterB.name);
@@ -185,7 +180,7 @@ export default function App() {
           allow_scrape: true,
           confirmed_a: true,
           confirmed_b: true,
-          allow_cross_division: allowCrossDivision,
+          allow_cross_division: true,
         }),
       });
       if (response.status === 409) {
@@ -200,7 +195,7 @@ export default function App() {
       }
       if (response.status === 422) {
         const problem = await response.json();
-        setMessage(problem.detail?.message || "This matchup is blocked by the weight class rule.");
+        setMessage(problem.detail?.message || "The prediction request could not be completed.");
         return;
       }
       if (!response.ok) throw new Error(await readApiError(response));
@@ -325,13 +320,6 @@ export default function App() {
     closeSearch(slot);
   }
 
-  function knownWeightClassMismatch() {
-    const classA = fighterMeta.a?.weight_class;
-    const classB = fighterMeta.b?.weight_class;
-    if (!classA || !classB || classA === "Unknown" || classB === "Unknown") return false;
-    return classA !== classB;
-  }
-
   async function saveFeedback(wasCorrect) {
     if (!result) return;
     const predicted = result.prediction.winner;
@@ -366,6 +354,7 @@ export default function App() {
   const readyTitle = selectedFighterA?.name && selectedFighterB?.name
     ? `${selectedFighterA.name} vs ${selectedFighterB.name}`
     : "Search for two fighters to generate a prediction.";
+  const matchupType = result?.analysis?.matchup_type || localMatchupType(fighterMeta.a, fighterMeta.b);
 
   return (
     <main className="app-shell" ref={appRef}>
@@ -427,17 +416,10 @@ export default function App() {
             {fighterMeta.a?.weight_class || "Fighter A unknown"} vs {fighterMeta.b?.weight_class || "Fighter B unknown"}
           </span>
         </div>
-        {knownWeightClassMismatch() && (
-          <p className="warning">These fighters are listed in different weight classes.</p>
-        )}
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={allowCrossDivision}
-            onChange={(event) => setAllowCrossDivision(event.target.checked)}
-          />
-          <span>Allow cross-division matchup</span>
-        </label>
+        <div className={`matchup-status ${matchupType.severity}`}>
+          <strong>{matchupType.label}</strong>
+          <span>{matchupType.explanation}</span>
+        </div>
       </section>
 
       {message && (
@@ -523,15 +505,16 @@ export default function App() {
           {activeTab === "matchup" && <StatsPanel comparison={result.comparison} />}
           {activeTab === "prediction" && (
             <section className="panel prediction-panel">
-              <div className="analyst-read">
-                <span>Analyst read</span>
-                <p>{result.analysis?.summary || result.summary}</p>
-              </div>
               {result.analysis && (
                 <div className="analysis-badges">
                   <span>{result.analysis.confidence_label}</span>
                   <span>{result.analysis.volatility_label} volatility</span>
                   <span>{result.analysis.data_quality_label} data</span>
+                  {result.analysis.matchup_type && (
+                    <span className={`matchup-badge ${result.analysis.matchup_type.severity}`}>
+                      {result.analysis.matchup_type.label}
+                    </span>
+                  )}
                 </div>
               )}
               <div className="winner">
@@ -543,6 +526,11 @@ export default function App() {
               </div>
               <p className="confidence-label">{confidence}% confidence</p>
               <p className="reasoning">{result.prediction.reasoning}</p>
+              <div className="analyst-read">
+                <span>Analyst read</span>
+                <p>{result.analysis?.summary || result.summary}</p>
+              </div>
+              {result.analysis?.prop_reads?.length > 0 && <PropReadsPanel analysis={result.analysis} />}
               {result.analysis && <AnalysisPanel analysis={result.analysis} />}
             </section>
           )}
@@ -568,6 +556,60 @@ async function readApiError(response) {
   } catch {
     return response.statusText || "Request failed";
   }
+}
+
+function localMatchupType(fighterA, fighterB) {
+  const classA = fighterA?.weight_class;
+  const classB = fighterB?.weight_class;
+  if (!fighterA || !fighterB) {
+    return {
+      label: "Weight-class data incomplete",
+      severity: "soft",
+      explanation: "Select two fighters to preview matchup context.",
+    };
+  }
+  if (missingWeightClass(classA) || missingWeightClass(classB)) {
+    return {
+      label: "Weight-class data incomplete",
+      severity: "soft",
+      explanation: "One or both fighters are missing reliable weight-class data, so confidence may be lower.",
+    };
+  }
+  const normalizedA = normalizeWeightClass(classA);
+  const normalizedB = normalizeWeightClass(classB);
+  if (normalizedA === normalizedB) {
+    return {
+      label: "Same-division matchup",
+      severity: "none",
+      explanation: "Both fighters are listed in the same division.",
+    };
+  }
+  const order = ["strawweight", "flyweight", "bantamweight", "featherweight", "lightweight", "welterweight", "middleweight", "light heavyweight", "heavyweight"];
+  const indexA = order.indexOf(normalizedA);
+  const indexB = order.indexOf(normalizedB);
+  if (indexA === -1 || indexB === -1 || Math.abs(indexA - indexB) <= 1) {
+    return {
+      label: "Potential cross-division matchup",
+      severity: "soft",
+      explanation: "These fighters are listed near different or uncertain divisions, so the model may be less confident.",
+    };
+  }
+  return {
+    label: "Cross-division matchup",
+    severity: "high",
+    explanation: "These fighters are listed in different divisions. The prediction is still shown, but matchup realism and confidence may be lower.",
+  };
+}
+
+function missingWeightClass(value) {
+  return !value || ["unknown", "n/a", "na", "none", "null"].includes(String(value).trim().toLowerCase());
+}
+
+function normalizeWeightClass(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^women'?s\s+/, "");
 }
 
 const FighterInput = memo(function FighterInput({
@@ -633,9 +675,64 @@ const StatsPanel = memo(function StatsPanel({ comparison }) {
   );
 });
 
+const PropReadsPanel = memo(function PropReadsPanel({ analysis }) {
+  return (
+    <section className="prop-panel">
+      <div className="prop-panel-header">
+        <div>
+          <span>Model-informed</span>
+          <h2>Prop Reads</h2>
+        </div>
+        <p>{analysis.responsible_use || "These prop reads are informational model analysis, not guarantees or financial advice. Fight outcomes are uncertain."}</p>
+      </div>
+      <div className="prop-read-grid">
+        {analysis.prop_reads.map((read) => (
+          <article className={`prop-read ${read.confidence || "low"}`} key={read.id || `${read.category}-${read.label}`}>
+            <div className="prop-read-topline">
+              <span>{read.category?.replaceAll("_", " ") || "read"}</span>
+              <b>{read.label}</b>
+            </div>
+            <p className="prop-style">{read.prop_style}</p>
+            <div className="prop-badges">
+              <span>{read.confidence || "low"} confidence</span>
+              <span>{formatSupportLevel(read.support_level)}</span>
+            </div>
+            {read.fighter && <small>{read.fighter}</small>}
+            {read.round_window && <small>{read.round_window}</small>}
+            <p>{read.explanation}</p>
+            {read.caution && <em>{read.caution}</em>}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+});
+
+function formatSupportLevel(value) {
+  return String(value || "scenario_read")
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 const AnalysisPanel = memo(function AnalysisPanel({ analysis }) {
   return (
     <div className="analysis-panel">
+      {analysis.secondary_reads?.length > 0 && (
+        <div className="secondary-read-grid">
+          {analysis.secondary_reads.map((read) => (
+            <article className={`secondary-read ${read.confidence || "low"}`} key={`${read.type}-${read.label}`}>
+              <div>
+                <span>{read.label}</span>
+                <b>{read.confidence || "low"} confidence</b>
+              </div>
+              {read.fighter && <small>{read.fighter}</small>}
+              {read.round_window && <small>{read.round_window}</small>}
+              <p>{read.read}</p>
+              {read.explanation && <em>{read.explanation}</em>}
+            </article>
+          ))}
+        </div>
+      )}
       {analysis.warnings?.length > 0 && (
         <div className="analysis-warnings">
           {analysis.warnings.map((warning) => (

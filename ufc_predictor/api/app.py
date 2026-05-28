@@ -26,7 +26,6 @@ from ufc_predictor.data.sync import get_sync_status
 from ufc_predictor.rankings.generator import query_elo_history, query_rankings
 from ufc_predictor.utils.helpers import normalize_name
 from ufc_predictor.utils.logger import get_logger
-from ufc_predictor.utils.weight_classes import detect_weight_class, same_weight_class
 
 logger = get_logger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -51,7 +50,7 @@ class PredictRequest(BaseModel):
     allow_scrape: bool = True
     confirmed_a: bool = False
     confirmed_b: bool = False
-    allow_cross_division: bool = False
+    allow_cross_division: bool = True
     debug: bool = False
 
 
@@ -219,23 +218,6 @@ def predict(request: PredictRequest):
         raise HTTPException(status_code=409, detail=_clean(exc.payload)) from exc
     except Exception as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
-
-    class_a = detect_weight_class(fighter_a)
-    class_b = detect_weight_class(fighter_b)
-    if not request.allow_cross_division and not same_weight_class(class_a, class_b):
-        raise HTTPException(
-            status_code=422,
-            detail={
-                "status": "weight_class_mismatch",
-                "message": (
-                    f"{fighter_a.get('name', request.fighter_a)} is listed at {class_a}, "
-                    f"while {fighter_b.get('name', request.fighter_b)} is listed at {class_b}. "
-                    "Turn on cross-division matchups to continue."
-                ),
-                "fighter_a_weight_class": class_a,
-                "fighter_b_weight_class": class_b,
-            },
-        )
 
     try:
         comparison, prediction, summary = _timed_call("predict.pipeline", run_prediction, fighter_a, fighter_b)
