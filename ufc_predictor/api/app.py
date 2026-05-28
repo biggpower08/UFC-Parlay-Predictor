@@ -10,7 +10,7 @@ from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 from sqlalchemy import text
 
 from ufc_predictor import __version__
@@ -21,6 +21,8 @@ from ufc_predictor.db.schema import get_engine, init_db, using_postgres
 from ufc_predictor.db.repository import resolve_name, save_prediction, search_fighters
 from ufc_predictor.feedback.feedback_handler import save_feedback
 from ufc_predictor.models.sklearn.predictor import model_available
+from ufc_predictor.models.props import prop_model_status
+from ufc_predictor.odds import get_odds_events, get_odds_status
 from ufc_predictor.pipeline import run_prediction
 from ufc_predictor.data.sync import get_sync_status
 from ufc_predictor.rankings.generator import query_elo_history, query_rankings
@@ -56,13 +58,44 @@ class PredictRequest(BaseModel):
 
 class FeedbackRequest(BaseModel):
     prediction_id: str | None = None
-    fighter_a: str
-    fighter_b: str
-    predicted_winner: str
+    fighter_a: str | None = None
+    fighter_b: str | None = None
+    predicted_winner: str | None = None
     actual_winner: str | None = None
     confidence: float | None = None
-    was_correct: bool
+    was_correct: bool | None = None
     user_notes: str | None = ""
+    feedback_type: str | None = None
+    target_type: str | None = None
+    target_id: str | None = None
+    user_label: str | None = None
+    rating: str | None = None
+    comment: str | None = None
+    metadata: dict | None = None
+
+    @root_validator(skip_on_failure=True)
+    def validate_feedback_shape(cls, values):
+        is_prediction_feedback = values.get("fighter_a") and values.get("fighter_b") and values.get("predicted_winner")
+        is_target_feedback = values.get("target_type") and (values.get("rating") or values.get("user_label"))
+        if not (is_prediction_feedback or is_target_feedback):
+            raise ValueError("Feedback must include either prediction fields or target_type with a rating/user_label.")
+        if is_prediction_feedback and values.get("was_correct") is None:
+            raise ValueError("Prediction feedback must include was_correct.")
+        if is_target_feedback:
+            values["fighter_a"] = values.get("fighter_a") or "N/A"
+            values["fighter_b"] = values.get("fighter_b") or "N/A"
+            values["predicted_winner"] = values.get("predicted_winner") or values.get("target_type") or "N/A"
+            values["was_correct"] = bool(values.get("was_correct", False))
+            note_parts = [
+                values.get("user_notes") or "",
+                f"feedback_type={values.get('feedback_type') or 'read_feedback'}",
+                f"target_type={values.get('target_type')}",
+                f"target_id={values.get('target_id') or ''}",
+                f"rating={values.get('rating') or values.get('user_label') or ''}",
+                f"comment={values.get('comment') or ''}",
+            ]
+            values["user_notes"] = " | ".join(part for part in note_parts if part)
+        return values
 
 
 @app.on_event("startup")
@@ -167,6 +200,34 @@ def rankings(type: str = "overall_current_elo", weight_class: str | None = None,
         raise HTTPException(status_code=500, detail=f"Rankings query failed: {exc}") from exc
     finally:
         _log_timing("rankings.query", start, type=type, weight_class=weight_class, limit=limit)
+
+
+@app.get("/api/odds/status")
+@app.get("/odds/status")
+def odds_status():
+    return get_odds_status()
+
+
+@app.get("/api/odds/events")
+@app.get("/odds/events")
+def odds_events():
+    return get_odds_events()
+
+
+@app.get("/api/betting/reads")
+@app.get("/betting/reads")
+def betting_reads():
+    status = get_odds_status()
+    return {
+        "odds_status": status,
+        "prop_model_status": prop_model_status(),
+        "reads": [],
+        "message": (
+            "Live sportsbook odds are not connected yet. These are model-informed betting reads, not sportsbook lines."
+            if not status["odds_enabled"]
+            else "Odds provider is configured, but dedicated betting reads require a selected fight."
+        ),
+    }
 
 
 @app.get("/api/fighters/{fighter_key}/elo-history")

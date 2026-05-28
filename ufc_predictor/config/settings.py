@@ -77,6 +77,13 @@ AI_SUMMARY_PROVIDER = os.getenv("AI_SUMMARY_PROVIDER", "none")
 AI_SUMMARY_MODEL = os.getenv("AI_SUMMARY_MODEL", "")
 AI_SUMMARY_TIMEOUT_SECONDS = float(os.getenv("AI_SUMMARY_TIMEOUT_SECONDS", "10"))
 
+# Odds / betting-read infrastructure. Disabled by default; no API key is required
+# for public predictions or normal app startup.
+ENABLE_ODDS = os.getenv("ENABLE_ODDS", "false").lower() in {"1", "true", "yes", "on"}
+ODDS_PROVIDER = os.getenv("ODDS_PROVIDER", "none")
+ODDS_API_KEY = os.getenv("ODDS_API_KEY", "")
+ODDS_CACHE_TTL_SECONDS = int(os.getenv("ODDS_CACHE_TTL_SECONDS", "300"))
+
 # Scraper / sync
 ENABLE_LIVE_SYNC = os.getenv("ENABLE_LIVE_SYNC", "false").lower() in {"1", "true", "yes", "on"}
 SYNC_SECRET = os.getenv("SYNC_SECRET", "")

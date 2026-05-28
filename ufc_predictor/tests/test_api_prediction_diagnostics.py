@@ -1,7 +1,9 @@
 import unittest
 
 import ufc_predictor.api.app as api_app
-from ufc_predictor.api.app import PredictRequest, predict
+from pydantic import ValidationError
+
+from ufc_predictor.api.app import FeedbackRequest, PredictRequest, predict
 from ufc_predictor.models.sklearn.predictor import model_available
 
 
@@ -95,3 +97,24 @@ def test_cross_division_request_is_not_blocked_when_legacy_flag_is_false(monkeyp
     assert payload["analysis"]["matchup_type"]["label"] == "Cross-division matchup"
     assert payload["analysis"]["prop_reads"]
     assert payload["prediction_id"] == "prediction-id"
+
+
+def test_feedback_request_accepts_prop_read_feedback():
+    request = FeedbackRequest(
+        feedback_type="read_feedback",
+        target_type="prop_read",
+        target_id="round_phase_finish",
+        rating="helpful",
+        comment="Useful but cautious.",
+    )
+
+    assert request.fighter_a == "N/A"
+    assert request.fighter_b == "N/A"
+    assert request.predicted_winner == "prop_read"
+    assert request.was_correct is False
+    assert "target_type=prop_read" in request.user_notes
+
+
+def test_feedback_request_rejects_empty_payload():
+    with unittest.TestCase().assertRaises(ValidationError):
+        FeedbackRequest()

@@ -6,6 +6,7 @@ import hashlib
 
 from ufc_predictor.analysis.providers import generate_optional_ai_summary
 from ufc_predictor.analysis.signals import confidence_label, data_quality_label, direction_for_names, volatility_label
+from ufc_predictor.models.props import prop_model_status
 
 WEIGHT_CLASS_ORDER = {
     "strawweight": 0,
@@ -36,6 +37,7 @@ def build_fight_analysis(comparison: dict, prediction: dict) -> dict:
     drivers = _drivers(stats_a, stats_b, prediction, labels, warnings)
     secondary_reads = _secondary_reads(stats_a, stats_b, comparison, prediction, labels, warnings)
     prop_reads = _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matchup_type)
+    model_status = prop_model_status()
     sections = _sections(stats_a, stats_b, comparison, prediction, labels, drivers, warnings, secondary_reads, prop_reads)
     summary = _summary(stats_a, stats_b, prediction, labels, warnings)
     structured = {
@@ -53,12 +55,14 @@ def build_fight_analysis(comparison: dict, prediction: dict) -> dict:
         "matchup_type": matchup_type,
         "secondary_reads": secondary_reads,
         "prop_reads": prop_reads,
+        "prop_model_status": model_status,
     }
     ai = generate_optional_ai_summary(structured)
     if ai:
         ai.setdefault("matchup_type", matchup_type)
         ai.setdefault("secondary_reads", secondary_reads)
         ai.setdefault("prop_reads", prop_reads)
+        ai.setdefault("prop_model_status", model_status)
         ai.setdefault("sections", sections)
         ai.setdefault("drivers", drivers)
         ai.setdefault("warnings", warnings)
@@ -73,6 +77,7 @@ def build_fight_analysis(comparison: dict, prediction: dict) -> dict:
         "matchup_type": matchup_type,
         "secondary_reads": secondary_reads,
         "prop_reads": prop_reads,
+        "prop_model_status": model_status,
         "responsible_use": "These prop reads are informational model analysis, not guarantees or financial advice. Fight outcomes are uncertain.",
         "sections": sections,
         "drivers": drivers,

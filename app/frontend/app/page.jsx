@@ -201,6 +201,11 @@ export default function App() {
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
       setResult(data);
+      try {
+        localStorage.setItem("latestPredictionResult", JSON.stringify(data));
+      } catch {
+        // Local storage is optional; the prediction result still renders here.
+      }
       setActiveTab("prediction");
     } catch (error) {
       setMessage(`Prediction failed: ${error.message}`);
@@ -409,17 +414,11 @@ export default function App() {
         </button>
       </section>
 
-      <section className="match-options panel">
-        <div>
-          <strong>Weight classes</strong>
-          <span>
-            {fighterMeta.a?.weight_class || "Fighter A unknown"} vs {fighterMeta.b?.weight_class || "Fighter B unknown"}
-          </span>
-        </div>
-        <div className={`matchup-status ${matchupType.severity}`}>
-          <strong>{matchupType.label}</strong>
-          <span>{matchupType.explanation}</span>
-        </div>
+      <section className="matchup-strip">
+        <span>
+          {fighterMeta.a?.weight_class || "Unknown"} vs {fighterMeta.b?.weight_class || "Unknown"}
+        </span>
+        <b className={`matchup-mini-badge ${matchupType.severity}`}>{compactMatchupLabel(matchupType)}</b>
       </section>
 
       {message && (
@@ -530,6 +529,7 @@ export default function App() {
                 <span>Analyst read</span>
                 <p>{result.analysis?.summary || result.summary}</p>
               </div>
+              <a className="analysis-link" href="/analysis">Open full analysis</a>
               {result.analysis?.prop_reads?.length > 0 && <PropReadsPanel analysis={result.analysis} />}
               {result.analysis && <AnalysisPanel analysis={result.analysis} />}
             </section>
@@ -612,6 +612,13 @@ function normalizeWeightClass(value) {
     .replace(/^women'?s\s+/, "");
 }
 
+function compactMatchupLabel(matchupType) {
+  if (matchupType.label === "Same-division matchup") return "Same division";
+  if (matchupType.label === "Potential cross-division matchup") return "Possibly cross-division";
+  if (matchupType.label === "Cross-division matchup") return "Cross-division";
+  return "Weight class unknown";
+}
+
 const FighterInput = memo(function FighterInput({
   label,
   value,
@@ -676,6 +683,28 @@ const StatsPanel = memo(function StatsPanel({ comparison }) {
 });
 
 const PropReadsPanel = memo(function PropReadsPanel({ analysis }) {
+  const [feedbackState, setFeedbackState] = useState({});
+
+  async function submitReadFeedback(read, rating) {
+    try {
+      await apiFetch("/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feedback_type: "read_feedback",
+          target_type: "prop_read",
+          target_id: read.id,
+          rating,
+          user_label: read.label,
+          comment: read.prop_style,
+        }),
+      });
+      setFeedbackState((current) => ({ ...current, [read.id]: "Thanks for the feedback." }));
+    } catch (error) {
+      setFeedbackState((current) => ({ ...current, [read.id]: `Feedback failed: ${error.message}` }));
+    }
+  }
+
   return (
     <section className="prop-panel">
       <div className="prop-panel-header">
@@ -701,6 +730,14 @@ const PropReadsPanel = memo(function PropReadsPanel({ analysis }) {
             {read.round_window && <small>{read.round_window}</small>}
             <p>{read.explanation}</p>
             {read.caution && <em>{read.caution}</em>}
+            <div className="read-feedback">
+              {["Helpful", "Too vague", "Too risky", "Seems wrong"].map((label) => (
+                <button key={label} type="button" onClick={() => submitReadFeedback(read, label.toLowerCase().replaceAll(" ", "_"))}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            {feedbackState[read.id] && <small>{feedbackState[read.id]}</small>}
           </article>
         ))}
       </div>
