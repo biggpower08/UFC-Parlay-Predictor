@@ -26,10 +26,13 @@ def test_odds_events_empty_when_provider_disabled():
     assert events["events"] == []
 
 
-def test_prop_model_registry_returns_not_trained():
+def test_prop_model_registry_reports_current_training_status():
     statuses = prop_model_status()
 
     assert statuses
-    for model in statuses.values():
-        assert model["status"] == "not_trained"
-        assert model["support_level"] == "not_available"
+    for model_name in ("finish_model", "goes_distance_model", "method_model", "round_model"):
+        assert statuses[model_name]["status"] in {"trained", "not_trained"}
+        assert statuses[model_name]["support_level"] in {"model_supported", "not_available"}
+    for model_name in ("strike_volume_model", "takedown_control_model", "odds_edge_model"):
+        assert statuses[model_name]["status"] == "insufficient_data"
+        assert statuses[model_name]["support_level"] == "not_available"

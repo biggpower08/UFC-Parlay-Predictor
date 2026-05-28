@@ -219,9 +219,11 @@ def test_prop_reads_have_required_fields_and_support_levels():
             "limited_data",
             "not_available",
         }
-        assert read["support_level"] != "model_supported"
         assert read["explanation"]
         assert read["caution"]
+
+    if analysis.get("prop_model_status", {}).get("finish_model", {}).get("status") == "trained":
+        assert any(read["support_level"] == "model_supported" for read in reads)
 
 
 def test_prop_reads_do_not_generate_unsupported_or_hype_claims():

@@ -7,6 +7,7 @@ import hashlib
 from ufc_predictor.analysis.providers import generate_optional_ai_summary
 from ufc_predictor.analysis.signals import confidence_label, data_quality_label, direction_for_names, volatility_label
 from ufc_predictor.models.props import prop_model_status
+from ufc_predictor.models.props.predictor import predict_supported_prop_models
 
 WEIGHT_CLASS_ORDER = {
     "strawweight": 0,
@@ -36,7 +37,8 @@ def build_fight_analysis(comparison: dict, prediction: dict) -> dict:
     }
     drivers = _drivers(stats_a, stats_b, prediction, labels, warnings)
     secondary_reads = _secondary_reads(stats_a, stats_b, comparison, prediction, labels, warnings)
-    prop_reads = _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matchup_type)
+    prop_predictions = predict_supported_prop_models(stats_a, stats_b)
+    prop_reads = _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matchup_type, prop_predictions)
     model_status = prop_model_status()
     sections = _sections(stats_a, stats_b, comparison, prediction, labels, drivers, warnings, secondary_reads, prop_reads)
     summary = _summary(stats_a, stats_b, prediction, labels, warnings)
@@ -56,6 +58,7 @@ def build_fight_analysis(comparison: dict, prediction: dict) -> dict:
         "secondary_reads": secondary_reads,
         "prop_reads": prop_reads,
         "prop_model_status": model_status,
+        "prop_model_predictions": prop_predictions,
     }
     ai = generate_optional_ai_summary(structured)
     if ai:
@@ -63,6 +66,7 @@ def build_fight_analysis(comparison: dict, prediction: dict) -> dict:
         ai.setdefault("secondary_reads", secondary_reads)
         ai.setdefault("prop_reads", prop_reads)
         ai.setdefault("prop_model_status", model_status)
+        ai.setdefault("prop_model_predictions", prop_predictions)
         ai.setdefault("sections", sections)
         ai.setdefault("drivers", drivers)
         ai.setdefault("warnings", warnings)
@@ -78,6 +82,7 @@ def build_fight_analysis(comparison: dict, prediction: dict) -> dict:
         "secondary_reads": secondary_reads,
         "prop_reads": prop_reads,
         "prop_model_status": model_status,
+        "prop_model_predictions": prop_predictions,
         "responsible_use": "These prop reads are informational model analysis, not guarantees or financial advice. Fight outcomes are uncertain.",
         "sections": sections,
         "drivers": drivers,
@@ -204,7 +209,7 @@ def _sections(stats_a, stats_b, comparison, prediction, labels, drivers, warning
     return sections
 
 
-def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matchup_type):
+def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matchup_type, prop_predictions=None):
     # Future hook: replace or enrich these with dedicated method, round, strike-volume,
     # takedown/control, and goes-distance model outputs when trained models exist.
     name_a, name_b = stats_a["Name"], stats_b["Name"]
@@ -215,6 +220,15 @@ def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matc
     base_confidence = _prop_confidence(prediction, labels, warnings, matchup_type)
     scenario_confidence = "low" if base_confidence != "high" else "medium"
     support = "model_informed_read" if base_confidence in {"medium", "high"} else "scenario_read"
+    prop_predictions = prop_predictions or {}
+    finish_prediction = prop_predictions.get("finish_model", {})
+    distance_prediction = prop_predictions.get("goes_distance_model", {})
+    method_prediction = prop_predictions.get("method_model", {})
+    round_prediction = prop_predictions.get("round_model", {})
+    finish_supported = finish_prediction.get("status") == "trained"
+    distance_supported = distance_prediction.get("status") == "trained"
+    method_supported = method_prediction.get("status") == "trained"
+    round_supported = round_prediction.get("status") == "trained"
     method_style = _method_prop_style(favorite, underdog, prediction)
     prop_reads = [
         {
@@ -223,10 +237,14 @@ def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matc
             "label": f"{favorite['Name']} method lean",
             "fighter": favorite["Name"],
             "prop_style": method_style,
-            "confidence": base_confidence,
-            "support_level": support,
+            "confidence": method_prediction.get("confidence", base_confidence),
+            "support_level": "model_supported" if method_supported else support,
             "explanation": _method_lane(stats_a, stats_b, prediction),
-            "caution": "This is a scenario read, not a trained method-prop probability.",
+            "caution": (
+                f"Dedicated method model lean: {method_prediction.get('label')}."
+                if method_supported
+                else "This is a scenario read, not a trained method-prop probability."
+            ),
         },
         {
             "id": "ko_tko_lean",
@@ -256,21 +274,25 @@ def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matc
             "label": "Finish vs decision lean",
             "fighter": favorite["Name"],
             "prop_style": _decision_finish_prop_style(stats_a, stats_b, prediction),
-            "confidence": scenario_confidence,
-            "support_level": support,
+            "confidence": finish_prediction.get("confidence", scenario_confidence),
+            "support_level": "model_supported" if finish_supported or distance_supported else support,
             "explanation": _decision_finish_read(stats_a, stats_b, prediction),
-            "caution": "The current model does not price exact method or goes-distance probabilities.",
+            "caution": _finish_distance_caution(finish_prediction, distance_prediction),
         },
         {
             "id": "round_phase_finish",
             "category": "round_phase",
             "label": "Round-phase finish read",
             "round_window": "Rounds 2-3",
-            "prop_style": "Middle-round finish pressure is plausible if the stronger repeatable offense starts stacking up.",
-            "confidence": "low" if warnings else scenario_confidence,
-            "support_level": "scenario_read",
+            "prop_style": _round_phase_prop_style(round_prediction),
+            "confidence": round_prediction.get("confidence", "low" if warnings else scenario_confidence),
+            "support_level": "model_supported" if round_supported else "scenario_read",
             "explanation": _middle_round_read(stats_a, stats_b, favorite, underdog),
-            "caution": "This is not a round prediction model.",
+            "caution": (
+                f"Dedicated round-phase model lean: {round_prediction.get('label')}."
+                if round_supported
+                else "This is not a round prediction model."
+            ),
         },
         {
             "id": "strike_volume",
@@ -526,6 +548,30 @@ def _decision_finish_prop_style(stats_a, stats_b, prediction):
     if _usable_number(favorite.get("TD Avg")) > 1.5 or _usable_number(favorite.get("SLpM")) > _usable_number(opponent.get("SLpM")) + 1.0:
         return f"Finish pressure is plausible if {favorite['Name']} turns repeated advantages into damage or dominant positions."
     return "Fight goes distance is the cleaner lean if both fighters stay disciplined and the pace remains technical."
+
+
+def _finish_distance_caution(finish_prediction, distance_prediction):
+    if finish_prediction.get("status") == "trained" and distance_prediction.get("status") == "trained":
+        return (
+            f"Dedicated finish model lean: {finish_prediction.get('label')}; "
+            f"goes-distance model lean: {distance_prediction.get('label')}."
+        )
+    return "The current model does not price exact method or goes-distance probabilities."
+
+
+def _round_phase_prop_style(round_prediction):
+    if round_prediction.get("status") != "trained":
+        return "Middle-round finish pressure is plausible if the stronger repeatable offense starts stacking up."
+    label = round_prediction.get("label")
+    if label == "early":
+        return "Early finish pressure is the model-supported round-phase lean."
+    if label == "middle":
+        return "Middle-round finish pressure is the model-supported round-phase lean."
+    if label == "late":
+        return "Late finish pressure is the model-supported round-phase lean."
+    if label == "decision":
+        return "Decision/no-finish is the model-supported round-phase lean."
+    return "Finish phase is uncertain from the dedicated round-phase model."
 
 
 def _volume_prop_style(stats_a, stats_b):
