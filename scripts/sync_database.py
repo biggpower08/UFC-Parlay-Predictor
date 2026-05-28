@@ -10,14 +10,13 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from ufc_predictor.agents.orchestrator import refresh_all
 from ufc_predictor.data.fetchers.errors import (
     FetchError,
     RateLimitError,
     SourceBlockedError,
     SourceUnavailableError,
 )
-from ufc_predictor.data.scrapers.ufcstats import BASE_URL, COMPLETED_EVENTS_URL, ScrapedEvent, UFCStatsClient
+from ufc_predictor.data.scrapers.ufcstats import BASE_URL, COMPLETED_EVENTS_URL, ScrapedEvent, UFCStatsClient, parse_event_fights
 from ufc_predictor.data.sync import (
     get_sync_status,
     record_sync_run,
@@ -27,7 +26,6 @@ from ufc_predictor.data.sync import (
     upsert_fighters_from_fights,
     upsert_fights,
 )
-from ufc_predictor.rankings.generator import generate_rankings
 from ufc_predictor.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -40,6 +38,7 @@ def main() -> int:
     parser.add_argument("--recent-days", type=int, default=30, help="For normal syncs, only keep events this recent.")
     parser.add_argument("--limit-events", type=int, default=None, help="Hard cap the number of events fetched/processed.")
     parser.add_argument("--event-url", action="append", default=[], help="Sync a specific UFCStats event URL.")
+    parser.add_argument("--event-html", action="append", default=[], help="Parse a manually saved UFCStats event HTML file.")
     parser.add_argument("--fighter-url", action="append", default=[], help="Reserved for targeted fighter profile sync.")
     parser.add_argument("--skip-fighters", action="store_true")
     parser.add_argument("--skip-elo", action="store_true")
@@ -75,17 +74,11 @@ def main() -> int:
                 force_refresh=args.force_refresh,
             )
             events = _load_events(client, args)
-            fights = []
-            for event in events:
-                try:
-                    event_fights = client.fetch_event_fights(event)
-                    fights.extend(event_fights)
-                    logger.info("sync parsed event=%s fights=%s", event.name, len(event_fights))
-                except FetchError as exc:
-                    status = "partial"
-                    counts["failed"] += 1
-                    message = f"{message} Event failed: {event.name}: {exc}".strip()
-                    logger.warning("sync event_failed event=%s error=%s", event.name, exc)
+            fights = _load_fights(client, events, args)
+            if getattr(args, "_partial_failure", False):
+                status = "partial"
+                counts["failed"] += int(getattr(args, "_failed_count", 0))
+                message = str(getattr(args, "_failure_message", ""))
 
             counts["events"] = upsert_events(events, dry_run=args.dry_run)
             counts["fights"] = upsert_fights(fights, dry_run=args.dry_run)
@@ -96,8 +89,12 @@ def main() -> int:
 
             if not args.dry_run and fights:
                 if not args.skip_elo:
+                    from ufc_predictor.agents.orchestrator import refresh_all
+
                     refresh_all(force_refresh=False)
                 if not args.skip_rankings:
+                    from ufc_predictor.rankings.generator import generate_rankings
+
                     ranking_result = generate_rankings()
                     counts["rankings"] = int(ranking_result.get("rankings", 0))
             logger.info(
@@ -181,6 +178,15 @@ def check_source_health(args) -> int:
 
 
 def _load_events(client: UFCStatsClient, args) -> list[ScrapedEvent]:
+    if args.event_html:
+        return [
+            ScrapedEvent(
+                name=Path(path).stem,
+                url=str(Path(path).resolve()),
+                source=args.source,
+            )
+            for path in args.event_html
+        ]
     if args.event_url:
         return [
             ScrapedEvent(
@@ -201,6 +207,36 @@ def _load_events(client: UFCStatsClient, args) -> list[ScrapedEvent]:
     # If UFCStats dates are missing or unparsable, keep the normal sync bounded.
     safe_limit = args.limit_events or 5
     return events[:safe_limit]
+
+
+def _load_fights(client: UFCStatsClient, events: list[ScrapedEvent], args) -> list:
+    if args.event_html:
+        fights = []
+        for event in events:
+            html_path = Path(event.url)
+            try:
+                event_fights = parse_event_fights(html_path.read_text(encoding="utf-8"), event)
+                fights.extend(event_fights)
+                logger.info("sync parsed manual_html=%s fights=%s", html_path, len(event_fights))
+            except Exception as exc:
+                args._partial_failure = True
+                args._failed_count = int(getattr(args, "_failed_count", 0)) + 1
+                args._failure_message = f"{getattr(args, '_failure_message', '')} Manual HTML failed: {html_path}: {exc}".strip()
+                logger.warning("sync manual_html_failed path=%s error=%s", html_path, exc)
+        return fights
+
+    fights = []
+    for event in events:
+        try:
+            event_fights = client.fetch_event_fights(event)
+            fights.extend(event_fights)
+            logger.info("sync parsed event=%s fights=%s", event.name, len(event_fights))
+        except FetchError as exc:
+            args._partial_failure = True
+            args._failed_count = int(getattr(args, "_failed_count", 0)) + 1
+            args._failure_message = f"{getattr(args, '_failure_message', '')} Event failed: {event.name}: {exc}".strip()
+            logger.warning("sync event_failed event=%s error=%s", event.name, exc)
+    return fights
 
 
 def _filter_recent(events: list[ScrapedEvent], recent_days: int) -> list[ScrapedEvent]:

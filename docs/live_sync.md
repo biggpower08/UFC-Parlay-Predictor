@@ -43,6 +43,18 @@ Run cache-only mode:
 .\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --cache-only --limit-events 1
 ```
 
+Parse a manually saved UFCStats event page without live fetching:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --event-html C:\path\to\ufcstats_event.html
+```
+
+Import local historical CSV data when live source health is challenged:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv --dry-run
+```
+
 Run a production-style recent sync manually:
 
 ```powershell

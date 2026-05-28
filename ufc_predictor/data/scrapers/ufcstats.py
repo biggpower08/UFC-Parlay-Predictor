@@ -15,8 +15,6 @@ from bs4 import BeautifulSoup
 
 from ufc_predictor.config import settings
 from ufc_predictor.data.fetchers.errors import ParseError
-from ufc_predictor.data.fetchers.playwright_fetcher import PlaywrightFetcher
-from ufc_predictor.data.fetchers.requests_fetcher import RequestsFetcher
 from ufc_predictor.utils.helpers import normalize_name
 
 BASE_URL = "http://ufcstats.com"
@@ -110,8 +108,12 @@ class UFCStatsClient:
 
 def build_fetcher(name: str, cache_only: bool = False, force_refresh: bool = False):
     if name == "requests":
+        from ufc_predictor.data.fetchers.requests_fetcher import RequestsFetcher
+
         return RequestsFetcher(cache_only=cache_only, force_refresh=force_refresh)
     if name == "playwright":
+        from ufc_predictor.data.fetchers.playwright_fetcher import PlaywrightFetcher
+
         return PlaywrightFetcher(cache_only=cache_only, force_refresh=force_refresh)
     raise ValueError(f"Unknown fetcher: {name}")
 

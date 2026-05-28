@@ -31,11 +31,11 @@ def model_artifact_available(model_name: str) -> bool:
 
 def predict_prop_model(model_name: str, feature_dict: dict) -> dict:
     artifact = load_prop_model(model_name)
-    if artifact is None:
+    if artifact is None or not _artifact_is_usable(artifact):
         return {
             "status": "not_trained",
             "support_level": "not_available",
-            "message": "No trained dedicated prop model artifact is available.",
+            "message": "No credible trained dedicated prop model artifact is available.",
             "probabilities": {},
             "label": None,
         }
@@ -109,3 +109,13 @@ def _confidence_label(probability: float) -> str:
     if probability >= 0.58:
         return "medium"
     return "low"
+
+
+def _artifact_is_usable(artifact: dict) -> bool:
+    metadata = artifact.get("metadata") or {}
+    return bool(
+        artifact.get("feature_names")
+        and artifact.get("metrics")
+        and metadata.get("training_source_status") == "credible"
+        and metadata.get("leakage_checked") is True
+    )

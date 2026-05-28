@@ -106,12 +106,19 @@ Safe dry-run, without writing production data:
 .\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --recent-days 14 --fetcher requests
 ```
 
+Training dataset readiness dry-run:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\build_training_dataset.py --dry-run --missingness-report
+```
+
 With an external venv:
 
 ```powershell
 $env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
 & $env:MMA_AI_PYTHON scripts\sync_database.py --status
 & $env:MMA_AI_PYTHON scripts\sync_database.py --source-health
+& $env:MMA_AI_PYTHON scripts\build_training_dataset.py --dry-run --missingness-report
 ```
 
 ## Git Workflow

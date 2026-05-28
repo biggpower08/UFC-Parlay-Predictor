@@ -1,10 +1,15 @@
-"""Registry for dedicated betting/prop models."""
+"""Registry for dedicated betting/prop models.
+
+Models are only marked trained when a saved artifact exists and its metadata
+confirms a credible training-data path. Cached-label experiments should remain
+not_trained until source health and leakage-safe datasets are proven.
+"""
 
 from __future__ import annotations
 
 from dataclasses import asdict
 
-from ufc_predictor.models.props.predictor import model_artifact_available
+from ufc_predictor.models.props.predictor import load_prop_model, model_artifact_available
 from ufc_predictor.models.props.schemas import PropModelStatus
 
 TRAINABLE_NOW = {
@@ -28,26 +33,43 @@ MODEL_NAMES = [
 def prop_model_status() -> dict:
     statuses = {}
     for name in MODEL_NAMES:
-        if model_artifact_available(name):
+        artifact = load_prop_model(name) if model_artifact_available(name) else None
+        if _artifact_is_credible(artifact):
             status = PropModelStatus(
                 name=name,
                 status="trained",
                 support_level="model_supported",
-                message="Dedicated prop model artifact is available.",
+                message="Dedicated prop model artifact includes data-source metadata and validation metrics.",
             )
         elif name in TRAINABLE_NOW:
             status = PropModelStatus(
                 name=name,
                 status="not_trained",
                 support_level="not_available",
-                message="This model can be trained from cached fight result labels.",
+                message="Training is blocked until credible source health and leakage-safe training data are proven.",
             )
         else:
             status = PropModelStatus(
                 name=name,
-                status="insufficient_data",
+                status="not_trained",
                 support_level="not_available",
-                message="Per-fight strike/control or historical odds data is not available yet.",
+                message="Training is blocked until the required per-fight labels or odds history exist.",
             )
         statuses[name] = asdict(status)
     return statuses
+
+
+def _artifact_is_credible(artifact: dict | None) -> bool:
+    if not artifact:
+        return False
+    metadata = artifact.get("metadata") or {}
+    metrics = artifact.get("metrics") or {}
+    return bool(
+        artifact.get("model_name")
+        and artifact.get("feature_names")
+        and metrics
+        and metadata.get("training_source_status") == "credible"
+        and metadata.get("leakage_checked") is True
+        and metadata.get("trained_at")
+        and metadata.get("data_cutoff_date")
+    )

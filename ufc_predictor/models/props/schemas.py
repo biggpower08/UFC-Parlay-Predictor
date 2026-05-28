@@ -5,7 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-PropModelAvailability = Literal["available", "unavailable", "trained", "not_trained", "insufficient_data"]
+PropModelAvailability = Literal[
+    "not_trained",
+    "insufficient_data",
+    "training_data_ready",
+    "trained",
+    "experimental",
+    "unavailable",
+]
 
 
 @dataclass(frozen=True)
