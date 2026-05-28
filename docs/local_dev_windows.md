@@ -1,0 +1,193 @@
+# Local Development on Windows
+
+Use this workflow for local development and validation.
+
+## Repo Location
+
+Use:
+
+```powershell
+cd C:\dev\mma-ai
+```
+
+Do not use the old OneDrive folder. OneDrive caused Git index-lock, npm, Next, and virtual-environment permission problems.
+
+## Python Version
+
+The local standard is Python 3.13 with a `.venv` virtual environment.
+
+The repo does not currently define `pyproject.toml`, `setup.py`, or `setup.cfg`; Python dependencies are listed in `requirements.txt`. The main dependencies are unpinned and current releases support Python 3.13, including scikit-learn, pandas, NumPy, Playwright, and Psycopg. If package resolution fails on a machine, use the exact pip error as the source of truth.
+
+Use `.venv`, not `.venv312`.
+
+No activation is required. Run tools through the venv Python directly.
+
+## First-Time Setup
+
+```powershell
+cd C:\dev\mma-ai
+.\scripts\dev_setup.ps1
+```
+
+If PowerShell blocks local scripts, use a process-only bypass:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+If Windows cannot find Python 3.13 through the `py` launcher, install Python 3.13 from python.org or pass a known Python command:
+
+```powershell
+.\scripts\dev_setup.ps1 -PythonCommand "C:\Path\To\python.exe"
+```
+
+## Backend Tests
+
+```powershell
+cd C:\dev\mma-ai
+.\scripts\dev_test_backend.ps1
+```
+
+This runs:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest ufc_predictor\tests -q --basetemp pytest_tmp_codex
+```
+
+If Windows refuses to execute `.venv\Scripts\python.exe`, use an external venv and point scripts at it:
+
+```powershell
+mkdir C:\venvs -Force
+Remove-Item -Recurse -Force C:\venvs\mma-ai -ErrorAction SilentlyContinue
+py -3.13 -m venv C:\venvs\mma-ai
+
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+.\scripts\dev_setup.ps1
+.\scripts\dev_test_backend.ps1
+```
+
+All local PowerShell scripts honor `MMA_AI_PYTHON`. If it is set, they use that Python path instead of `.venv\Scripts\python.exe`.
+
+## Frontend Build
+
+```powershell
+cd C:\dev\mma-ai
+.\scripts\dev_test_frontend.ps1
+```
+
+The script uses `npm ci` when `app\frontend\package-lock.json` exists, then runs the production build.
+
+If `npm run build` fails because of a Windows npm wrapper or PATH issue, run this from `app\frontend`:
+
+```powershell
+& "C:\Program Files\nodejs\node.exe" node_modules\next\dist\bin\next build
+```
+
+Do not treat the fallback as a way to hide real Next build errors. It only bypasses local npm wrapper/PATH problems.
+
+## Sync Status and Source Health
+
+Check current sync/source status:
+
+```powershell
+cd C:\dev\mma-ai
+.\.venv\Scripts\python.exe scripts\sync_database.py --status
+```
+
+Check UFCStats source health:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\sync_database.py --source-health
+```
+
+Safe dry-run, without writing production data:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --recent-days 14 --fetcher requests
+```
+
+With an external venv:
+
+```powershell
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON scripts\sync_database.py --status
+& $env:MMA_AI_PYTHON scripts\sync_database.py --source-health
+```
+
+## Git Workflow
+
+Codex can edit files, but you should manually stage, commit, and push.
+
+Before staging:
+
+```powershell
+cd C:\dev\mma-ai
+.\scripts\git_health_check.ps1
+```
+
+Normal flow:
+
+```powershell
+git status
+git add <files>
+git commit -m "Your commit message"
+git push
+```
+
+If Git reports a stale index lock and no Git process is running:
+
+```powershell
+Remove-Item -Force .git\index.lock -ErrorAction SilentlyContinue
+```
+
+## Access Denied Fixes
+
+- Make sure the repo is `C:\dev\mma-ai`, not OneDrive.
+- Close VS Code terminals or Git GUI tools that may hold `.git\index.lock`.
+- Delete and recreate `.venv` only if it is broken:
+
+```powershell
+Remove-Item -Recurse -Force .\.venv
+.\scripts\dev_setup.ps1
+```
+
+- If Git complains about ownership:
+
+```powershell
+git config --global --add safe.directory C:/dev/mma-ai
+```
+
+## Defender / Controlled Folder Access
+
+If Python exists but Windows returns `Access is denied`, Windows Security may be blocking execution from the repo or venv folder.
+
+Manual steps:
+
+1. Open Windows Security.
+2. Go to Virus & threat protection.
+3. Open Manage settings.
+4. Open Exclusions.
+5. Choose Add or remove exclusions.
+6. Add folder `C:\dev\mma-ai`.
+7. Add folder `C:\venvs\mma-ai` if using the external venv workaround.
+
+Optional admin PowerShell commands:
+
+```powershell
+Add-MpPreference -ExclusionPath "C:\dev\mma-ai"
+Add-MpPreference -ExclusionPath "C:\venvs\mma-ai"
+```
+
+## Do Not Commit
+
+Do not commit:
+
+- `.venv\`
+- `.venv312\`
+- `node_modules\`
+- `app\frontend\node_modules\`
+- `app\frontend\.next\`
+- `app\frontend\out\`
+- `.pytest_cache\`
+- `pytest_tmp_codex\`
+- `__pycache__\`
