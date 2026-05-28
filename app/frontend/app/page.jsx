@@ -2,6 +2,7 @@
 
 import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { saveLatestPrediction } from "../lib/latestPrediction";
 
 const API_CANDIDATES = Array.from(
   new Set(
@@ -201,11 +202,7 @@ export default function App() {
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
       setResult(data);
-      try {
-        localStorage.setItem("latestPredictionResult", JSON.stringify(data));
-      } catch {
-        // Local storage is optional; the prediction result still renders here.
-      }
+      saveLatestPrediction(data);
       setActiveTab("prediction");
     } catch (error) {
       setMessage(`Prediction failed: ${error.message}`);
@@ -530,6 +527,11 @@ export default function App() {
                 <p>{result.analysis?.summary || result.summary}</p>
               </div>
               <a className="analysis-link" href="/analysis">Open full analysis</a>
+              <div className="deep-link-grid">
+                <a href="/analysis">Full Analysis</a>
+                <a href="/stats">Matchup Stats</a>
+                <a href="/odds">Odds / Betting Reads</a>
+              </div>
               {result.analysis?.prop_reads?.length > 0 && <PropReadsPanel analysis={result.analysis} />}
               {result.analysis && <AnalysisPanel analysis={result.analysis} />}
             </section>

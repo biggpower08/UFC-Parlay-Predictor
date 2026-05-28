@@ -1,17 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { loadLatestPrediction } from "../../lib/latestPrediction";
 
 export default function AnalysisPage() {
   const [result, setResult] = useState(null);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("latestPredictionResult");
-      if (saved) setResult(JSON.parse(saved));
-    } catch {
-      setResult(null);
-    }
+    setResult(loadLatestPrediction());
   }, []);
 
   if (!result) {
@@ -20,8 +16,8 @@ export default function AnalysisPage() {
         <section className="panel empty-page">
           <p className="eyebrow">Analysis</p>
           <h1>Fight Analysis</h1>
-          <p>Choose two fighters on the prediction page to generate a full analysis.</p>
-          <a className="analysis-link" href="/">Open prediction page</a>
+          <p>Generate a prediction on the Home page to unlock the full analysis.</p>
+          <a className="analysis-link" href="/">Go to Home</a>
         </section>
       </main>
     );
@@ -57,17 +53,35 @@ export default function AnalysisPage() {
         )}
       </section>
 
-      {analysis.sections?.length > 0 && (
-        <section className="analysis-page-grid">
-          {analysis.sections.map((section, index) => (
+      <section className="analysis-page-grid">
+          {(analysis.sections?.length ? analysis.sections : fallbackSections()).map((section, index) => (
             <article className="analysis-detail" key={section.title}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <h2>{section.title}</h2>
               <p>{section.body}</p>
             </article>
           ))}
-        </section>
-      )}
+      </section>
     </main>
   );
+}
+
+function fallbackSections() {
+  return [
+    "Main prediction read",
+    "Why the model leans this way",
+    "Fighter A path to victory",
+    "Fighter B path to victory",
+    "Method lean",
+    "Round-phase outlook",
+    "Key exchanges",
+    "Pace/volume read",
+    "Swing factors",
+    "Volatility warning",
+    "Data quality note",
+    "Final analyst read",
+  ].map((title) => ({
+    title,
+    body: "This section will expand as more matchup data becomes available.",
+  }));
 }

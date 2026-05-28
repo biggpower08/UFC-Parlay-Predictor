@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { loadLatestPrediction } from "../../lib/latestPrediction";
 
 const API_BASE = "/api";
 
@@ -20,12 +21,7 @@ export default function OddsPage() {
   useEffect(() => {
     fetchJson("/odds/status").then(setStatus).catch((error) => setMessage(`Odds status unavailable: ${error.message}`));
     fetchJson("/betting/reads").then(setBettingReads).catch(() => setBettingReads(null));
-    try {
-      const saved = localStorage.getItem("latestPredictionResult");
-      if (saved) setLatest(JSON.parse(saved));
-    } catch {
-      setLatest(null);
-    }
+    setLatest(loadLatestPrediction());
   }, []);
 
   async function submitFeedback(read, rating) {
@@ -87,7 +83,12 @@ export default function OddsPage() {
           </div>
           <p>No fake odds, edge, units, ROI, or bet placement is shown here.</p>
         </div>
-        {propReads.length > 0 ? (
+        {!latest ? (
+          <div className="empty-page">
+            <p>Generate a prediction on the Home page to view model-informed betting reads.</p>
+            <a className="analysis-link" href="/">Go to Home</a>
+          </div>
+        ) : propReads.length > 0 ? (
           <div className="prop-read-grid">
             {propReads.map((read) => (
               <article className={`prop-read ${read.confidence || "low"}`} key={read.id}>
@@ -112,7 +113,7 @@ export default function OddsPage() {
             ))}
           </div>
         ) : (
-          <p className="helper-text">Generate a prediction first to see model-informed betting reads for that matchup.</p>
+          <p className="helper-text">Prop-style reads will appear here when the latest prediction includes them.</p>
         )}
       </section>
     </main>

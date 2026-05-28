@@ -1,132 +1,108 @@
 "use client";
 
-import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { loadLatestPrediction } from "../../lib/latestPrediction";
 
-const API_BASE = "/api";
-
-async function fetchJson(path) {
-  const response = await fetch(`${API_BASE}${path}`);
-  if (!response.ok) throw new Error(await response.text());
-  return response.json();
-}
+const STAT_ROWS = [
+  ["Record", "Record"],
+  ["Weight Class", "Weight Class"],
+  ["Elo", "Elo"],
+  ["Elo fights", "Elo Fights"],
+  ["Stance", "Stance"],
+  ["Height", "Height (cm)"],
+  ["Reach", "Reach (cm)"],
+  ["SLpM", "SLpM"],
+  ["SApM", "SApM"],
+  ["TD Avg", "TD Avg"],
+  ["TD Def", "TD Def %"],
+];
 
 export default function StatsPage() {
-  const [query, setQuery] = useState("");
-  const [rankings, setRankings] = useState([]);
-  const [fighters, setFighters] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [eloHistory, setEloHistory] = useState([]);
-  const [message, setMessage] = useState("");
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
-    fetchJson("/rankings?limit=12")
-      .then((data) => setRankings(data.rankings || []))
-      .catch((error) => setMessage(`Rankings unavailable: ${error.message}`));
+    setResult(loadLatestPrediction());
   }, []);
 
-  async function searchFighters(value) {
-    setQuery(value);
-    setSelected(null);
-    setEloHistory([]);
-    if (value.trim().length < 2) {
-      setFighters([]);
-      return;
-    }
-    try {
-      const data = await fetchJson(`/fighters/search?q=${encodeURIComponent(value)}&limit=8`);
-      setFighters(data.fighters || []);
-    } catch (error) {
-      setMessage(`Search failed: ${error.message}`);
-    }
+  if (!result) {
+    return (
+      <main className="app-shell">
+        <section className="panel empty-page">
+          <p className="eyebrow">Matchup stats</p>
+          <h1>Stats</h1>
+          <p>Generate a prediction on the Home page to view matchup stats.</p>
+          <a className="analysis-link" href="/">Go to Home</a>
+        </section>
+      </main>
+    );
   }
 
-  async function pickFighter(fighter) {
-    setSelected(fighter);
-    setQuery(fighter.name);
-    setFighters([]);
-    try {
-      const data = await fetchJson(`/fighters/${encodeURIComponent(fighter.name)}/elo-history?limit=30`);
-      setEloHistory(data.elo_history || []);
-    } catch {
-      setEloHistory([]);
-    }
-  }
+  const statsA = result.comparison?.stats1 || {};
+  const statsB = result.comparison?.stats2 || {};
+  const matchupType = result.analysis?.matchup_type;
 
   return (
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">Stats lab</p>
-          <h1>Fighter Stats</h1>
+          <p className="eyebrow">Expanded matchup stats</p>
+          <h1>{statsA.Name} vs {statsB.Name}</h1>
+          <div className="matchup-strip">
+            <span>{value(statsA, "Weight Class")} vs {value(statsB, "Weight Class")}</span>
+            {matchupType && <b className={`matchup-mini-badge ${matchupType.severity}`}>{compactMatchupLabel(matchupType)}</b>}
+          </div>
         </div>
       </header>
 
-      {message && <div className="message"><span>{message}</span></div>}
-
-      <section className="panel stat-search-panel">
-        <label className="fighter-input">
-          <span>Find a fighter</span>
-          <div className="input-wrap">
-            <Search size={18} />
-            <input value={query} placeholder="Search fighter stats" onChange={(event) => searchFighters(event.target.value)} />
-          </div>
-          {fighters.length > 0 && (
-            <div className="suggestions">
-              {fighters.map((fighter) => (
-                <button type="button" key={fighter.name} onClick={() => pickFighter(fighter)}>
-                  <span>{fighter.name}</span>
-                  <small>{fighter.weight_class || "Unknown"}</small>
-                </button>
-              ))}
-            </div>
-          )}
-        </label>
+      <section className="fighter-card-grid">
+        <FighterStatCard stats={statsA} label="Fighter A" />
+        <FighterStatCard stats={statsB} label="Fighter B" />
       </section>
 
-      {selected ? (
-        <section className="panel stats-profile">
-          <div>
-            <p className="eyebrow">Profile</p>
-            <h2>{selected.name}</h2>
-            <p>{selected.nickname ? `"${selected.nickname}"` : "No nickname listed"}</p>
+      <section className="panel stats-grid">
+        <h2>{statsA.Name}</h2>
+        <h2>{statsB.Name}</h2>
+        {STAT_ROWS.map(([label, key]) => (
+          <div className="stat-row" key={label}>
+            <span>{value(statsA, key)}</span>
+            <b>{label}</b>
+            <span>{value(statsB, key)}</span>
           </div>
-          <div className="ready-grid">
-            <div><strong>Weight class</strong><span>{selected.weight_class || "Unknown"}</span></div>
-            <div><strong>Record</strong><span>{selected.wins ?? 0}-{selected.losses ?? 0}-{selected.draws ?? 0}</span></div>
-            <div><strong>Elo history rows</strong><span>{eloHistory.length}</span></div>
-          </div>
-          {eloHistory.length > 0 ? (
-            <div className="simple-table">
-              {eloHistory.slice(0, 8).map((row, index) => (
-                <div key={`${row.computed_at}-${index}`}>
-                  <span>{row.computed_at || "Computed"}</span>
-                  <b>{row.elo}</b>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="helper-text">No Elo history rows returned for this fighter yet.</p>
-          )}
-        </section>
-      ) : (
-        <section className="panel empty-page">
-          <p>Search for a fighter to inspect available profile and Elo data. Missing fields are shown as unknown rather than estimated.</p>
-        </section>
-      )}
+        ))}
+      </section>
 
-      <section className="panel">
-        <p className="eyebrow">Current Elo rankings</p>
-        <div className="simple-table">
-          {rankings.map((row) => (
-            <div key={`${row.ranking_type}-${row.rank}-${row.fighter_name}`}>
-              <span>{row.rank}. {row.fighter_name}</span>
-              <b>{row.elo}</b>
-            </div>
-          ))}
-          {rankings.length === 0 && <p className="helper-text">Rankings are unavailable right now.</p>}
-        </div>
+      <section className="panel empty-page">
+        <p className="eyebrow">Data note</p>
+        <p>{result.analysis?.data_quality_label || "Unknown"} data quality. Missing fields are shown as “Not available” and are not estimated.</p>
       </section>
     </main>
   );
+}
+
+function FighterStatCard({ stats, label }) {
+  return (
+    <article className="analysis-detail">
+      <span>{label}</span>
+      <h2>{stats.Name || "Not available"}</h2>
+      <p>{value(stats, "Record")} · {value(stats, "Weight Class")}</p>
+      <div className="simple-table">
+        <div><span>Elo</span><b>{value(stats, "Elo")}</b></div>
+        <div><span>Fights counted</span><b>{value(stats, "Elo Fights")}</b></div>
+        <div><span>Stance</span><b>{value(stats, "Stance")}</b></div>
+      </div>
+    </article>
+  );
+}
+
+function value(stats, key) {
+  if (key === "Elo" && stats?.["Elo Available"] === false) return "Not available";
+  const raw = stats?.[key];
+  return raw === null || raw === undefined || raw === "" || raw === "N/A" ? "Not available" : raw;
+}
+
+function compactMatchupLabel(matchupType) {
+  if (matchupType.label === "Same-division matchup") return "Same division";
+  if (matchupType.label === "Potential cross-division matchup") return "Possibly cross-division";
+  if (matchupType.label === "Cross-division matchup") return "Cross-division";
+  return "Weight class unknown";
 }

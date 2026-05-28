@@ -44,6 +44,12 @@ body {
   text-decoration: none;
 }
 
+.site-nav a.active {
+  border-color: rgba(36, 246, 255, 0.45);
+  background: rgba(36, 246, 255, 0.14);
+  color: #24f6ff;
+}
+
 button,
 input {
   font: inherit;
@@ -712,6 +718,26 @@ input::placeholder {
   font-size: 0.78rem;
 }
 
+.deep-link-grid,
+.fighter-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.deep-link-grid a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(36, 246, 255, 0.2);
+  border-radius: 6px;
+  color: #edf8ff;
+  background: rgba(36, 246, 255, 0.08);
+  text-decoration: none;
+  text-align: center;
+}
+
 .driver,
 .analysis-section,
 .analysis-warnings,
@@ -912,7 +938,9 @@ input::placeholder {
   .stat-row,
   .analysis-badges,
   .analysis-page-grid,
+  .deep-link-grid,
   .driver-grid,
+  .fighter-card-grid,
   .prop-read-grid,
   .secondary-read-grid,
   .resolver-entry,

@@ -1,4 +1,5 @@
 import "./globals.css";
+import SiteNav from "./components/SiteNav";
 
 export const metadata = {
   title: "UFC Predictor",
@@ -19,12 +20,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <nav className="site-nav" aria-label="Primary">
-          <a href="/">Prediction</a>
-          <a href="/analysis">Analysis</a>
-          <a href="/stats">Stats</a>
-          <a href="/odds">Betting Odds</a>
-        </nav>
+        <SiteNav />
         {children}
       </body>
     </html>
