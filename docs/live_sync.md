@@ -6,14 +6,15 @@ This app now has a safe live-sync path for UFCStats data, but scheduled scraping
 
 UFCStats may return a browser JavaScript challenge instead of normal HTML. The app detects that response and stops safely. It does not try to bypass CAPTCHA, access controls, login walls, or anti-abuse protections.
 
-If UFCStats is challenged, use cache-only mode, fixture tests, or manual imports until the source is available again.
+If UFCStats is challenged, use cache-only mode, manual HTML import planning, or CSV imports until the source is available again.
 
 ## Fetch Modes
 
-- Live fetch: requests UFCStats with polite rate limiting and retries.
-- Cache-only: reads previously cached HTML and does not make network requests.
-- Fixture/sample: used by tests with saved HTML files.
-- Manual import: future-safe path for CSV/HTML files when live scraping is unavailable.
+- Live fetch: requests UFCStats with polite rate limiting and limited retries.
+- Cached HTML mode: reads previously cached HTML and does not make network requests. Use this for parser validation when cached pages are known-good.
+- Manual HTML import mode: save source HTML manually and parse it offline. Keep this review-driven; do not use it as a bot-protection bypass.
+- CSV import mode: import historical fights from local CSV. Use this for Elo/model training when live source health is challenged.
+- Future backup source mode: placeholder for other licensed or stable sources. Do not add aggressive scraping.
 - Optional Playwright: available by flag for ordinary JavaScript-rendered pages only. It is not required for app startup and is not used as a bot-protection bypass.
 
 ## Safe Local Commands
@@ -21,43 +22,43 @@ If UFCStats is challenged, use cache-only mode, fixture tests, or manual imports
 Check current sync/source status:
 
 ```powershell
-.\.venv312\Scripts\python.exe scripts\sync_database.py --status
+.\.venv\Scripts\python.exe scripts\sync_database.py --status
 ```
 
 Check UFCStats source health:
 
 ```powershell
-.\.venv312\Scripts\python.exe scripts\sync_database.py --source-health
+.\.venv\Scripts\python.exe scripts\sync_database.py --source-health
 ```
 
 Run a dry-run limited sync:
 
 ```powershell
-.\.venv312\Scripts\python.exe scripts\sync_database.py --dry-run --limit-events 1
+.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --recent-days 14 --fetcher requests
 ```
 
 Run cache-only mode:
 
 ```powershell
-.\.venv312\Scripts\python.exe scripts\sync_database.py --dry-run --cache-only --limit-events 1
+.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --cache-only --limit-events 1
 ```
 
 Run a production-style recent sync manually:
 
 ```powershell
-.\.venv312\Scripts\python.exe scripts\sync_database.py --recent-days 14
+.\.venv\Scripts\python.exe scripts\sync_database.py --recent-days 14 --fetcher requests
 ```
 
 Generate rankings without scraping:
 
 ```powershell
-.\.venv312\Scripts\python.exe scripts\generate_rankings.py
+.\.venv\Scripts\python.exe scripts\generate_rankings.py
 ```
 
 Refresh Elo without scraping:
 
 ```powershell
-.\.venv312\Scripts\python.exe scripts\update_elo.py --no-refresh
+.\.venv\Scripts\python.exe scripts\update_elo.py --no-refresh
 ```
 
 ## Optional Environment Variables
@@ -82,7 +83,7 @@ When ready, use a Render Cron Job instead of making normal users trigger scrapin
 python scripts/sync_database.py --recent-days 14 --fetcher requests
 ```
 
-If UFCStats challenge pages are frequent, keep the cron disabled and use manual/cache imports.
+Use only after source-health checks are stable. If UFCStats challenge pages are frequent, keep the cron disabled and use manual/cache/CSV imports.
 
 Recommended early schedule: once per day during off-peak hours. Avoid hourly scraping unless repeated manual checks show the source is healthy.
 
@@ -140,6 +141,8 @@ select max(generated_at) as latest_rankings from fighter_rankings;
 - `failed`: no safe sync could complete.
 
 The sync uses a database lock so overlapping live jobs do not run at the same time. Expired locks are cleared automatically.
+
+Source-health checks record source state in `scraper_sources` and add a zero-data audit row to `sync_runs`. Dry-run syncs do not write app fight/event/fighter data.
 
 ## Rollback / Disable
 

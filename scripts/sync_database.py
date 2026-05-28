@@ -157,18 +157,25 @@ def check_source_health(args) -> int:
         cache_only=args.cache_only,
         force_refresh=args.force_refresh,
     )
+    counts = {"events": 0, "fights": 0, "fighters": 0, "rankings": 0, "inserted": 0, "updated": 0, "skipped": 0, "failed": 0}
     try:
         html = client.fetch(COMPLETED_EVENTS_URL)
         status = "healthy" if "event-details" in html else "unavailable"
-        update_source_health(args.source, BASE_URL, status, "" if status == "healthy" else "Events page did not contain event links")
+        message = "" if status == "healthy" else "Events page did not contain event links"
+        update_source_health(args.source, BASE_URL, status, message)
+        record_sync_run(args.source, f"source_health_{status}", True, counts, message)
         print(json.dumps(get_sync_status(args.source), indent=2, default=str))
         return 0 if status == "healthy" else 1
     except SourceBlockedError as exc:
-        update_source_health(args.source, BASE_URL, "failed", str(exc), challenged=True)
+        message = str(exc)
+        update_source_health(args.source, BASE_URL, "failed", message, challenged=True)
+        record_sync_run(args.source, "source_health_challenged", True, counts, message)
         print(json.dumps(get_sync_status(args.source), indent=2, default=str))
         return 2
     except (RateLimitError, SourceUnavailableError, FetchError) as exc:
-        update_source_health(args.source, BASE_URL, "failed", str(exc))
+        message = str(exc)
+        update_source_health(args.source, BASE_URL, "failed", message)
+        record_sync_run(args.source, "source_health_failed", True, counts, message)
         print(json.dumps(get_sync_status(args.source), indent=2, default=str))
         return 1
 
