@@ -84,7 +84,7 @@ export default function OddsPage() {
         </div>
         {!latest ? (
           <div className="empty-page">
-            <p>Generate a prediction on the Home page to view model-informed betting reads.</p>
+            <p>No prediction yet. Generate a matchup on Home first.</p>
             <a className="analysis-link" href="/">Go to Home</a>
           </div>
         ) : propReads.length > 0 ? (

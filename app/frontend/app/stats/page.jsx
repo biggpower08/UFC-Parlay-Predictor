@@ -26,7 +26,7 @@ export default function StatsPage() {
         <section className="panel empty-page">
           <p className="eyebrow">Matchup stats</p>
           <h1>Stats</h1>
-          <p>Generate a prediction on the Home page to view matchup stats.</p>
+          <p>No prediction yet. Generate a matchup on Home first.</p>
           <a className="analysis-link" href="/">Go to Home</a>
         </section>
       </main>

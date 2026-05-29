@@ -2,7 +2,7 @@
 
 import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clearLatestPrediction, saveLatestPrediction } from "../lib/latestPrediction";
+import { clearLatestPrediction, saveLatestPrediction, useLatestPrediction } from "../lib/latestPrediction";
 
 const API_CANDIDATES = Array.from(
   new Set(
@@ -84,6 +84,8 @@ export default function App() {
   const [fighterMeta, setFighterMeta] = useState({ a: null, b: null });
   const [searching, setSearching] = useState({ a: false, b: false });
   const [activeSearchSlot, setActiveSearchSlot] = useState(null);
+  const [hideSavedResultForEditing, setHideSavedResultForEditing] = useState(false);
+  const latestPrediction = useLatestPrediction();
   const debouncedFighterA = useDebouncedValue(fighterAQuery, 300);
   const debouncedFighterB = useDebouncedValue(fighterBQuery, 300);
   const latestSearch = useRef({ a: "", b: "" });
@@ -134,6 +136,13 @@ export default function App() {
     }
     return () => document.removeEventListener("pointerdown", closeSearchOnOutsideClick);
   }, []);
+
+  useEffect(() => {
+    if (!result && latestPrediction && !hideSavedResultForEditing) {
+      setResult(latestPrediction.result || latestPrediction);
+      setActiveTab("prediction");
+    }
+  }, [hideSavedResultForEditing, latestPrediction, result]);
 
   useEffect(() => {
     if (activeSearchSlot === "a" && userEditedSearch.current.a && debouncedFighterA === fighterAQuery) {
@@ -201,8 +210,9 @@ export default function App() {
       }
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
-      setResult(data);
-      saveLatestPrediction(data, { fighter_a: fighterMeta.a || selectedFighterA, fighter_b: fighterMeta.b || selectedFighterB });
+      const saved = saveLatestPrediction(data, { fighter_a: fighterMeta.a || selectedFighterA, fighter_b: fighterMeta.b || selectedFighterB });
+      setHideSavedResultForEditing(false);
+      setResult(saved?.result || data);
       setActiveTab("prediction");
     } catch (error) {
       setMessage(`Prediction failed: ${error.message}`);
@@ -243,13 +253,12 @@ export default function App() {
   function pickResolved(name) {
     if (!resolver) return;
     const picked = resolver.candidates.find((fighter) => fighter.name === name) || null;
+    setHideSavedResultForEditing(true);
     if (resolver.slot === "a") {
-      clearLatestPrediction();
       setFighterAQuery(name);
       setSelectedFighterA(picked || { name });
     }
     if (resolver.slot === "b") {
-      clearLatestPrediction();
       setFighterBQuery(name);
       setSelectedFighterB(picked || { name });
     }
@@ -266,7 +275,8 @@ export default function App() {
   }
 
   function pickFighter(slot, fighter) {
-    clearLatestPrediction();
+    setHideSavedResultForEditing(true);
+    setResult(null);
     const name = fighter.name;
     if (slot === "a") {
       setFighterAQuery(name);
@@ -286,7 +296,7 @@ export default function App() {
   }
 
   function handleFighterInput(slot, value) {
-    clearLatestPrediction();
+    setHideSavedResultForEditing(true);
     if (slot === "a") {
       setFighterAQuery(value);
       setSelectedFighterA(null);
@@ -345,6 +355,14 @@ export default function App() {
       }),
     });
     setMessage("Feedback saved.");
+  }
+
+  function clearCurrentLatestPrediction() {
+    clearLatestPrediction();
+    setHideSavedResultForEditing(false);
+    setResult(null);
+    setActiveTab("matchup");
+    setMessage("Latest prediction cleared.");
   }
 
   const confidence = useMemo(() => {
@@ -531,6 +549,9 @@ export default function App() {
                 <a href="/stats">Matchup Stats</a>
                 <a href="/odds">Odds / Betting Reads</a>
               </div>
+              <button className="analysis-link" type="button" onClick={clearCurrentLatestPrediction}>
+                Clear latest prediction
+              </button>
             </section>
           )}
           {activeTab === "feedback" && (
@@ -662,142 +683,5 @@ const FighterInput = memo(function FighterInput({
         </div>
       )}
     </label>
-  );
-});
-
-const StatsPanel = memo(function StatsPanel({ comparison }) {
-  const rows = ["Elo", "Record", "Weight Class", "SLpM", "Str Acc %", "SApM", "Str Def %", "TD Avg", "TD Acc %", "TD Def %", "Reach (cm)", "Stance"];
-  const valueFor = (stats, row) => {
-    if (row !== "Elo") return stats[row];
-    if (stats["Elo Available"]) return stats.Elo;
-    return stats["Elo Source"] === "baseline" ? "1000 starting baseline" : "Not available";
-  };
-  return (
-    <section className="panel stats-grid">
-      <h2>{comparison.stats1.Name}</h2>
-      <h2>{comparison.stats2.Name}</h2>
-      {rows.map((row) => (
-        <div className="stat-row" key={row}>
-          <span>{valueFor(comparison.stats1, row)}</span>
-          <b>{row}</b>
-          <span>{valueFor(comparison.stats2, row)}</span>
-        </div>
-      ))}
-    </section>
-  );
-});
-
-const PropReadsPanel = memo(function PropReadsPanel({ analysis }) {
-  const [feedbackState, setFeedbackState] = useState({});
-
-  async function submitReadFeedback(read, rating) {
-    try {
-      await apiFetch("/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          feedback_type: "read_feedback",
-          target_type: "prop_read",
-          target_id: read.id,
-          rating,
-          user_label: read.label,
-          comment: read.prop_style,
-        }),
-      });
-      setFeedbackState((current) => ({ ...current, [read.id]: "Thanks for the feedback." }));
-    } catch (error) {
-      setFeedbackState((current) => ({ ...current, [read.id]: `Feedback failed: ${error.message}` }));
-    }
-  }
-
-  return (
-    <section className="prop-panel">
-      <div className="prop-panel-header">
-        <div>
-          <span>Model-informed</span>
-          <h2>Prop Reads</h2>
-        </div>
-        <p>{analysis.responsible_use || "These prop reads are informational model analysis, not guarantees or financial advice. Fight outcomes are uncertain."}</p>
-      </div>
-      <div className="prop-read-grid">
-        {analysis.prop_reads.map((read) => (
-          <article className={`prop-read ${read.confidence || "low"}`} key={read.id || `${read.category}-${read.label}`}>
-            <div className="prop-read-topline">
-              <span>{read.category?.replaceAll("_", " ") || "read"}</span>
-              <b>{read.label}</b>
-            </div>
-            <p className="prop-style">{read.prop_style}</p>
-            <div className="prop-badges">
-              <span>{read.confidence || "low"} confidence</span>
-              <span>{formatSupportLevel(read.support_level)}</span>
-            </div>
-            {read.fighter && <small>{read.fighter}</small>}
-            {read.round_window && <small>{read.round_window}</small>}
-            <p>{read.explanation}</p>
-            {read.caution && <em>{read.caution}</em>}
-            <div className="read-feedback">
-              {["Helpful", "Not helpful", "Too vague", "Too risky", "Seems wrong", "I want more detail"].map((label) => (
-                <button key={label} type="button" onClick={() => submitReadFeedback(read, label.toLowerCase().replaceAll(" ", "_"))}>
-                  {label}
-                </button>
-              ))}
-            </div>
-            {feedbackState[read.id] && <small>{feedbackState[read.id]}</small>}
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-});
-
-function formatSupportLevel(value) {
-  return String(value || "scenario_read")
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-const AnalysisPanel = memo(function AnalysisPanel({ analysis }) {
-  return (
-    <div className="analysis-panel">
-      {analysis.secondary_reads?.length > 0 && (
-        <div className="secondary-read-grid">
-          {analysis.secondary_reads.map((read) => (
-            <article className={`secondary-read ${read.confidence || "low"}`} key={`${read.type}-${read.label}`}>
-              <div>
-                <span>{read.label}</span>
-                <b>{read.confidence || "low"} confidence</b>
-              </div>
-              {read.fighter && <small>{read.fighter}</small>}
-              {read.round_window && <small>{read.round_window}</small>}
-              <p>{read.read}</p>
-              {read.explanation && <em>{read.explanation}</em>}
-            </article>
-          ))}
-        </div>
-      )}
-      {analysis.warnings?.length > 0 && (
-        <div className="analysis-warnings">
-          {analysis.warnings.map((warning) => (
-            <p key={warning}>{warning}</p>
-          ))}
-        </div>
-      )}
-      {analysis.drivers?.length > 0 && (
-        <div className="driver-grid">
-          {analysis.drivers.map((driver) => (
-            <div className="driver" key={driver.label}>
-              <span>{driver.label}</span>
-              <p>{driver.explanation}</p>
-            </div>
-          ))}
-        </div>
-      )}
-      {analysis.sections?.map((section, index) => (
-        <details className="analysis-section" key={section.title} open={index < 2}>
-          <summary>{section.title}</summary>
-          <p>{section.body}</p>
-        </details>
-      ))}
-    </div>
   );
 });

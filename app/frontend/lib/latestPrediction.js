@@ -2,59 +2,74 @@
 
 import { useEffect, useState } from "react";
 
-export const LATEST_PREDICTION_KEY = "ufc_latest_prediction";
+export const LATEST_PREDICTION_KEY = "ufc_latest_prediction_v2";
 export const LATEST_PREDICTION_EVENT = "ufc_latest_prediction_updated";
-const SCHEMA_VERSION = 1;
-const LEGACY_STORAGE_KEY = "latestPredictionResult";
+const SCHEMA_VERSION = 2;
+const OLD_STORAGE_KEYS = ["latestPredictionResult", "ufc_latest_prediction"];
 
 function isBrowser() {
   return typeof window !== "undefined";
 }
 
-function dispatchLatestPredictionEvent() {
+function dispatchLatestPredictionEvent(latestPrediction = null) {
   if (!isBrowser()) return;
-  window.dispatchEvent(new Event(LATEST_PREDICTION_EVENT));
+  window.dispatchEvent(new CustomEvent(LATEST_PREDICTION_EVENT, { detail: latestPrediction }));
+}
+
+function removeOldPredictionKeys() {
+  if (!isBrowser()) return;
+  OLD_STORAGE_KEYS.forEach((key) => window.localStorage.removeItem(key));
 }
 
 function normalizeLatestPrediction(raw) {
   if (!raw || typeof raw !== "object") return null;
-  if (!raw.prediction || !raw.comparison) return null;
+  const source = raw.result && typeof raw.result === "object" ? raw.result : raw;
+  if (!source.prediction || !source.comparison) return null;
 
-  const statsA = raw.comparison?.stats1 || {};
-  const statsB = raw.comparison?.stats2 || {};
+  const statsA = source.comparison?.stats1 || {};
+  const statsB = source.comparison?.stats2 || {};
+  const analysis = source.analysis || raw.analysis || {};
   const generatedAt = raw.generatedAt || raw.saved_at || new Date().toISOString();
   const fighterA = raw.fighterA || raw.selectedFighters?.fighter_a || raw.selected_fighters?.fighter_a || statsA;
   const fighterB = raw.fighterB || raw.selectedFighters?.fighter_b || raw.selected_fighters?.fighter_b || statsB;
-  const predictionKey =
+  const predictionId =
+    raw.predictionId ||
     raw.predictionKey ||
+    source.prediction_id ||
     raw.prediction_id ||
     `${statsA.Name || fighterA?.name || "fighter-a"}::${statsB.Name || fighterB?.name || "fighter-b"}::${generatedAt}`;
+  const matchupLabel = analysis.matchup_type?.label || "";
+  const weightClassDisplay = `${statsA["Weight Class"] || fighterA?.weight_class || "Unknown"} vs ${statsB["Weight Class"] || fighterB?.weight_class || "Unknown"}`;
 
   return {
-    ...raw,
+    ...source,
     schemaVersion: SCHEMA_VERSION,
-    predictionKey,
+    predictionId,
     generatedAt,
     fighterA,
     fighterB,
+    matchupLabel,
+    weightClassDisplay,
+    result: source,
+    analysis,
+    stats: source.comparison,
+    propReads: analysis.prop_reads || raw.propReads || [],
+    confidence: source.prediction?.confidence ?? raw.confidence ?? null,
+    volatility: analysis.volatility_label ?? raw.volatility ?? null,
+    dataQuality: analysis.data_quality_label ?? raw.dataQuality ?? null,
+    matchupType: analysis.matchup_type ?? raw.matchupType ?? null,
     selectedFighters: {
       fighter_a: fighterA,
       fighter_b: fighterB,
     },
-    analysis: raw.analysis || {},
-    propReads: raw.propReads || raw.analysis?.prop_reads || [],
-    confidence: raw.confidence ?? raw.prediction?.confidence ?? null,
-    volatility: raw.volatility ?? raw.analysis?.volatility_label ?? null,
-    dataQuality: raw.dataQuality ?? raw.analysis?.data_quality_label ?? null,
-    matchupType: raw.matchupType ?? raw.analysis?.matchup_type ?? null,
   };
 }
 
 export function loadLatestPrediction() {
   if (!isBrowser()) return null;
   try {
+    removeOldPredictionKeys();
     const saved = window.localStorage.getItem(LATEST_PREDICTION_KEY);
-    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
     if (!saved) return null;
     const parsed = JSON.parse(saved);
     const normalized = normalizeLatestPrediction(parsed);
@@ -75,11 +90,11 @@ export function saveLatestPrediction(result, selectedFighters = {}) {
   const statsA = result?.comparison?.stats1 || {};
   const statsB = result?.comparison?.stats2 || {};
   const payload = normalizeLatestPrediction({
-    ...result,
+    result,
     fighterA: selectedFighters.fighter_a || statsA,
     fighterB: selectedFighters.fighter_b || statsB,
     generatedAt,
-    predictionKey:
+    predictionId:
       result?.prediction_id ||
       `${statsA.Name || selectedFighters.fighter_a?.name || "fighter-a"}::${statsB.Name || selectedFighters.fighter_b?.name || "fighter-b"}::${generatedAt}`,
   });
@@ -87,8 +102,8 @@ export function saveLatestPrediction(result, selectedFighters = {}) {
   if (!payload) return null;
   try {
     window.localStorage.setItem(LATEST_PREDICTION_KEY, JSON.stringify(payload));
-    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
-    dispatchLatestPredictionEvent();
+    removeOldPredictionKeys();
+    dispatchLatestPredictionEvent(payload);
     return payload;
   } catch {
     return null;
@@ -99,9 +114,9 @@ export function clearLatestPrediction() {
   if (!isBrowser()) return;
   try {
     window.localStorage.removeItem(LATEST_PREDICTION_KEY);
-    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    removeOldPredictionKeys();
   } finally {
-    dispatchLatestPredictionEvent();
+    dispatchLatestPredictionEvent(null);
   }
 }
 
@@ -112,16 +127,19 @@ export function useLatestPrediction() {
     const refresh = () => setLatest(loadLatestPrediction());
     refresh();
 
-    const onStorage = (event) => {
-      if (!event.key || event.key === LATEST_PREDICTION_KEY) refresh();
+    const onLatestUpdated = (event) => {
+      setLatest(event.detail || loadLatestPrediction());
     };
-    window.addEventListener(LATEST_PREDICTION_EVENT, refresh);
+    const onStorage = (event) => {
+      if (!event.key || event.key === LATEST_PREDICTION_KEY || OLD_STORAGE_KEYS.includes(event.key)) refresh();
+    };
+    window.addEventListener(LATEST_PREDICTION_EVENT, onLatestUpdated);
     window.addEventListener("storage", onStorage);
     window.addEventListener("focus", refresh);
     window.addEventListener("pageshow", refresh);
     document.addEventListener("visibilitychange", refresh);
     return () => {
-      window.removeEventListener(LATEST_PREDICTION_EVENT, refresh);
+      window.removeEventListener(LATEST_PREDICTION_EVENT, onLatestUpdated);
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("focus", refresh);
       window.removeEventListener("pageshow", refresh);

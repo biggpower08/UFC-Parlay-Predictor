@@ -11,7 +11,7 @@ export default function AnalysisPage() {
         <section className="panel empty-page">
           <p className="eyebrow">Analysis</p>
           <h1>Fight Analysis</h1>
-          <p>Generate a prediction on the Home page to unlock the full analysis.</p>
+          <p>No prediction yet. Generate a matchup on Home first.</p>
           <a className="analysis-link" href="/">Go to Home</a>
         </section>
       </main>
