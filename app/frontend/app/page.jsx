@@ -202,7 +202,7 @@ export default function App() {
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
       setResult(data);
-      saveLatestPrediction(data);
+      saveLatestPrediction(data, { fighter_a: fighterMeta.a || selectedFighterA, fighter_b: fighterMeta.b || selectedFighterB });
       setActiveTab("prediction");
     } catch (error) {
       setMessage(`Prediction failed: ${error.message}`);
@@ -733,7 +733,7 @@ const PropReadsPanel = memo(function PropReadsPanel({ analysis }) {
             <p>{read.explanation}</p>
             {read.caution && <em>{read.caution}</em>}
             <div className="read-feedback">
-              {["Helpful", "Too vague", "Too risky", "Seems wrong"].map((label) => (
+              {["Helpful", "Not helpful", "Too vague", "Too risky", "Seems wrong", "I want more detail"].map((label) => (
                 <button key={label} type="button" onClick={() => submitReadFeedback(read, label.toLowerCase().replaceAll(" ", "_"))}>
                   {label}
                 </button>

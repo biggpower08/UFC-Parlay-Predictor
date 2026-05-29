@@ -104,7 +104,7 @@ export default function OddsPage() {
                 <p>{read.explanation}</p>
                 <em>{read.caution}</em>
                 <div className="read-feedback">
-                  {["Helpful", "Too vague", "Too risky", "Seems wrong", "Want more detail"].map((label) => (
+                  {["Helpful", "Not helpful", "Too vague", "Too risky", "Seems wrong", "I want more detail"].map((label) => (
                     <button type="button" key={label} onClick={() => submitFeedback(read, label.toLowerCase().replaceAll(" ", "_"))}>{label}</button>
                   ))}
                 </div>

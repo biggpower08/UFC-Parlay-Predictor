@@ -7,7 +7,8 @@ const STAT_ROWS = [
   ["Record", "Record"],
   ["Weight Class", "Weight Class"],
   ["Elo", "Elo"],
-  ["Elo fights", "Elo Fights"],
+  ["Peak Elo", "Peak Elo"],
+  ["Fights counted", "Elo Fights"],
   ["Stance", "Stance"],
   ["Height", "Height (cm)"],
   ["Reach", "Reach (cm)"],
@@ -73,7 +74,7 @@ export default function StatsPage() {
 
       <section className="panel empty-page">
         <p className="eyebrow">Data note</p>
-        <p>{result.analysis?.data_quality_label || "Unknown"} data quality. Missing fields are shown as “Not available” and are not estimated.</p>
+        <p>{result.analysis?.data_quality_label || "Unknown"} data quality. Missing fields are shown as "Not available" and are not estimated.</p>
       </section>
     </main>
   );
@@ -84,9 +85,10 @@ function FighterStatCard({ stats, label }) {
     <article className="analysis-detail">
       <span>{label}</span>
       <h2>{stats.Name || "Not available"}</h2>
-      <p>{value(stats, "Record")} · {value(stats, "Weight Class")}</p>
+      <p>{value(stats, "Record")} - {value(stats, "Weight Class")}</p>
       <div className="simple-table">
         <div><span>Elo</span><b>{value(stats, "Elo")}</b></div>
+        <div><span>Peak Elo</span><b>{value(stats, "Peak Elo")}</b></div>
         <div><span>Fights counted</span><b>{value(stats, "Elo Fights")}</b></div>
         <div><span>Stance</span><b>{value(stats, "Stance")}</b></div>
       </div>
