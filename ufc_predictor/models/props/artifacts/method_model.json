@@ -1,0 +1,207 @@
+{
+  "model_name": "method_model",
+  "model_version": "prop_baseline_v1",
+  "model_type": "nearest_centroid_softmax_baseline",
+  "feature_names": [
+    "a_prior_fights",
+    "b_prior_fights",
+    "a_prior_wins",
+    "b_prior_wins",
+    "a_prior_finishes",
+    "b_prior_finishes",
+    "a_prior_decisions",
+    "b_prior_decisions"
+  ],
+  "classes": [
+    "Decision",
+    "KO/TKO",
+    "Other",
+    "Submission"
+  ],
+  "centroids": [
+    [
+      1.0098221404468821,
+      0.9209615227821045,
+      0.9494554939906158,
+      0.8588472845393934,
+      0.7515086111459829,
+      0.7154831343145193,
+      0.8759541679191869,
+      0.7684509790516109
+    ],
+    [
+      0.9783271985507996,
+      0.9476760972637333,
+      0.9433304868999408,
+      0.9100999247162495,
+      0.8859401772741377,
+      0.8382529633356955,
+      0.6916337777499898,
+      0.7083874312713848
+    ],
+    [
+      1.191890952905264,
+      0.8275056643671221,
+      0.9947144106207115,
+      0.6782769190620147,
+      0.7513602968355206,
+      0.4692584462350881,
+      0.9638539997129814,
+      0.733607464969438
+    ],
+    [
+      0.860922608545172,
+      0.695799071896788,
+      0.8107896118578858,
+      0.6316164061132706,
+      0.7847873948437397,
+      0.5666729738428976,
+      0.5645360304962034,
+      0.5115759409017009
+    ]
+  ],
+  "scales": [
+    5.166491717914363,
+    5.533433262868406,
+    3.597964732598731,
+    3.7246082219151915,
+    2.3816452529461483,
+    2.4674989787227513,
+    1.856581686379265,
+    1.8653314176520643
+  ],
+  "metrics": {
+    "train": {
+      "accuracy": 0.2604,
+      "balanced_accuracy": 0.3245,
+      "log_loss": 1.3827,
+      "roc_auc": null,
+      "confusion_matrix": {
+        "Decision": {
+          "Decision": 266,
+          "KO/TKO": 567,
+          "Other": 570,
+          "Submission": 1428
+        },
+        "KO/TKO": {
+          "Decision": 131,
+          "KO/TKO": 556,
+          "Other": 300,
+          "Submission": 1104
+        },
+        "Other": {
+          "Decision": 1,
+          "KO/TKO": 2,
+          "Other": 6,
+          "Submission": 10
+        },
+        "Submission": {
+          "Decision": 61,
+          "KO/TKO": 226,
+          "Other": 192,
+          "Submission": 789
+        }
+      },
+      "per_class_recall": {
+        "Decision": 0.094,
+        "KO/TKO": 0.2659,
+        "Other": 0.3158,
+        "Submission": 0.6222
+      }
+    },
+    "validation": {
+      "accuracy": 0.2447,
+      "balanced_accuracy": 0.2076,
+      "log_loss": 1.3888,
+      "roc_auc": null,
+      "confusion_matrix": {
+        "Decision": {
+          "Decision": 124,
+          "KO/TKO": 177,
+          "Other": 177,
+          "Submission": 294
+        },
+        "KO/TKO": {
+          "Decision": 44,
+          "KO/TKO": 154,
+          "Other": 84,
+          "Submission": 208
+        },
+        "Other": {
+          "Decision": 0,
+          "KO/TKO": 0,
+          "Other": 0,
+          "Submission": 4
+        },
+        "Submission": {
+          "Decision": 33,
+          "KO/TKO": 96,
+          "Other": 56,
+          "Submission": 102
+        }
+      },
+      "per_class_recall": {
+        "Decision": 0.1606,
+        "KO/TKO": 0.3143,
+        "Other": 0.0,
+        "Submission": 0.3554
+      }
+    },
+    "majority_class_baseline": {
+      "label": "Decision",
+      "accuracy": 0.4971,
+      "class_counts": {
+        "KO/TKO": 490,
+        "Decision": 772,
+        "Submission": 287,
+        "Other": 4
+      }
+    },
+    "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated."
+  },
+  "metadata": {
+    "model_name": "method_model",
+    "model_type": "nearest_centroid_softmax_baseline",
+    "target_label": "method_class",
+    "status": "experimental",
+    "training_rows": 6209,
+    "validation_rows": 1553,
+    "date_range": {
+      "min": null,
+      "max": null
+    },
+    "data_source": "csv",
+    "input_path": "C:\\dev\\mma-ai\\ufc_predictor\\data\\raw\\fights.csv",
+    "split_type": "source_order_reversed_experimental",
+    "feature_names": [
+      "a_prior_fights",
+      "b_prior_fights",
+      "a_prior_wins",
+      "b_prior_wins",
+      "a_prior_finishes",
+      "b_prior_finishes",
+      "a_prior_decisions",
+      "b_prior_decisions"
+    ],
+    "class_distribution": {
+      "Decision": 3603,
+      "KO/TKO": 2581,
+      "Submission": 1555,
+      "Other": 23
+    },
+    "trained_at": "2026-05-29T04:14:57.699187+00:00",
+    "data_cutoff_date": "source_order_7905",
+    "training_source_status": "experimental",
+    "leakage_checked": true,
+    "limitations": [
+      "Event dates are missing; split uses reversed source order and should not be treated as production-grade chronological validation.",
+      "No event_date column is available; chronological order falls back to CSV row order.",
+      "Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.",
+      "Significant-strike labels are unavailable; strike-volume model is blocked.",
+      "Takedown/control labels are unavailable; takedown-control model is blocked.",
+      "Dedicated model training is blocked until credible chronological source data is available.",
+      "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+    ],
+    "model_version": "prop_baseline_v1"
+  }
+}

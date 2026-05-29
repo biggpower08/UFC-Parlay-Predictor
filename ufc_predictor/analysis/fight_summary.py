@@ -225,10 +225,10 @@ def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matc
     distance_prediction = prop_predictions.get("goes_distance_model", {})
     method_prediction = prop_predictions.get("method_model", {})
     round_prediction = prop_predictions.get("round_model", {})
-    finish_supported = finish_prediction.get("status") == "trained"
-    distance_supported = distance_prediction.get("status") == "trained"
-    method_supported = method_prediction.get("status") == "trained"
-    round_supported = round_prediction.get("status") == "trained"
+    finish_supported = finish_prediction.get("status") in {"trained", "experimental"} and finish_prediction.get("label")
+    distance_supported = distance_prediction.get("status") in {"trained", "experimental"} and distance_prediction.get("label")
+    method_supported = method_prediction.get("status") in {"trained", "experimental"} and method_prediction.get("label")
+    round_supported = round_prediction.get("status") in {"trained", "experimental"} and round_prediction.get("label")
     method_style = _method_prop_style(favorite, underdog, prediction)
     prop_reads = [
         {
@@ -241,7 +241,7 @@ def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matc
             "support_level": "model_supported" if method_supported else support,
             "explanation": _method_lane(stats_a, stats_b, prediction),
             "caution": (
-                f"Dedicated method model lean: {method_prediction.get('label')}."
+                f"Dedicated {method_prediction.get('status')} method model lean: {method_prediction.get('label')}."
                 if method_supported
                 else "This is a scenario read, not a trained method-prop probability."
             ),
@@ -289,7 +289,7 @@ def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matc
             "support_level": "model_supported" if round_supported else "scenario_read",
             "explanation": _middle_round_read(stats_a, stats_b, favorite, underdog),
             "caution": (
-                f"Dedicated round-phase model lean: {round_prediction.get('label')}."
+                f"Dedicated {round_prediction.get('status')} round-phase model lean: {round_prediction.get('label')}."
                 if round_supported
                 else "This is not a round prediction model."
             ),
@@ -551,16 +551,17 @@ def _decision_finish_prop_style(stats_a, stats_b, prediction):
 
 
 def _finish_distance_caution(finish_prediction, distance_prediction):
-    if finish_prediction.get("status") == "trained" and distance_prediction.get("status") == "trained":
+    if finish_prediction.get("status") in {"trained", "experimental"} and distance_prediction.get("status") in {"trained", "experimental"}:
+        prefix = "Dedicated" if finish_prediction.get("status") == "trained" else "Experimental"
         return (
-            f"Dedicated finish model lean: {finish_prediction.get('label')}; "
+            f"{prefix} finish model lean: {finish_prediction.get('label')}; "
             f"goes-distance model lean: {distance_prediction.get('label')}."
         )
     return "The current model does not price exact method or goes-distance probabilities."
 
 
 def _round_phase_prop_style(round_prediction):
-    if round_prediction.get("status") != "trained":
+    if round_prediction.get("status") not in {"trained", "experimental"}:
         return "Middle-round finish pressure is plausible if the stronger repeatable offense starts stacking up."
     label = round_prediction.get("label")
     if label == "early":

@@ -31,7 +31,8 @@ def model_artifact_available(model_name: str) -> bool:
 
 def predict_prop_model(model_name: str, feature_dict: dict) -> dict:
     artifact = load_prop_model(model_name)
-    if artifact is None or not _artifact_is_usable(artifact):
+    artifact_status = _artifact_status(artifact)
+    if artifact is None or artifact_status is None:
         return {
             "status": "not_trained",
             "support_level": "not_available",
@@ -41,18 +42,36 @@ def predict_prop_model(model_name: str, feature_dict: dict) -> dict:
         }
 
     expected_features = artifact.get("feature_names") or FEATURE_NAMES
+    missing_features = [name for name in expected_features if name not in feature_dict]
+    if missing_features:
+        return {
+            "status": artifact_status,
+            "support_level": "not_available",
+            "message": "Dedicated prop model artifact is available, but the current prediction pipeline does not provide the required training feature set.",
+            "probabilities": {},
+            "label": None,
+            "missing_features": missing_features,
+            "model_version": artifact.get("model_version"),
+        }
     vector = np.array([float(feature_dict.get(name, 0.0) or 0.0) for name in expected_features], dtype=float)
-    means = np.array(artifact["means"], dtype=float)
-    scales = np.array(artifact["scales"], dtype=float)
-    X = (vector - means) / scales
-    weights = np.array(artifact["weights"], dtype=float)
-    intercept = np.array(artifact["intercept"], dtype=float)
-    logits = X @ weights.T + intercept
-    probs = _softmax(logits)
+    if artifact.get("model_type") == "nearest_centroid_softmax_baseline":
+        scales = np.array(artifact["scales"], dtype=float)
+        centroids = np.array(artifact["centroids"], dtype=float)
+        X = vector / scales
+        distances = np.linalg.norm(centroids - X, axis=1)
+        probs = _softmax(-distances)
+    else:
+        means = np.array(artifact["means"], dtype=float)
+        scales = np.array(artifact["scales"], dtype=float)
+        X = (vector - means) / scales
+        weights = np.array(artifact["weights"], dtype=float)
+        intercept = np.array(artifact["intercept"], dtype=float)
+        logits = X @ weights.T + intercept
+        probs = _softmax(logits)
     classes = artifact["classes"]
     best_index = int(np.argmax(probs))
     return {
-        "status": "trained",
+        "status": artifact_status,
         "support_level": "model_supported",
         "message": artifact.get("message", "Dedicated prop model artifact is available."),
         "label": classes[best_index],
@@ -112,10 +131,22 @@ def _confidence_label(probability: float) -> str:
 
 
 def _artifact_is_usable(artifact: dict) -> bool:
+    return _artifact_status(artifact) is not None
+
+
+def _artifact_status(artifact: dict | None) -> str | None:
+    if artifact is None:
+        return None
     metadata = artifact.get("metadata") or {}
-    return bool(
+    valid = bool(
         artifact.get("feature_names")
         and artifact.get("metrics")
-        and metadata.get("training_source_status") == "credible"
         and metadata.get("leakage_checked") is True
     )
+    if not valid:
+        return None
+    if metadata.get("status") in {"trained", "experimental"}:
+        return metadata.get("status")
+    if metadata.get("training_source_status") == "credible":
+        return "trained"
+    return None

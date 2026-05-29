@@ -1,0 +1,318 @@
+{
+  "finish_model": {
+    "status": "experimental",
+    "artifact_path": "C:\\dev\\mma-ai\\ufc_predictor\\models\\props\\artifacts\\finish_model.json",
+    "metrics": {
+      "train": {
+        "accuracy": 0.5558,
+        "balanced_accuracy": 0.5452,
+        "log_loss": 0.6848,
+        "roc_auc": 0.573,
+        "confusion_matrix": {
+          "0": {
+            "0": 1200,
+            "1": 1631
+          },
+          "1": {
+            "0": 1127,
+            "1": 2251
+          }
+        },
+        "per_class_recall": {
+          "0": 0.4239,
+          "1": 0.6664
+        }
+      },
+      "validation": {
+        "accuracy": 0.5319,
+        "balanced_accuracy": 0.532,
+        "log_loss": 0.6886,
+        "roc_auc": 0.5587,
+        "confusion_matrix": {
+          "0": {
+            "0": 432,
+            "1": 340
+          },
+          "1": {
+            "0": 387,
+            "1": 394
+          }
+        },
+        "per_class_recall": {
+          "0": 0.5596,
+          "1": 0.5045
+        }
+      },
+      "majority_class_baseline": {
+        "label": "1",
+        "accuracy": 0.5029,
+        "class_counts": {
+          "1": 781,
+          "0": 772
+        }
+      },
+      "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated."
+    },
+    "class_distribution": {
+      "1": 4159,
+      "0": 3603
+    }
+  },
+  "goes_distance_model": {
+    "status": "experimental",
+    "artifact_path": "C:\\dev\\mma-ai\\ufc_predictor\\models\\props\\artifacts\\goes_distance_model.json",
+    "metrics": {
+      "train": {
+        "accuracy": 0.5558,
+        "balanced_accuracy": 0.5452,
+        "log_loss": 0.6848,
+        "roc_auc": 0.5749,
+        "confusion_matrix": {
+          "0": {
+            "0": 2251,
+            "1": 1127
+          },
+          "1": {
+            "0": 1631,
+            "1": 1200
+          }
+        },
+        "per_class_recall": {
+          "0": 0.6664,
+          "1": 0.4239
+        }
+      },
+      "validation": {
+        "accuracy": 0.5319,
+        "balanced_accuracy": 0.532,
+        "log_loss": 0.6886,
+        "roc_auc": 0.5586,
+        "confusion_matrix": {
+          "0": {
+            "0": 394,
+            "1": 387
+          },
+          "1": {
+            "0": 340,
+            "1": 432
+          }
+        },
+        "per_class_recall": {
+          "0": 0.5045,
+          "1": 0.5596
+        }
+      },
+      "majority_class_baseline": {
+        "label": "0",
+        "accuracy": 0.5029,
+        "class_counts": {
+          "0": 781,
+          "1": 772
+        }
+      },
+      "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated."
+    },
+    "class_distribution": {
+      "0": 4159,
+      "1": 3603
+    }
+  },
+  "method_model": {
+    "status": "experimental",
+    "artifact_path": "C:\\dev\\mma-ai\\ufc_predictor\\models\\props\\artifacts\\method_model.json",
+    "metrics": {
+      "train": {
+        "accuracy": 0.2604,
+        "balanced_accuracy": 0.3245,
+        "log_loss": 1.3827,
+        "roc_auc": null,
+        "confusion_matrix": {
+          "Decision": {
+            "Decision": 266,
+            "KO/TKO": 567,
+            "Other": 570,
+            "Submission": 1428
+          },
+          "KO/TKO": {
+            "Decision": 131,
+            "KO/TKO": 556,
+            "Other": 300,
+            "Submission": 1104
+          },
+          "Other": {
+            "Decision": 1,
+            "KO/TKO": 2,
+            "Other": 6,
+            "Submission": 10
+          },
+          "Submission": {
+            "Decision": 61,
+            "KO/TKO": 226,
+            "Other": 192,
+            "Submission": 789
+          }
+        },
+        "per_class_recall": {
+          "Decision": 0.094,
+          "KO/TKO": 0.2659,
+          "Other": 0.3158,
+          "Submission": 0.6222
+        }
+      },
+      "validation": {
+        "accuracy": 0.2447,
+        "balanced_accuracy": 0.2076,
+        "log_loss": 1.3888,
+        "roc_auc": null,
+        "confusion_matrix": {
+          "Decision": {
+            "Decision": 124,
+            "KO/TKO": 177,
+            "Other": 177,
+            "Submission": 294
+          },
+          "KO/TKO": {
+            "Decision": 44,
+            "KO/TKO": 154,
+            "Other": 84,
+            "Submission": 208
+          },
+          "Other": {
+            "Decision": 0,
+            "KO/TKO": 0,
+            "Other": 0,
+            "Submission": 4
+          },
+          "Submission": {
+            "Decision": 33,
+            "KO/TKO": 96,
+            "Other": 56,
+            "Submission": 102
+          }
+        },
+        "per_class_recall": {
+          "Decision": 0.1606,
+          "KO/TKO": 0.3143,
+          "Other": 0.0,
+          "Submission": 0.3554
+        }
+      },
+      "majority_class_baseline": {
+        "label": "Decision",
+        "accuracy": 0.4971,
+        "class_counts": {
+          "KO/TKO": 490,
+          "Decision": 772,
+          "Submission": 287,
+          "Other": 4
+        }
+      },
+      "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated."
+    },
+    "class_distribution": {
+      "Decision": 3603,
+      "KO/TKO": 2581,
+      "Submission": 1555,
+      "Other": 23
+    }
+  },
+  "round_model": {
+    "status": "experimental",
+    "artifact_path": "C:\\dev\\mma-ai\\ufc_predictor\\models\\props\\artifacts\\round_model.json",
+    "metrics": {
+      "train": {
+        "accuracy": 0.286,
+        "balanced_accuracy": 0.4123,
+        "log_loss": 1.3263,
+        "roc_auc": null,
+        "confusion_matrix": {
+          "decision": {
+            "decision": 420,
+            "early": 1522,
+            "late": 661,
+            "middle": 228
+          },
+          "early": {
+            "decision": 193,
+            "early": 1163,
+            "late": 319,
+            "middle": 156
+          },
+          "late": {
+            "decision": 5,
+            "early": 5,
+            "late": 46,
+            "middle": 4
+          },
+          "middle": {
+            "decision": 154,
+            "early": 823,
+            "late": 363,
+            "middle": 147
+          }
+        },
+        "per_class_recall": {
+          "decision": 0.1484,
+          "early": 0.6352,
+          "late": 0.7667,
+          "middle": 0.0989
+        }
+      },
+      "validation": {
+        "accuracy": 0.235,
+        "balanced_accuracy": 0.4252,
+        "log_loss": 1.4347,
+        "roc_auc": null,
+        "confusion_matrix": {
+          "decision": {
+            "decision": 124,
+            "early": 327,
+            "late": 274,
+            "middle": 47
+          },
+          "early": {
+            "decision": 47,
+            "early": 188,
+            "late": 107,
+            "middle": 32
+          },
+          "late": {
+            "decision": 0,
+            "early": 0,
+            "late": 18,
+            "middle": 1
+          },
+          "middle": {
+            "decision": 64,
+            "early": 162,
+            "late": 127,
+            "middle": 35
+          }
+        },
+        "per_class_recall": {
+          "decision": 0.1606,
+          "early": 0.5027,
+          "late": 0.9474,
+          "middle": 0.0902
+        }
+      },
+      "majority_class_baseline": {
+        "label": "decision",
+        "accuracy": 0.4971,
+        "class_counts": {
+          "middle": 388,
+          "decision": 772,
+          "early": 374,
+          "late": 19
+        }
+      },
+      "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated."
+    },
+    "class_distribution": {
+      "decision": 3603,
+      "early": 2205,
+      "middle": 1875,
+      "late": 79
+    }
+  }
+}

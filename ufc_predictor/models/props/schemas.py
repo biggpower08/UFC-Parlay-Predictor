@@ -8,6 +8,8 @@ from typing import Literal
 PropModelAvailability = Literal[
     "not_trained",
     "insufficient_data",
+    "blocked_missing_labels",
+    "blocked_missing_dates",
     "training_data_ready",
     "trained",
     "experimental",

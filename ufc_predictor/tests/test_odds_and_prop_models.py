@@ -31,8 +31,8 @@ def test_prop_model_registry_reports_current_training_status():
 
     assert statuses
     for model_name in ("finish_model", "goes_distance_model", "method_model", "round_model"):
-        assert statuses[model_name]["status"] == "not_trained"
-        assert statuses[model_name]["support_level"] == "not_available"
+        assert statuses[model_name]["status"] in {"not_trained", "trained", "experimental"}
+        assert statuses[model_name]["support_level"] in {"not_available", "model_supported"}
     for model_name in ("strike_volume_model", "takedown_control_model", "odds_edge_model"):
         assert statuses[model_name]["status"] == "not_trained"
         assert statuses[model_name]["support_level"] == "not_available"

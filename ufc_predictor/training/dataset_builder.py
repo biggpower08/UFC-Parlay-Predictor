@@ -48,7 +48,11 @@ class TrainingDatasetAudit:
         }
 
 
-def build_training_rows(fights: pd.DataFrame, source: str = "csv") -> tuple[pd.DataFrame, TrainingDatasetAudit]:
+def build_training_rows(
+    fights: pd.DataFrame,
+    source: str = "csv",
+    assume_reverse_chronological: bool = False,
+) -> tuple[pd.DataFrame, TrainingDatasetAudit]:
     required = {"fighter_1", "fighter_2", "result", "method", "round"}
     missing_columns = sorted(required - set(fights.columns))
     if missing_columns:
@@ -60,6 +64,8 @@ def build_training_rows(fights: pd.DataFrame, source: str = "csv") -> tuple[pd.D
     if has_event_date:
         df["_event_date"] = pd.to_datetime(df["event_date"], errors="coerce")
         df = df.sort_values(["_event_date", "_source_order"], na_position="last")
+    elif assume_reverse_chronological:
+        df = df.sort_values("_source_order", ascending=False)
     else:
         df["_event_date"] = pd.NaT
 
@@ -68,6 +74,8 @@ def build_training_rows(fights: pd.DataFrame, source: str = "csv") -> tuple[pd.D
     warnings: list[str] = []
     if not has_event_date:
         warnings.append("No event_date column is available; chronological order falls back to CSV row order.")
+        if assume_reverse_chronological:
+            warnings.append("Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.")
 
     for _, fight in df.iterrows():
         result = str(fight.get("result") or "").lower().strip().split("\n")[0]
@@ -98,6 +106,7 @@ def build_training_rows(fights: pd.DataFrame, source: str = "csv") -> tuple[pd.D
                 "b_prior_finishes": b_hist["finishes"],
                 "a_prior_decisions": a_hist["decisions"],
                 "b_prior_decisions": b_hist["decisions"],
+                "source_order": int(fight.get("_source_order", len(rows))),
                 "winner": fighter_a,
                 "finish_binary": 0 if is_decision else 1,
                 "goes_distance_binary": 1 if is_decision else 0,
