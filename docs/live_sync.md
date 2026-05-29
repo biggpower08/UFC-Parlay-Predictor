@@ -32,6 +32,24 @@ Check UFCStats source health:
 & $env:MMA_AI_PYTHON scripts\sync_database.py --source-health
 ```
 
+Run the detailed UFCStats scraper diagnostic:
+
+```powershell
+& $env:MMA_AI_PYTHON scripts\diagnose_scraper.py --fetcher requests
+```
+
+Cache-only diagnostic:
+
+```powershell
+& $env:MMA_AI_PYTHON scripts\diagnose_scraper.py --fetcher requests --cache-only
+```
+
+Save debug HTML for local inspection only:
+
+```powershell
+& $env:MMA_AI_PYTHON scripts\diagnose_scraper.py --fetcher requests --save-debug-html
+```
+
 Run a dry-run limited sync:
 
 ```powershell
@@ -47,8 +65,16 @@ Run cache-only mode:
 Parse a manually saved UFCStats event page without live fetching:
 
 ```powershell
+& $env:MMA_AI_PYTHON scripts\diagnose_scraper.py --manual-html C:\path\to\ufcstats_event.html --page-type event_detail
 & $env:MMA_AI_PYTHON scripts\sync_database.py --dry-run --event-html C:\path\to\ufcstats_event.html
 ```
+
+Manual HTML flow:
+
+1. Open the UFCStats page in your browser.
+2. Save the page HTML to a local file.
+3. Run `diagnose_scraper.py --manual-html` with the matching `--page-type`.
+4. For event detail pages, run `sync_database.py --event-html ... --dry-run`.
 
 Import local historical CSV data when live source health is challenged:
 

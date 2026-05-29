@@ -28,10 +28,12 @@ class PlaywrightFetcher:
         self.timeout = timeout
         self.force_refresh = force_refresh
         self.cache_only = cache_only
+        self.last_cache_age_seconds: float | None = None
 
     def fetch(self, url: str) -> FetchResult:
         start = time.perf_counter()
         cached = None if self.force_refresh else self.cache.read(url)
+        self.last_cache_age_seconds = None if self.force_refresh else self.cache.age_seconds(url)
         if cached and looks_like_browser_challenge(cached):
             raise SourceBlockedError(f"Cached response for {url} is a browser JavaScript challenge")
         if cached:
@@ -42,15 +44,20 @@ class PlaywrightFetcher:
         try:
             from playwright.sync_api import sync_playwright
         except Exception as exc:  # pragma: no cover - depends on optional install
-            raise SourceUnavailableError("Playwright fetcher requested but Playwright is not installed.") from exc
+            raise SourceUnavailableError(
+                "Playwright fetcher requested but Playwright is not installed. "
+                "Install it with: & $env:MMA_AI_PYTHON -m pip install playwright; "
+                "& $env:MMA_AI_PYTHON -m playwright install chromium"
+            ) from exc
 
         try:
             with sync_playwright() as pw:
                 browser = pw.chromium.launch(headless=True)
                 page = browser.new_page(user_agent=settings.SCRAPER_USER_AGENT)
-                response = page.goto(url, wait_until="domcontentloaded", timeout=int(self.timeout * 1000))
+                response = page.goto(url, wait_until="networkidle", timeout=int(self.timeout * 1000))
                 html = page.content()
                 status = response.status if response else None
+                final_url = page.url
                 browser.close()
         except Exception as exc:  # pragma: no cover - browser runtime varies
             raise SourceUnavailableError(f"Playwright fetch failed for {url}: {exc}") from exc
@@ -58,7 +65,7 @@ class PlaywrightFetcher:
         if looks_like_browser_challenge(html):
             raise SourceBlockedError("Rendered page is still a browser challenge; refusing to bypass source protection.")
         self.cache.write(url, html)
-        return FetchResult(url, html, status, False, _elapsed_ms(start), len(html.encode("utf-8")))
+        return FetchResult(url, html, status, False, _elapsed_ms(start), len(html.encode("utf-8")), final_url=final_url)
 
 
 def _elapsed_ms(start: float) -> float:

@@ -19,6 +19,9 @@ from ufc_predictor.utils.helpers import normalize_name
 
 BASE_URL = "http://ufcstats.com"
 COMPLETED_EVENTS_URL = f"{BASE_URL}/statistics/events/completed?page=all"
+UPCOMING_EVENTS_URL = f"{BASE_URL}/statistics/events/upcoming"
+FIGHTERS_URL = f"{BASE_URL}/statistics/fighters?char=a&page=all"
+KNOWN_FIGHTER_PROFILE_URL = f"{BASE_URL}/fighter-details/07f72a2a7591b409"
 USER_AGENT = settings.SCRAPER_USER_AGENT
 
 
@@ -85,6 +88,23 @@ class ScrapedFighterProfile:
         return normalize_name(self.name)
 
 
+@dataclass(frozen=True)
+class ScrapedFighterListing:
+    first_name: str
+    last_name: str
+    nickname: str | None = None
+    height: str | None = None
+    weight: str | None = None
+    reach: str | None = None
+    stance: str | None = None
+    record: str | None = None
+    url: str | None = None
+
+    @property
+    def name(self) -> str:
+        return _clean_text(f"{self.first_name} {self.last_name}")
+
+
 class UFCStatsClient:
     def __init__(
         self,
@@ -100,6 +120,10 @@ class UFCStatsClient:
 
     def fetch_completed_events(self, limit: int | None = None) -> list[ScrapedEvent]:
         events = parse_completed_events(self.fetch(COMPLETED_EVENTS_URL))
+        return events[:limit] if limit else events
+
+    def fetch_upcoming_events(self, limit: int | None = None) -> list[ScrapedEvent]:
+        events = parse_completed_events(self.fetch(UPCOMING_EVENTS_URL))
         return events[:limit] if limit else events
 
     def fetch_event_fights(self, event: ScrapedEvent) -> list[ScrapedFight]:
@@ -207,6 +231,42 @@ def parse_fighter_profile(html: str, source_url: str | None = None) -> ScrapedFi
         date_of_birth=_parse_date(details.get("dob")),
         source_url=source_url,
     )
+
+
+def parse_fighter_listing(html: str) -> list[ScrapedFighterListing]:
+    soup = BeautifulSoup(html, "html.parser")
+    fighters: list[ScrapedFighterListing] = []
+    for row in soup.select("tr.b-statistics__table-row"):
+        cells = [_clean_text(cell.get_text(" ", strip=True)) for cell in row.select("td")]
+        links = row.select("a[href*='/fighter-details/']")
+        if len(cells) < 2 or not links:
+            continue
+        first_name = cells[0]
+        last_name = cells[1] if len(cells) > 1 else ""
+        if not first_name or first_name.lower() == "first":
+            continue
+        wins = cells[7] if len(cells) > 7 else None
+        losses = cells[8] if len(cells) > 8 else None
+        draws = cells[9] if len(cells) > 9 else None
+        record = None
+        if wins is not None and losses is not None and draws is not None:
+            record = f"{wins}-{losses}-{draws}"
+        fighters.append(
+            ScrapedFighterListing(
+                first_name=first_name,
+                last_name=last_name,
+                nickname=cells[2] if len(cells) > 2 else None,
+                height=cells[3] if len(cells) > 3 else None,
+                weight=cells[4] if len(cells) > 4 else None,
+                reach=cells[5] if len(cells) > 5 else None,
+                stance=cells[6] if len(cells) > 6 else None,
+                record=record,
+                url=links[0].get("href"),
+            )
+        )
+    if not fighters:
+        raise ParseError("No UFCStats fighters found in response")
+    return fighters
 
 
 def stable_hash(parts: list[str]) -> str:

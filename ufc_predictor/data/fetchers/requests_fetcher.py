@@ -1,4 +1,4 @@
-"""Requests/httpx fetcher with cache, rate limiting, and safe failures."""
+"""Requests fetcher with cache, rate limiting, and safe failures."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import random
 import time
 from pathlib import Path
 
-import httpx
+import requests
 
 from ufc_predictor.config import settings
 from ufc_predictor.data.fetchers.base import FetchResult
@@ -42,10 +42,12 @@ class RequestsFetcher:
         self.max_response_bytes = max_response_bytes or settings.SCRAPER_MAX_RESPONSE_BYTES
         self.force_refresh = force_refresh
         self.cache_only = cache_only
+        self.last_cache_age_seconds: float | None = None
 
     def fetch(self, url: str) -> FetchResult:
         start = time.perf_counter()
         cached = None if self.force_refresh else self.cache.read(url)
+        self.last_cache_age_seconds = None if self.force_refresh else self.cache.age_seconds(url)
         if cached and looks_like_browser_challenge(cached):
             raise SourceBlockedError(f"Cached response for {url} is a browser JavaScript challenge")
         if cached:
@@ -58,13 +60,22 @@ class RequestsFetcher:
         for attempt in range(1, self.retries + 2):
             try:
                 logger.info("fetch attempt url=%s attempt=%s", url, attempt)
-                with httpx.Client(
-                    timeout=self.timeout,
-                    headers={"User-Agent": self.user_agent},
-                    follow_redirects=True,
-                ) as client:
-                    response = client.get(url)
-                if response.status_code in {429, 503}:
+                with requests.Session() as session:
+                    session.headers.update(
+                        {
+                            "User-Agent": self.user_agent,
+                            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                            "Accept-Language": "en-US,en;q=0.9",
+                        }
+                    )
+                    response = session.get(url, timeout=self.timeout, allow_redirects=True)
+                if response.status_code in {403, 401}:
+                    raise SourceBlockedError(f"Source returned status {response.status_code}")
+                if response.status_code == 429:
+                    raise RateLimitError(f"Source returned status {response.status_code}")
+                if response.status_code == 503 and looks_like_browser_challenge(response.text):
+                    raise SourceBlockedError("Source returned a browser JavaScript challenge instead of scrapeable HTML")
+                if response.status_code == 503:
                     raise RateLimitError(f"Source returned status {response.status_code}")
                 if response.status_code >= 400:
                     raise SourceUnavailableError(f"Source returned status {response.status_code}")
@@ -76,13 +87,22 @@ class RequestsFetcher:
                     raise SourceBlockedError("Source returned a browser JavaScript challenge instead of scrapeable HTML")
                 self.cache.write(url, text)
                 time.sleep(self.rate_limit_seconds)
-                return FetchResult(url, text, response.status_code, False, _elapsed_ms(start), size)
-            except httpx.TimeoutException as exc:
+                return FetchResult(
+                    url,
+                    text,
+                    response.status_code,
+                    False,
+                    _elapsed_ms(start),
+                    size,
+                    final_url=response.url,
+                    content_type=response.headers.get("content-type"),
+                )
+            except requests.Timeout as exc:
                 last_error = FetchTimeoutError(str(exc))
             except (SourceBlockedError, RateLimitError) as exc:
                 logger.warning("fetch stopped url=%s error=%s", url, exc)
                 raise
-            except Exception as exc:
+            except requests.RequestException as exc:
                 last_error = exc
 
             if attempt <= self.retries:
@@ -95,7 +115,17 @@ class RequestsFetcher:
 
 def looks_like_browser_challenge(html: str) -> bool:
     text = (html or "").lower()
-    return "checking your browser" in text or "requires javascript" in text or "cf-chl" in text
+    markers = (
+        "checking your browser",
+        "requires javascript",
+        "enable javascript",
+        "cf-chl",
+        "cloudflare",
+        "captcha",
+        "access denied",
+        "challenge",
+    )
+    return any(marker in text for marker in markers)
 
 
 def _elapsed_ms(start: float) -> float:

@@ -14,3 +14,5 @@ class FetchResult:
     elapsed_ms: float
     bytes_read: int
     challenged: bool = False
+    final_url: str | None = None
+    content_type: str | None = None

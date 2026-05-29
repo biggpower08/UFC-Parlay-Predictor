@@ -26,6 +26,7 @@ from ufc_predictor.data.sync import (
     upsert_fighters_from_fights,
     upsert_fights,
 )
+from ufc_predictor.data.scrapers.diagnostics import diagnose_ufcstats
 from ufc_predictor.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -152,41 +153,18 @@ def main() -> int:
 
 def check_source_health(args) -> int:
     counts = {"events": 0, "fights": 0, "fighters": 0, "rankings": 0, "inserted": 0, "updated": 0, "skipped": 0, "failed": 0}
-    try:
-        UFCStatsClient, _parse_event_fights, _scraped_event = _ufcstats_imports()
-        client = UFCStatsClient(
-            fetcher_name=args.fetcher,
-            cache_only=args.cache_only,
-            force_refresh=args.force_refresh,
-        )
-        html = client.fetch(COMPLETED_EVENTS_URL)
-        status = "healthy" if "event-details" in html else "unavailable"
-        message = "" if status == "healthy" else "Events page did not contain event links"
-        update_source_health(args.source, BASE_URL, status, message)
-        record_sync_run(args.source, f"source_health_{status}", True, counts, message)
-        print(json.dumps(_source_health_payload(args.source, "healthy" if status == "healthy" else "unreliable"), indent=2, default=str))
-        return 0 if status == "healthy" else 1
-    except SourceBlockedError as exc:
-        message = str(exc)
-        update_source_health(args.source, BASE_URL, "failed", message, challenged=True)
-        record_sync_run(args.source, "source_health_challenged", True, counts, message)
-        print(json.dumps(_source_health_payload(args.source, "blocked"), indent=2, default=str))
-        return 2
-    except (RateLimitError, SourceUnavailableError, FetchError) as exc:
-        message = str(exc)
-        update_source_health(args.source, BASE_URL, "failed", message)
-        record_sync_run(args.source, "source_health_failed", True, counts, message)
-        print(json.dumps(_source_health_payload(args.source, "unreliable"), indent=2, default=str))
-        return 1
-    except ImportError as exc:
-        message = _dependency_message(args.fetcher, exc)
-        update_source_health(args.source, BASE_URL, "failed", message)
-        record_sync_run(args.source, "source_health_failed", True, counts, message)
-        print(json.dumps(_source_health_payload(args.source, "unreliable", message), indent=2, default=str))
-        return 1
+    diagnostic = diagnose_ufcstats(fetcher_name=args.fetcher, cache_only=args.cache_only)
+    live_status = diagnostic["source_health"]
+    message = _source_health_message(diagnostic)
+    challenged = live_status == "blocked"
+    db_status = "healthy" if live_status == "healthy" else "failed"
+    update_source_health(args.source, BASE_URL, db_status, message, challenged=challenged)
+    record_sync_run(args.source, f"source_health_{live_status}", True, counts, message)
+    print(json.dumps(_source_health_payload(args.source, live_status, message, diagnostic), indent=2, default=str))
+    return 0 if live_status == "healthy" else (2 if live_status == "blocked" else 1)
 
 
-def _source_health_payload(source: str, ufcstats_live_status: str, live_message: str | None = None) -> dict:
+def _source_health_payload(source: str, ufcstats_live_status: str, live_message: str | None = None, diagnostic: dict | None = None) -> dict:
     csv_exists = settings.FIGHTS_CSV.is_file()
     manual_html_available = True
     cached_html_available = _has_cached_html()
@@ -219,7 +197,37 @@ def _source_health_payload(source: str, ufcstats_live_status: str, live_message:
                 "provider": settings.ODDS_PROVIDER,
             },
         },
+        "diagnostic_summary": _diagnostic_summary(diagnostic),
         "sync_status": get_sync_status(source),
+    }
+
+
+def _source_health_message(diagnostic: dict) -> str:
+    pages = diagnostic.get("pages", [])
+    failures = [f"{page.get('page_type')}: {page.get('source_health_status')} {page.get('error') or ''}".strip() for page in pages if page.get("source_health_status") != "healthy"]
+    return "; ".join(failures)[:2000]
+
+
+def _diagnostic_summary(diagnostic: dict | None) -> dict:
+    if not diagnostic:
+        return {}
+    return {
+        "fetcher": diagnostic.get("fetcher"),
+        "source_health": diagnostic.get("source_health"),
+        "pages": [
+            {
+                "page_type": page.get("page_type"),
+                "status": page.get("source_health_status"),
+                "status_code": page.get("status_code"),
+                "events": page.get("events_parsed"),
+                "fights": page.get("fights_parsed"),
+                "fighters": page.get("fighters_parsed"),
+                "profiles": page.get("fighter_profiles_parsed"),
+                "cache_hit": page.get("cache_hit"),
+                "error": page.get("error"),
+            }
+            for page in diagnostic.get("pages", [])
+        ],
     }
 
 
