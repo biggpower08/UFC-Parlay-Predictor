@@ -2,7 +2,7 @@
 
 import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { saveLatestPrediction } from "../lib/latestPrediction";
+import { clearLatestPrediction, saveLatestPrediction } from "../lib/latestPrediction";
 
 const API_CANDIDATES = Array.from(
   new Set(
@@ -244,10 +244,12 @@ export default function App() {
     if (!resolver) return;
     const picked = resolver.candidates.find((fighter) => fighter.name === name) || null;
     if (resolver.slot === "a") {
+      clearLatestPrediction();
       setFighterAQuery(name);
       setSelectedFighterA(picked || { name });
     }
     if (resolver.slot === "b") {
+      clearLatestPrediction();
       setFighterBQuery(name);
       setSelectedFighterB(picked || { name });
     }
@@ -264,6 +266,7 @@ export default function App() {
   }
 
   function pickFighter(slot, fighter) {
+    clearLatestPrediction();
     const name = fighter.name;
     if (slot === "a") {
       setFighterAQuery(name);
@@ -283,6 +286,7 @@ export default function App() {
   }
 
   function handleFighterInput(slot, value) {
+    clearLatestPrediction();
     if (slot === "a") {
       setFighterAQuery(value);
       setSelectedFighterA(null);

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { loadLatestPrediction } from "../../lib/latestPrediction";
+import { useLatestPrediction } from "../../lib/latestPrediction";
 
 const STAT_ROWS = [
   ["Record", "Record"],
@@ -19,11 +18,7 @@ const STAT_ROWS = [
 ];
 
 export default function StatsPage() {
-  const [result, setResult] = useState(null);
-
-  useEffect(() => {
-    setResult(loadLatestPrediction());
-  }, []);
+  const result = useLatestPrediction();
 
   if (!result) {
     return (

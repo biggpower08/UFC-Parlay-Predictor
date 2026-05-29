@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { loadLatestPrediction } from "../../lib/latestPrediction";
+import { useLatestPrediction } from "../../lib/latestPrediction";
 
 export default function AnalysisPage() {
-  const [result, setResult] = useState(null);
-
-  useEffect(() => {
-    setResult(loadLatestPrediction());
-  }, []);
+  const result = useLatestPrediction();
 
   if (!result) {
     return (

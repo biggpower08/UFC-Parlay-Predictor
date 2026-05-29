@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { loadLatestPrediction } from "../../lib/latestPrediction";
+import { useLatestPrediction } from "../../lib/latestPrediction";
 
 const API_BASE = "/api";
 
@@ -14,14 +14,13 @@ async function fetchJson(path) {
 export default function OddsPage() {
   const [status, setStatus] = useState(null);
   const [bettingReads, setBettingReads] = useState(null);
-  const [latest, setLatest] = useState(null);
+  const latest = useLatestPrediction();
   const [feedbackState, setFeedbackState] = useState({});
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetchJson("/odds/status").then(setStatus).catch((error) => setMessage(`Odds status unavailable: ${error.message}`));
     fetchJson("/betting/reads").then(setBettingReads).catch(() => setBettingReads(null));
-    setLatest(loadLatestPrediction());
   }, []);
 
   async function submitFeedback(read, rating) {
