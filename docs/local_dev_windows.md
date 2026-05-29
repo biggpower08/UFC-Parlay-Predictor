@@ -14,11 +14,11 @@ Do not use the old OneDrive folder. OneDrive caused Git index-lock, npm, Next, a
 
 ## Python Version
 
-The local standard is Python 3.13 with a `.venv` virtual environment.
+The current recommended Windows workflow is Python 3.13 with an external virtual environment at `C:\venvs\mma-ai`.
 
 The repo does not currently define `pyproject.toml`, `setup.py`, or `setup.cfg`; Python dependencies are listed in `requirements.txt`. The main dependencies are unpinned and current releases support Python 3.13, including scikit-learn, pandas, NumPy, Playwright, and Psycopg. If package resolution fails on a machine, use the exact pip error as the source of truth.
 
-Use `.venv`, not `.venv312`.
+Use `C:\venvs\mma-ai` through `MMA_AI_PYTHON` when the repo-local `.venv` returns Access Denied. Use `.venv`, not `.venv312`, only if repo-local execution works on your machine.
 
 No activation is required. Run tools through the venv Python directly.
 
@@ -26,6 +26,10 @@ No activation is required. Run tools through the venv Python directly.
 
 ```powershell
 cd C:\dev\mma-ai
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+mkdir C:\venvs -Force
+py -3.13 -m venv C:\venvs\mma-ai
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
 .\scripts\dev_setup.ps1
 ```
 
@@ -48,10 +52,11 @@ cd C:\dev\mma-ai
 .\scripts\dev_test_backend.ps1
 ```
 
-This runs:
+Recommended external-venv command:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest ufc_predictor\tests -q --basetemp pytest_tmp_codex
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+.\scripts\dev_test_backend.ps1
 ```
 
 If Windows refuses to execute `.venv\Scripts\python.exe`, use an external venv and point scripts at it:
@@ -91,25 +96,26 @@ Check current sync/source status:
 
 ```powershell
 cd C:\dev\mma-ai
-.\.venv\Scripts\python.exe scripts\sync_database.py --status
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON scripts\sync_database.py --status
 ```
 
 Check UFCStats source health:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --source-health
+& $env:MMA_AI_PYTHON scripts\sync_database.py --source-health
 ```
 
 Safe dry-run, without writing production data:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --recent-days 14 --fetcher requests
+& $env:MMA_AI_PYTHON scripts\sync_database.py --dry-run --recent-days 14 --fetcher requests
 ```
 
 Training dataset readiness dry-run:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\build_training_dataset.py --dry-run --missingness-report
+& $env:MMA_AI_PYTHON scripts\build_training_dataset.py --dry-run --missingness-report
 ```
 
 With an external venv:

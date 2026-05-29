@@ -1,7 +1,14 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $frontend = Join-Path $root "app\frontend"
-$python = if ($env:MMA_AI_PYTHON) { $env:MMA_AI_PYTHON } else { Join-Path $root ".venv\Scripts\python.exe" }
+$externalPython = "C:\venvs\mma-ai\Scripts\python.exe"
+$python = if ($env:MMA_AI_PYTHON) {
+    $env:MMA_AI_PYTHON
+} elseif (Test-Path $externalPython) {
+    $externalPython
+} else {
+    Join-Path $root ".venv\Scripts\python.exe"
+}
 
 if (-not (Test-Path $python)) {
     throw "Python executable was not found. Run .\scripts\dev_setup.ps1 or set MMA_AI_PYTHON."

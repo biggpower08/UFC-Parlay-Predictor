@@ -22,55 +22,56 @@ If UFCStats is challenged, use cache-only mode, manual HTML import planning, or 
 Check current sync/source status:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --status
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON scripts\sync_database.py --status
 ```
 
 Check UFCStats source health:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --source-health
+& $env:MMA_AI_PYTHON scripts\sync_database.py --source-health
 ```
 
 Run a dry-run limited sync:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --recent-days 14 --fetcher requests
+& $env:MMA_AI_PYTHON scripts\sync_database.py --dry-run --recent-days 14 --fetcher requests
 ```
 
 Run cache-only mode:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --cache-only --limit-events 1
+& $env:MMA_AI_PYTHON scripts\sync_database.py --dry-run --cache-only --limit-events 1
 ```
 
 Parse a manually saved UFCStats event page without live fetching:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --dry-run --event-html C:\path\to\ufcstats_event.html
+& $env:MMA_AI_PYTHON scripts\sync_database.py --dry-run --event-html C:\path\to\ufcstats_event.html
 ```
 
 Import local historical CSV data when live source health is challenged:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv --dry-run
+& $env:MMA_AI_PYTHON scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv --dry-run
 ```
 
 Run a production-style recent sync manually:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\sync_database.py --recent-days 14 --fetcher requests
+& $env:MMA_AI_PYTHON scripts\sync_database.py --recent-days 14 --fetcher requests
 ```
 
 Generate rankings without scraping:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\generate_rankings.py
+& $env:MMA_AI_PYTHON scripts\generate_rankings.py
 ```
 
 Refresh Elo without scraping:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\update_elo.py --no-refresh
+& $env:MMA_AI_PYTHON scripts\update_elo.py --no-refresh
 ```
 
 ## Optional Environment Variables
@@ -84,6 +85,24 @@ None of these are required for normal app startup.
 - `SCRAPER_CACHE_DIR`: override scraper cache folder.
 - `SCRAPER_USER_AGENT`: override the polite user agent string.
 - `SCRAPER_MAX_RESPONSE_BYTES`: safety limit for source responses.
+
+## Optional Playwright Fetcher
+
+Playwright is optional and should only be used for normal JavaScript-rendered pages. Do not use it to bypass CAPTCHA, anti-bot checks, challenge pages, or access controls.
+
+Install optional support:
+
+```powershell
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON -m pip install playwright
+& $env:MMA_AI_PYTHON -m playwright install chromium
+```
+
+Run source-health with Playwright:
+
+```powershell
+& $env:MMA_AI_PYTHON scripts\sync_database.py --source-health --fetcher playwright
+```
 
 ## Render Cron Recommendation
 

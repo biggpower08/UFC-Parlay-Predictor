@@ -7,7 +7,14 @@ if ($RepoRoot.Path -like "*OneDrive*") {
     throw "Do not run tests from OneDrive. Use C:\dev\mma-ai."
 }
 
-$PythonExe = if ($env:MMA_AI_PYTHON) { $env:MMA_AI_PYTHON } else { Join-Path $RepoRoot ".venv\Scripts\python.exe" }
+$ExternalVenvPython = "C:\venvs\mma-ai\Scripts\python.exe"
+$PythonExe = if ($env:MMA_AI_PYTHON) {
+    $env:MMA_AI_PYTHON
+} elseif (Test-Path $ExternalVenvPython) {
+    $ExternalVenvPython
+} else {
+    Join-Path $RepoRoot ".venv\Scripts\python.exe"
+}
 Write-Host "Using Python: $PythonExe"
 if (-not (Test-Path $PythonExe)) {
     throw "Python executable was not found. Run .\scripts\dev_setup.ps1 or set MMA_AI_PYTHON."

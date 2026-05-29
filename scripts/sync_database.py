@@ -16,7 +16,7 @@ from ufc_predictor.data.fetchers.errors import (
     SourceBlockedError,
     SourceUnavailableError,
 )
-from ufc_predictor.data.scrapers.ufcstats import BASE_URL, COMPLETED_EVENTS_URL, ScrapedEvent, UFCStatsClient, parse_event_fights
+from ufc_predictor.config import settings
 from ufc_predictor.data.sync import (
     get_sync_status,
     record_sync_run,
@@ -29,6 +29,8 @@ from ufc_predictor.data.sync import (
 from ufc_predictor.utils.logger import get_logger
 
 logger = get_logger(__name__)
+BASE_URL = "http://ufcstats.com"
+COMPLETED_EVENTS_URL = f"{BASE_URL}/statistics/events/completed?page=all"
 
 
 def main() -> int:
@@ -149,35 +151,80 @@ def main() -> int:
 
 
 def check_source_health(args) -> int:
-    client = UFCStatsClient(
-        fetcher_name=args.fetcher,
-        cache_only=args.cache_only,
-        force_refresh=args.force_refresh,
-    )
     counts = {"events": 0, "fights": 0, "fighters": 0, "rankings": 0, "inserted": 0, "updated": 0, "skipped": 0, "failed": 0}
     try:
+        UFCStatsClient, _parse_event_fights, _scraped_event = _ufcstats_imports()
+        client = UFCStatsClient(
+            fetcher_name=args.fetcher,
+            cache_only=args.cache_only,
+            force_refresh=args.force_refresh,
+        )
         html = client.fetch(COMPLETED_EVENTS_URL)
         status = "healthy" if "event-details" in html else "unavailable"
         message = "" if status == "healthy" else "Events page did not contain event links"
         update_source_health(args.source, BASE_URL, status, message)
         record_sync_run(args.source, f"source_health_{status}", True, counts, message)
-        print(json.dumps(get_sync_status(args.source), indent=2, default=str))
+        print(json.dumps(_source_health_payload(args.source, "healthy" if status == "healthy" else "unreliable"), indent=2, default=str))
         return 0 if status == "healthy" else 1
     except SourceBlockedError as exc:
         message = str(exc)
         update_source_health(args.source, BASE_URL, "failed", message, challenged=True)
         record_sync_run(args.source, "source_health_challenged", True, counts, message)
-        print(json.dumps(get_sync_status(args.source), indent=2, default=str))
+        print(json.dumps(_source_health_payload(args.source, "blocked"), indent=2, default=str))
         return 2
     except (RateLimitError, SourceUnavailableError, FetchError) as exc:
         message = str(exc)
         update_source_health(args.source, BASE_URL, "failed", message)
         record_sync_run(args.source, "source_health_failed", True, counts, message)
-        print(json.dumps(get_sync_status(args.source), indent=2, default=str))
+        print(json.dumps(_source_health_payload(args.source, "unreliable"), indent=2, default=str))
+        return 1
+    except ImportError as exc:
+        message = _dependency_message(args.fetcher, exc)
+        update_source_health(args.source, BASE_URL, "failed", message)
+        record_sync_run(args.source, "source_health_failed", True, counts, message)
+        print(json.dumps(_source_health_payload(args.source, "unreliable", message), indent=2, default=str))
         return 1
 
 
+def _source_health_payload(source: str, ufcstats_live_status: str, live_message: str | None = None) -> dict:
+    csv_exists = settings.FIGHTS_CSV.is_file()
+    manual_html_available = True
+    cached_html_available = _has_cached_html()
+    structured_api_configured = bool(getattr(settings, "SPORTSDATAIO_API_KEY", "") or getattr(settings, "BALLDONTLIE_API_KEY", ""))
+    return {
+        "sources": {
+            "ufcstats_live": {
+                "status": ufcstats_live_status,
+                "message": live_message or "Use only after source-health is healthy. Do not bypass challenge/block pages.",
+            },
+            "csv_import": {
+                "status": "available" if csv_exists else "unavailable",
+                "path": str(settings.FIGHTS_CSV),
+                "message": "Primary current fallback for historical import and data audits.",
+            },
+            "manual_html_import": {
+                "status": "available" if manual_html_available else "unavailable",
+                "command": "scripts\\sync_database.py --dry-run --event-html <saved_ufcstats_event.html>",
+            },
+            "cached_html": {
+                "status": "available" if cached_html_available else "unavailable",
+                "path": str(settings.SCRAPER_CACHE_DIR),
+            },
+            "structured_api": {
+                "status": "configured" if structured_api_configured else "not_configured",
+                "providers": ["future_sportsdataio", "future_balldontlie"],
+            },
+            "odds_source": {
+                "status": "configured" if settings.ENABLE_ODDS else "not_configured",
+                "provider": settings.ODDS_PROVIDER,
+            },
+        },
+        "sync_status": get_sync_status(source),
+    }
+
+
 def _load_events(client: UFCStatsClient, args) -> list[ScrapedEvent]:
+    UFCStatsClient, parse_event_fights, ScrapedEvent = _ufcstats_imports()
     if args.event_html:
         return [
             ScrapedEvent(
@@ -210,6 +257,7 @@ def _load_events(client: UFCStatsClient, args) -> list[ScrapedEvent]:
 
 
 def _load_fights(client: UFCStatsClient, events: list[ScrapedEvent], args) -> list:
+    UFCStatsClient, parse_event_fights, ScrapedEvent = _ufcstats_imports()
     if args.event_html:
         fights = []
         for event in events:
@@ -237,6 +285,28 @@ def _load_fights(client: UFCStatsClient, events: list[ScrapedEvent], args) -> li
             args._failure_message = f"{getattr(args, '_failure_message', '')} Event failed: {event.name}: {exc}".strip()
             logger.warning("sync event_failed event=%s error=%s", event.name, exc)
     return fights
+
+
+def _ufcstats_imports():
+    from ufc_predictor.data.scrapers.ufcstats import ScrapedEvent, UFCStatsClient, parse_event_fights
+
+    return UFCStatsClient, parse_event_fights, ScrapedEvent
+
+
+def _dependency_message(fetcher: str, exc: ImportError) -> str:
+    base = f"Missing dependency for source-health check: {exc}"
+    if fetcher == "playwright":
+        return (
+            f"{base}. Install optional Playwright support with: "
+            "& $env:MMA_AI_PYTHON -m pip install playwright; "
+            "& $env:MMA_AI_PYTHON -m playwright install chromium"
+        )
+    return base
+
+
+def _has_cached_html() -> bool:
+    cache_dir = settings.SCRAPER_CACHE_DIR
+    return cache_dir.is_dir() and any(cache_dir.rglob("*"))
 
 
 def _filter_recent(events: list[ScrapedEvent], recent_days: int) -> list[ScrapedEvent]:

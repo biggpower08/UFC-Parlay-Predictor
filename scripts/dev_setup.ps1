@@ -19,8 +19,15 @@ if (-not (Test-Path "requirements.txt")) {
     throw "requirements.txt was not found. Run this script from the mma-ai repo."
 }
 
+$ExternalVenvPython = "C:\venvs\mma-ai\Scripts\python.exe"
 $DefaultVenvPython = Join-Path $RepoRoot ".venv\Scripts\python.exe"
-$PythonExe = if ($env:MMA_AI_PYTHON) { $env:MMA_AI_PYTHON } else { $DefaultVenvPython }
+$PythonExe = if ($env:MMA_AI_PYTHON) {
+    $env:MMA_AI_PYTHON
+} elseif (Test-Path $ExternalVenvPython) {
+    $ExternalVenvPython
+} else {
+    $DefaultVenvPython
+}
 
 function Invoke-Python {
     param([string[]]$Arguments)
@@ -34,14 +41,14 @@ function Invoke-Python {
 }
 
 Write-Host "Checking Python..."
-if ($env:MMA_AI_PYTHON) {
-    Write-Host "Using MMA_AI_PYTHON: $PythonExe"
+if ($env:MMA_AI_PYTHON -or (Test-Path $ExternalVenvPython)) {
+    Write-Host "Using Python: $PythonExe"
     if (-not (Test-Path $PythonExe)) {
-        throw "MMA_AI_PYTHON points to a file that does not exist: $PythonExe"
+        throw "Python executable does not exist: $PythonExe"
     }
     & $PythonExe --version
     if ($LASTEXITCODE -ne 0) {
-        throw "MMA_AI_PYTHON is not executable: $PythonExe"
+        throw "Python is not executable: $PythonExe"
     }
 } else {
     Invoke-Python @("--version")
