@@ -170,7 +170,7 @@
       "min": null,
       "max": null
     },
-    "data_source": "csv",
+    "data_source": "imported_csv",
     "input_path": "C:\\dev\\mma-ai\\ufc_predictor\\data\\raw\\fights.csv",
     "split_type": "source_order_reversed_experimental",
     "feature_names": [
@@ -189,7 +189,7 @@
       "middle": 1875,
       "late": 79
     },
-    "trained_at": "2026-05-29T04:53:11.407424+00:00",
+    "trained_at": "2026-05-29T15:42:04.214865+00:00",
     "data_cutoff_date": "source_order_7905",
     "training_source_status": "experimental",
     "leakage_checked": true,
