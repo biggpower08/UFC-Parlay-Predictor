@@ -127,7 +127,7 @@
       "0": 4159,
       "1": 3603
     },
-    "trained_at": "2026-05-29T04:14:57.653716+00:00",
+    "trained_at": "2026-05-29T04:53:11.350950+00:00",
     "data_cutoff_date": "source_order_7905",
     "training_source_status": "experimental",
     "leakage_checked": true,

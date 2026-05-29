@@ -491,9 +491,6 @@ export default function App() {
       {result && (
         <>
           <nav className="tabs">
-            <button className={activeTab === "matchup" ? "active" : ""} onClick={() => setActiveTab("matchup")}>
-              Matchup
-            </button>
             <button className={activeTab === "prediction" ? "active" : ""} onClick={() => setActiveTab("prediction")}>
               Prediction
             </button>
@@ -502,7 +499,6 @@ export default function App() {
             </button>
           </nav>
 
-          {activeTab === "matchup" && <StatsPanel comparison={result.comparison} />}
           {activeTab === "prediction" && (
             <section className="panel prediction-panel">
               {result.analysis && (
@@ -527,17 +523,14 @@ export default function App() {
               <p className="confidence-label">{confidence}% confidence</p>
               <p className="reasoning">{result.prediction.reasoning}</p>
               <div className="analyst-read">
-                <span>Analyst read</span>
-                <p>{result.analysis?.summary || result.summary}</p>
+                <span>Analyst summary</span>
+                <p>{summaryPreview(result.analysis?.summary || result.summary)}</p>
               </div>
-              <a className="analysis-link" href="/analysis">Open full analysis</a>
               <div className="deep-link-grid">
                 <a href="/analysis">Full Analysis</a>
                 <a href="/stats">Matchup Stats</a>
                 <a href="/odds">Odds / Betting Reads</a>
               </div>
-              {result.analysis?.prop_reads?.length > 0 && <PropReadsPanel analysis={result.analysis} />}
-              {result.analysis && <AnalysisPanel analysis={result.analysis} />}
             </section>
           )}
           {activeTab === "feedback" && (
@@ -623,6 +616,12 @@ function compactMatchupLabel(matchupType) {
   if (matchupType.label === "Potential cross-division matchup") return "Possibly cross-division";
   if (matchupType.label === "Cross-division matchup") return "Cross-division";
   return "Weight class unknown";
+}
+
+function summaryPreview(text) {
+  if (!text) return "Open the full Analysis page for the deeper matchup breakdown.";
+  const sentences = String(text).match(/[^.!?]+[.!?]+/g) || [String(text)];
+  return sentences.slice(0, 3).join(" ").trim();
 }
 
 const FighterInput = memo(function FighterInput({

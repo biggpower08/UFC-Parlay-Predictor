@@ -86,7 +86,7 @@ def build_training_rows(
         if not fighter_a or not fighter_b:
             continue
 
-        method = normalize_method(fight.get("method"))
+        method = normalize_method(fight.get("method_group") or fight.get("method"))
         is_decision = method == "Decision"
         round_phase = round_phase_label(fight.get("round"), is_decision)
         a_hist = history[fighter_a]
@@ -113,15 +113,21 @@ def build_training_rows(
                 "method_class": method,
                 "round_number": _safe_int(fight.get("round")),
                 "round_phase_class": round_phase,
-                "fighter_a_sig_strikes": None,
-                "fighter_b_sig_strikes": None,
-                "combined_sig_strikes": None,
-                "fighter_a_strike_volume_bucket": None,
-                "fighter_b_strike_volume_bucket": None,
-                "fighter_a_takedowns": None,
-                "fighter_b_takedowns": None,
-                "grappling_heavy_binary": None,
-                "takedown_control_bucket": None,
+                "fighter_a_sig_strikes": fight.get("fighter_a_sig_strikes"),
+                "fighter_b_sig_strikes": fight.get("fighter_b_sig_strikes"),
+                "combined_sig_strikes": fight.get("combined_sig_strikes"),
+                "fighter_a_strike_volume_bucket": fight.get("fighter_a_strike_volume_bucket"),
+                "fighter_b_strike_volume_bucket": fight.get("fighter_b_strike_volume_bucket"),
+                "combined_strike_volume_bucket": fight.get("strike_volume_bucket") or fight.get("combined_strike_volume_bucket"),
+                "fighter_a_50plus_sig_strikes": fight.get("fighter_a_50plus_sig_strikes"),
+                "fighter_b_50plus_sig_strikes": fight.get("fighter_b_50plus_sig_strikes"),
+                "combined_100plus_sig_strikes": fight.get("combined_100plus_sig_strikes"),
+                "fighter_a_takedowns": fight.get("fighter_a_takedowns"),
+                "fighter_b_takedowns": fight.get("fighter_b_takedowns"),
+                "fighter_a_takedown_1plus": fight.get("fighter_a_takedown_1plus"),
+                "fighter_b_takedown_1plus": fight.get("fighter_b_takedown_1plus"),
+                "grappling_heavy_binary": fight.get("grappling_heavy_binary"),
+                "takedown_control_bucket": fight.get("takedown_control_bucket"),
             }
         )
 
@@ -145,8 +151,16 @@ def audit_training_dataset(dataset: pd.DataFrame, raw_fights: pd.DataFrame, sour
         "fighter_a_sig_strikes",
         "fighter_b_sig_strikes",
         "combined_sig_strikes",
+        "fighter_a_strike_volume_bucket",
+        "fighter_b_strike_volume_bucket",
+        "combined_strike_volume_bucket",
+        "fighter_a_50plus_sig_strikes",
+        "fighter_b_50plus_sig_strikes",
+        "combined_100plus_sig_strikes",
         "fighter_a_takedowns",
         "fighter_b_takedowns",
+        "fighter_a_takedown_1plus",
+        "fighter_b_takedown_1plus",
         "grappling_heavy_binary",
         "takedown_control_bucket",
     ]
@@ -156,7 +170,7 @@ def audit_training_dataset(dataset: pd.DataFrame, raw_fights: pd.DataFrame, sour
     }
     distributions = {
         column: {str(key): int(value) for key, value in Counter(dataset[column].dropna()).items()}
-        for column in ("finish_binary", "goes_distance_binary", "method_class", "round_phase_class")
+        for column in ("finish_binary", "goes_distance_binary", "method_class", "round_phase_class", "combined_strike_volume_bucket", "grappling_heavy_binary")
         if column in dataset.columns
     }
     feature_columns = [
@@ -203,8 +217,8 @@ def audit_training_dataset(dataset: pd.DataFrame, raw_fights: pd.DataFrame, sour
             "has_fight_results": "result" in raw_fights.columns,
             "has_method_round_time": all(column in raw_fights.columns for column in ("method", "round", "time")),
             "has_event_date": bool(raw_fights.get("event_date") is not None and raw_fights.get("event_date").notna().any()),
-            "has_significant_strike_totals": False,
-            "has_takedown_control_labels": False,
+            "has_significant_strike_totals": any(column in raw_fights.columns for column in ("fighter_a_sig_strikes", "fighter_b_sig_strikes", "combined_sig_strikes")),
+            "has_takedown_control_labels": any(column in raw_fights.columns for column in ("fighter_a_takedowns", "fighter_b_takedowns", "grappling_heavy_binary", "takedown_control_bucket")),
         },
         label_availability=label_availability,
         class_distributions=distributions,

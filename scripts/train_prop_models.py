@@ -40,10 +40,10 @@ MODEL_TARGETS = [
     ("goes_distance_model", "goes_distance_binary"),
     ("method_model", "method_class"),
     ("round_model", "round_phase_class"),
+    ("strike_volume_model", "combined_strike_volume_bucket"),
+    ("takedown_control_model", "grappling_heavy_binary"),
 ]
 BLOCKED_TARGETS = {
-    "strike_volume_model": "Missing per-fight significant strike totals.",
-    "takedown_control_model": "Missing per-fight takedown/control labels.",
 }
 
 
@@ -51,7 +51,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Train dedicated prop models from available labels.")
     parser.add_argument("--dry-run", action="store_true", help="Audit and print the training plan without writing artifacts.")
     parser.add_argument("--input", default=str(settings.FIGHTS_CSV), help="Input fights CSV for training.")
-    parser.add_argument("--source", default="csv", choices=["csv", "ufcstats_cache", "manual_html"])
+    parser.add_argument("--source", default="csv", choices=["csv", "imported_csv", "ufcstats_cache", "manual_html"])
     parser.add_argument("--min-rows", type=int, default=500)
     parser.add_argument("--test-size", type=float, default=0.2)
     parser.add_argument(
@@ -62,7 +62,11 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    fights = load_fights_csv(args.input)
+    default_import = settings.DATA_PROCESSED_DIR / "training_imports" / "normalized_fights.csv"
+    input_path = args.input
+    if args.source == "imported_csv" and args.input == str(settings.FIGHTS_CSV) and default_import.is_file():
+        input_path = str(default_import)
+    fights = load_fights_csv(input_path)
     dataset, audit = build_training_rows(
         fights,
         source=args.source,
@@ -87,7 +91,7 @@ def main() -> int:
             audit=audit.to_dict(),
             test_size=args.test_size,
             data_source=args.source,
-            input_path=args.input,
+            input_path=input_path,
             status=plan[model_name]["status"],
         )
         artifact_path = settings.PROP_MODELS_DIR / f"{model_name}.json"

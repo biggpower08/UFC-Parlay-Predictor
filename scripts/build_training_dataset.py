@@ -20,12 +20,16 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--min-date", default="")
     parser.add_argument("--max-date", default="")
-    parser.add_argument("--source", default="csv", choices=["csv", "ufcstats_cache", "manual_html"])
+    parser.add_argument("--source", default="csv", choices=["csv", "imported_csv", "ufcstats_cache", "manual_html"])
     parser.add_argument("--input", default=str(settings.FIGHTS_CSV), help="Input fights CSV path.")
     parser.add_argument("--missingness-report", action="store_true")
     args = parser.parse_args()
 
-    fights = load_fights_csv(args.input)
+    default_import = settings.DATA_PROCESSED_DIR / "training_imports" / "normalized_fights.csv"
+    input_path = args.input
+    if args.source == "imported_csv" and args.input == str(settings.FIGHTS_CSV) and default_import.is_file():
+        input_path = str(default_import)
+    fights = load_fights_csv(input_path)
     if args.min_date and "event_date" in fights.columns:
         fights = fights[fights["event_date"] >= args.min_date]
     if args.max_date and "event_date" in fights.columns:

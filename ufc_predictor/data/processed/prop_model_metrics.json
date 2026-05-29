@@ -314,5 +314,19 @@
       "middle": 1875,
       "late": 79
     }
+  },
+  "strike_volume_model": {
+    "target": "combined_strike_volume_bucket",
+    "status": "insufficient_data",
+    "rows": 0,
+    "class_distribution": {},
+    "reason": "Only 0 rows available for combined_strike_volume_bucket; minimum is 500."
+  },
+  "takedown_control_model": {
+    "target": "grappling_heavy_binary",
+    "status": "insufficient_data",
+    "rows": 0,
+    "class_distribution": {},
+    "reason": "Only 0 rows available for grappling_heavy_binary; minimum is 500."
   }
 }
