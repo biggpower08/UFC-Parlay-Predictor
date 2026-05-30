@@ -28,8 +28,10 @@ function normalizeLatestPrediction(raw) {
 
   const statsA = source.comparison?.stats1 || {};
   const statsB = source.comparison?.stats2 || {};
+  if (!statsA.Name || !statsB.Name || !source.prediction?.winner) return null;
   const analysis = source.analysis || raw.analysis || {};
   const generatedAt = raw.generatedAt || raw.saved_at || new Date().toISOString();
+  if (!isValidIsoDate(generatedAt)) return null;
   const fighterA = raw.fighterA || raw.selectedFighters?.fighter_a || raw.selected_fighters?.fighter_a || statsA;
   const fighterB = raw.fighterB || raw.selectedFighters?.fighter_b || raw.selected_fighters?.fighter_b || statsB;
   const predictionId =
@@ -72,6 +74,10 @@ export function loadLatestPrediction() {
     const saved = window.localStorage.getItem(LATEST_PREDICTION_KEY);
     if (!saved) return null;
     const parsed = JSON.parse(saved);
+    if (parsed?.schemaVersion !== SCHEMA_VERSION) {
+      window.localStorage.removeItem(LATEST_PREDICTION_KEY);
+      return null;
+    }
     const normalized = normalizeLatestPrediction(parsed);
     if (!normalized) {
       window.localStorage.removeItem(LATEST_PREDICTION_KEY);
@@ -82,6 +88,12 @@ export function loadLatestPrediction() {
     window.localStorage.removeItem(LATEST_PREDICTION_KEY);
     return null;
   }
+}
+
+function isValidIsoDate(value) {
+  if (!value || typeof value !== "string") return false;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp);
 }
 
 export function saveLatestPrediction(result, selectedFighters = {}) {

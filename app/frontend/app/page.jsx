@@ -2,7 +2,7 @@
 
 import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { clearLatestPrediction, saveLatestPrediction, useLatestPrediction } from "../lib/latestPrediction";
+import { clearLatestPrediction, saveLatestPrediction } from "../lib/latestPrediction";
 
 const API_CANDIDATES = Array.from(
   new Set(
@@ -84,8 +84,6 @@ export default function App() {
   const [fighterMeta, setFighterMeta] = useState({ a: null, b: null });
   const [searching, setSearching] = useState({ a: false, b: false });
   const [activeSearchSlot, setActiveSearchSlot] = useState(null);
-  const [hideSavedResultForEditing, setHideSavedResultForEditing] = useState(false);
-  const latestPrediction = useLatestPrediction();
   const debouncedFighterA = useDebouncedValue(fighterAQuery, 300);
   const debouncedFighterB = useDebouncedValue(fighterBQuery, 300);
   const latestSearch = useRef({ a: "", b: "" });
@@ -136,13 +134,6 @@ export default function App() {
     }
     return () => document.removeEventListener("pointerdown", closeSearchOnOutsideClick);
   }, []);
-
-  useEffect(() => {
-    if (!result && latestPrediction && !hideSavedResultForEditing) {
-      setResult(latestPrediction.result || latestPrediction);
-      setActiveTab("prediction");
-    }
-  }, [hideSavedResultForEditing, latestPrediction, result]);
 
   useEffect(() => {
     if (activeSearchSlot === "a" && userEditedSearch.current.a && debouncedFighterA === fighterAQuery) {
@@ -211,7 +202,6 @@ export default function App() {
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
       const saved = saveLatestPrediction(data, { fighter_a: fighterMeta.a || selectedFighterA, fighter_b: fighterMeta.b || selectedFighterB });
-      setHideSavedResultForEditing(false);
       setResult(saved?.result || data);
       setActiveTab("prediction");
     } catch (error) {
@@ -253,7 +243,7 @@ export default function App() {
   function pickResolved(name) {
     if (!resolver) return;
     const picked = resolver.candidates.find((fighter) => fighter.name === name) || null;
-    setHideSavedResultForEditing(true);
+    setResult(null);
     if (resolver.slot === "a") {
       setFighterAQuery(name);
       setSelectedFighterA(picked || { name });
@@ -275,7 +265,6 @@ export default function App() {
   }
 
   function pickFighter(slot, fighter) {
-    setHideSavedResultForEditing(true);
     setResult(null);
     const name = fighter.name;
     if (slot === "a") {
@@ -296,7 +285,6 @@ export default function App() {
   }
 
   function handleFighterInput(slot, value) {
-    setHideSavedResultForEditing(true);
     if (slot === "a") {
       setFighterAQuery(value);
       setSelectedFighterA(null);
@@ -359,7 +347,6 @@ export default function App() {
 
   function clearCurrentLatestPrediction() {
     clearLatestPrediction();
-    setHideSavedResultForEditing(false);
     setResult(null);
     setActiveTab("matchup");
     setMessage("Latest prediction cleared.");
