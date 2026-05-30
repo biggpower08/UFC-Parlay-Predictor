@@ -1,5 +1,6 @@
 import unittest
 
+from ufc_predictor.config import settings
 from ufc_predictor.features.feature_engineering import build_master_df, compare_fighters
 from ufc_predictor.features.matchup_builder import build_matchup_features, features_to_vector
 from ufc_predictor.models.sklearn.predictor import model_available, predict_matchup
@@ -36,6 +37,52 @@ class TestPredictionPipeline(unittest.TestCase):
         self.assertIn("Elo", comp["stats1"])
         self.assertIn("Elo Available", comp["stats1"])
         self.assertIn("Elo Source", comp["stats1"])
+
+    def test_ensemble_ignores_elo_when_fighter_is_baseline_only(self):
+        original_sklearn = settings.USE_SKLEARN_MODEL
+        original_llm = settings.USE_LLM_ANALYST
+        settings.USE_SKLEARN_MODEL = False
+        settings.USE_LLM_ANALYST = False
+        try:
+            high_elo = self.f1.copy()
+            baseline = self.f2.copy()
+            high_elo["elo"] = 1300
+            high_elo["elo_source"] = "computed"
+            high_elo["elo_fights_count"] = 10
+            baseline["elo"] = 1000
+            baseline["elo_source"] = "baseline"
+            baseline["elo_fights_count"] = 0
+
+            out = predict_ensemble(high_elo, baseline, compare_fighters(high_elo, baseline))
+        finally:
+            settings.USE_SKLEARN_MODEL = original_sklearn
+            settings.USE_LLM_ANALYST = original_llm
+
+        self.assertFalse(out["signals"]["elo"]["available"])
+        self.assertEqual(out["prob_a"], 0.5)
+
+    def test_ensemble_uses_elo_when_both_fighters_are_computed(self):
+        original_sklearn = settings.USE_SKLEARN_MODEL
+        original_llm = settings.USE_LLM_ANALYST
+        settings.USE_SKLEARN_MODEL = False
+        settings.USE_LLM_ANALYST = False
+        try:
+            high_elo = self.f1.copy()
+            low_elo = self.f2.copy()
+            high_elo["elo"] = 1300
+            high_elo["elo_source"] = "computed"
+            high_elo["elo_fights_count"] = 10
+            low_elo["elo"] = 900
+            low_elo["elo_source"] = "computed"
+            low_elo["elo_fights_count"] = 10
+
+            out = predict_ensemble(high_elo, low_elo, compare_fighters(high_elo, low_elo))
+        finally:
+            settings.USE_SKLEARN_MODEL = original_sklearn
+            settings.USE_LLM_ANALYST = original_llm
+
+        self.assertTrue(out["signals"]["elo"]["available"])
+        self.assertGreater(out["prob_a"], 0.5)
 
     def test_run_prediction(self):
         comp, pred, summary = run_prediction(self.f1, self.f2)

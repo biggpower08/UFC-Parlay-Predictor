@@ -33,16 +33,52 @@ def update_elo_draw(elo_a, elo_b, k_factor=None):
 def _normalize_result(result):
     if pd.isna(result):
         return "nc"
-    return str(result).lower().strip().split("\n")[0]
+    normalized = str(result).lower().strip().split("\n")[0]
+    if normalized in {"no contest", "no-contest", "no_contest", "nc"}:
+        return "nc"
+    if normalized in {"unknown", "nan", ""}:
+        return "unknown"
+    return normalized
 
 
 def prepare_fights_chronological(fights_df: pd.DataFrame) -> pd.DataFrame:
     df = fights_df.copy()
     if "event" not in df.columns:
         df = df.reset_index()
-    df = df.iloc[::-1].reset_index(drop=True)
+    df["_original_order"] = range(len(df))
     df["result"] = df["result"].apply(_normalize_result)
-    return df
+    df["elo_order_source"] = "source_order_inferred"
+
+    if "event_date" in df.columns:
+        parsed_dates = pd.to_datetime(df["event_date"], errors="coerce")
+        if parsed_dates.notna().any():
+            df["_event_date_sort"] = parsed_dates
+            sort_columns = ["_event_date_sort"]
+            order_column = _first_existing_column(df, ("fight_order", "bout_order", "source_order", "card_order"))
+            if order_column:
+                df["_fight_order_sort"] = pd.to_numeric(df[order_column], errors="coerce")
+                sort_columns.append("_fight_order_sort")
+            elif "event" in df.columns:
+                sort_columns.append("event")
+            sort_columns.append("_original_order")
+            df = df.sort_values(sort_columns, kind="mergesort", na_position="last")
+            df["elo_order_source"] = "event_date"
+        else:
+            logger.warning("Elo chronological order inferred from source order because event_date values are missing or invalid")
+            df = df.iloc[::-1]
+    else:
+        logger.warning("Elo chronological order inferred from source order because event_date column is missing")
+        df = df.iloc[::-1]
+
+    df = df.drop(columns=[col for col in ("_event_date_sort", "_fight_order_sort") if col in df.columns])
+    return df.reset_index(drop=True)
+
+
+def _first_existing_column(df: pd.DataFrame, candidates: tuple[str, ...]) -> str | None:
+    for column in candidates:
+        if column in df.columns:
+            return column
+    return None
 
 
 def compute_elo_ratings(
@@ -62,24 +98,40 @@ def compute_elo_ratings(
         "fighter_2_elo_start",
         "fighter_1_elo_end",
         "fighter_2_elo_end",
+        "fighter_1_elo_change",
+        "fighter_2_elo_change",
+        "elo_expected_fighter_1",
+        "elo_expected_fighter_2",
     ):
         ufcfights[col] = 0.0
+    ufcfights["elo_result_type"] = "unknown"
 
     for index, row in ufcfights.iterrows():
         f1, f2 = row["fighter_1"], row["fighter_2"]
         elo_ratings.setdefault(f1, initial)
         elo_ratings.setdefault(f2, initial)
         s1, s2 = elo_ratings[f1], elo_ratings[f2]
+        expected_f1 = expected_score(s1, s2)
+        expected_f2 = expected_score(s2, s1)
         ufcfights.at[index, "fighter_1_elo_start"] = s1
         ufcfights.at[index, "fighter_2_elo_start"] = s2
+        ufcfights.at[index, "elo_expected_fighter_1"] = round(expected_f1, 6)
+        ufcfights.at[index, "elo_expected_fighter_2"] = round(expected_f2, 6)
 
         result = row["result"]
-        if result == "win":
+        outcome = _fight_outcome(row, f1, f2)
+        if outcome == "fighter_1_win":
             n1, n2 = update_elo_win(s1, s2, k)
-        elif result == "draw":
+            result_type = "win"
+        elif outcome == "fighter_2_win":
+            n2, n1 = update_elo_win(s2, s1, k)
+            result_type = "win"
+        elif outcome == "draw":
             n1, n2 = update_elo_draw(s1, s2, k)
+            result_type = "draw"
         else:
             n1, n2 = s1, s2
+            result_type = "no_change"
 
         for fighter, new_elo in ((f1, n1), (f2, n2)):
             peak_elo_ratings[fighter] = max(
@@ -88,13 +140,50 @@ def compute_elo_ratings(
 
         ufcfights.at[index, "fighter_1_elo_end"] = n1
         ufcfights.at[index, "fighter_2_elo_end"] = n2
+        ufcfights.at[index, "fighter_1_elo_change"] = round(n1 - s1, 2)
+        ufcfights.at[index, "fighter_2_elo_change"] = round(n2 - s2, 2)
+        ufcfights.at[index, "elo_result_type"] = result_type
         elo_ratings[f1], elo_ratings[f2] = n1, n2
 
+    ufcfights = ufcfights.reset_index(drop=True)
     for fighter, elo in elo_ratings.items():
         elo_by_search[normalize_name(fighter)] = elo
 
     logger.info("Computed Elo for %s fighters", len(elo_ratings))
     return ufcfights, elo_ratings, peak_elo_ratings, elo_by_search
+
+
+def _fight_outcome(row: pd.Series, fighter_1: str, fighter_2: str) -> str:
+    """Return the Elo outcome using explicit winner fields when they match fighters.
+
+    Historical CSV rows use result == "win" to mean fighter_1 beat fighter_2.
+    If imported data includes an explicit winner name matching either fighter,
+    that explicit result is safer and takes precedence.
+    """
+    winner = _first_non_empty_value(row, ("winner_name", "winner", "winning_fighter"))
+    loser = _first_non_empty_value(row, ("loser_name", "loser", "losing_fighter"))
+    f1_key = normalize_name(fighter_1)
+    f2_key = normalize_name(fighter_2)
+    winner_key = normalize_name(winner)
+    loser_key = normalize_name(loser)
+    if winner_key == f1_key or (loser_key == f2_key and bool(loser_key)):
+        return "fighter_1_win"
+    if winner_key == f2_key or (loser_key == f1_key and bool(loser_key)):
+        return "fighter_2_win"
+
+    result = str(row.get("result", "")).lower().strip().split("\n")[0]
+    if result == "win":
+        return "fighter_1_win"
+    if result == "draw":
+        return "draw"
+    return "no_change"
+
+
+def _first_non_empty_value(row: pd.Series, candidates: tuple[str, ...]):
+    for column in candidates:
+        if column in row.index and not pd.isna(row.get(column)) and str(row.get(column)).strip():
+            return row.get(column)
+    return None
 
 
 def build_elo_fight_counts(fights_elo: pd.DataFrame) -> dict[str, int]:
