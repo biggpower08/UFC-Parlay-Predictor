@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/analysis", label: "Analysis" },
   { href: "/stats", label: "Stats" },
   { href: "/odds", label: "Odds" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 export default function SiteNav() {

@@ -1,0 +1,2177 @@
+
+
+============================================================
+FILE: ufc_predictor\models\elo\elo_engine.py
+============================================================
+
+"""Elo rating engine for UFC fight history."""
+
+import pandas as pd
+
+from ufc_predictor.config import settings
+from ufc_predictor.utils.helpers import normalize_name
+from ufc_predictor.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+def expected_score(elo_a: float, elo_b: float) -> float:
+    return 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+
+
+def update_elo_win(winner_elo, loser_elo, k_factor=None):
+    k = k_factor or settings.ELO_K_FACTOR
+    expected_win = expected_score(winner_elo, loser_elo)
+    new_winner = winner_elo + k * (1 - expected_win)
+    new_loser = loser_elo + k * (0 - (1 - expected_win))
+    return round(new_winner, 2), round(new_loser, 2)
+
+
+def update_elo_draw(elo_a, elo_b, k_factor=None):
+    k = k_factor or settings.ELO_K_FACTOR
+    exp_a = expected_score(elo_a, elo_b)
+    exp_b = expected_score(elo_b, elo_a)
+    new_a = elo_a + k * (0.5 - exp_a)
+    new_b = elo_b + k * (0.5 - exp_b)
+    return round(new_a, 2), round(new_b, 2)
+
+
+def _normalize_result(result):
+    if pd.isna(result):
+        return "nc"
+    return str(result).lower().strip().split("\n")[0]
+
+
+def prepare_fights_chronological(fights_df: pd.DataFrame) -> pd.DataFrame:
+    df = fights_df.copy()
+    if "event" not in df.columns:
+        df = df.reset_index()
+    df = df.iloc[::-1].reset_index(drop=True)
+    df["result"] = df["result"].apply(_normalize_result)
+    return df
+
+
+def compute_elo_ratings(
+    fights_df: pd.DataFrame,
+    initial_elo=None,
+    k_factor=None,
+):
+    initial = initial_elo or settings.ELO_INITIAL
+    k = k_factor or settings.ELO_K_FACTOR
+    ufcfights = prepare_fights_chronological(fights_df)
+    elo_ratings = {}
+    peak_elo_ratings = {}
+    elo_by_search = {}
+
+    for col in (
+        "fighter_1_elo_start",
+        "fighter_2_elo_start",
+        "fighter_1_elo_end",
+        "fighter_2_elo_end",
+    ):
+        ufcfights[col] = 0.0
+
+    for index, row in ufcfights.iterrows():
+        f1, f2 = row["fighter_1"], row["fighter_2"]
+        elo_ratings.setdefault(f1, initial)
+        elo_ratings.setdefault(f2, initial)
+        s1, s2 = elo_ratings[f1], elo_ratings[f2]
+        ufcfights.at[index, "fighter_1_elo_start"] = s1
+        ufcfights.at[index, "fighter_2_elo_start"] = s2
+
+        result = row["result"]
+        if result == "win":
+            n1, n2 = update_elo_win(s1, s2, k)
+        elif result == "draw":
+            n1, n2 = update_elo_draw(s1, s2, k)
+        else:
+            n1, n2 = s1, s2
+
+        for fighter, new_elo in ((f1, n1), (f2, n2)):
+            peak_elo_ratings[fighter] = max(
+                peak_elo_ratings.get(fighter, initial), new_elo
+            )
+
+        ufcfights.at[index, "fighter_1_elo_end"] = n1
+        ufcfights.at[index, "fighter_2_elo_end"] = n2
+        elo_ratings[f1], elo_ratings[f2] = n1, n2
+
+    for fighter, elo in elo_ratings.items():
+        elo_by_search[normalize_name(fighter)] = elo
+
+    logger.info("Computed Elo for %s fighters", len(elo_ratings))
+    return ufcfights, elo_ratings, peak_elo_ratings, elo_by_search
+
+
+def build_elo_fight_counts(fights_elo: pd.DataFrame) -> dict[str, int]:
+    """Count completed Elo-tracked fights per normalized fighter name."""
+    counts: dict[str, int] = {}
+    if fights_elo is None or fights_elo.empty:
+        return counts
+    for _, row in fights_elo.iterrows():
+        result = str(row.get("result", "")).lower().strip().split("\n")[0]
+        if result not in {"win", "draw"}:
+            continue
+        for col in ("fighter_1", "fighter_2"):
+            name = row.get(col)
+            key = normalize_name(name)
+            if key:
+                counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
+def get_fighter_elo(fighter_name, elo_by_search, default=None):
+    default = default or settings.ELO_INITIAL
+    return elo_by_search.get(normalize_name(fighter_name), default)
+
+
+def export_elo_leaderboard(elo_ratings, path=None):
+    from pathlib import Path
+
+    path = Path(path or settings.ELO_LEADERBOARD_CSV)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = sorted(elo_ratings.items(), key=lambda x: x[1], reverse=True)
+    pd.DataFrame(rows, columns=["Fighter", "Elo Rating"]).to_csv(path, index=False)
+    logger.info("Exported Elo leaderboard to %s", path)
+
+
+============================================================
+FILE: scripts\update_elo.py
+============================================================
+
+"""Refresh fight history and recompute MMA Elo ratings.
+
+Run manually:
+
+    python scripts/update_elo.py --no-refresh
+
+Cron/Task Scheduler can call the same command. The script is retry-safe and
+deduplicates fight rows through the shared orchestrator before persisting Elo.
+"""
+
+from __future__ import annotations
+
+import argparse
+import logging
+import sys
+import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from ufc_predictor.agents.orchestrator import refresh_all
+from ufc_predictor.config import settings
+
+
+LOG_PATH = settings.LOGS_DIR / "elo_update.log"
+
+
+def configure_logging() -> None:
+    settings.LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format=settings.LOG_FORMAT,
+        handlers=[logging.FileHandler(LOG_PATH, encoding="utf-8"), logging.StreamHandler()],
+    )
+
+
+def update_elo(force_refresh: bool = True) -> dict:
+    logging.info("Elo update started force_refresh=%s", force_refresh)
+    result = refresh_all(force_refresh=force_refresh)
+    logging.info("Elo update complete: %s", result)
+    return result
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--no-refresh", action="store_true", help="Use cached fights.csv instead of downloading.")
+    parser.add_argument("--force-refresh", action="store_true", help="Download fresh fight data before Elo recompute.")
+    parser.add_argument("--retries", type=int, default=2)
+    args = parser.parse_args()
+
+    configure_logging()
+    force_refresh = args.force_refresh or not args.no_refresh
+    last_error = None
+    for attempt in range(1, args.retries + 2):
+        try:
+            result = update_elo(force_refresh=force_refresh)
+            print("Elo update complete:")
+            for key, value in result.items():
+                print(f"  {key}: {value}")
+            logging.info("Result: %s", result)
+            return 0
+        except Exception as exc:
+            last_error = exc
+            logging.exception("Elo update attempt %s failed", attempt)
+            if attempt <= args.retries:
+                time.sleep(min(30, attempt * 5))
+
+    logging.error("Elo update failed permanently: %s", last_error)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
+
+============================================================
+FILE: ufc_predictor\features\feature_engineering.py
+============================================================
+
+"""Master fighter table, stat extraction, and comparison logic."""
+
+from datetime import datetime, timezone
+
+import pandas as pd
+
+from ufc_predictor.config import settings
+from ufc_predictor.data_sources.fights import load_fights
+from ufc_predictor.db import repository
+from ufc_predictor.data_sources.rankings import division_point_dominance, p4p_rankings
+from ufc_predictor.models.elo.elo_engine import build_elo_fight_counts, compute_elo_ratings, get_fighter_elo
+from ufc_predictor.utils.helpers import (
+    find_name_column,
+    get_stat,
+    normalize_name,
+    safe_float,
+)
+from ufc_predictor.utils.weight_classes import detect_weight_class
+
+_elo_cache = None
+_master_cache = None
+
+
+def load_stats_df() -> pd.DataFrame:
+    df = repository.get_fighters_df()
+    name_col = find_name_column(df)
+    df["_search_name"] = df[name_col].astype(str).map(normalize_name)
+    if "normalized_name" not in df.columns:
+        df["normalized_name"] = df["_search_name"]
+    return df
+
+
+def get_elo_tables():
+    global _elo_cache
+    if _elo_cache is not None:
+        return _elo_cache
+    fights = load_fights()
+    fights_elo, elo_ratings, peak_elo, elo_by_search = compute_elo_ratings(fights)
+    _elo_cache = {
+        "fights_elo": fights_elo,
+        "elo_ratings": elo_ratings,
+        "peak_elo": peak_elo,
+        "elo_by_search": elo_by_search,
+        "fight_counts": build_elo_fight_counts(fights_elo),
+    }
+    return _elo_cache
+
+
+def _rankings_to_search_df(rankings_df, prefix):
+    out = rankings_df.copy()
+    out["_search_name"] = out["Fighter"].astype(str).map(normalize_name)
+    rename = {
+        "Rank": f"rank_{prefix}",
+        "Points": f"points_{prefix}",
+        "Division": f"division_{prefix}",
+        "Record": f"record_{prefix}",
+    }
+    if "Country" in out.columns:
+        rename["Country"] = f"country_{prefix}"
+    out = out.rename(columns={k: v for k, v in rename.items() if k in out.columns})
+    keep = ["_search_name"] + [v for v in rename.values() if v in out.columns]
+    return out[keep].drop_duplicates(subset="_search_name", keep="first")
+
+
+def build_master_df(force_refresh=False):
+    global _master_cache
+    if _master_cache is not None and not force_refresh:
+        return _master_cache.copy()
+
+    stats = load_stats_df()
+    name_col = find_name_column(stats)
+    master = stats
+
+    if settings.USE_RANKINGS:
+        ranking_cols = [
+            c
+            for c in master.columns
+            if c.startswith(("rank_", "points_", "division_", "record_", "country_"))
+        ]
+        if ranking_cols:
+            master = master.drop(columns=ranking_cols)
+        p4p = _rankings_to_search_df(p4p_rankings(), "p4p")
+        dom = _rankings_to_search_df(division_point_dominance(), "dom")
+        master = master.merge(p4p, on="_search_name", how="left")
+        master = master.merge(dom, on="_search_name", how="left")
+
+    elo_data = get_elo_tables()
+    elo_by_search = elo_data["elo_by_search"]
+    peak = elo_data["peak_elo"]
+    fight_counts = elo_data["fight_counts"]
+    master["elo"] = master["_search_name"].map(elo_by_search).fillna(settings.ELO_INITIAL)
+    master["peak_elo"] = master[name_col].map(
+        lambda n: peak.get(n, elo_by_search.get(normalize_name(n), settings.ELO_INITIAL))
+    )
+    master["elo_fights_count"] = master["_search_name"].map(fight_counts).fillna(0).astype(int)
+    master["elo_source"] = master["elo_fights_count"].map(lambda count: "computed" if int(count) > 0 else "baseline")
+    computed_at = datetime.now(timezone.utc).isoformat()
+    master["elo_computed_at"] = master["elo_source"].map(lambda source: None if source == "baseline" else computed_at)
+
+    _master_cache = master
+    repository.save_fighters_df(master, replace=True)
+    repository.replace_elo_history(elo_data["elo_ratings"], peak, settings.ELO_ENGINE_VERSION)
+    return master.copy()
+
+
+def get_elo_for_row(fighter_row):
+    elo_data = get_elo_tables()
+    name_col = find_name_column(fighter_row.to_frame().T)
+    return get_fighter_elo(fighter_row[name_col], elo_data["elo_by_search"])
+
+
+def search_fighter(df, name):
+    query = normalize_name(name)
+    if not query:
+        return df.iloc[0:0]
+    return df.loc[df["_search_name"] == query].copy()
+
+
+def extract_stats(fighter_row):
+    name_col = find_name_column(fighter_row.to_frame().T)
+    name = fighter_row.get(name_col, "Unknown")
+    elo = safe_float(fighter_row.get("elo", get_elo_for_row(fighter_row)), settings.ELO_INITIAL)
+    elo_fights_count = int(safe_float(fighter_row.get("elo_fights_count"), 0))
+    elo_source_raw = str(fighter_row.get("elo_source") or "").strip().lower()
+    has_real_elo_value = elo != settings.ELO_INITIAL
+    has_elo_history_marker = elo_fights_count > 0
+    if elo_source_raw == "computed" or has_real_elo_value or has_elo_history_marker:
+        elo_source = "computed"
+        elo_available = True
+    else:
+        elo_source = "baseline"
+        elo_available = False
+
+    return {
+        "Name": name,
+        "Record": _format_record(fighter_row),
+        "Elo": round(elo, 1),
+        "Elo Available": elo_available,
+        "Elo Source": elo_source,
+        "Elo Last Updated": _fmt_optional(fighter_row.get("elo_computed_at")),
+        "Elo Fights": elo_fights_count,
+        "Peak Elo": round(safe_float(fighter_row.get("peak_elo"), elo), 1),
+        "P4P Rank": _fmt_optional(fighter_row.get("rank_p4p")),
+        "P4P Points": _fmt_optional(fighter_row.get("points_p4p")),
+        "Dom Rank": _fmt_optional(fighter_row.get("rank_dom")),
+        "Dom Points": _fmt_optional(fighter_row.get("points_dom")),
+        "SLpM": safe_float(get_stat(fighter_row, "significant_strikes_landed_per_minute", "slpm")),
+        "Str Acc %": safe_float(get_stat(fighter_row, "significant_striking_accuracy", "stracc")),
+        "SApM": safe_float(get_stat(fighter_row, "significant_strikes_absorbed_per_minute", "sapm")),
+        "Str Def %": safe_float(get_stat(fighter_row, "significant_strike_defence", "strdef")),
+        "TD Avg": safe_float(get_stat(fighter_row, "average_takedowns_landed_per_15_minutes", "tdavg")),
+        "TD Acc %": safe_float(get_stat(fighter_row, "takedown_accuracy", "tdacc")),
+        "TD Def %": safe_float(get_stat(fighter_row, "takedown_defense", "tddef")),
+        "Sub Avg": safe_float(
+            get_stat(fighter_row, "average_submissions_attempted_per_15_minutes", "subavg")
+        ),
+        "Reach (cm)": safe_float(get_stat(fighter_row, "reach_in_cm", "reach")),
+        "Height (cm)": safe_float(get_stat(fighter_row, "height_cm", "height")),
+        "Weight (kg)": safe_float(get_stat(fighter_row, "weight_in_kg", "weight")),
+        "Weight Class": detect_weight_class(fighter_row),
+        "Stance": get_stat(fighter_row, "stance") or "N/A",
+    }
+
+
+def _fmt_optional(val):
+    if val is None or (isinstance(val, float) and pd.isna(val)):
+        return "N/A"
+    if isinstance(val, float) and val == int(val):
+        return str(int(val))
+    return str(val)
+
+
+def _format_record(row):
+    w, l, d = get_stat(row, "wins", "win"), get_stat(row, "losses", "loss"), get_stat(row, "draws", "draw")
+    if w is None and l is None:
+        rec = row.get("record_p4p") or row.get("record_dom")
+        return str(rec) if rec is not None and not pd.isna(rec) else "N/A"
+    parts = [f"{safe_float(w, 0):.0f}W", f"{safe_float(l, 0):.0f}L"]
+    if d is not None and safe_float(d) > 0:
+        parts.append(f"{safe_float(d):.0f}D")
+    return "-".join(parts)
+
+
+def analyze_style(fighter_row):
+    slpm = safe_float(get_stat(fighter_row, "significant_strikes_landed_per_minute", "slpm"), 0)
+    str_def = safe_float(get_stat(fighter_row, "significant_strike_defence", "strdef"), 0)
+    str_acc = safe_float(get_stat(fighter_row, "significant_striking_accuracy", "stracc"), 0)
+    td_avg = safe_float(get_stat(fighter_row, "average_takedowns_landed_per_15_minutes", "tdavg"), 0)
+    td_acc = safe_float(get_stat(fighter_row, "takedown_accuracy", "tdacc"), 0)
+    td_def = safe_float(get_stat(fighter_row, "takedown_defense", "tddef"), 0)
+    sub_avg = safe_float(
+        get_stat(fighter_row, "average_submissions_attempted_per_15_minutes", "subavg"), 0
+    )
+    reach = safe_float(get_stat(fighter_row, "reach_in_cm", "reach"), 0)
+    strike_score = slpm * 2.0 + str_def * 0.05 + str_acc * 0.03 + reach * 0.01
+    grapple_score = td_avg * 3.0 + sub_avg * 2.0 + td_acc * 0.05 + td_def * 0.02
+    if strike_score > grapple_score * 1.25:
+        label = "striker-leaning"
+    elif grapple_score > strike_score * 1.25:
+        label = "grappler-leaning"
+    else:
+        label = "balanced"
+    return {
+        "label": label,
+        "strike_score": round(strike_score, 2),
+        "grapple_score": round(grapple_score, 2),
+    }
+
+
+def compare_fighters(f1, f2):
+    stats1, stats2 = extract_stats(f1), extract_stats(f2)
+    style1, style2 = analyze_style(f1), analyze_style(f2)
+    name1, name2 = stats1["Name"], stats2["Name"]
+    numeric_keys = ["Elo", "SLpM", "Str Def %", "TD Avg", "Sub Avg", "Reach (cm)"]
+    edges = {
+        k: (name1 if stats1[k] > stats2[k] else name2 if stats2[k] > stats1[k] else "even")
+        for k in numeric_keys
+    }
+    s1, w1 = _strengths_weaknesses(stats1, stats2, style1)
+    s2, w2 = _strengths_weaknesses(stats2, stats1, style2)
+    return {
+        "stats1": stats1,
+        "stats2": stats2,
+        "style1": style1,
+        "style2": style2,
+        "edges": edges,
+        "strengths1": s1,
+        "weaknesses1": w1,
+        "strengths2": s2,
+        "weaknesses2": w2,
+        "matchup": _matchup_text(name1, name2, style1, style2, stats1, stats2),
+    }
+
+
+def _strengths_weaknesses(stats_self, stats_opp, style_self):
+    strengths, weaknesses = [], []
+    if stats_self.get("Elo Available") and stats_opp.get("Elo Available") and stats_self["Elo"] > stats_opp["Elo"] + 25:
+        strengths.append(f"Higher Elo ({stats_self['Elo']} vs {stats_opp['Elo']})")
+    elif stats_self.get("Elo Available") and stats_opp.get("Elo Available") and stats_self["Elo"] < stats_opp["Elo"] - 25:
+        weaknesses.append(f"Lower Elo ({stats_self['Elo']} vs {stats_opp['Elo']})")
+    if stats_self["SLpM"] >= stats_opp["SLpM"] * 1.1:
+        strengths.append("Higher SLpM")
+    elif stats_self["SLpM"] < stats_opp["SLpM"] * 0.9:
+        weaknesses.append("Lower striking volume")
+    if not strengths:
+        strengths.append("Competitive on paper")
+    if not weaknesses:
+        weaknesses.append("No major statistical red flag")
+    return strengths, weaknesses
+
+
+def _matchup_text(name1, name2, style1, style2, stats1, stats2):
+    elo_text_1 = stats1["Elo"] if stats1.get("Elo Available") else "baseline"
+    elo_text_2 = stats2["Elo"] if stats2.get("Elo Available") else "baseline"
+    return (
+        f"{name1} ({style1['label']}, Elo {elo_text_1}) vs "
+        f"{name2} ({style2['label']}, Elo {elo_text_2})."
+    )
+
+
+============================================================
+FILE: ufc_predictor\models\ensemble\predictor.py
+============================================================
+
+"""Weighted winner ensemble for sklearn, Elo, and optional private analyst."""
+
+from ufc_predictor.config import settings
+from ufc_predictor.models.elo.elo_engine import expected_score
+from ufc_predictor.models.llm.ollama_analyst import analyze_matchup
+from ufc_predictor.models.sklearn.predictor import explain_top_features, predict_matchup
+from ufc_predictor.utils.logger import get_logger
+
+
+logger = get_logger(__name__)
+
+
+def predict_ensemble(f1, f2, comparison: dict) -> dict:
+    stats1, stats2 = comparison["stats1"], comparison["stats2"]
+    name1, name2 = stats1["Name"], stats2["Name"]
+    elo_prob = expected_score(stats1["Elo"], stats2["Elo"])
+    elo_available = bool(stats1.get("Elo Available") and stats2.get("Elo Available"))
+    elo_diagnostics = {
+        "fighter_a_elo": stats1["Elo"],
+        "fighter_b_elo": stats2["Elo"],
+        "fighter_a_elo_available": bool(stats1.get("Elo Available")),
+        "fighter_b_elo_available": bool(stats2.get("Elo Available")),
+        "fighter_a_elo_source": stats1.get("Elo Source"),
+        "fighter_b_elo_source": stats2.get("Elo Source"),
+        "fighter_a_elo_fights": stats1.get("Elo Fights"),
+        "fighter_b_elo_fights": stats2.get("Elo Fights"),
+        "delta_elo": stats1["Elo"] - stats2["Elo"],
+        "elo_expected_a": elo_prob,
+        "ensemble_elo_available": elo_available,
+    }
+
+    signals = {}
+    sklearn_prediction = predict_matchup(f1, f2) if settings.USE_SKLEARN_MODEL else None
+    if sklearn_prediction is not None:
+        signals["sklearn"] = {
+            "prob_a": sklearn_prediction["prob_a_wins"],
+            "available": True,
+            "top_features": explain_top_features(sklearn_prediction, 3),
+            "diagnostics": sklearn_prediction.get("diagnostics"),
+        }
+
+    if settings.USE_ELO_FALLBACK:
+        signals["elo"] = {"prob_a": elo_prob, "available": elo_available}
+
+    if settings.USE_LLM_ANALYST:
+        llm = analyze_matchup(
+            stats1,
+            stats2,
+            comparison,
+            signals.get("sklearn", {}).get("prob_a"),
+            elo_prob,
+        )
+        if llm.get("available"):
+            llm_prob = _winner_to_prob(llm["winner"], name1, name2, llm["confidence"])
+            signals["llm"] = {"prob_a": llm_prob, **llm}
+
+    prob_a = _weighted_probability(signals)
+    winner = _winner_from_probability(prob_a, name1, name2)
+
+    if _is_sklearn_close(signals) and signals.get("llm", {}).get("available"):
+        winner = signals["llm"]["winner"]
+        prob_a = signals["llm"]["prob_a"]
+
+    confidence = max(prob_a, 1 - prob_a)
+    diagnostics = {
+        "elo": elo_diagnostics,
+        "sklearn": (signals.get("sklearn") or {}).get("diagnostics"),
+        "ensemble_weights": settings.ENSEMBLE_WEIGHTS,
+        "available_signals": [key for key, signal in signals.items() if signal.get("available")],
+    }
+    logger.info(
+        "prediction_elo_diagnostics fighter_a=%s fighter_b=%s elo_a=%s elo_b=%s delta_elo=%s "
+        "elo_available=%s sklearn_elo_features=%s available_signals=%s",
+        name1,
+        name2,
+        elo_diagnostics["fighter_a_elo"],
+        elo_diagnostics["fighter_b_elo"],
+        elo_diagnostics["delta_elo"],
+        elo_available,
+        diagnostics["sklearn"].get("elo_features_present") if diagnostics["sklearn"] else None,
+        diagnostics["available_signals"],
+    )
+    return {
+        "winner": winner,
+        "confidence": confidence,
+        "prob_a": prob_a,
+        "prob_b": 1 - prob_a,
+        "model": "ensemble",
+        "signals": signals,
+        "diagnostics": diagnostics,
+        "reasoning": _reasoning(name1, name2, prob_a, elo_prob, signals, comparison),
+    }
+
+
+def _weighted_probability(signals: dict) -> float:
+    total_weight = 0.0
+    total = 0.0
+    for key, signal in signals.items():
+        weight = settings.ENSEMBLE_WEIGHTS.get(key, 0)
+        if not signal.get("available"):
+            continue
+        total_weight += weight
+        total += weight * float(signal["prob_a"])
+    if total_weight == 0:
+        return 0.5
+    return min(0.99, max(0.01, total / total_weight))
+
+
+def _winner_to_prob(winner: str, name1: str, name2: str, confidence: float) -> float:
+    if winner == name1:
+        return confidence
+    if winner == name2:
+        return 1 - confidence
+    return 0.5
+
+
+def _winner_from_probability(prob_a: float, name1: str, name2: str) -> str:
+    if abs(prob_a - 0.5) < settings.CLOSE_CALL_PROB_THRESHOLD:
+        return "Too close to call"
+    return name1 if prob_a > 0.5 else name2
+
+
+def _is_sklearn_close(signals: dict) -> bool:
+    sklearn = signals.get("sklearn")
+    return bool(sklearn) and abs(float(sklearn["prob_a"]) - 0.5) < settings.CLOSE_CALL_PROB_THRESHOLD
+
+
+def _reasoning(name1, name2, prob_a, elo_prob, signals, comparison) -> str:
+    parts = [f"Ensemble: {name1} {prob_a:.0%} vs {name2} {1 - prob_a:.0%}."]
+    if "sklearn" in signals:
+        top = signals["sklearn"].get("top_features") or []
+        contrib = ", ".join(f"{n} ({v:+.2f})" for n, v in top) if top else "mixed features"
+        parts.append(f"Sklearn signal {signals['sklearn']['prob_a']:.0%}; drivers: {contrib}.")
+    if signals.get("elo", {}).get("available"):
+        parts.append(f"Elo signal {elo_prob:.0%}.")
+    else:
+        parts.append("Elo signal unavailable; using starting baseline only.")
+    if signals.get("llm", {}).get("available"):
+        parts.append(f"Analyst signal: {signals['llm']['reasoning']}")
+    else:
+        parts.append("Decision used the statistical model and Elo signals.")
+    parts.append(comparison["matchup"])
+    return " ".join(parts)
+
+
+============================================================
+FILE: ufc_predictor\db\models.py
+============================================================
+
+"""SQLAlchemy table definitions for the production database."""
+
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, MetaData, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.sql import func
+
+metadata = MetaData()
+Base = declarative_base(metadata=metadata)
+
+
+class Fighter(Base):
+    __tablename__ = "fighters"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+    normalized_name = Column(Text, index=True)
+    nickname = Column(Text)
+    wins = Column(Float)
+    losses = Column(Float)
+    draws = Column(Float)
+    height_cm = Column(Float)
+    weight_in_kg = Column(Float)
+    reach_in_cm = Column(Float)
+    stance = Column(Text)
+    date_of_birth = Column(Text)
+    significant_strikes_landed_per_minute = Column(Float)
+    significant_striking_accuracy = Column(Float)
+    significant_strikes_absorbed_per_minute = Column(Float)
+    significant_strike_defence = Column(Float)
+    average_takedowns_landed_per_15_minutes = Column(Float)
+    takedown_accuracy = Column(Float)
+    takedown_defense = Column(Float)
+    average_submissions_attempted_per_15_minutes = Column(Float)
+    elo = Column(Float, default=1000)
+    peak_elo = Column(Float, default=1000)
+    elo_version = Column(Text, default="v1")
+    elo_computed_at = Column(DateTime(timezone=True))
+    elo_fights_count = Column(Integer, default=0)
+    elo_source = Column(Text, default="baseline")
+    weight_class = Column(Text)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Fight(Base):
+    __tablename__ = "fights"
+
+    id = Column(Integer, primary_key=True)
+    event = Column(Text)
+    fighter_1 = Column(Text)
+    fighter_2 = Column(Text)
+    result = Column(Text)
+    method = Column(Text)
+    round = Column(Text)
+    time = Column(Text)
+    source_hash = Column(Text, unique=True)
+    event_date = Column(DateTime(timezone=False))
+    weight_class = Column(Text)
+    source = Column(Text, default="local_csv")
+    source_url = Column(Text)
+    scraped_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class FighterEloHistory(Base):
+    __tablename__ = "fighter_elo_history"
+
+    id = Column(Integer, primary_key=True)
+    fighter_name = Column(Text, nullable=False)
+    normalized_name = Column(Text, index=True)
+    elo = Column(Float, nullable=False)
+    peak_elo = Column(Float)
+    elo_version = Column(Text, default="v1", nullable=False)
+    computed_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Prediction(Base):
+    __tablename__ = "predictions"
+
+    prediction_id = Column(String, primary_key=True)
+    fighter_a = Column(Text, nullable=False)
+    fighter_b = Column(Text, nullable=False)
+    winner = Column(Text)
+    confidence = Column(Float)
+    model = Column(Text)
+    payload_json = Column(JSONB, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Feedback(Base):
+    __tablename__ = "feedback"
+
+    id = Column(Integer, primary_key=True)
+    prediction_id = Column(Text)
+    fighter_a = Column(Text, nullable=False)
+    fighter_b = Column(Text, nullable=False)
+    predicted_winner = Column(Text, nullable=False)
+    actual_winner = Column(Text)
+    confidence = Column(Float)
+    was_correct = Column(Boolean, nullable=False)
+    user_notes = Column(Text)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class ScrapeCache(Base):
+    __tablename__ = "scrape_cache"
+
+    normalized_name = Column(Text, primary_key=True)
+    source = Column(Text)
+    url = Column(Text)
+    raw_json = Column(JSONB, nullable=False)
+    confidence = Column(Float, default=0)
+    fetched_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Event(Base):
+    __tablename__ = "events"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+    normalized_name = Column(Text, unique=True, index=True)
+    event_date = Column(DateTime(timezone=False))
+    location = Column(Text)
+    source = Column(Text, default="ufcstats")
+    source_url = Column(Text)
+    source_hash = Column(Text, unique=True)
+    scraped_at = Column(DateTime(timezone=True))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class FighterRanking(Base):
+    __tablename__ = "fighter_rankings"
+
+    id = Column(Integer, primary_key=True)
+    fighter_name = Column(Text, nullable=False)
+    normalized_name = Column(Text, index=True)
+    ranking_type = Column(Text, index=True)
+    weight_class = Column(Text)
+    rank = Column(Integer, nullable=False)
+    elo = Column(Float, nullable=False)
+    peak_elo = Column(Float)
+    fights_count = Column(Integer, default=0)
+    wins = Column(Integer, default=0)
+    losses = Column(Integer, default=0)
+    generated_at = Column(DateTime(timezone=True), server_default=func.now())
+    source = Column(Text, default="elo_v1")
+
+
+class FighterWeightClassHistory(Base):
+    __tablename__ = "fighter_weight_class_history"
+
+    id = Column(Integer, primary_key=True)
+    fighter_name = Column(Text, nullable=False)
+    normalized_name = Column(Text, index=True)
+    weight_class = Column(Text, nullable=False)
+    fights_count = Column(Integer, default=0)
+    first_seen = Column(DateTime(timezone=False))
+    last_seen = Column(DateTime(timezone=False))
+    inferred_from_fights = Column(Boolean, default=True, nullable=False)
+    confidence = Column(Float, default=0)
+    generated_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class SyncRun(Base):
+    __tablename__ = "sync_runs"
+
+    id = Column(Integer, primary_key=True)
+    source = Column(Text, nullable=False)
+    status = Column(Text, nullable=False)
+    started_at = Column(DateTime(timezone=True), server_default=func.now())
+    finished_at = Column(DateTime(timezone=True))
+    dry_run = Column(Boolean, default=False, nullable=False)
+    events_seen = Column(Integer, default=0)
+    fights_seen = Column(Integer, default=0)
+    fighters_seen = Column(Integer, default=0)
+    inserted_count = Column(Integer, default=0)
+    updated_count = Column(Integer, default=0)
+    skipped_count = Column(Integer, default=0)
+    failed_count = Column(Integer, default=0)
+    message = Column(Text)
+
+
+class ScraperSource(Base):
+    __tablename__ = "scraper_sources"
+
+    source = Column(Text, primary_key=True)
+    base_url = Column(Text, nullable=False)
+    enabled = Column(Boolean, default=True, nullable=False)
+    last_success_at = Column(DateTime(timezone=True))
+    last_failed_at = Column(DateTime(timezone=True))
+    last_error = Column(Text)
+    challenge_detected = Column(Boolean, default=False, nullable=False)
+    consecutive_failures = Column(Integer, default=0, nullable=False)
+    last_status_code = Column(Integer)
+    average_fetch_ms = Column(Float)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class SyncLock(Base):
+    __tablename__ = "sync_locks"
+
+    lock_name = Column(Text, primary_key=True)
+    owner = Column(Text, nullable=False)
+    started_at = Column(DateTime(timezone=True), server_default=func.now())
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    metadata_json = Column("metadata", JSONB)
+
+
+============================================================
+FILE: ufc_predictor\db\repository.py
+============================================================
+
+"""Repository helpers for fighters, predictions, and scrape cache."""
+
+import json
+import sqlite3
+import time
+import uuid
+from datetime import date, datetime, timezone
+from difflib import SequenceMatcher
+
+import pandas as pd
+from sqlalchemy import inspect
+from sqlalchemy import text
+
+from ufc_predictor.config import settings
+from ufc_predictor.db.schema import connect, get_engine, init_db, table_exists as schema_table_exists, using_postgres
+from ufc_predictor.utils.helpers import find_name_column, normalize_name
+from ufc_predictor.utils.logger import get_logger
+from ufc_predictor.utils.weight_classes import detect_weight_class
+
+
+FIGHTERS_TABLE = "fighters"
+INTEGER_COLUMNS = {"wins", "losses", "draws", "elo_fights_count"}
+DATE_COLUMNS = {"date_of_birth"}
+FIGHTERS_CACHE_TTL_SECONDS = 60
+logger = get_logger(__name__)
+_initialized = False
+_fighters_cache: tuple[float, pd.DataFrame] | None = None
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def initialize_database(force_import: bool = False) -> None:
+    global _initialized
+    if _initialized and not force_import:
+        return
+    start = time.perf_counter()
+    init_db()
+    if force_import or not table_exists(FIGHTERS_TABLE) or not _table_has_rows(FIGHTERS_TABLE):
+        import_fighters_csv()
+    _initialized = True
+    _log_timing("repository.initialize_database", start)
+
+
+def table_exists(table_name: str) -> bool:
+    return schema_table_exists(table_name)
+
+
+def _table_has_rows(table_name: str) -> bool:
+    if not table_exists(table_name):
+        return False
+    if using_postgres():
+        with get_engine().begin() as conn:
+            count = conn.execute(text(f"SELECT COUNT(*) FROM {table_name}")).scalar_one()
+        return count > 0
+    with connect() as conn:
+        count = conn.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
+    return count > 0
+
+
+def import_fighters_csv(path=None) -> pd.DataFrame:
+    path = path or settings.FIGHTERS_CSV
+    if not path.is_file():
+        raise FileNotFoundError(f"Fighter CSV not found: {path}")
+    df = pd.read_csv(path)
+    return save_fighters_df(df, replace=True)
+
+
+def save_fighters_df(df: pd.DataFrame, replace: bool = True) -> pd.DataFrame:
+    _invalidate_fighters_cache()
+    out = df.copy()
+    name_col = find_name_column(out)
+    out["normalized_name"] = out[name_col].astype(str).map(normalize_name)
+    out = out.drop_duplicates(subset=["normalized_name"], keep="first")
+    out["_search_name"] = out["normalized_name"]
+    if "elo" not in out.columns:
+        out["elo"] = settings.ELO_INITIAL
+    if "peak_elo" not in out.columns:
+        out["peak_elo"] = out["elo"]
+    if "elo_version" not in out.columns:
+        out["elo_version"] = "v1"
+    if "elo_computed_at" not in out.columns:
+        out["elo_computed_at"] = None
+    if "elo_fights_count" not in out.columns:
+        out["elo_fights_count"] = 0
+    if "elo_source" not in out.columns:
+        out["elo_source"] = out.apply(
+            lambda row: "computed"
+            if safe_int(row.get("elo_fights_count")) > 0 or safe_float(row.get("elo"), settings.ELO_INITIAL) != settings.ELO_INITIAL
+            else "baseline",
+            axis=1,
+        )
+    if "weight_class" not in out.columns:
+        out["weight_class"] = out.apply(detect_weight_class, axis=1)
+    settings.DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    if using_postgres():
+        engine = get_engine()
+        db_columns = [col["name"] for col in inspect(engine).get_columns(FIGHTERS_TABLE)]
+        out_db = out[[col for col in out.columns if col in db_columns and col != "id"]].copy()
+        records = [_clean_db_record(record) for record in out_db.to_dict(orient="records")]
+        columns = list(records[0].keys()) if records else list(out_db.columns)
+        placeholders = ", ".join(f":{col}" for col in columns)
+        column_list = ", ".join(columns)
+        insert_sql = text(f"INSERT INTO {FIGHTERS_TABLE} ({column_list}) VALUES ({placeholders})")
+        with engine.begin() as conn:
+            if replace and table_exists(FIGHTERS_TABLE):
+                conn.execute(text(f"DELETE FROM {FIGHTERS_TABLE}"))
+            if records:
+                for start in range(0, len(records), 500):
+                    conn.execute(insert_sql, records[start : start + 500])
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_normalized_name ON fighters(normalized_name)"))
+        return out
+
+    with connect() as conn:
+        out.to_sql(FIGHTERS_TABLE, conn, if_exists="replace" if replace else "append", index=False)
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_fighters_normalized_name ON fighters(normalized_name)"
+        )
+        conn.commit()
+    return out
+
+
+def get_fighters_df() -> pd.DataFrame:
+    initialize_database()
+    global _fighters_cache
+    if _fighters_cache and time.monotonic() - _fighters_cache[0] < FIGHTERS_CACHE_TTL_SECONDS:
+        return _fighters_cache[1].copy()
+    start = time.perf_counter()
+    if using_postgres():
+        with get_engine().begin() as conn:
+            rows = conn.execute(text(f"SELECT * FROM {FIGHTERS_TABLE}")).mappings().all()
+        df = pd.DataFrame([dict(row) for row in rows])
+        _fighters_cache = (time.monotonic(), df)
+        _log_timing("repository.get_fighters_df", start, rows=len(df))
+        return df.copy()
+    with connect() as conn:
+        df = pd.read_sql_query(f"SELECT * FROM {FIGHTERS_TABLE}", conn)
+    _fighters_cache = (time.monotonic(), df)
+    _log_timing("repository.get_fighters_df", start, rows=len(df))
+    return df.copy()
+
+
+def _clean_db_record(record: dict) -> dict:
+    clean = {}
+    for key, value in record.items():
+        if pd.isna(value):
+            clean[key] = None
+            continue
+        if key in INTEGER_COLUMNS:
+            clean[key] = int(value)
+            continue
+        if key in DATE_COLUMNS:
+            if isinstance(value, date):
+                clean[key] = value
+            else:
+                clean[key] = str(value)[:10] if str(value).strip() else None
+            continue
+        clean[key] = value
+    return clean
+
+
+def search_fighters(query: str, limit: int = 12) -> list[dict]:
+    return find_fighter_candidates(query, limit=limit)
+
+
+def find_fighter_candidates(query: str, limit: int = 8) -> list[dict]:
+    start = time.perf_counter()
+    initialize_database()
+    normalized = normalize_name(query)
+    if not normalized:
+        return []
+    df = get_fighters_df()
+    for col in (
+        "nickname",
+        "wins",
+        "losses",
+        "draws",
+        "stance",
+        "weight_in_kg",
+        "reach_in_cm",
+        "elo",
+        "elo_fights_count",
+        "elo_source",
+        "elo_computed_at",
+    ):
+        if col not in df.columns:
+            df[col] = None
+    name_col = find_name_column(df)
+    search_df = df.copy()
+    search_df["_name_key"] = search_df.get("normalized_name", search_df[name_col]).fillna("").astype(str)
+    if "normalized_name" not in search_df.columns:
+        search_df["_name_key"] = search_df[name_col].fillna("").astype(str).map(normalize_name)
+    search_df["_nick_key"] = search_df["nickname"].fillna("").astype(str).map(normalize_name)
+
+    rows = []
+    seen = set()
+
+    def add_row(row, score: float, match_type: str) -> None:
+        key = row.get("normalized_name") or row.get("_name_key") or normalize_name(row.get(name_col))
+        if not key or key in seen:
+            return
+        seen.add(key)
+        item = row.to_dict()
+        item["weight_class"] = detect_weight_class(row)
+        item["_score"] = score
+        item["_match_type"] = match_type
+        rows.append(item)
+
+    exact_name = search_df["_name_key"] == normalized
+    exact_nick = search_df["_nick_key"] == normalized
+    for _, row in search_df.loc[exact_name].iterrows():
+        add_row(row, 1.0, "exact_name")
+    for _, row in search_df.loc[exact_nick].iterrows():
+        add_row(row, 0.98, "exact_nickname")
+
+    partial_name = search_df["_name_key"].str.contains(normalized, regex=False, na=False)
+    partial_nick = search_df["_nick_key"].str.contains(normalized, regex=False, na=False)
+    for _, row in search_df.loc[partial_name].iterrows():
+        score = _partial_score(normalized, str(row["_name_key"]), 0.96, 0.86)
+        add_row(row, score, "partial_name")
+    for _, row in search_df.loc[partial_nick].iterrows():
+        score = _partial_score(normalized, str(row["_nick_key"]), 0.94, 0.84)
+        add_row(row, score, "partial_nickname")
+
+    if len(rows) < limit and len(normalized) >= 3:
+        for _, row in search_df.iterrows():
+            key = row.get("normalized_name") or row.get("_name_key")
+            if key in seen:
+                continue
+            score, match_type = _match_score(normalized, str(row["_name_key"]), str(row["_nick_key"]))
+            if score > 0:
+                add_row(row, score, match_type)
+    if not rows:
+        return []
+    matches = pd.DataFrame(rows).sort_values(
+        ["_score", "normalized_name"],
+        ascending=[False, True],
+    ).head(limit)
+    matches = matches.rename(columns={name_col: "name"})
+    columns = [
+        "name",
+        "nickname",
+        "wins",
+        "losses",
+        "draws",
+        "stance",
+        "weight_in_kg",
+        "weight_class",
+        "reach_in_cm",
+        "elo",
+        "elo_fights_count",
+        "elo_source",
+        "elo_computed_at",
+        "_score",
+        "_match_type",
+    ]
+    result = matches[columns].to_dict(orient="records")
+    _log_timing("repository.find_fighter_candidates", start, query=query, matches=len(result))
+    return result
+
+
+def resolve_name(query: str) -> dict:
+    normalized = normalize_name(query)
+    candidates = find_fighter_candidates(query, limit=5)
+    if not candidates:
+        return {
+            "status": "needs_full_name",
+            "query": query,
+            "resolved_name": None,
+            "candidates": [],
+            "message": "I could not recognize that fighter. Please enter the full fighter name.",
+        }
+
+    best = candidates[0]
+    exact = best["_match_type"] in {"exact_name", "exact_nickname"}
+    clear_single = len(candidates) == 1 and best["_score"] >= 0.82
+    clear_lead = len(candidates) > 1 and best["_score"] >= 0.88 and best["_score"] - candidates[1]["_score"] >= 0.12
+    if exact or clear_single or clear_lead:
+        return {
+            "status": "resolved",
+            "query": query,
+            "resolved_name": best["name"],
+            "candidates": candidates,
+            "message": f"Resolved {query} to {best['name']}.",
+        }
+
+    return {
+        "status": "needs_confirmation",
+        "query": query,
+        "resolved_name": best["name"],
+        "candidates": candidates,
+        "message": f"Did you mean {best['name']}?",
+    }
+
+
+def _match_score(query: str, name_key: str, nick_key: str) -> tuple[float, str]:
+    if query == name_key:
+        return 1.0, "exact_name"
+    if nick_key and query == nick_key:
+        return 0.98, "exact_nickname"
+    if query in name_key:
+        return _partial_score(query, name_key, 0.96, 0.86), "partial_name"
+    if nick_key and query in nick_key:
+        return _partial_score(query, nick_key, 0.94, 0.84), "partial_nickname"
+
+    name_score = SequenceMatcher(None, query, name_key).ratio()
+    nick_score = SequenceMatcher(None, query, nick_key).ratio() if nick_key else 0
+    if max(name_score, nick_score) < 0.58:
+        return 0.0, "none"
+    if nick_score > name_score:
+        return nick_score * 0.86, "fuzzy_nickname"
+    return name_score * 0.86, "fuzzy_name"
+
+
+def _partial_score(query: str, value: str, prefix_base: float, contains_base: float) -> float:
+    if value.startswith(query) or any(part.startswith(query) for part in value.split()):
+        return prefix_base - min(0.12, (len(value) - len(query)) / 160)
+    return contains_base - min(0.16, (len(value) - len(query)) / 120)
+
+
+def get_fighter_by_name(name: str) -> pd.Series | None:
+    initialize_database()
+    normalized = normalize_name(name)
+    if using_postgres():
+        with get_engine().begin() as conn:
+            row = conn.execute(
+                text("SELECT * FROM fighters WHERE normalized_name = :normalized LIMIT 1"),
+                {"normalized": normalized},
+            ).mappings().fetchone()
+        return pd.Series(dict(row)) if row else None
+
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT * FROM fighters WHERE normalized_name = ? LIMIT 1",
+            (normalized,),
+        ).fetchone()
+    return pd.Series(dict(row)) if row else None
+
+
+def upsert_fighter(record: dict) -> pd.Series:
+    initialize_database()
+    df = get_fighters_df()
+    name = record.get("name") or record.get("Name") or record.get("fighter")
+    if not name:
+        raise ValueError("Cannot upsert fighter without a name")
+    normalized = normalize_name(name)
+    record = {**record, "name": name, "normalized_name": normalized, "_search_name": normalized}
+    for col in df.columns:
+        record.setdefault(col, None)
+    new_row = pd.DataFrame([{col: record.get(col) for col in df.columns}])
+    df = df[df["normalized_name"] != normalized]
+    df = pd.concat([df, new_row], ignore_index=True)
+    save_fighters_df(df, replace=True)
+    return new_row.iloc[0]
+
+
+def update_elo_columns(
+    elo_by_search: dict,
+    peak_elo: dict | None = None,
+    elo_version: str = "v1",
+    fight_counts: dict | None = None,
+    computed_at: str | None = None,
+) -> None:
+    initialize_database()
+    df = get_fighters_df()
+    name_col = find_name_column(df)
+    peak_elo = peak_elo or {}
+    fight_counts = fight_counts or {}
+    computed_at = computed_at or _utc_now()
+    df["elo"] = df["normalized_name"].map(elo_by_search).fillna(settings.ELO_INITIAL)
+    df["peak_elo"] = df[name_col].map(
+        lambda n: peak_elo.get(n, elo_by_search.get(normalize_name(n), settings.ELO_INITIAL))
+    )
+    df["elo_fights_count"] = df["normalized_name"].map(fight_counts).fillna(0).astype(int)
+    df["elo_source"] = df["elo_fights_count"].map(lambda count: "computed" if int(count) > 0 else "baseline")
+    df["elo_version"] = elo_version
+    df["elo_computed_at"] = df["elo_source"].map(lambda source: computed_at if source == "computed" else None)
+    save_fighters_df(df, replace=True)
+    logger.info(
+        "Updated latest Elo columns fighters=%s computed=%s baseline=%s version=%s",
+        len(df),
+        int((df["elo_source"] == "computed").sum()),
+        int((df["elo_source"] == "baseline").sum()),
+        elo_version,
+    )
+
+
+def replace_elo_history(
+    elo_ratings: dict,
+    peak_elo: dict | None = None,
+    elo_version: str = "v1",
+    computed_at: str | None = None,
+) -> int:
+    """Replace the latest Elo snapshot for one engine version.
+
+    The table stores a rerunnable snapshot per Elo version, so refreshing the same
+    version deletes stale rows before inserting the newly computed ratings.
+    """
+    init_db()
+    peak_elo = peak_elo or {}
+    computed_at = computed_at or _utc_now()
+    rows = [
+        {
+            "fighter_name": fighter_name,
+            "normalized_name": normalize_name(fighter_name),
+            "elo": float(elo),
+            "peak_elo": float(peak_elo.get(fighter_name, elo)),
+            "elo_version": elo_version,
+            "computed_at": computed_at,
+        }
+        for fighter_name, elo in elo_ratings.items()
+    ]
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(
+                text("DELETE FROM fighter_elo_history WHERE elo_version = :elo_version"),
+                {"elo_version": elo_version},
+            )
+            if rows:
+                conn.execute(
+                    text(
+                        """
+                        INSERT INTO fighter_elo_history
+                            (fighter_name, normalized_name, elo, peak_elo, elo_version, computed_at)
+                        VALUES
+                            (:fighter_name, :normalized_name, :elo, :peak_elo, :elo_version, :computed_at)
+                        """
+                    ),
+                    rows,
+                )
+        logger.info("Replaced Elo history rows=%s version=%s", len(rows), elo_version)
+        return len(rows)
+
+    with connect() as conn:
+        conn.execute("DELETE FROM fighter_elo_history WHERE elo_version = ?", (elo_version,))
+        conn.executemany(
+            """
+            INSERT INTO fighter_elo_history
+                (fighter_name, normalized_name, elo, peak_elo, elo_version, computed_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (
+                    row["fighter_name"],
+                    row["normalized_name"],
+                    row["elo"],
+                    row["peak_elo"],
+                    row["elo_version"],
+                    row["computed_at"],
+                )
+                for row in rows
+            ],
+        )
+        conn.commit()
+    logger.info("Replaced Elo history rows=%s version=%s", len(rows), elo_version)
+    return len(rows)
+
+
+def safe_int(value, default: int = 0) -> int:
+    try:
+        if pd.isna(value):
+            return default
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_float(value, default: float = 0.0) -> float:
+    try:
+        if pd.isna(value):
+            return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _invalidate_fighters_cache() -> None:
+    global _fighters_cache
+    _fighters_cache = None
+
+
+def _log_timing(label: str, start: float, **fields) -> None:
+    elapsed_ms = round((time.perf_counter() - start) * 1000, 2)
+    extra = " ".join(f"{key}={value}" for key, value in fields.items() if value is not None)
+    logger.info("timing %s elapsed_ms=%s%s", label, elapsed_ms, f" {extra}" if extra else "")
+
+
+def save_scrape_cache(normalized_name: str, source: str, url: str, raw: dict, confidence: float) -> None:
+    init_db()
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO scrape_cache
+                        (normalized_name, source, url, raw_json, confidence, fetched_at)
+                    VALUES (:normalized_name, :source, :url, CAST(:raw_json AS jsonb), :confidence, :fetched_at)
+                    ON CONFLICT (normalized_name) DO UPDATE SET
+                        source = EXCLUDED.source,
+                        url = EXCLUDED.url,
+                        raw_json = EXCLUDED.raw_json,
+                        confidence = EXCLUDED.confidence,
+                        fetched_at = EXCLUDED.fetched_at
+                    """
+                ),
+                {
+                    "normalized_name": normalized_name,
+                    "source": source,
+                    "url": url,
+                    "raw_json": json.dumps(raw),
+                    "confidence": confidence,
+                    "fetched_at": _utc_now(),
+                },
+            )
+        return
+
+    with connect() as conn:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO scrape_cache
+                (normalized_name, source, url, raw_json, confidence, fetched_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (normalized_name, source, url, json.dumps(raw), confidence, _utc_now()),
+        )
+        conn.commit()
+
+
+def get_scrape_cache(normalized_name: str) -> dict | None:
+    init_db()
+    if using_postgres():
+        with get_engine().begin() as conn:
+            row = conn.execute(
+                text("SELECT * FROM scrape_cache WHERE normalized_name = :normalized_name"),
+                {"normalized_name": normalized_name},
+            ).mappings().fetchone()
+        if not row:
+            return None
+        out = dict(row)
+        raw = out.pop("raw_json")
+        out["raw"] = raw if isinstance(raw, dict) else json.loads(raw)
+        return out
+
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT * FROM scrape_cache WHERE normalized_name = ?",
+            (normalized_name,),
+        ).fetchone()
+    if not row:
+        return None
+    out = dict(row)
+    out["raw"] = json.loads(out.pop("raw_json"))
+    return out
+
+
+def save_prediction(fighter_a: str, fighter_b: str, prediction: dict, payload: dict) -> str:
+    init_db()
+    prediction_id = prediction.get("prediction_id") or str(uuid.uuid4())
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(
+                text(
+                    """
+                    INSERT INTO predictions
+                        (prediction_id, fighter_a, fighter_b, winner, confidence, model, payload_json, created_at)
+                    VALUES
+                        (:prediction_id, :fighter_a, :fighter_b, :winner, :confidence, :model,
+                         CAST(:payload_json AS jsonb), :created_at)
+                    ON CONFLICT (prediction_id) DO UPDATE SET
+                        fighter_a = EXCLUDED.fighter_a,
+                        fighter_b = EXCLUDED.fighter_b,
+                        winner = EXCLUDED.winner,
+                        confidence = EXCLUDED.confidence,
+                        model = EXCLUDED.model,
+                        payload_json = EXCLUDED.payload_json,
+                        created_at = EXCLUDED.created_at
+                    """
+                ),
+                {
+                    "prediction_id": prediction_id,
+                    "fighter_a": fighter_a,
+                    "fighter_b": fighter_b,
+                    "winner": prediction.get("winner"),
+                    "confidence": prediction.get("confidence"),
+                    "model": prediction.get("model"),
+                    "payload_json": json.dumps(payload, default=str),
+                    "created_at": _utc_now(),
+                },
+            )
+        return prediction_id
+
+    with connect() as conn:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO predictions
+                (prediction_id, fighter_a, fighter_b, winner, confidence, model, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                prediction_id,
+                fighter_a,
+                fighter_b,
+                prediction.get("winner"),
+                prediction.get("confidence"),
+                prediction.get("model"),
+                json.dumps(payload, default=str),
+                _utc_now(),
+            ),
+        )
+        conn.commit()
+    return prediction_id
+
+
+============================================================
+FILE: ufc_predictor\db\schema.py
+============================================================
+
+"""Database connection and schema helpers.
+
+Local development uses SQLite. Production uses Supabase Postgres when
+DATABASE_URL is provided.
+"""
+
+import sqlite3
+from functools import lru_cache
+
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.engine import Engine
+
+from ufc_predictor.config import settings
+
+
+def using_postgres() -> bool:
+    return bool(settings.DATABASE_URL)
+
+
+def _database_url() -> str:
+    url = settings.DATABASE_URL
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+psycopg://", 1)
+    elif url.startswith("postgresql://") and "+psycopg" not in url:
+        url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
+@lru_cache(maxsize=1)
+def get_engine() -> Engine:
+    if using_postgres():
+        return create_engine(_database_url(), pool_pre_ping=True, connect_args={"prepare_threshold": None})
+    settings.DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    return create_engine(f"sqlite:///{settings.FIGHTERS_DB}", future=True)
+
+
+def connect(db_path=None) -> sqlite3.Connection:
+    if using_postgres():
+        raise RuntimeError("Use get_engine() for DATABASE_URL/Postgres connections.")
+    path = db_path or settings.FIGHTERS_DB
+    path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(path)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def table_exists(table_name: str) -> bool:
+    if using_postgres():
+        return inspect(get_engine()).has_table(table_name)
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+            (table_name,),
+        ).fetchone()
+    return row is not None
+
+
+def init_db(db_path=None) -> None:
+    """Create durable tables that sit beside the pandas-managed fighters table."""
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(text("CREATE EXTENSION IF NOT EXISTS pgcrypto"))
+            conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fighters (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL UNIQUE,
+                        nickname TEXT,
+                        wins INTEGER,
+                        losses INTEGER,
+                        draws INTEGER,
+                        height_cm DOUBLE PRECISION,
+                        weight_in_kg DOUBLE PRECISION,
+                        reach_in_cm DOUBLE PRECISION,
+                        stance TEXT,
+                        date_of_birth DATE,
+                        significant_strikes_landed_per_minute DOUBLE PRECISION,
+                        significant_striking_accuracy DOUBLE PRECISION,
+                        significant_strikes_absorbed_per_minute DOUBLE PRECISION,
+                        significant_strike_defence DOUBLE PRECISION,
+                        average_takedowns_landed_per_15_minutes DOUBLE PRECISION,
+                        takedown_accuracy DOUBLE PRECISION,
+                        takedown_defense DOUBLE PRECISION,
+                        average_submissions_attempted_per_15_minutes DOUBLE PRECISION,
+                        elo DOUBLE PRECISION DEFAULT 1000,
+                        peak_elo DOUBLE PRECISION DEFAULT 1000,
+                        elo_version TEXT DEFAULT 'v1',
+                        elo_computed_at TIMESTAMPTZ,
+                        elo_fights_count INTEGER DEFAULT 0,
+                        elo_source TEXT DEFAULT 'baseline',
+                        weight_class TEXT,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_name_trgm ON fighters USING gin (normalized_name gin_trgm_ops)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_nickname ON fighters (nickname)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_normalized_name ON fighters (normalized_name)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_name_lower ON fighters (lower(name))"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_nickname_lower ON fighters (lower(nickname))"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_nickname_trgm ON fighters USING gin (nickname gin_trgm_ops)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_weight_class ON fighters (weight_class)"))
+            conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_version TEXT DEFAULT 'v1'"))
+            conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_computed_at TIMESTAMPTZ"))
+            conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_fights_count INTEGER DEFAULT 0"))
+            conn.execute(text("ALTER TABLE fighters ADD COLUMN IF NOT EXISTS elo_source TEXT DEFAULT 'baseline'"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS scrape_cache (
+                        normalized_name TEXT PRIMARY KEY,
+                        source TEXT,
+                        url TEXT,
+                        raw_json JSONB NOT NULL,
+                        confidence DOUBLE PRECISION DEFAULT 0.0,
+                        fetched_at TIMESTAMPTZ NOT NULL
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS predictions (
+                        prediction_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        fighter_a TEXT NOT NULL,
+                        fighter_b TEXT NOT NULL,
+                        winner TEXT,
+                        confidence DOUBLE PRECISION,
+                        model TEXT,
+                        payload_json JSONB NOT NULL,
+                        created_at TIMESTAMPTZ NOT NULL
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fights (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        event TEXT,
+                        fighter_1 TEXT,
+                        fighter_2 TEXT,
+                        result TEXT,
+                        method TEXT,
+                        round TEXT,
+                        time TEXT,
+                        source_hash TEXT UNIQUE,
+                        event_date DATE,
+                        weight_class TEXT,
+                        source TEXT DEFAULT 'local_csv',
+                        source_url TEXT,
+                        scraped_at TIMESTAMPTZ,
+                        created_at TIMESTAMPTZ DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS event_date DATE"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS weight_class TEXT"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'local_csv'"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS source_url TEXT"))
+            conn.execute(text("ALTER TABLE fights ADD COLUMN IF NOT EXISTS scraped_at TIMESTAMPTZ"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS feedback (
+                        prediction_id UUID,
+                        fighter_a TEXT NOT NULL,
+                        fighter_b TEXT NOT NULL,
+                        predicted_winner TEXT NOT NULL,
+                        actual_winner TEXT,
+                        confidence DOUBLE PRECISION,
+                        was_correct BOOLEAN NOT NULL,
+                        user_notes TEXT,
+                        timestamp TIMESTAMPTZ NOT NULL
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fighter_elo_history (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        fighter_name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL,
+                        elo DOUBLE PRECISION NOT NULL,
+                        peak_elo DOUBLE PRECISION NOT NULL,
+                        elo_version TEXT NOT NULL DEFAULT 'v1',
+                        computed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_normalized_name ON fighter_elo_history (normalized_name)"))
+            conn.execute(text("ALTER TABLE fighter_elo_history ADD COLUMN IF NOT EXISTS elo_version TEXT NOT NULL DEFAULT 'v1'"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_fighter_name ON fighter_elo_history (fighter_name)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_elo_source ON fighters (elo_source)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_fighter_1_event ON fights (fighter_1, event)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_fighter_2_event ON fights (fighter_2, event)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_event_created_at ON fights (event, created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_created_at ON fights (created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_weight_class ON fights (weight_class)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_fighter_a_created_at ON predictions (fighter_a, created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_fighter_b_created_at ON predictions (fighter_b, created_at)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_predictions_created_at ON predictions (created_at)"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS events (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL UNIQUE,
+                        event_date DATE,
+                        location TEXT,
+                        source TEXT NOT NULL DEFAULT 'ufcstats',
+                        source_url TEXT,
+                        source_hash TEXT UNIQUE,
+                        scraped_at TIMESTAMPTZ,
+                        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_events_event_date ON events (event_date)"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fighter_rankings (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        fighter_name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL,
+                        ranking_type TEXT NOT NULL,
+                        weight_class TEXT,
+                        rank INTEGER NOT NULL,
+                        elo DOUBLE PRECISION NOT NULL,
+                        peak_elo DOUBLE PRECISION,
+                        fights_count INTEGER DEFAULT 0,
+                        wins INTEGER DEFAULT 0,
+                        losses INTEGER DEFAULT 0,
+                        generated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        source TEXT NOT NULL DEFAULT 'elo_v1'
+                    )
+                    """
+                )
+            )
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_rankings_type_rank ON fighter_rankings (ranking_type, rank)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_rankings_weight_class ON fighter_rankings (weight_class)"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fighter_weight_class_history (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        fighter_name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL,
+                        weight_class TEXT NOT NULL,
+                        fights_count INTEGER DEFAULT 0,
+                        first_seen DATE,
+                        last_seen DATE,
+                        inferred_from_fights BOOLEAN NOT NULL DEFAULT true,
+                        confidence DOUBLE PRECISION DEFAULT 0,
+                        generated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS sync_runs (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        source TEXT NOT NULL,
+                        status TEXT NOT NULL,
+                        started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        finished_at TIMESTAMPTZ,
+                        dry_run BOOLEAN NOT NULL DEFAULT false,
+                        events_seen INTEGER DEFAULT 0,
+                        fights_seen INTEGER DEFAULT 0,
+                        fighters_seen INTEGER DEFAULT 0,
+                        inserted_count INTEGER DEFAULT 0,
+                        updated_count INTEGER DEFAULT 0,
+                        skipped_count INTEGER DEFAULT 0,
+                        failed_count INTEGER DEFAULT 0,
+                        message TEXT
+                    )
+                    """
+                )
+            )
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS scraper_sources (
+                        source TEXT PRIMARY KEY,
+                        base_url TEXT NOT NULL,
+                        enabled BOOLEAN NOT NULL DEFAULT true,
+                        last_success_at TIMESTAMPTZ,
+                        last_failed_at TIMESTAMPTZ,
+                        last_error TEXT,
+                        challenge_detected BOOLEAN NOT NULL DEFAULT false,
+                        consecutive_failures INTEGER NOT NULL DEFAULT 0,
+                        last_status_code INTEGER,
+                        average_fetch_ms DOUBLE PRECISION,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS last_failed_at TIMESTAMPTZ"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS challenge_detected BOOLEAN NOT NULL DEFAULT false"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS consecutive_failures INTEGER NOT NULL DEFAULT 0"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS last_status_code INTEGER"))
+            conn.execute(text("ALTER TABLE scraper_sources ADD COLUMN IF NOT EXISTS average_fetch_ms DOUBLE PRECISION"))
+            for stmt in (
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS inserted_count INTEGER DEFAULT 0",
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS updated_count INTEGER DEFAULT 0",
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS skipped_count INTEGER DEFAULT 0",
+                "ALTER TABLE sync_runs ADD COLUMN IF NOT EXISTS failed_count INTEGER DEFAULT 0",
+            ):
+                conn.execute(text(stmt))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS sync_locks (
+                        lock_name TEXT PRIMARY KEY,
+                        owner TEXT NOT NULL,
+                        started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                        expires_at TIMESTAMPTZ NOT NULL,
+                        metadata JSONB
+                    )
+                    """
+                )
+            )
+            conn.execute(text("ALTER TABLE sync_locks ADD COLUMN IF NOT EXISTS metadata JSONB"))
+        return
+
+    with connect(db_path) as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS scrape_cache (
+                normalized_name TEXT PRIMARY KEY,
+                source TEXT,
+                url TEXT,
+                raw_json TEXT NOT NULL,
+                confidence REAL DEFAULT 0.0,
+                fetched_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS predictions (
+                prediction_id TEXT PRIMARY KEY,
+                fighter_a TEXT NOT NULL,
+                fighter_b TEXT NOT NULL,
+                winner TEXT,
+                confidence REAL,
+                model TEXT,
+                payload_json TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fights (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event TEXT,
+                fighter_1 TEXT,
+                fighter_2 TEXT,
+                result TEXT,
+                method TEXT,
+                round TEXT,
+                time TEXT,
+                source_hash TEXT UNIQUE,
+                event_date TEXT,
+                weight_class TEXT,
+                source TEXT DEFAULT 'local_csv',
+                source_url TEXT,
+                scraped_at TEXT
+            )
+            """
+        )
+        for stmt in (
+            "ALTER TABLE fights ADD COLUMN source_hash TEXT",
+            "ALTER TABLE fights ADD COLUMN event_date TEXT",
+            "ALTER TABLE fights ADD COLUMN weight_class TEXT",
+            "ALTER TABLE fights ADD COLUMN source TEXT DEFAULT 'local_csv'",
+            "ALTER TABLE fights ADD COLUMN source_url TEXT",
+            "ALTER TABLE fights ADD COLUMN scraped_at TEXT",
+        ):
+            try:
+                conn.execute(stmt)
+            except sqlite3.OperationalError:
+                pass
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fighter_elo_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fighter_name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL,
+                elo REAL NOT NULL,
+                peak_elo REAL NOT NULL,
+                elo_version TEXT NOT NULL DEFAULT 'v1',
+                computed_at TEXT NOT NULL
+            )
+            """
+        )
+        try:
+            conn.execute("ALTER TABLE fighter_elo_history ADD COLUMN elo_version TEXT NOT NULL DEFAULT 'v1'")
+        except sqlite3.OperationalError:
+            pass
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_normalized_name ON fighter_elo_history (normalized_name)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL UNIQUE,
+                event_date TEXT,
+                location TEXT,
+                source TEXT NOT NULL DEFAULT 'ufcstats',
+                source_url TEXT,
+                source_hash TEXT UNIQUE,
+                scraped_at TEXT,
+                created_at TEXT,
+                updated_at TEXT
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_events_event_date ON events (event_date)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fighter_rankings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fighter_name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL,
+                ranking_type TEXT NOT NULL,
+                weight_class TEXT,
+                rank INTEGER NOT NULL,
+                elo REAL NOT NULL,
+                peak_elo REAL,
+                fights_count INTEGER DEFAULT 0,
+                wins INTEGER DEFAULT 0,
+                losses INTEGER DEFAULT 0,
+                generated_at TEXT,
+                source TEXT NOT NULL DEFAULT 'elo_v1'
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_rankings_type_rank ON fighter_rankings (ranking_type, rank)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fighter_weight_class_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fighter_name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL,
+                weight_class TEXT NOT NULL,
+                fights_count INTEGER DEFAULT 0,
+                first_seen TEXT,
+                last_seen TEXT,
+                inferred_from_fights INTEGER NOT NULL DEFAULT 1,
+                confidence REAL DEFAULT 0,
+                generated_at TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sync_runs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source TEXT NOT NULL,
+                status TEXT NOT NULL,
+                started_at TEXT,
+                finished_at TEXT,
+                dry_run INTEGER NOT NULL DEFAULT 0,
+                events_seen INTEGER DEFAULT 0,
+                fights_seen INTEGER DEFAULT 0,
+                fighters_seen INTEGER DEFAULT 0,
+                inserted_count INTEGER DEFAULT 0,
+                updated_count INTEGER DEFAULT 0,
+                skipped_count INTEGER DEFAULT 0,
+                failed_count INTEGER DEFAULT 0,
+                message TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS scraper_sources (
+                source TEXT PRIMARY KEY,
+                base_url TEXT NOT NULL,
+                enabled INTEGER NOT NULL DEFAULT 1,
+                last_success_at TEXT,
+                last_failed_at TEXT,
+                last_error TEXT,
+                challenge_detected INTEGER NOT NULL DEFAULT 0,
+                consecutive_failures INTEGER NOT NULL DEFAULT 0,
+                last_status_code INTEGER,
+                average_fetch_ms REAL,
+                updated_at TEXT
+            )
+            """
+        )
+        for stmt in (
+            "ALTER TABLE scraper_sources ADD COLUMN last_failed_at TEXT",
+            "ALTER TABLE scraper_sources ADD COLUMN challenge_detected INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE scraper_sources ADD COLUMN consecutive_failures INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE scraper_sources ADD COLUMN last_status_code INTEGER",
+            "ALTER TABLE scraper_sources ADD COLUMN average_fetch_ms REAL",
+        ):
+            try:
+                conn.execute(stmt)
+            except sqlite3.OperationalError:
+                pass
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sync_locks (
+                lock_name TEXT PRIMARY KEY,
+                owner TEXT NOT NULL,
+                started_at TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                metadata TEXT
+            )
+            """
+        )
+        for stmt in (
+            "ALTER TABLE sync_locks ADD COLUMN metadata TEXT",
+            "ALTER TABLE sync_runs ADD COLUMN inserted_count INTEGER DEFAULT 0",
+            "ALTER TABLE sync_runs ADD COLUMN updated_count INTEGER DEFAULT 0",
+            "ALTER TABLE sync_runs ADD COLUMN skipped_count INTEGER DEFAULT 0",
+            "ALTER TABLE sync_runs ADD COLUMN failed_count INTEGER DEFAULT 0",
+        ):
+            try:
+                conn.execute(stmt)
+            except sqlite3.OperationalError:
+                pass
+        conn.commit()
+
+
+============================================================
+FILE: ufc_predictor\tests\test_elo_engine.py
+============================================================
+
+import unittest
+
+import pandas as pd
+
+from ufc_predictor.models.elo.elo_engine import build_elo_fight_counts, compute_elo_ratings
+
+
+class TestEloEngine(unittest.TestCase):
+    def test_elo_changes_after_completed_fights(self):
+        fights = pd.DataFrame(
+            [
+                {"event": "Newest", "fighter_1": "Alpha Fighter", "fighter_2": "Beta Fighter", "result": "win"},
+                {"event": "Middle", "fighter_1": "Alpha Fighter", "fighter_2": "Beta Fighter", "result": "win"},
+                {"event": "Oldest", "fighter_1": "Alpha Fighter", "fighter_2": "Beta Fighter", "result": "win"},
+            ]
+        )
+
+        fights_elo, ratings, peak_elo, elo_by_search = compute_elo_ratings(fights)
+        fight_counts = build_elo_fight_counts(fights_elo)
+
+        self.assertGreater(ratings["Alpha Fighter"], 1000)
+        self.assertLess(ratings["Beta Fighter"], 1000)
+        self.assertEqual(elo_by_search["alpha fighter"], ratings["Alpha Fighter"])
+        self.assertGreaterEqual(peak_elo["Alpha Fighter"], ratings["Alpha Fighter"])
+        self.assertEqual(fight_counts["alpha fighter"], 3)
+        self.assertEqual(fight_counts["beta fighter"], 3)
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+============================================================
+FILE: ufc_predictor\tests\test_prediction.py
+============================================================
+
+import unittest
+
+from ufc_predictor.features.feature_engineering import build_master_df, compare_fighters
+from ufc_predictor.features.matchup_builder import build_matchup_features, features_to_vector
+from ufc_predictor.models.sklearn.predictor import model_available, predict_matchup
+from ufc_predictor.models.ensemble.predictor import predict_ensemble
+from ufc_predictor.pipeline import run_prediction
+from ufc_predictor.utils.helpers import normalize_name
+
+
+class TestPredictionPipeline(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.master = build_master_df()
+        cls.row = cls.master[
+            cls.master["_search_name"] == normalize_name("Islam Makhachev")
+        ]
+        if cls.row.empty:
+            cls.skipTest("Islam Makhachev not in database")
+        cls.f1 = cls.row.iloc[0]
+        cls.row2 = cls.master[
+            cls.master["_search_name"] == normalize_name("Alex Pereira")
+        ]
+        if cls.row2.empty:
+            cls.skipTest("Alex Pereira not in database")
+        cls.f2 = cls.row2.iloc[0]
+
+    def test_matchup_features_shape(self):
+        feats = build_matchup_features(self.f1, self.f2)
+        vec = features_to_vector(feats)
+        self.assertGreater(len(vec), 10)
+
+    def test_compare_fighters(self):
+        comp = compare_fighters(self.f1, self.f2)
+        self.assertIn("stats1", comp)
+        self.assertIn("Elo", comp["stats1"])
+        self.assertIn("Elo Available", comp["stats1"])
+        self.assertIn("Elo Source", comp["stats1"])
+
+    def test_run_prediction(self):
+        comp, pred, summary = run_prediction(self.f1, self.f2)
+        self.assertIn("winner", pred)
+        self.assertIn("prob_a", pred)
+        self.assertIn("diagnostics", pred)
+        self.assertIn("elo", pred["diagnostics"])
+        self.assertTrue(summary)
+        self.assertIn("matchup", summary)
+        self.assertIn("biggest danger", summary)
+        self.assertNotIn("guaranteed", summary.lower())
+        self.assertNotIn("lock", summary.lower())
+
+    @unittest.skipUnless(model_available(), "model not trained")
+    def test_sklearn_predict(self):
+        out = predict_matchup(self.f1, self.f2)
+        self.assertIsNotNone(out)
+        self.assertGreaterEqual(out["prob_a_wins"], 0)
+        self.assertLessEqual(out["prob_a_wins"], 1)
+        self.assertTrue(out["diagnostics"]["elo_features_present"])
+        self.assertIn("delta_elo", out["features"])
+        self.assertIn("elo_expected_a", out["features"])
+
+    @unittest.skipUnless(model_available(), "model not trained")
+    def test_elo_changes_model_and_ensemble_signal_for_identical_fighters(self):
+        high_elo = self.f1.copy()
+        low_elo = self.f1.copy()
+        for row, name, elo in ((high_elo, "High Elo Test", 1300), (low_elo, "Low Elo Test", 900)):
+            row["name"] = name
+            row["elo"] = elo
+            row["elo_source"] = "computed"
+            row["elo_fights_count"] = 10
+            row["points_p4p"] = 0
+            row["rank_p4p"] = 0
+            row["points_dom"] = 0
+            row["rank_dom"] = 0
+
+        high_vs_low_features = build_matchup_features(high_elo, low_elo)
+        low_vs_high_features = build_matchup_features(low_elo, high_elo)
+        self.assertEqual(high_vs_low_features["delta_elo"], 400)
+        self.assertEqual(low_vs_high_features["delta_elo"], -400)
+
+        high_vs_low = predict_matchup(high_elo, low_elo)
+        low_vs_high = predict_matchup(low_elo, high_elo)
+        self.assertGreater(high_vs_low["prob_a_wins"], low_vs_high["prob_a_wins"])
+
+        high_ensemble = predict_ensemble(high_elo, low_elo, compare_fighters(high_elo, low_elo))
+        low_ensemble = predict_ensemble(low_elo, high_elo, compare_fighters(low_elo, high_elo))
+        self.assertTrue(high_ensemble["signals"]["elo"]["available"])
+        self.assertGreater(high_ensemble["prob_a"], low_ensemble["prob_a"])
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+============================================================
+FILE: alembic\versions\0003_add_elo_status_columns.py
+============================================================
+
+"""add elo status columns
+
+Revision ID: 0003_add_elo_status_columns
+Revises: 0002_add_performance_indexes
+Create Date: 2026-05-26
+"""
+
+from alembic import op
+
+revision = "0003_add_elo_status_columns"
+down_revision = "0002_add_performance_indexes"
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    op.execute("alter table fighters add column if not exists elo_fights_count integer default 0")
+    op.execute("alter table fighters add column if not exists elo_source text default 'baseline'")
+    op.execute("create index if not exists idx_fighters_elo_source on fighters (elo_source)")
+
+
+def downgrade() -> None:
+    op.execute("drop index if exists idx_fighters_elo_source")
+    op.execute("alter table fighters drop column if exists elo_source")
+    op.execute("alter table fighters drop column if exists elo_fights_count")

@@ -18,14 +18,14 @@ from ufc_predictor.agents.orchestrator import FighterResolutionError, refresh_al
 from ufc_predictor.analysis import build_fight_analysis
 from ufc_predictor.config import settings
 from ufc_predictor.db.schema import get_engine, init_db, using_postgres
-from ufc_predictor.db.repository import resolve_name, save_prediction, search_fighters
+from ufc_predictor.db.repository import query_elo_fight_history, query_elo_trend_summary, resolve_name, save_prediction, search_fighters
 from ufc_predictor.feedback.feedback_handler import save_feedback
 from ufc_predictor.models.sklearn.predictor import model_available
 from ufc_predictor.models.props import prop_model_status
 from ufc_predictor.odds import get_odds_events, get_odds_status
 from ufc_predictor.pipeline import run_prediction
 from ufc_predictor.data.sync import get_sync_status
-from ufc_predictor.rankings.generator import query_elo_history, query_rankings
+from ufc_predictor.rankings.generator import query_rankings
 from ufc_predictor.utils.helpers import normalize_name
 from ufc_predictor.utils.logger import get_logger
 
@@ -232,13 +232,18 @@ def betting_reads():
 
 @app.get("/api/fighters/{fighter_key}/elo-history")
 @app.get("/fighters/{fighter_key}/elo-history")
-def fighter_elo_history(fighter_key: str, limit: int = 100):
+def fighter_elo_history(fighter_key: str, limit: int = 10):
     start = time.perf_counter()
     normalized = _resolve_fighter_history_key(fighter_key)
     if not normalized:
         raise HTTPException(status_code=404, detail="Fighter not found")
     try:
-        return {"fighter": normalized, "elo_history": _clean(query_elo_history(normalized, limit=limit))}
+        capped_limit = min(max(int(limit), 1), 50)
+        return {
+            "fighter": normalized,
+            "trend": _clean(query_elo_trend_summary(normalized)),
+            "elo_history": _clean(query_elo_fight_history(normalized, limit=capped_limit)),
+        }
     finally:
         _log_timing("fighters.elo_history", start, fighter=fighter_key, limit=limit)
 

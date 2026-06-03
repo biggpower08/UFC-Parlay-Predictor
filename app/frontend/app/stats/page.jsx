@@ -8,6 +8,7 @@ const STAT_ROWS = [
   ["Elo", "Elo"],
   ["Peak Elo", "Peak Elo"],
   ["Fights counted", "Elo Fights"],
+  ["Elo status", "Elo Source"],
   ["Stance", "Stance"],
   ["Height", "Height (cm)"],
   ["Reach", "Reach (cm)"],
@@ -85,6 +86,7 @@ function FighterStatCard({ stats, label }) {
         <div><span>Elo</span><b>{value(stats, "Elo")}</b></div>
         <div><span>Peak Elo</span><b>{value(stats, "Peak Elo")}</b></div>
         <div><span>Fights counted</span><b>{value(stats, "Elo Fights")}</b></div>
+        <div><span>Elo status</span><b>{eloStatus(stats)}</b></div>
         <div><span>Stance</span><b>{value(stats, "Stance")}</b></div>
       </div>
     </article>
@@ -93,8 +95,17 @@ function FighterStatCard({ stats, label }) {
 
 function value(stats, key) {
   if (key === "Elo" && stats?.["Elo Available"] === false) return "Not available";
+  if (key === "Elo Source") return eloStatus(stats);
   const raw = stats?.[key];
   return raw === null || raw === undefined || raw === "" || raw === "N/A" ? "Not available" : raw;
+}
+
+function eloStatus(stats) {
+  const source = String(stats?.["Elo Source"] || "").toLowerCase();
+  const fights = Number(stats?.["Elo Fights"] || 0);
+  if (!fights || source === "baseline") return "baseline";
+  if (fights < 3) return "limited";
+  return "computed";
 }
 
 function compactMatchupLabel(matchupType) {

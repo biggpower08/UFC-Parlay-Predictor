@@ -13,6 +13,7 @@ from sqlalchemy import text
 
 from ufc_predictor.config import settings
 from ufc_predictor.db.schema import connect, get_engine, init_db, table_exists as schema_table_exists, using_postgres
+from ufc_predictor.models.elo.history import build_elo_fight_history_rows, summarize_elo_trend
 from ufc_predictor.utils.helpers import find_name_column, normalize_name
 from ufc_predictor.utils.logger import get_logger
 from ufc_predictor.utils.weight_classes import detect_weight_class
@@ -455,6 +456,161 @@ def replace_elo_history(
         conn.commit()
     logger.info("Replaced Elo history rows=%s version=%s", len(rows), elo_version)
     return len(rows)
+
+
+def replace_elo_fight_history(
+    fights_elo: pd.DataFrame,
+    elo_version: str = "v1",
+    computed_at: str | None = None,
+) -> int:
+    """Replace true fight-by-fight Elo history for one engine version."""
+    init_db()
+    computed_at = computed_at or _utc_now()
+    rows = build_elo_fight_history_rows(fights_elo, elo_version=elo_version, computed_at=computed_at)
+    columns = [
+        "fighter_name",
+        "normalized_name",
+        "opponent_name",
+        "opponent_normalized_name",
+        "event",
+        "event_date",
+        "fight_id",
+        "source_hash",
+        "weight_class",
+        "result",
+        "method",
+        "round",
+        "elo_before",
+        "elo_after",
+        "elo_change",
+        "opponent_elo_before",
+        "expected_score",
+        "elo_version",
+        "order_source",
+        "computed_at",
+    ]
+    if using_postgres():
+        with get_engine().begin() as conn:
+            conn.execute(
+                text("DELETE FROM fighter_elo_fight_history WHERE elo_version = :elo_version"),
+                {"elo_version": elo_version},
+            )
+            if rows:
+                conn.execute(
+                    text(
+                        f"""
+                        INSERT INTO fighter_elo_fight_history
+                            ({", ".join(columns)})
+                        VALUES
+                            ({", ".join(f":{column}" for column in columns)})
+                        """
+                    ),
+                    rows,
+                )
+        logger.info("Replaced fight-by-fight Elo history rows=%s version=%s", len(rows), elo_version)
+        return len(rows)
+
+    with connect() as conn:
+        conn.execute("DELETE FROM fighter_elo_fight_history WHERE elo_version = ?", (elo_version,))
+        if rows:
+            conn.executemany(
+                f"""
+                INSERT INTO fighter_elo_fight_history
+                    ({", ".join(columns)})
+                VALUES
+                    ({", ".join(["?"] * len(columns))})
+                """,
+                [tuple(row.get(column) for column in columns) for row in rows],
+            )
+        conn.commit()
+    logger.info("Replaced fight-by-fight Elo history rows=%s version=%s", len(rows), elo_version)
+    return len(rows)
+
+
+def query_elo_fight_history(normalized_name: str, limit: int = 10, elo_version: str = "v1") -> list[dict]:
+    """Return recent true fight-by-fight Elo history rows for one fighter."""
+    init_db()
+    limit = min(max(int(limit), 1), 50)
+    params = {"normalized_name": normalized_name, "elo_version": elo_version, "limit": limit}
+    sql = """
+        SELECT fighter_name, normalized_name, opponent_name, opponent_normalized_name,
+               event, event_date, fight_id, source_hash, weight_class, result, method, round,
+               elo_before, elo_after, elo_change, opponent_elo_before, expected_score,
+               elo_version, order_source, computed_at
+        FROM fighter_elo_fight_history
+        WHERE normalized_name = :normalized_name AND elo_version = :elo_version
+        ORDER BY event_date DESC NULLS LAST, id DESC
+        LIMIT :limit
+    """
+    if using_postgres():
+        with get_engine().begin() as conn:
+            rows = conn.execute(text(sql), params).mappings().all()
+        return [dict(row) for row in rows]
+
+    sqlite_sql = sql.replace(" DESC NULLS LAST", " IS NULL ASC, event_date DESC")
+    with connect() as conn:
+        rows = conn.execute(sqlite_sql, params).fetchall()
+    return [dict(row) for row in rows]
+
+
+def query_elo_trend_summary(normalized_name: str, elo_version: str = "v1") -> dict:
+    """Return a lightweight Elo trend summary backed by fight-by-fight history."""
+    init_db()
+    snapshot = _query_fighter_elo_snapshot(normalized_name)
+    params = {"normalized_name": normalized_name, "elo_version": elo_version}
+    sql = """
+        SELECT id, fighter_name, normalized_name, opponent_name, event, event_date,
+               result, elo_after, elo_change, elo_version
+        FROM fighter_elo_fight_history
+        WHERE normalized_name = :normalized_name AND elo_version = :elo_version
+        ORDER BY event_date ASC NULLS LAST, id ASC
+    """
+    if using_postgres():
+        with get_engine().begin() as conn:
+            rows = conn.execute(text(sql), params).mappings().all()
+        history = [dict(row) for row in rows]
+    else:
+        sqlite_sql = sql.replace(" ASC NULLS LAST", " IS NULL ASC, event_date ASC")
+        with connect() as conn:
+            rows = conn.execute(sqlite_sql, params).fetchall()
+        history = [dict(row) for row in rows]
+
+    return summarize_elo_trend(
+        history,
+        current_elo=snapshot.get("elo"),
+        peak_elo=snapshot.get("peak_elo"),
+        elo_fights_count=snapshot.get("elo_fights_count"),
+        elo_version=snapshot.get("elo_version") or elo_version,
+    )
+
+
+def _query_fighter_elo_snapshot(normalized_name: str) -> dict:
+    if using_postgres():
+        with get_engine().begin() as conn:
+            row = conn.execute(
+                text(
+                    """
+                    SELECT elo, peak_elo, elo_fights_count, elo_version
+                    FROM fighters
+                    WHERE normalized_name = :normalized_name
+                    LIMIT 1
+                    """
+                ),
+                {"normalized_name": normalized_name},
+            ).mappings().fetchone()
+        return dict(row) if row else {"elo_fights_count": 0}
+
+    with connect() as conn:
+        row = conn.execute(
+            """
+            SELECT elo, peak_elo, elo_fights_count, elo_version
+            FROM fighters
+            WHERE normalized_name = ?
+            LIMIT 1
+            """,
+            (normalized_name,),
+        ).fetchone()
+    return dict(row) if row else {"elo_fights_count": 0}
 
 
 def safe_int(value, default: int = 0) -> int:

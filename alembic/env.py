@@ -18,6 +18,12 @@ target_metadata = Base.metadata
 
 def database_url() -> str:
     url = settings.DATABASE_URL
+    if not url:
+        raise RuntimeError(
+            "Alembic migrations require DATABASE_URL for Postgres/Supabase. "
+            "For local SQLite development, run scripts/update_elo.py or start the app; "
+            "init_db() creates local tables."
+        )
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql+psycopg://", 1)
     elif url.startswith("postgresql://") and "+psycopg" not in url:

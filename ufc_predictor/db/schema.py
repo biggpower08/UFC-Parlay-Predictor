@@ -202,6 +202,40 @@ def init_db(db_path=None) -> None:
             conn.execute(text("ALTER TABLE fighter_elo_history ADD COLUMN IF NOT EXISTS elo_version TEXT NOT NULL DEFAULT 'v1'"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_history_fighter_name ON fighter_elo_history (fighter_name)"))
+            conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS fighter_elo_fight_history (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        fighter_name TEXT NOT NULL,
+                        normalized_name TEXT NOT NULL,
+                        opponent_name TEXT NOT NULL,
+                        opponent_normalized_name TEXT,
+                        event TEXT,
+                        event_date DATE,
+                        fight_id TEXT,
+                        source_hash TEXT,
+                        weight_class TEXT,
+                        result TEXT,
+                        method TEXT,
+                        round TEXT,
+                        elo_before DOUBLE PRECISION NOT NULL,
+                        elo_after DOUBLE PRECISION NOT NULL,
+                        elo_change DOUBLE PRECISION NOT NULL,
+                        opponent_elo_before DOUBLE PRECISION,
+                        expected_score DOUBLE PRECISION,
+                        elo_version TEXT NOT NULL DEFAULT 'v1',
+                        order_source TEXT,
+                        computed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+                    )
+                    """
+                )
+            )
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_normalized_name ON fighter_elo_fight_history (normalized_name)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_event_date ON fighter_elo_fight_history (event_date)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_elo_version ON fighter_elo_fight_history (elo_version)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_name_date ON fighter_elo_fight_history (normalized_name, event_date)"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_source_hash ON fighter_elo_fight_history (source_hash)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fighters_elo_source ON fighters (elo_source)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_fighter_1_event ON fights (fighter_1, event)"))
             conn.execute(text("CREATE INDEX IF NOT EXISTS idx_fights_fighter_2_event ON fights (fighter_2, event)"))
@@ -419,6 +453,38 @@ def init_db(db_path=None) -> None:
             pass
         conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_normalized_name ON fighter_elo_history (normalized_name)")
         conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_history_name_computed_at ON fighter_elo_history (normalized_name, computed_at)")
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS fighter_elo_fight_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fighter_name TEXT NOT NULL,
+                normalized_name TEXT NOT NULL,
+                opponent_name TEXT NOT NULL,
+                opponent_normalized_name TEXT,
+                event TEXT,
+                event_date TEXT,
+                fight_id TEXT,
+                source_hash TEXT,
+                weight_class TEXT,
+                result TEXT,
+                method TEXT,
+                round TEXT,
+                elo_before REAL NOT NULL,
+                elo_after REAL NOT NULL,
+                elo_change REAL NOT NULL,
+                opponent_elo_before REAL,
+                expected_score REAL,
+                elo_version TEXT NOT NULL DEFAULT 'v1',
+                order_source TEXT,
+                computed_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_normalized_name ON fighter_elo_fight_history (normalized_name)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_event_date ON fighter_elo_fight_history (event_date)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_elo_version ON fighter_elo_fight_history (elo_version)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_name_date ON fighter_elo_fight_history (normalized_name, event_date)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_elo_fight_history_source_hash ON fighter_elo_fight_history (source_hash)")
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS events (

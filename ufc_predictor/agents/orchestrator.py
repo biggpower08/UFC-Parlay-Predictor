@@ -64,10 +64,15 @@ def refresh_all(force_refresh: bool = False) -> dict:
         peak_elo,
         elo_version=settings.ELO_ENGINE_VERSION,
     )
+    fight_history_rows = repository.replace_elo_fight_history(
+        fights_elo,
+        elo_version=settings.ELO_ENGINE_VERSION,
+    )
     export_elo_leaderboard(elo_ratings)
     return {
         "fighters": len(repository.get_fighters_df()),
         "fights": len(fights),
         "elo_fighters": len(elo_ratings),
         "elo_history_rows": history_rows,
+        "elo_fight_history_rows": fight_history_rows,
     }

@@ -100,6 +100,7 @@ def build_master_df(force_refresh=False):
     _master_cache = master
     repository.save_fighters_df(master, replace=True)
     repository.replace_elo_history(elo_data["elo_ratings"], peak, settings.ELO_ENGINE_VERSION)
+    repository.replace_elo_fight_history(elo_data["fights_elo"], settings.ELO_ENGINE_VERSION)
     return master.copy()
 
 

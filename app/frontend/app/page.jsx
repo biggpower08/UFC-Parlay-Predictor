@@ -371,8 +371,11 @@ export default function App() {
     <main className="app-shell" ref={appRef}>
       <header className="topbar">
         <div>
-          <p className="eyebrow">Local AI Fight Lab</p>
-          <h1>UFC Predictor</h1>
+          <p className="eyebrow">AI UFC and MMA matchup intelligence</p>
+          <h1>Compare fighters before the fight.</h1>
+          <p className="hero-copy">
+            Generate winner predictions, confidence scores, fighter stats, Elo ratings, and model-informed fight reads from one clean matchup view.
+          </p>
         </div>
         <div className="status-stack">
           <div className={health?.ok ? "status online" : "status offline"}>
@@ -425,6 +428,25 @@ export default function App() {
           {fighterMeta.a?.weight_class || "Unknown"} vs {fighterMeta.b?.weight_class || "Unknown"}
         </span>
         <b className={`matchup-mini-badge ${matchupType.severity}`}>{compactMatchupLabel(matchupType)}</b>
+      </section>
+
+      <section className="product-card-grid" aria-label="Product sections">
+        <a href="/analysis">
+          <strong>Full Analysis</strong>
+          <span>Paths to victory, method leans, key exchanges, and uncertainty notes.</span>
+        </a>
+        <a href="/stats">
+          <strong>Matchup Stats</strong>
+          <span>Records, physical stats, Elo status, and fighter comparison data.</span>
+        </a>
+        <a href="/odds">
+          <strong>Betting Reads</strong>
+          <span>Model-informed prop angles without fake odds or bet placement.</span>
+        </a>
+        <a href="/pricing">
+          <strong>Pricing</strong>
+          <span>Free now, with Premium and Pro plans prepared for future launch.</span>
+        </a>
       </section>
 
       {message && (
@@ -535,6 +557,7 @@ export default function App() {
                 <a href="/analysis">Full Analysis</a>
                 <a href="/stats">Matchup Stats</a>
                 <a href="/odds">Odds / Betting Reads</a>
+                <a href="/pricing">Pricing</a>
               </div>
               <button className="analysis-link" type="button" onClick={clearCurrentLatestPrediction}>
                 Clear latest prediction

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export const LATEST_PREDICTION_KEY = "ufc_latest_prediction_v2";
 export const LATEST_PREDICTION_EVENT = "ufc_latest_prediction_updated";
 const SCHEMA_VERSION = 2;
-const OLD_STORAGE_KEYS = ["latestPredictionResult", "ufc_latest_prediction"];
+const OLD_STORAGE_KEYS = ["latestPredictionResult", "latestPrediction", "latest_prediction", "ufc_latest_prediction", "ufc_latest_prediction_v1"];
 
 function isBrowser() {
   return typeof window !== "undefined";

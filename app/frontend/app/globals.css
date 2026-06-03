@@ -90,6 +90,14 @@ h1 {
   line-height: 0.95;
 }
 
+.hero-copy {
+  max-width: 760px;
+  margin-top: 12px;
+  color: #c9d8e2;
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.55;
+}
+
 .status,
 .predict-button,
 .tabs button,
@@ -227,6 +235,36 @@ h1 {
   gap: 16px;
   align-items: end;
   padding: 18px;
+}
+
+.product-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.product-card-grid a {
+  display: grid;
+  gap: 8px;
+  min-height: 112px;
+  padding: 14px;
+  border: 1px solid rgba(36, 246, 255, 0.18);
+  border-radius: 6px;
+  color: #edf8ff;
+  background: rgba(8, 17, 27, 0.62);
+  text-decoration: none;
+}
+
+.product-card-grid a:hover {
+  border-color: rgba(36, 246, 255, 0.42);
+  background: rgba(36, 246, 255, 0.08);
+}
+
+.product-card-grid span {
+  color: #c9d8e2;
+  line-height: 1.45;
+  font-size: 0.9rem;
 }
 
 .fighter-input {
@@ -721,7 +759,7 @@ input::placeholder {
 .deep-link-grid,
 .fighter-card-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -920,6 +958,117 @@ input::placeholder {
   color: #24f6ff;
 }
 
+.pricing-hero {
+  align-items: flex-start;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pricing-card,
+.premium-feature-card {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(8, 17, 27, 0.76);
+}
+
+.pricing-card-top {
+  display: grid;
+  gap: 8px;
+}
+
+.pricing-card-top span,
+.premium-feature-card span {
+  width: fit-content;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 204, 102, 0.34);
+  border-radius: 999px;
+  padding: 0 10px;
+  color: #ffcc66;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pricing-card-top strong {
+  color: #24f6ff;
+  font-size: 1.55rem;
+}
+
+.pricing-card p,
+.pricing-card li,
+.premium-feature-card p {
+  color: #c9d8e2;
+  line-height: 1.5;
+}
+
+.pricing-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.pricing-card button {
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  color: #edf8ff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pricing-card button:disabled {
+  color: #9fb6c5;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.comparison-panel {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.comparison-table {
+  display: grid;
+  overflow-x: auto;
+}
+
+.comparison-heading,
+.comparison-row {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(120px, 1fr));
+  gap: 12px;
+  min-width: 680px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.comparison-heading {
+  color: #24f6ff;
+  border-top: 0;
+}
+
+.comparison-row span {
+  color: #c9d8e2;
+}
+
+.premium-placeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
 @media (max-width: 760px) {
   .app-shell {
     width: min(100% - 20px, 520px);
@@ -934,6 +1083,9 @@ input::placeholder {
   .topbar,
   .match-card,
   .match-options,
+  .product-card-grid,
+  .pricing-grid,
+  .premium-placeholder-grid,
   .stats-grid,
   .stat-row,
   .analysis-badges,

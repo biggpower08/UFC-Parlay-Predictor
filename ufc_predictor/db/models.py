@@ -74,6 +74,32 @@ class FighterEloHistory(Base):
     computed_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
+class FighterEloFightHistory(Base):
+    __tablename__ = "fighter_elo_fight_history"
+
+    id = Column(Integer, primary_key=True)
+    fighter_name = Column(Text, nullable=False)
+    normalized_name = Column(Text, index=True, nullable=False)
+    opponent_name = Column(Text, nullable=False)
+    opponent_normalized_name = Column(Text, index=True)
+    event = Column(Text)
+    event_date = Column(DateTime(timezone=False), index=True)
+    fight_id = Column(Text)
+    source_hash = Column(Text, index=True)
+    weight_class = Column(Text)
+    result = Column(Text)
+    method = Column(Text)
+    round = Column(Text)
+    elo_before = Column(Float, nullable=False)
+    elo_after = Column(Float, nullable=False)
+    elo_change = Column(Float, nullable=False)
+    opponent_elo_before = Column(Float)
+    expected_score = Column(Float)
+    elo_version = Column(Text, default="v1", nullable=False, index=True)
+    order_source = Column(Text)
+    computed_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class Prediction(Base):
     __tablename__ = "predictions"
 

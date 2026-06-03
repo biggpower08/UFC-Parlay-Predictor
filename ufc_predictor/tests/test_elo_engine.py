@@ -10,6 +10,7 @@ from ufc_predictor.models.elo.elo_engine import (
     update_elo_draw,
     update_elo_win,
 )
+from ufc_predictor.models.elo.history import build_elo_fight_history_rows, summarize_elo_trend
 
 
 class TestEloEngine(unittest.TestCase):
@@ -148,6 +149,106 @@ class TestEloEngine(unittest.TestCase):
         self.assertGreaterEqual(peak_elo["Alpha Fighter"], ratings["Alpha Fighter"])
         self.assertEqual(fight_counts["alpha fighter"], 2)
         self.assertEqual(fight_counts["beta fighter"], 2)
+
+    def test_fight_history_rows_are_generated_for_each_completed_fighter(self):
+        fights = pd.DataFrame(
+            [{"event": "One", "event_date": "2020-01-01", "fighter_1": "Alpha", "fighter_2": "Beta", "result": "win"}]
+        )
+
+        fights_elo, _ratings, _peak_elo, _elo_by_search = compute_elo_ratings(fights)
+        rows = build_elo_fight_history_rows(fights_elo, elo_version="test")
+
+        self.assertEqual(len(rows), 2)
+        alpha = next(row for row in rows if row["fighter_name"] == "Alpha")
+        beta = next(row for row in rows if row["fighter_name"] == "Beta")
+        self.assertEqual(alpha["result"], "win")
+        self.assertEqual(beta["result"], "loss")
+        self.assertEqual(alpha["elo_before"], 1000)
+        self.assertEqual(alpha["elo_after"], 1020)
+        self.assertEqual(alpha["elo_change"], 20)
+        self.assertAlmostEqual(alpha["expected_score"], 0.5)
+        self.assertEqual(beta["opponent_elo_before"], 1000)
+        self.assertEqual(alpha["elo_version"], "test")
+
+    def test_fight_history_rows_track_explicit_fighter_2_win(self):
+        fights = pd.DataFrame(
+            [
+                {
+                    "event": "One",
+                    "event_date": "2020-01-01",
+                    "fighter_1": "Alpha",
+                    "fighter_2": "Beta",
+                    "winner_name": "Beta",
+                    "loser_name": "Alpha",
+                    "result": "win",
+                }
+            ]
+        )
+
+        fights_elo, _ratings, _peak_elo, _elo_by_search = compute_elo_ratings(fights)
+        rows = build_elo_fight_history_rows(fights_elo)
+
+        alpha = next(row for row in rows if row["fighter_name"] == "Alpha")
+        beta = next(row for row in rows if row["fighter_name"] == "Beta")
+        self.assertEqual(alpha["result"], "loss")
+        self.assertEqual(beta["result"], "win")
+        self.assertLess(alpha["elo_change"], 0)
+        self.assertGreater(beta["elo_change"], 0)
+
+    def test_fight_history_rows_track_draws(self):
+        fights = pd.DataFrame(
+            [{"event": "One", "event_date": "2020-01-01", "fighter_1": "Alpha", "fighter_2": "Beta", "result": "draw"}]
+        )
+
+        fights_elo, _ratings, _peak_elo, _elo_by_search = compute_elo_ratings(fights)
+        rows = build_elo_fight_history_rows(fights_elo)
+
+        self.assertEqual(len(rows), 2)
+        self.assertEqual({row["result"] for row in rows}, {"draw"})
+
+    def test_fight_history_rows_skip_no_contests_by_default(self):
+        fights = pd.DataFrame(
+            [{"event": "One", "event_date": "2020-01-01", "fighter_1": "Alpha", "fighter_2": "Beta", "result": "nc"}]
+        )
+
+        fights_elo, _ratings, _peak_elo, _elo_by_search = compute_elo_ratings(fights)
+        rows = build_elo_fight_history_rows(fights_elo)
+
+        self.assertEqual(rows, [])
+
+    def test_elo_trend_summary_baseline_when_no_history(self):
+        summary = summarize_elo_trend([], current_elo=1000, peak_elo=1000, elo_fights_count=0)
+
+        self.assertEqual(summary["trend"], "baseline")
+        self.assertEqual(summary["elo_fights_count"], 0)
+        self.assertIsNone(summary["last_elo_change"])
+
+    def test_elo_trend_summary_rising_falling_and_stable(self):
+        rising = summarize_elo_trend(
+            [
+                {"event_date": "2020-01-01", "opponent_name": "B", "result": "win", "elo_change": 2, "elo_after": 1002},
+                {"event_date": "2020-02-01", "opponent_name": "C", "result": "win", "elo_change": 4, "elo_after": 1006},
+            ],
+            elo_fights_count=2,
+        )
+        falling = summarize_elo_trend(
+            [
+                {"event_date": "2020-01-01", "opponent_name": "B", "result": "loss", "elo_change": -3, "elo_after": 997},
+                {"event_date": "2020-02-01", "opponent_name": "C", "result": "loss", "elo_change": -4, "elo_after": 993},
+            ],
+            elo_fights_count=2,
+        )
+        stable = summarize_elo_trend(
+            [{"event_date": "2020-01-01", "opponent_name": "B", "result": "draw", "elo_change": 1, "elo_after": 1001}],
+            elo_fights_count=1,
+        )
+
+        self.assertEqual(rising["trend"], "rising")
+        self.assertEqual(falling["trend"], "falling")
+        self.assertEqual(stable["trend"], "stable")
+        self.assertEqual(rising["last_3_change"], 6)
+        self.assertEqual(rising["biggest_gain"]["opponent_name"], "C")
+        self.assertEqual(falling["biggest_loss"]["opponent_name"], "C")
 
 
 if __name__ == "__main__":
