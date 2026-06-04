@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from difflib import SequenceMatcher
 
 from ufc_predictor.analysis.providers import generate_optional_ai_summary
 from ufc_predictor.analysis.signals import confidence_label, data_quality_label, direction_for_names, volatility_label
@@ -134,12 +135,20 @@ def _sections(stats_a, stats_b, comparison, prediction, labels, drivers, warning
     method_read = _read_by_type(secondary_reads, "method_lean")
     pace_read = _read_by_type(secondary_reads, "pace_volume")
     round_read = _read_by_type(secondary_reads, "round_phase")
+    opener = _choose(
+        [
+            f"{winner} is the cleaner model side",
+            f"The forecast gives {winner} the first read",
+            f"The matchup grades most cleanly toward {winner}",
+        ],
+        f"{name_a}:{name_b}:main:{winner}",
+    ) if winner != "Too close to call" else "The model treats this as a narrow matchup"
     sections = [
         {
             "title": "Main prediction read",
             "body": (
-                f"The model read is {winner}, with {labels['confidence'].lower()} and "
-                f"{labels['volatility'].lower()} volatility. This is a winner-probability forecast first; "
+                f"{opener}, with {labels['confidence'].lower()} and {labels['volatility'].lower()} volatility. "
+                "This is a winner-probability forecast first; "
                 "the notes below translate the matchup into scenario projections without treating them as exact outcomes."
             ),
         },
@@ -175,11 +184,7 @@ def _sections(stats_a, stats_b, comparison, prediction, labels, drivers, warning
         },
         {
             "title": "Late fight phase",
-            "body": (
-                f"Late, the read shifts toward composure and minute-winning. If {winner} is ahead, the safer lane is "
-                "repeatable control rather than chasing a dramatic finish; if the fight is close, one defensive lapse "
-                "or scramble can outweigh several quiet minutes."
-            ),
+            "body": _late_phase_read(stats_a, stats_b, winner, labels),
         },
         {
             "title": "Key exchanges",
@@ -199,14 +204,10 @@ def _sections(stats_a, stats_b, comparison, prediction, labels, drivers, warning
         },
         {
             "title": "Final analyst read",
-            "body": (
-                f"The final read is {winner} with {labels['confidence'].lower()}. The better way to use this is as "
-                "a structured fight preview: the favorite, the opponent's live routes back into the fight, the exchanges "
-                "that can flip the forecast, and the uncertainty that should keep the read measured."
-            ),
+            "body": _final_analyst_read(stats_a, stats_b, winner, labels, warnings),
         },
     ]
-    return sections
+    return _dedupe_sections(sections, stats_a, stats_b, prediction, labels)
 
 
 def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matchup_type, prop_predictions=None):
@@ -747,6 +748,90 @@ def _key_exchanges(stats_a, stats_b) -> str:
     if _usable_number(stats_a.get("Reach (cm)")) != _usable_number(stats_b.get("Reach (cm)")):
         ideas.append("who controls distance before combinations start")
     return "Watch " + "; ".join(ideas) + "."
+
+
+def _late_phase_read(stats_a, stats_b, winner, labels) -> str:
+    name_a, name_b = stats_a["Name"], stats_b["Name"]
+    if winner == "Too close to call":
+        return (
+            f"If {name_a} and {name_b} are still level late, the deciding layer is likely discipline: "
+            "who exits exchanges cleanly, who avoids desperate entries, and who can win quiet minutes without forcing risk."
+        )
+    return _choose(
+        [
+            f"Late rounds favor the fighter who can repeat the safer actions. If {winner} is ahead, the practical lane is composure, clean exits, and time-aware minute-winning.",
+            f"The longer the fight stays competitive, the more important restraint becomes. {winner} should benefit most by protecting position and avoiding the kind of scramble that resets the read.",
+            f"Past the early danger window, the question becomes whether {winner} can keep winning small exchanges without chasing a finish that is not clearly there.",
+        ],
+        f"{name_a}:{name_b}:late:{labels['volatility']}",
+    )
+
+
+def _final_analyst_read(stats_a, stats_b, winner, labels, warnings) -> str:
+    name_a, name_b = stats_a["Name"], stats_b["Name"]
+    caution = " The warnings matter here, so the read should stay measured." if warnings else ""
+    if winner == "Too close to call":
+        return (
+            f"Final read: {name_a} vs {name_b} is better treated as a live, volatile research spot than a forced angle. "
+            f"The confidence is {labels['confidence'].lower()}, and the useful takeaway is which exchanges create separation.{caution}"
+        )
+    return _choose(
+        [
+            f"Final read: {winner} is the preferred side, but the value of the analysis is in the map around that lean: the clean path, the opponent's disruption points, and the volatility that can bend the fight.",
+            f"Bottom line: {winner} has the stronger model case with {labels['confidence'].lower()}, while the opposing side remains live through the specific danger zones above.{caution}",
+            f"The best use of this read is as a fight plan preview. {winner} owns the cleaner lane, but the forecast still depends on range, pace, and whether the underdog can force uncomfortable exchanges.",
+        ],
+        f"{name_a}:{name_b}:final:{winner}:{labels['confidence']}",
+    )
+
+
+def _dedupe_sections(sections, stats_a, stats_b, prediction, labels):
+    cleaned = []
+    seen_phrases: set[str] = set()
+    for section in sections:
+        body = section["body"]
+        if any(_too_similar(body, prior["body"]) for prior in cleaned) or _starts_repeated(body, seen_phrases):
+            body = _rewrite_repetitive_section(section["title"], stats_a, stats_b, prediction, labels)
+        cleaned.append({**section, "body": body})
+        first_phrase = " ".join(str(body).lower().split()[:4])
+        if first_phrase:
+            seen_phrases.add(first_phrase)
+    return cleaned
+
+
+def _too_similar(left: str, right: str) -> bool:
+    return SequenceMatcher(None, str(left), str(right)).ratio() >= 0.78
+
+
+def _starts_repeated(body: str, seen_phrases: set[str]) -> bool:
+    first_phrase = " ".join(str(body).lower().split()[:4])
+    return bool(first_phrase and first_phrase in seen_phrases)
+
+
+def _rewrite_repetitive_section(title, stats_a, stats_b, prediction, labels) -> str:
+    name_a, name_b = stats_a["Name"], stats_b["Name"]
+    winner = prediction.get("winner") or "Too close to call"
+    if "path to victory" in title:
+        fighter = title.replace(" path to victory", "")
+        opponent = name_b if fighter == name_a else name_a
+        return (
+            f"For {fighter}, the useful path is not one single moment. It is making {opponent} answer the same problem repeatedly, "
+            "then turning those reactions into cleaner minutes or a late opening."
+        )
+    if "Volatility" in title:
+        return (
+            f"The volatility read is {labels['volatility'].lower()}. A clean forecast needs respect for momentum swings, "
+            "especially if the first layer of offense does not work as expected."
+        )
+    if "Data quality" in title:
+        return (
+            f"The data note is simple: only available fighter metadata and model outputs are used for {name_a} vs {name_b}. "
+            "Missing fields are treated as uncertainty, not filled in with guesses."
+        )
+    return (
+        f"This layer of the {name_a} vs {name_b} read stays specific to the matchup: {winner} has the current model lean, "
+        "but the section should be used as context rather than a hard outcome claim."
+    )
 
 
 def _swing_factors(stats_a, stats_b, warnings):

@@ -969,7 +969,8 @@ input::placeholder {
 }
 
 .pricing-card,
-.premium-feature-card {
+.premium-feature-card,
+.credit-pack-card {
   display: grid;
   align-content: start;
   gap: 16px;
@@ -985,7 +986,8 @@ input::placeholder {
 }
 
 .pricing-card-top span,
-.premium-feature-card span {
+.premium-feature-card span,
+.credit-pack-card span {
   width: fit-content;
   min-height: 26px;
   display: inline-flex;
@@ -1006,7 +1008,8 @@ input::placeholder {
 
 .pricing-card p,
 .pricing-card li,
-.premium-feature-card p {
+.premium-feature-card p,
+.credit-pack-card p {
   color: #c9d8e2;
   line-height: 1.5;
 }
@@ -1018,7 +1021,8 @@ input::placeholder {
   padding-left: 18px;
 }
 
-.pricing-card button {
+.pricing-card button,
+.credit-pack-card button {
   min-height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 6px;
@@ -1026,10 +1030,26 @@ input::placeholder {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.pricing-card button:disabled {
+.pricing-card button:disabled,
+.credit-pack-card button:disabled {
   color: #9fb6c5;
   cursor: not-allowed;
   opacity: 0.8;
+}
+
+.credit-status {
+  border-color: rgba(255, 204, 102, 0.38);
+  color: #ffcc66;
+}
+
+.credit-pack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.credit-pack-card h2 {
+  color: #edf8ff;
 }
 
 .comparison-panel {
@@ -1086,6 +1106,7 @@ input::placeholder {
   .product-card-grid,
   .pricing-grid,
   .premium-placeholder-grid,
+  .credit-pack-grid,
   .stats-grid,
   .stat-row,
   .analysis-badges,

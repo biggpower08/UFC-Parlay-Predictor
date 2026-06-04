@@ -242,10 +242,31 @@ def test_prop_reads_do_not_generate_unsupported_or_hype_claims():
         for read in analysis["prop_reads"]
     ).lower()
 
-    for forbidden in ["will hit", "guaranteed", "lock", "free money", "place bet", "value bet", "units", "roi"]:
+    for forbidden in ["will hit", "guaranteed", "lock", "free money", "sure bet", "profit", "risk-free", "place bet", "value bet", "units", "roi"]:
         assert forbidden not in combined
     assert "%" not in combined
     assert "projected over" not in combined
+
+
+def test_analysis_sections_are_matchup_specific_and_avoid_forbidden_language():
+    comparison = {
+        "stats1": _stats("Alpha Fighter", elo=1180, slpm=5.4, td_avg=0.3),
+        "stats2": _stats("Beta Fighter", elo=1040, slpm=3.0, td_avg=2.3),
+        "style1": {"label": "striker-leaning"},
+        "style2": {"label": "grappler-leaning"},
+        "matchup": "Alpha Fighter vs Beta Fighter.",
+    }
+    prediction = {"winner": "Alpha Fighter", "confidence": 0.64, "prob_a": 0.64}
+
+    analysis = build_fight_analysis(comparison, prediction)
+    section_text = " ".join(section["body"] for section in analysis["sections"])
+    openings = [" ".join(section["body"].lower().split()[:4]) for section in analysis["sections"]]
+
+    assert "Alpha Fighter" in section_text
+    assert "Beta Fighter" in section_text
+    assert len(openings) == len(set(openings))
+    for forbidden in ["guaranteed", "lock", "free money", "sure bet", "profit", "risk-free"]:
+        assert forbidden not in section_text.lower()
 
 
 def test_cross_division_prop_reads_are_lower_confidence_and_warn():

@@ -97,6 +97,8 @@ def test_cross_division_request_is_not_blocked_when_legacy_flag_is_false(monkeyp
     assert payload["analysis"]["matchup_type"]["label"] == "Cross-division matchup"
     assert payload["analysis"]["prop_reads"]
     assert payload["prediction_id"] == "prediction-id"
+    assert payload["credit_status"]["enabled"] is False
+    assert payload["credit_usage"]["source"] == "gate_disabled"
 
 
 def test_feedback_request_accepts_prop_read_feedback():

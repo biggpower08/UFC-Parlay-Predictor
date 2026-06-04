@@ -5,6 +5,7 @@ const PLANS = [
     status: "Live",
     description: "Core matchup prediction tools for casual fight research.",
     features: [
+      "3 free predictions",
       "Winner prediction",
       "Confidence meter",
       "Compact analyst summary",
@@ -18,13 +19,13 @@ const PLANS = [
     name: "Premium",
     price: "Coming soon",
     status: "Stripe-ready",
-    description: "Deeper fight intelligence once subscriptions launch.",
+    description: "Prediction-credit packs once checkout launches.",
     features: [
-      "Saved predictions",
-      "Advanced Elo trends",
-      "Full betting-read dashboard",
-      "Premium prop-style reads",
-      "Shareable matchup reports",
+      "5, 10, 15, or 20 prediction credits",
+      "Full fight analysis",
+      "Model-informed betting reads",
+      "Advanced Elo trend cards",
+      "Saved prediction history",
     ],
     cta: "Upgrade coming soon",
     disabled: true,
@@ -46,6 +47,8 @@ const PLANS = [
   },
 ];
 
+const CREDIT_PACKS = [5, 10, 15, 20];
+
 const COMPARISON_ROWS = [
   ["Winner predictions", "Included", "Included", "Included"],
   ["Full analysis page", "Limited", "Included", "Included"],
@@ -63,7 +66,7 @@ export default function PricingPage() {
           <p className="eyebrow">Pricing</p>
           <h1>Free now. Premium tools coming soon.</h1>
           <p className="hero-copy">
-            The app is being prepared for subscriptions, but real Stripe checkout is not active yet. Upgrade buttons are disabled until billing launches.
+            The app is being prepared for prediction credits, but real checkout is not active yet. Upgrade buttons are disabled until billing launches.
           </p>
         </div>
       </header>
@@ -87,6 +90,19 @@ export default function PricingPage() {
             </button>
           </article>
         ))}
+      </section>
+
+      <section className="panel comparison-panel">
+        <div>
+          <p className="eyebrow">Prediction credits</p>
+          <h2>Future credit packs</h2>
+          <p className="helper-text">Each generated matchup will use one prediction credit after the free allowance is used. Checkout is not connected yet.</p>
+        </div>
+        <div className="credit-pack-grid">
+          {CREDIT_PACKS.map((count) => (
+            <CreditPackCard key={count} count={count} />
+          ))}
+        </div>
       </section>
 
       <section className="panel comparison-panel">
@@ -127,6 +143,17 @@ function PremiumFeatureCard({ title, body }) {
       <span>Coming soon</span>
       <h2>{title}</h2>
       <p>{body}</p>
+    </article>
+  );
+}
+
+function CreditPackCard({ count }) {
+  return (
+    <article className="credit-pack-card">
+      <span>{count} predictions</span>
+      <h2>{count} credits</h2>
+      <p>Use credits for future paid fight research and model-informed analysis.</p>
+      <button type="button" disabled>Coming soon</button>
     </article>
   );
 }

@@ -86,6 +86,25 @@ ODDS_PROVIDER = os.getenv("ODDS_PROVIDER", "none")
 ODDS_API_KEY = os.getenv("ODDS_API_KEY", "")
 ODDS_CACHE_TTL_SECONDS = int(os.getenv("ODDS_CACHE_TTL_SECONDS", "300"))
 
+# Prediction-credit/paywall scaffolding. Disabled by default so current public
+# prediction behavior is unchanged until payments/auth are intentionally added.
+ENABLE_CREDIT_GATE = os.getenv("ENABLE_CREDIT_GATE", "false").lower() in {"1", "true", "yes", "on"}
+FREE_PREDICTION_LIMIT = int(os.getenv("FREE_PREDICTION_LIMIT", "3"))
+CREDIT_PACK_OPTIONS = [
+    int(option.strip())
+    for option in os.getenv("CREDIT_PACK_OPTIONS", "5,10,15,20").split(",")
+    if option.strip().isdigit()
+]
+
+# Future Stripe placeholders only; real checkout/webhooks are not active yet.
+ENABLE_STRIPE = os.getenv("ENABLE_STRIPE", "false").lower() in {"1", "true", "yes", "on"}
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_PRICE_PACK_5 = os.getenv("STRIPE_PRICE_PACK_5", "")
+STRIPE_PRICE_PACK_10 = os.getenv("STRIPE_PRICE_PACK_10", "")
+STRIPE_PRICE_PACK_15 = os.getenv("STRIPE_PRICE_PACK_15", "")
+STRIPE_PRICE_PACK_20 = os.getenv("STRIPE_PRICE_PACK_20", "")
+
 # Scraper / sync
 ENABLE_LIVE_SYNC = os.getenv("ENABLE_LIVE_SYNC", "false").lower() in {"1", "true", "yes", "on"}
 SYNC_SECRET = os.getenv("SYNC_SECRET", "")

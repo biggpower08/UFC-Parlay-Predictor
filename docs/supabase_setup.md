@@ -24,10 +24,15 @@ Future Stripe placeholders, not required yet:
 
 ```powershell
 ENABLE_STRIPE=false
+ENABLE_CREDIT_GATE=false
+FREE_PREDICTION_LIMIT=3
+CREDIT_PACK_OPTIONS=5,10,15,20
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
-STRIPE_PRICE_PREMIUM_MONTHLY=
-STRIPE_PRICE_PRO_MONTHLY=
+STRIPE_PRICE_PACK_5=
+STRIPE_PRICE_PACK_10=
+STRIPE_PRICE_PACK_15=
+STRIPE_PRICE_PACK_20=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 ```
 
@@ -110,6 +115,14 @@ These are planned for after Supabase Auth and Stripe are added. They are not req
 - `stripe_webhook_events`
 
 The future paywall should check backend entitlement state before returning premium-only data. Do not rely on frontend-only checks for paid access.
+
+Future prediction-credit flow:
+
+1. User chooses a 5, 10, 15, or 20 prediction-credit pack.
+2. Backend creates a checkout session after Stripe or another provider is approved.
+3. Payment webhook confirms the purchase.
+4. Credits are added to the user's account or anonymous balance.
+5. Each generated prediction decrements one credit after the free allowance is used.
 
 ## Do Not Commit
 

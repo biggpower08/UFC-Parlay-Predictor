@@ -17,6 +17,7 @@ from ufc_predictor import __version__
 from ufc_predictor.agents.orchestrator import FighterResolutionError, refresh_all, resolve_fighter
 from ufc_predictor.analysis import build_fight_analysis
 from ufc_predictor.config import settings
+from ufc_predictor.credits import credit_status, evaluate_prediction_credit, record_prediction_usage
 from ufc_predictor.db.schema import get_engine, init_db, using_postgres
 from ufc_predictor.db.repository import query_elo_fight_history, query_elo_trend_summary, resolve_name, save_prediction, search_fighters
 from ufc_predictor.feedback.feedback_handler import save_feedback
@@ -230,6 +231,12 @@ def betting_reads():
     }
 
 
+@app.get("/api/credits/status")
+@app.get("/credits/status")
+def credits_status():
+    return credit_status()
+
+
 @app.get("/api/fighters/{fighter_key}/elo-history")
 @app.get("/fighters/{fighter_key}/elo-history")
 def fighter_elo_history(fighter_key: str, limit: int = 10):
@@ -265,6 +272,9 @@ def internal_sync_status(source: str = "ufcstats", x_sync_secret: str | None = H
 @app.post("/predict")
 def predict(request: PredictRequest):
     start = time.perf_counter()
+    credit_decision = evaluate_prediction_credit()
+    if not credit_decision.allowed:
+        raise HTTPException(status_code=402, detail=credit_decision.status)
     try:
         fighter_a = _timed_call(
             "predict.resolve_fighter_a",
@@ -316,6 +326,8 @@ def predict(request: PredictRequest):
         payload,
     )
     payload["prediction_id"] = prediction_id
+    payload["credit_status"] = credit_status()
+    payload["credit_usage"] = record_prediction_usage(prediction_id, credit_decision)
     _log_timing("predict.total", start, fighter_a=comparison["stats1"]["Name"], fighter_b=comparison["stats2"]["Name"])
     return payload
 

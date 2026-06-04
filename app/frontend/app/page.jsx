@@ -78,6 +78,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("matchup");
   const [result, setResult] = useState(null);
   const [health, setHealth] = useState(null);
+  const [creditStatus, setCreditStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [resolver, setResolver] = useState(null);
@@ -117,6 +118,7 @@ export default function App() {
 
   useEffect(() => {
     checkHealth();
+    loadCreditStatus();
     const closeSearchOnOutsideClick = (event) => {
       if (!event.target.closest?.(".fighter-input")) {
         setActiveSearchSlot(null);
@@ -156,6 +158,15 @@ export default function App() {
     } catch (error) {
       setHealth({ ok: false });
       setMessage(`Prediction engine is not connected: ${error.message}`);
+    }
+  }
+
+  async function loadCreditStatus() {
+    try {
+      const data = await apiFetchJson("/credits/status", { cache: "no-store", force: true });
+      setCreditStatus(data);
+    } catch {
+      setCreditStatus(null);
     }
   }
 
@@ -199,8 +210,14 @@ export default function App() {
         setMessage(problem.detail?.message || "The prediction request could not be completed.");
         return;
       }
+      if (response.status === 402) {
+        const problem = await response.json();
+        setMessage(problem.detail?.message || "You have used your free predictions. Buy prediction credits to continue.");
+        return;
+      }
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
+      if (data.credit_status) setCreditStatus(data.credit_status);
       const saved = saveLatestPrediction(data, { fighter_a: fighterMeta.a || selectedFighterA, fighter_b: fighterMeta.b || selectedFighterB });
       setResult(saved?.result || data);
       setActiveTab("prediction");
@@ -378,6 +395,7 @@ export default function App() {
           </p>
         </div>
         <div className="status-stack">
+          <CreditBalanceBadge creditStatus={creditStatus} />
           <div className={health?.ok ? "status online" : "status offline"}>
             <Activity size={18} />
             {health?.ok ? "Engine connected" : "Engine offline"}
@@ -653,6 +671,20 @@ function summaryPreview(text) {
   if (!text) return "Open the full Analysis page for the deeper matchup breakdown.";
   const sentences = String(text).match(/[^.!?]+[.!?]+/g) || [String(text)];
   return sentences.slice(0, 3).join(" ").trim();
+}
+
+function CreditBalanceBadge({ creditStatus }) {
+  if (!creditStatus) {
+    return <div className="status credit-status">3 free predictions included</div>;
+  }
+  if (!creditStatus.enabled) {
+    return <div className="status credit-status">{creditStatus.free_prediction_limit} free predictions included</div>;
+  }
+  return (
+    <div className="status credit-status">
+      {creditStatus.free_predictions_remaining} free / {creditStatus.credits_remaining} credits
+    </div>
+  );
 }
 
 const FighterInput = memo(function FighterInput({
