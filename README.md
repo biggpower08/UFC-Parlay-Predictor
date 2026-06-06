@@ -98,8 +98,10 @@ python scripts/compare_elo_versions.py
 
 Backend:
 
-```bash
-python -m uvicorn ufc_predictor.api.app:app --host 127.0.0.1 --port 8000
+```powershell
+cd C:\dev\mma-ai
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON -m uvicorn ufc_predictor.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 Frontend:
@@ -111,3 +113,17 @@ npm run dev
 ```
 
 Local frontend defaults to `/api`, which proxies to `http://127.0.0.1:8000`.
+
+## Local Python Policy
+
+Recommended local Python is Python 3.14 through an external venv at `C:\venvs\mma-ai`. Python 3.13 remains the compatibility fallback if a dependency blocks 3.14 on a specific machine.
+
+Use PowerShell:
+
+```powershell
+cd C:\dev\mma-ai
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON --version
+```
+
+See `docs/local_dev_windows.md` for full setup and test commands.

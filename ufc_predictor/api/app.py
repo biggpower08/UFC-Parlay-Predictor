@@ -231,6 +231,15 @@ def betting_reads():
     }
 
 
+@app.get("/api/models/status")
+@app.get("/models/status")
+def model_status():
+    return {
+        "models": prop_model_status(),
+        "message": "Model statuses describe data readiness and validation level without exposing internal calculation details.",
+    }
+
+
 @app.get("/api/credits/status")
 @app.get("/credits/status")
 def credits_status():

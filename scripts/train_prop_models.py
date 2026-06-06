@@ -43,7 +43,19 @@ MODEL_TARGETS = [
     ("strike_volume_model", "combined_strike_volume_bucket"),
     ("takedown_control_model", "grappling_heavy_binary"),
 ]
+ALL_MODEL_NAMES = [
+    "winner_model",
+    "finish_model",
+    "goes_distance_model",
+    "method_model",
+    "round_model",
+    "strike_volume_model",
+    "takedown_control_model",
+    "odds_calibration_model",
+]
 BLOCKED_TARGETS = {
+    "winner_model": "Winner prediction already uses the existing sklearn/Elo pipeline; this pass does not retrain it.",
+    "odds_calibration_model": "Historical odds snapshots are not available, so odds calibration/value modeling is blocked.",
 }
 
 
@@ -80,9 +92,11 @@ def main() -> int:
     settings.PROP_MODELS_DIR.mkdir(parents=True, exist_ok=True)
     settings.DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     results = {}
+    registry = {}
     for model_name, target in MODEL_TARGETS:
         if plan[model_name]["status"] not in {"experimental", "trained"}:
             results[model_name] = plan[model_name]
+            registry[model_name] = registry_entry_from_plan(model_name, plan[model_name], audit.to_dict())
             continue
         artifact = train_model(
             model_name=model_name,
@@ -102,10 +116,17 @@ def main() -> int:
             "metrics": artifact["metrics"],
             "class_distribution": artifact["metadata"]["class_distribution"],
         }
+        registry[model_name] = registry_entry_from_artifact(artifact, artifact_path)
+
+    for model_name, reason in BLOCKED_TARGETS.items():
+        registry[model_name] = blocked_registry_entry(model_name, reason, audit.to_dict())
+        results.setdefault(model_name, {"status": "blocked", "reason": reason})
 
     metrics_path = settings.PROP_MODEL_METRICS_JSON
     metrics_path.write_text(json.dumps(results, indent=2, default=str), encoding="utf-8")
-    print(json.dumps({"trained": results, "metrics_path": str(metrics_path)}, indent=2, default=str))
+    registry_path = settings.MODEL_REGISTRY_JSON
+    registry_path.write_text(json.dumps(registry, indent=2, default=str), encoding="utf-8")
+    print(json.dumps({"trained": results, "metrics_path": str(metrics_path), "registry_path": str(registry_path)}, indent=2, default=str))
     return 0
 
 
@@ -135,7 +156,8 @@ def training_plan(dataset, audit: dict, min_rows: int) -> dict:
         }
     for model_name, reason in BLOCKED_TARGETS.items():
         plan[model_name] = {
-            "status": "insufficient_data",
+            "target": None,
+            "status": "blocked",
             "rows": 0,
             "class_distribution": {},
             "reason": reason,
@@ -182,6 +204,9 @@ def train_model(model_name: str, target: str, dataset, audit: dict, test_size: f
         "split_type": "chronological" if audit.get("source_coverage", {}).get("has_event_date") else "source_order_reversed_experimental",
         "feature_names": FEATURE_NAMES,
         "class_distribution": {str(key): int(value) for key, value in rows[target].value_counts().to_dict().items()},
+        "baseline_metrics": metrics["majority_class_baseline"],
+        "source_datasets": [data_source],
+        "source_files": [input_path],
         "trained_at": now,
         "data_cutoff_date": audit.get("date_range", {}).get("max") or f"source_order_{int(rows['source_order'].max())}",
         "training_source_status": "credible" if status == "trained" else "experimental",
@@ -199,6 +224,71 @@ def train_model(model_name: str, target: str, dataset, audit: dict, test_size: f
         "scales": model["scales"].tolist(),
         "metrics": metrics,
         "metadata": metadata,
+    }
+
+
+def registry_entry_from_artifact(artifact: dict, artifact_path: Path) -> dict:
+    metadata = artifact["metadata"]
+    metrics = artifact.get("metrics", {})
+    return {
+        "model_name": metadata["model_name"],
+        "target_label": metadata["target_label"],
+        "status": metadata["status"],
+        "artifact_path": str(artifact_path),
+        "training_rows": metadata["training_rows"],
+        "validation_rows": metadata["validation_rows"],
+        "date_range": metadata["date_range"],
+        "split_type": metadata["split_type"],
+        "metrics": metrics.get("validation", {}),
+        "baseline_metrics": metrics.get("majority_class_baseline", {}),
+        "feature_names": metadata["feature_names"],
+        "class_distribution": metadata["class_distribution"],
+        "limitations": metadata["limitations"],
+        "trained_at": metadata["trained_at"],
+        "source_datasets": metadata.get("source_datasets", []),
+        "source_files": metadata.get("source_files", []),
+    }
+
+
+def registry_entry_from_plan(model_name: str, plan_entry: dict, audit: dict) -> dict:
+    return {
+        "model_name": model_name,
+        "target_label": plan_entry.get("target"),
+        "status": plan_entry["status"],
+        "artifact_path": None,
+        "training_rows": 0,
+        "validation_rows": 0,
+        "date_range": audit.get("date_range"),
+        "split_type": "chronological" if audit.get("source_coverage", {}).get("has_event_date") else "unavailable",
+        "metrics": {},
+        "baseline_metrics": {},
+        "feature_names": FEATURE_NAMES,
+        "class_distribution": plan_entry.get("class_distribution", {}),
+        "limitations": [plan_entry.get("reason", "Training data is not sufficient.")],
+        "trained_at": None,
+        "source_datasets": [audit.get("source")],
+        "source_files": [],
+    }
+
+
+def blocked_registry_entry(model_name: str, reason: str, audit: dict) -> dict:
+    return {
+        "model_name": model_name,
+        "target_label": None,
+        "status": "blocked",
+        "artifact_path": None,
+        "training_rows": 0,
+        "validation_rows": 0,
+        "date_range": audit.get("date_range"),
+        "split_type": "unavailable",
+        "metrics": {},
+        "baseline_metrics": {},
+        "feature_names": [],
+        "class_distribution": {},
+        "limitations": [reason],
+        "trained_at": None,
+        "source_datasets": [audit.get("source")],
+        "source_files": [],
     }
 
 

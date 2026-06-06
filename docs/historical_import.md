@@ -25,7 +25,8 @@ This file has historical completed fight results. It does not include event date
 Run this first. It validates the CSV and estimates inserts without writing rows if `DATABASE_URL` is missing.
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv --dry-run
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv --dry-run
 ```
 
 If `DATABASE_URL` is set, dry-run also checks how many matching `source_hash` rows already exist.
@@ -35,13 +36,13 @@ If `DATABASE_URL` is set, dry-run also checks how many matching `source_hash` ro
 Use this only after the dry-run looks correct:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv --limit 100
+& $env:MMA_AI_PYTHON scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv --limit 100
 ```
 
 ## Full Import
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv
+& $env:MMA_AI_PYTHON scripts\import_historical_fights.py --source-file ufc_predictor\data\raw\fights.csv
 ```
 
 The import is idempotent. It uses a stable `source_hash` and does not delete existing fight rows.
@@ -51,9 +52,9 @@ The import is idempotent. It uses a stable `source_hash` and does not delete exi
 Run Elo and rankings:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\update_elo.py --no-refresh
-.\.venv\Scripts\python.exe scripts\generate_rankings.py
-.\.venv\Scripts\python.exe scripts\sync_database.py --status
+& $env:MMA_AI_PYTHON scripts\update_elo.py --no-refresh
+& $env:MMA_AI_PYTHON scripts\generate_rankings.py
+& $env:MMA_AI_PYTHON scripts\sync_database.py --status
 ```
 
 ## Supabase Verification SQL

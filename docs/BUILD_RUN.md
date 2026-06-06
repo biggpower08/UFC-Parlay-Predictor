@@ -6,7 +6,8 @@ Start backend:
 
 ```powershell
 cd C:\dev\mma-ai
-.\.venv\Scripts\python.exe -m uvicorn ufc_predictor.api.app:app --host 127.0.0.1 --port 8000
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON -m uvicorn ufc_predictor.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 Start frontend:
@@ -61,13 +62,14 @@ Start: uvicorn ufc_predictor.api.app:app --host 0.0.0.0 --port $PORT
 Manual:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\update_elo.py
+$env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
+& $env:MMA_AI_PYTHON scripts\update_elo.py
 ```
 
 Cached data only:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\update_elo.py --no-refresh
+& $env:MMA_AI_PYTHON scripts\update_elo.py --no-refresh
 ```
 
 This script is safe for Task Scheduler or cron.
@@ -83,5 +85,5 @@ $env:SUPABASE_DB_URL="postgresql://postgres:<password>@<host>:5432/postgres"
 Import:
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\import_supabase.py --apply-schema
+& $env:MMA_AI_PYTHON scripts\import_supabase.py --apply-schema
 ```

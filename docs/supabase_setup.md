@@ -136,4 +136,4 @@ Future prediction-credit flow:
 - `node_modules`
 - `.venv`
 - `C:\venvs`
-- `pytest_tmp_codex`
+- repo-local pytest temp folders

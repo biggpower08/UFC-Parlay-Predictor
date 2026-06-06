@@ -41,6 +41,7 @@ LATEST_MODEL_PKL = MODELS_DIR / "latest_model.pkl"
 SKLEARN_MODEL_DIR = MODELS_DIR / "sklearn"
 PROP_MODELS_DIR = MODELS_DIR / "props" / "artifacts"
 PROP_MODEL_METRICS_JSON = DATA_PROCESSED_DIR / "prop_model_metrics.json"
+MODEL_REGISTRY_JSON = DATA_PROCESSED_DIR / "model_registry.json"
 
 # Config files
 NOTE_TAGS_YAML = PACKAGE_ROOT / "config" / "note_tags.yaml"

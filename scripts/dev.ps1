@@ -15,6 +15,10 @@ if (-not (Test-Path $python)) {
 }
 
 Write-Host "Using Python: $python"
+& $python --version
+if ($LASTEXITCODE -ne 0) {
+    throw "Python is not executable: $python"
+}
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$root'; & '$python' -m uvicorn ufc_predictor.api.app:app --host 127.0.0.1 --port 8000"
 Start-Sleep -Seconds 2
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$frontend'; npm run dev"

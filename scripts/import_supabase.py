@@ -93,7 +93,9 @@ def connect():
     try:
         import psycopg
     except ImportError as exc:
-        raise RuntimeError("Install psycopg first: python -m pip install -r requirements.txt") from exc
+        raise RuntimeError(
+            "Install psycopg first: & $env:MMA_AI_PYTHON -m pip install -r requirements.txt"
+        ) from exc
 
     db_url = os.getenv("DATABASE_URL") or os.getenv("SUPABASE_DB_URL")
     if not db_url:

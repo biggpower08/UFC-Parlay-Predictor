@@ -1,5 +1,5 @@
 param(
-    [string]$PythonCommand = "py -3.13"
+    [string]$BasePython = "C:\Program Files\Python314\python.exe"
 )
 
 $ErrorActionPreference = "Stop"
@@ -19,7 +19,8 @@ if (-not (Test-Path "requirements.txt")) {
     throw "requirements.txt was not found. Run this script from the mma-ai repo."
 }
 
-$ExternalVenvPython = "C:\venvs\mma-ai\Scripts\python.exe"
+$ExternalVenvRoot = "C:\venvs\mma-ai"
+$ExternalVenvPython = Join-Path $ExternalVenvRoot "Scripts\python.exe"
 $DefaultVenvPython = Join-Path $RepoRoot ".venv\Scripts\python.exe"
 $PythonExe = if ($env:MMA_AI_PYTHON) {
     $env:MMA_AI_PYTHON
@@ -27,17 +28,6 @@ $PythonExe = if ($env:MMA_AI_PYTHON) {
     $ExternalVenvPython
 } else {
     $DefaultVenvPython
-}
-
-function Invoke-Python {
-    param([string[]]$Arguments)
-    $parts = $PythonCommand -split " "
-    $command = $parts[0]
-    $prefixArgs = @()
-    if ($parts.Length -gt 1) {
-        $prefixArgs = $parts[1..($parts.Length - 1)] | Where-Object { $_ }
-    }
-    & $command @prefixArgs @Arguments
 }
 
 Write-Host "Checking Python..."
@@ -51,29 +41,39 @@ if ($env:MMA_AI_PYTHON -or (Test-Path $ExternalVenvPython)) {
         throw "Python is not executable: $PythonExe"
     }
 } else {
-    Invoke-Python @("--version")
-    if ($LASTEXITCODE -ne 0) {
-        throw "Python command failed: $PythonCommand"
-    }
-    Invoke-Python @("-c", "import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 13) else 13)")
-    if ($LASTEXITCODE -ne 0) {
-        throw "Expected Python 3.13. Pass -PythonCommand with a Python 3.13 interpreter if needed."
+    if (-not (Test-Path $BasePython)) {
+        throw "Base Python was not found: $BasePython. Install Python 3.14 for all users, or pass -BasePython with a known Python 3.14 path. Python 3.13 is the fallback if a dependency blocks 3.14."
     }
 
-    if (-not (Test-Path $DefaultVenvPython)) {
-        Write-Host "Creating .venv..."
-        Invoke-Python @("-m", "venv", ".venv")
+    Write-Host "Using base Python: $BasePython"
+    & $BasePython --version
+    if ($LASTEXITCODE -ne 0) {
+        throw "Base Python failed: $BasePython"
+    }
+
+    & $BasePython -c "import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 14) else 14)"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Expected Python 3.14. Pass -BasePython with a Python 3.14 interpreter. Use Python 3.13 only as a compatibility fallback."
+    }
+
+    if (-not (Test-Path $ExternalVenvPython)) {
+        Write-Host "Creating external venv at $ExternalVenvRoot..."
+        $venvParent = Split-Path -Parent $ExternalVenvRoot
+        if (-not (Test-Path $venvParent)) {
+            New-Item -ItemType Directory -Path $venvParent | Out-Null
+        }
+        & $BasePython -m venv $ExternalVenvRoot
         if ($LASTEXITCODE -ne 0) {
-            throw "Could not create .venv."
+            throw "Could not create external venv at $ExternalVenvRoot."
         }
     } else {
-        Write-Host ".venv already exists."
+        Write-Host "External venv already exists."
     }
-    $PythonExe = $DefaultVenvPython
-    Write-Host "Using repo Python: $PythonExe"
+    $PythonExe = $ExternalVenvPython
+    Write-Host "Using project Python: $PythonExe"
     & $PythonExe --version
     if ($LASTEXITCODE -ne 0) {
-        throw "Repo-local Python is not executable: $PythonExe"
+        throw "Project Python is not executable: $PythonExe"
     }
 }
 
@@ -89,9 +89,19 @@ if ($LASTEXITCODE -ne 0) {
     throw "requirements installation failed."
 }
 
+if (Test-Path "requirements-dev.txt") {
+    Write-Host "Installing development requirements..."
+    & $PythonExe -m pip install -r requirements-dev.txt
+    if ($LASTEXITCODE -ne 0) {
+        throw "development requirements installation failed."
+    }
+}
+
 Write-Host ""
 Write-Host "Setup complete. No activation is required."
 Write-Host "Python used: $PythonExe"
+Write-Host "To persist this Python path for future shells:"
+Write-Host "[Environment]::SetEnvironmentVariable('MMA_AI_PYTHON', '$PythonExe', 'User')"
 Write-Host "Run backend tests:"
 Write-Host ".\scripts\dev_test_backend.ps1"
 Write-Host ""

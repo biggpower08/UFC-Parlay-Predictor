@@ -1,0 +1,458 @@
+{
+    "finish_model":  {
+                         "model_name":  "finish_model",
+                         "target_label":  "finish_binary",
+                         "status":  "experimental",
+                         "artifact_path":  "ufc_predictor\\models\\props\\artifacts\\finish_model.json",
+                         "training_rows":  6209,
+                         "validation_rows":  1553,
+                         "date_range":  {
+                                            "min":  null,
+                                            "max":  null
+                                        },
+                         "split_type":  "source_order_reversed_experimental",
+                         "metrics":  {
+                                         "accuracy":  0.5319,
+                                         "balanced_accuracy":  0.532,
+                                         "log_loss":  0.6886,
+                                         "roc_auc":  0.5587,
+                                         "confusion_matrix":  {
+                                                                  "0":  {
+                                                                            "0":  432,
+                                                                            "1":  340
+                                                                        },
+                                                                  "1":  {
+                                                                            "0":  387,
+                                                                            "1":  394
+                                                                        }
+                                                              },
+                                         "per_class_recall":  {
+                                                                  "0":  0.5596,
+                                                                  "1":  0.5045
+                                                              }
+                                     },
+                         "baseline_metrics":  {
+                                                  "label":  "1",
+                                                  "accuracy":  0.5029,
+                                                  "class_counts":  {
+                                                                       "1":  781,
+                                                                       "0":  772
+                                                                   }
+                                              },
+                         "feature_names":  [
+                                               "a_prior_fights",
+                                               "b_prior_fights",
+                                               "a_prior_wins",
+                                               "b_prior_wins",
+                                               "a_prior_finishes",
+                                               "b_prior_finishes",
+                                               "a_prior_decisions",
+                                               "b_prior_decisions"
+                                           ],
+                         "class_distribution":  {
+                                                    "1":  4159,
+                                                    "0":  3603
+                                                },
+                         "limitations":  [
+                                             "Event dates are missing; split uses reversed source order and should not be treated as production-grade chronological validation.",
+                                             "No event_date column is available; chronological order falls back to CSV row order.",
+                                             "Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.",
+                                             "Significant-strike labels are unavailable; strike-volume model is blocked.",
+                                             "Takedown/control labels are unavailable; takedown-control model is blocked.",
+                                             "Dedicated model training is blocked until credible chronological source data is available.",
+                                             "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+                                         ],
+                         "trained_at":  "2026-05-29T15:42:04.117354+00:00",
+                         "source_datasets":  [
+                                                 "imported_csv"
+                                             ],
+                         "source_files":  [
+                                              "C:\\dev\\mma-ai\\ufc_predictor\\data\\raw\\fights.csv"
+                                          ]
+                     },
+    "goes_distance_model":  {
+                                "model_name":  "goes_distance_model",
+                                "target_label":  "goes_distance_binary",
+                                "status":  "experimental",
+                                "artifact_path":  "ufc_predictor\\models\\props\\artifacts\\goes_distance_model.json",
+                                "training_rows":  6209,
+                                "validation_rows":  1553,
+                                "date_range":  {
+                                                   "min":  null,
+                                                   "max":  null
+                                               },
+                                "split_type":  "source_order_reversed_experimental",
+                                "metrics":  {
+                                                "accuracy":  0.5319,
+                                                "balanced_accuracy":  0.532,
+                                                "log_loss":  0.6886,
+                                                "roc_auc":  0.5586,
+                                                "confusion_matrix":  {
+                                                                         "0":  {
+                                                                                   "0":  394,
+                                                                                   "1":  387
+                                                                               },
+                                                                         "1":  {
+                                                                                   "0":  340,
+                                                                                   "1":  432
+                                                                               }
+                                                                     },
+                                                "per_class_recall":  {
+                                                                         "0":  0.5045,
+                                                                         "1":  0.5596
+                                                                     }
+                                            },
+                                "baseline_metrics":  {
+                                                         "label":  "0",
+                                                         "accuracy":  0.5029,
+                                                         "class_counts":  {
+                                                                              "0":  781,
+                                                                              "1":  772
+                                                                          }
+                                                     },
+                                "feature_names":  [
+                                                      "a_prior_fights",
+                                                      "b_prior_fights",
+                                                      "a_prior_wins",
+                                                      "b_prior_wins",
+                                                      "a_prior_finishes",
+                                                      "b_prior_finishes",
+                                                      "a_prior_decisions",
+                                                      "b_prior_decisions"
+                                                  ],
+                                "class_distribution":  {
+                                                           "0":  4159,
+                                                           "1":  3603
+                                                       },
+                                "limitations":  [
+                                                    "Event dates are missing; split uses reversed source order and should not be treated as production-grade chronological validation.",
+                                                    "No event_date column is available; chronological order falls back to CSV row order.",
+                                                    "Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.",
+                                                    "Significant-strike labels are unavailable; strike-volume model is blocked.",
+                                                    "Takedown/control labels are unavailable; takedown-control model is blocked.",
+                                                    "Dedicated model training is blocked until credible chronological source data is available.",
+                                                    "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+                                                ],
+                                "trained_at":  "2026-05-29T15:42:04.150211+00:00",
+                                "source_datasets":  [
+                                                        "imported_csv"
+                                                    ],
+                                "source_files":  [
+                                                     "C:\\dev\\mma-ai\\ufc_predictor\\data\\raw\\fights.csv"
+                                                 ]
+                            },
+    "method_model":  {
+                         "model_name":  "method_model",
+                         "target_label":  "method_class",
+                         "status":  "experimental",
+                         "artifact_path":  "ufc_predictor\\models\\props\\artifacts\\method_model.json",
+                         "training_rows":  6209,
+                         "validation_rows":  1553,
+                         "date_range":  {
+                                            "min":  null,
+                                            "max":  null
+                                        },
+                         "split_type":  "source_order_reversed_experimental",
+                         "metrics":  {
+                                         "accuracy":  0.2447,
+                                         "balanced_accuracy":  0.2076,
+                                         "log_loss":  1.3888,
+                                         "roc_auc":  null,
+                                         "confusion_matrix":  {
+                                                                  "Decision":  {
+                                                                                   "Decision":  124,
+                                                                                   "KO/TKO":  177,
+                                                                                   "Other":  177,
+                                                                                   "Submission":  294
+                                                                               },
+                                                                  "KO/TKO":  {
+                                                                                 "Decision":  44,
+                                                                                 "KO/TKO":  154,
+                                                                                 "Other":  84,
+                                                                                 "Submission":  208
+                                                                             },
+                                                                  "Other":  {
+                                                                                "Decision":  0,
+                                                                                "KO/TKO":  0,
+                                                                                "Other":  0,
+                                                                                "Submission":  4
+                                                                            },
+                                                                  "Submission":  {
+                                                                                     "Decision":  33,
+                                                                                     "KO/TKO":  96,
+                                                                                     "Other":  56,
+                                                                                     "Submission":  102
+                                                                                 }
+                                                              },
+                                         "per_class_recall":  {
+                                                                  "Decision":  0.1606,
+                                                                  "KO/TKO":  0.3143,
+                                                                  "Other":  0.0,
+                                                                  "Submission":  0.3554
+                                                              }
+                                     },
+                         "baseline_metrics":  {
+                                                  "label":  "Decision",
+                                                  "accuracy":  0.4971,
+                                                  "class_counts":  {
+                                                                       "KO/TKO":  490,
+                                                                       "Decision":  772,
+                                                                       "Submission":  287,
+                                                                       "Other":  4
+                                                                   }
+                                              },
+                         "feature_names":  [
+                                               "a_prior_fights",
+                                               "b_prior_fights",
+                                               "a_prior_wins",
+                                               "b_prior_wins",
+                                               "a_prior_finishes",
+                                               "b_prior_finishes",
+                                               "a_prior_decisions",
+                                               "b_prior_decisions"
+                                           ],
+                         "class_distribution":  {
+                                                    "Decision":  3603,
+                                                    "KO/TKO":  2581,
+                                                    "Submission":  1555,
+                                                    "Other":  23
+                                                },
+                         "limitations":  [
+                                             "Event dates are missing; split uses reversed source order and should not be treated as production-grade chronological validation.",
+                                             "No event_date column is available; chronological order falls back to CSV row order.",
+                                             "Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.",
+                                             "Significant-strike labels are unavailable; strike-volume model is blocked.",
+                                             "Takedown/control labels are unavailable; takedown-control model is blocked.",
+                                             "Dedicated model training is blocked until credible chronological source data is available.",
+                                             "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+                                         ],
+                         "trained_at":  "2026-05-29T15:42:04.182325+00:00",
+                         "source_datasets":  [
+                                                 "imported_csv"
+                                             ],
+                         "source_files":  [
+                                              "C:\\dev\\mma-ai\\ufc_predictor\\data\\raw\\fights.csv"
+                                          ]
+                     },
+    "round_model":  {
+                        "model_name":  "round_model",
+                        "target_label":  "round_phase_class",
+                        "status":  "experimental",
+                        "artifact_path":  "ufc_predictor\\models\\props\\artifacts\\round_model.json",
+                        "training_rows":  6209,
+                        "validation_rows":  1553,
+                        "date_range":  {
+                                           "min":  null,
+                                           "max":  null
+                                       },
+                        "split_type":  "source_order_reversed_experimental",
+                        "metrics":  {
+                                        "accuracy":  0.235,
+                                        "balanced_accuracy":  0.4252,
+                                        "log_loss":  1.4347,
+                                        "roc_auc":  null,
+                                        "confusion_matrix":  {
+                                                                 "decision":  {
+                                                                                  "decision":  124,
+                                                                                  "early":  327,
+                                                                                  "late":  274,
+                                                                                  "middle":  47
+                                                                              },
+                                                                 "early":  {
+                                                                               "decision":  47,
+                                                                               "early":  188,
+                                                                               "late":  107,
+                                                                               "middle":  32
+                                                                           },
+                                                                 "late":  {
+                                                                              "decision":  0,
+                                                                              "early":  0,
+                                                                              "late":  18,
+                                                                              "middle":  1
+                                                                          },
+                                                                 "middle":  {
+                                                                                "decision":  64,
+                                                                                "early":  162,
+                                                                                "late":  127,
+                                                                                "middle":  35
+                                                                            }
+                                                             },
+                                        "per_class_recall":  {
+                                                                 "decision":  0.1606,
+                                                                 "early":  0.5027,
+                                                                 "late":  0.9474,
+                                                                 "middle":  0.0902
+                                                             }
+                                    },
+                        "baseline_metrics":  {
+                                                 "label":  "decision",
+                                                 "accuracy":  0.4971,
+                                                 "class_counts":  {
+                                                                      "middle":  388,
+                                                                      "decision":  772,
+                                                                      "early":  374,
+                                                                      "late":  19
+                                                                  }
+                                             },
+                        "feature_names":  [
+                                              "a_prior_fights",
+                                              "b_prior_fights",
+                                              "a_prior_wins",
+                                              "b_prior_wins",
+                                              "a_prior_finishes",
+                                              "b_prior_finishes",
+                                              "a_prior_decisions",
+                                              "b_prior_decisions"
+                                          ],
+                        "class_distribution":  {
+                                                   "decision":  3603,
+                                                   "early":  2205,
+                                                   "middle":  1875,
+                                                   "late":  79
+                                               },
+                        "limitations":  [
+                                            "Event dates are missing; split uses reversed source order and should not be treated as production-grade chronological validation.",
+                                            "No event_date column is available; chronological order falls back to CSV row order.",
+                                            "Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.",
+                                            "Significant-strike labels are unavailable; strike-volume model is blocked.",
+                                            "Takedown/control labels are unavailable; takedown-control model is blocked.",
+                                            "Dedicated model training is blocked until credible chronological source data is available.",
+                                            "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+                                        ],
+                        "trained_at":  "2026-05-29T15:42:04.214865+00:00",
+                        "source_datasets":  [
+                                                "imported_csv"
+                                            ],
+                        "source_files":  [
+                                             "C:\\dev\\mma-ai\\ufc_predictor\\data\\raw\\fights.csv"
+                                         ]
+                    },
+    "winner_model":  {
+                         "model_name":  "winner_model",
+                         "target_label":  "winner",
+                         "status":  "trained",
+                         "artifact_path":  "ufc_predictor/models/latest_model.pkl",
+                         "training_rows":  0,
+                         "validation_rows":  0,
+                         "date_range":  null,
+                         "split_type":  "existing_pipeline",
+                         "metrics":  {
+
+                                     },
+                         "baseline_metrics":  {
+
+                                              },
+                         "feature_names":  [
+
+                                           ],
+                         "class_distribution":  {
+
+                                                },
+                         "limitations":  [
+                                             "Existing winner model is part of the current prediction pipeline; this registry does not retrain it."
+                                         ],
+                         "trained_at":  null,
+                         "source_datasets":  [
+                                                 "existing_project_data"
+                                             ],
+                         "source_files":  [
+
+                                          ]
+                     },
+    "strike_volume_model":  {
+                                "model_name":  "strike_volume_model",
+                                "target_label":  "combined_strike_volume_bucket",
+                                "status":  "insufficient_data",
+                                "artifact_path":  null,
+                                "training_rows":  0,
+                                "validation_rows":  0,
+                                "date_range":  null,
+                                "split_type":  "unavailable",
+                                "metrics":  {
+
+                                            },
+                                "baseline_metrics":  {
+
+                                                     },
+                                "feature_names":  [
+
+                                                  ],
+                                "class_distribution":  {
+
+                                                       },
+                                "limitations":  [
+                                                    "Significant-strike labels are not available in the current local training data."
+                                                ],
+                                "trained_at":  null,
+                                "source_datasets":  [
+
+                                                    ],
+                                "source_files":  [
+
+                                                 ]
+                            },
+    "takedown_control_model":  {
+                                   "model_name":  "takedown_control_model",
+                                   "target_label":  "grappling_heavy_binary",
+                                   "status":  "insufficient_data",
+                                   "artifact_path":  null,
+                                   "training_rows":  0,
+                                   "validation_rows":  0,
+                                   "date_range":  null,
+                                   "split_type":  "unavailable",
+                                   "metrics":  {
+
+                                               },
+                                   "baseline_metrics":  {
+
+                                                        },
+                                   "feature_names":  [
+
+                                                     ],
+                                   "class_distribution":  {
+
+                                                          },
+                                   "limitations":  [
+                                                       "Takedown/control labels are not available in the current local training data."
+                                                   ],
+                                   "trained_at":  null,
+                                   "source_datasets":  [
+
+                                                       ],
+                                   "source_files":  [
+
+                                                    ]
+                               },
+    "odds_calibration_model":  {
+                                   "model_name":  "odds_calibration_model",
+                                   "target_label":  null,
+                                   "status":  "blocked",
+                                   "artifact_path":  null,
+                                   "training_rows":  0,
+                                   "validation_rows":  0,
+                                   "date_range":  null,
+                                   "split_type":  "unavailable",
+                                   "metrics":  {
+
+                                               },
+                                   "baseline_metrics":  {
+
+                                                        },
+                                   "feature_names":  [
+
+                                                     ],
+                                   "class_distribution":  {
+
+                                                          },
+                                   "limitations":  [
+                                                       "Historical odds snapshots are not available, so odds calibration/value modeling is blocked."
+                                                   ],
+                                   "trained_at":  null,
+                                   "source_datasets":  [
+
+                                                       ],
+                                   "source_files":  [
+
+                                                    ]
+                               }
+}

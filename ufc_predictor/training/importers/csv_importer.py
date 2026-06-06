@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +18,10 @@ SUPPORTED_FILE_NAMES = {
     "ufc_fight_stats.csv",
     "ufc_fighter_details.csv",
     "ufc_fighter_tott.csv",
+    "fights.csv",
+    "fighters.csv",
+    "enhanced_fights.csv",
+    "fighter_stats.csv",
 }
 
 EVENT_ALIASES = ["event_name", "event", "event_title", "event_url"]
@@ -42,6 +47,9 @@ RED_TD_ATTEMPTED = ["r_td_attempted", "r_td_att", "red_takedowns_attempted", "fi
 BLUE_TD_ATTEMPTED = ["b_td_attempted", "b_td_att", "blue_takedowns_attempted", "fighter_b_takedowns_attempted"]
 RED_CONTROL = ["r_ctrl", "r_control", "red_control_time", "fighter_a_control_time_seconds"]
 BLUE_CONTROL = ["b_ctrl", "b_control", "blue_control_time", "fighter_b_control_time_seconds"]
+ODDS_ALIASES = ["moneyline", "odds", "opening_odds", "closing_odds", "r_odds", "b_odds", "fighter_odds"]
+SPORTSBOOK_ALIASES = ["sportsbook", "book", "provider", "source"]
+SNAPSHOT_DATE_ALIASES = ["snapshot_date", "scrape_date", "odds_date", "timestamp", "fetched_at"]
 
 
 @dataclass
@@ -51,12 +59,15 @@ class ImportReport:
     detected_files: list[str] = field(default_factory=list)
     supported_files: list[str] = field(default_factory=list)
     unknown_files: list[str] = field(default_factory=list)
+    file_types: dict[str, str] = field(default_factory=dict)
     rows_read: int = 0
     rows_normalized: int = 0
     duplicate_fights: int = 0
     missing_columns: dict[str, list[str]] = field(default_factory=dict)
     label_availability: dict[str, int] = field(default_factory=dict)
     date_range: dict[str, str | None] = field(default_factory=dict)
+    odds_availability: dict[str, int] = field(default_factory=dict)
+    source_files: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
@@ -66,12 +77,15 @@ class ImportReport:
             "detected_files": self.detected_files,
             "supported_files": self.supported_files,
             "unknown_files": self.unknown_files,
+            "file_types": self.file_types,
             "rows_read": self.rows_read,
             "rows_normalized": self.rows_normalized,
             "duplicate_fights": self.duplicate_fights,
             "missing_columns": self.missing_columns,
             "label_availability": self.label_availability,
             "date_range": self.date_range,
+            "odds_availability": self.odds_availability,
+            "source_files": self.source_files,
             "warnings": self.warnings,
         }
 
@@ -86,14 +100,24 @@ def import_training_csvs(input_dir: str | Path, output: str | Path | None = None
     csv_files = sorted(input_path.rglob("*.csv"))
     report.detected_files = [str(path) for path in csv_files]
     normalized_frames = []
+    odds_rows = []
     for path in csv_files:
-        if path.name.lower() in SUPPORTED_FILE_NAMES or _looks_like_fight_csv(path):
+        file_type = _classify_csv(path)
+        report.file_types[str(path)] = file_type
+        if file_type == "fight":
             report.supported_files.append(str(path))
             frame, missing = _normalize_csv(path)
             report.rows_read += int(len(frame)) if not frame.empty else int(len(pd.read_csv(path)))
             report.missing_columns[str(path)] = missing
             if not frame.empty:
                 normalized_frames.append(frame)
+        elif file_type in {"fighter", "odds"}:
+            report.supported_files.append(str(path))
+            rows = int(len(pd.read_csv(path)))
+            report.rows_read += rows
+            report.missing_columns[str(path)] = []
+            if file_type == "odds":
+                odds_rows.append((path, rows))
         else:
             report.unknown_files.append(str(path))
 
@@ -107,7 +131,9 @@ def import_training_csvs(input_dir: str | Path, output: str | Path | None = None
         normalized = pd.DataFrame()
 
     report.rows_normalized = int(len(normalized))
+    report.source_files = sorted(normalized["source_file"].dropna().unique().tolist()) if not normalized.empty else []
     report.label_availability = _label_availability(normalized)
+    report.odds_availability = _odds_availability(odds_rows)
     dates = pd.to_datetime(normalized.get("event_date"), errors="coerce") if not normalized.empty else pd.Series(dtype="datetime64[ns]")
     valid_dates = dates.dropna()
     report.date_range = {
@@ -122,12 +148,34 @@ def import_training_csvs(input_dir: str | Path, output: str | Path | None = None
         report.warnings.append("No significant-strike labels detected in imported CSVs.")
     if report.label_availability.get("fighter_a_takedowns", 0) == 0:
         report.warnings.append("No takedown/control labels detected in imported CSVs.")
+    if report.odds_availability.get("rows", 0) == 0:
+        report.warnings.append("No odds snapshot rows detected; odds calibration/value models remain blocked.")
 
     if output and not dry_run and not normalized.empty:
         output_path = Path(output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         normalized.to_csv(output_path, index=False)
+        report_path = output_path.with_suffix(".import_report.json")
+        report_path.write_text(__import__("json").dumps(report.to_dict(), indent=2, default=str), encoding="utf-8")
     return normalized, report
+
+
+def _classify_csv(path: Path) -> str:
+    lower_name = path.name.lower()
+    if lower_name in SUPPORTED_FILE_NAMES or _looks_like_fight_csv(path):
+        if lower_name in {"fighters.csv", "fighter_stats.csv", "ufc_fighter_details.csv", "ufc_fighter_tott.csv"} and not _looks_like_fight_csv(path):
+            return "fighter"
+        return "fight"
+    try:
+        columns = _standardize_columns(pd.read_csv(path, nrows=0)).columns
+    except Exception:
+        return "unknown"
+    if _first_existing(columns, ODDS_ALIASES):
+        return "odds"
+    fighter_profile_markers = {"wins", "losses", "draws", "height", "weight", "reach", "stance", "date_of_birth", "dob"}
+    if ({"fighter", "fighter_name"} & set(columns)) or ("name" in columns and fighter_profile_markers & set(columns)):
+        return "fighter"
+    return "unknown"
 
 
 def _looks_like_fight_csv(path: Path) -> bool:
@@ -186,12 +234,16 @@ def _normalize_csv(path: Path) -> tuple[pd.DataFrame, list[str]]:
                 "fight_order": row.get("fight_order", index),
                 "source_order": index,
                 "source_file": str(path),
+                "source_dataset": path.parent.name or "local_csv",
+                "source_id": _source_id(path, index, winner, loser, row.get(method_col), round_number),
                 "weight_class": _first_value(row, WEIGHT_ALIASES),
                 "scheduled_rounds": _first_value(row, SCHEDULED_ROUNDS_ALIASES),
                 "fighter_1": winner,
                 "fighter_2": loser,
                 "fighter_a_name": winner,
                 "fighter_b_name": loser,
+                "fighter_a_normalized_name": _normalize_name(winner),
+                "fighter_b_normalized_name": _normalize_name(loser),
                 "winner_name": winner,
                 "loser_name": loser,
                 "result": "win",
@@ -298,6 +350,16 @@ def _clean_name(value) -> str:
     if pd.isna(value):
         return ""
     return str(value).strip()
+
+
+def _normalize_name(value) -> str:
+    text = _clean_name(value).lower()
+    return " ".join("".join(ch if ch.isalnum() or ch.isspace() else " " for ch in text).split())
+
+
+def _source_id(path: Path, index: int, winner: str, loser: str, method, round_number) -> str:
+    raw = "|".join([str(path), str(index), winner, loser, str(method), str(round_number)])
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
 
 def _stat_value(row: pd.Series, aliases: list[str]) -> int | None:
@@ -416,3 +478,10 @@ def _label_availability(df: pd.DataFrame) -> dict[str, int]:
         "takedown_control_bucket",
     ]
     return {label: int(df[label].notna().sum()) if label in df.columns else 0 for label in labels}
+
+
+def _odds_availability(odds_rows: list[tuple[Path, int]]) -> dict[str, int]:
+    return {
+        "files": len(odds_rows),
+        "rows": sum(rows for _path, rows in odds_rows),
+    }

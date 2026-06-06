@@ -25,4 +25,6 @@ if ($LASTEXITCODE -ne 0) {
     throw "Python is not executable: $PythonExe"
 }
 
-& $PythonExe -m pytest ufc_predictor\tests -q --basetemp pytest_tmp_codex
+$TempTestDir = Join-Path $env:TEMP ("mma_ai_pytest_" + [guid]::NewGuid().ToString())
+Write-Host "Using pytest temp dir: $TempTestDir"
+& $PythonExe -m pytest ufc_predictor\tests -q -p no:cacheprovider --basetemp $TempTestDir

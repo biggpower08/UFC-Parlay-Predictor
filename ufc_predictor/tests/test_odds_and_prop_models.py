@@ -30,12 +30,13 @@ def test_prop_model_registry_reports_current_training_status():
     statuses = prop_model_status()
 
     assert statuses
+    assert statuses["winner_model"]["status"] in {"not_trained", "blocked", "trained", "experimental", "production_ready"}
     for model_name in ("finish_model", "goes_distance_model", "method_model", "round_model"):
-        assert statuses[model_name]["status"] in {"not_trained", "trained", "experimental"}
+        assert statuses[model_name]["status"] in {"not_trained", "trained", "experimental", "production_ready"}
         assert statuses[model_name]["support_level"] in {"not_available", "model_supported"}
     for model_name in ("strike_volume_model", "takedown_control_model"):
-        assert statuses[model_name]["status"] in {"not_trained", "insufficient_data"}
-        assert statuses[model_name]["support_level"] == "not_available"
-    assert statuses["odds_edge_model"]["status"] == "not_trained"
-    for model_name in ("odds_edge_model",):
+        assert statuses[model_name]["status"] in {"not_trained", "insufficient_data", "experimental", "trained", "production_ready"}
+        assert statuses[model_name]["support_level"] in {"not_available", "model_supported"}
+    assert statuses["odds_calibration_model"]["status"] in {"not_trained", "blocked", "insufficient_data"}
+    for model_name in ("odds_calibration_model",):
         assert statuses[model_name]["support_level"] == "not_available"

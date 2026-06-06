@@ -36,6 +36,8 @@ def test_training_plan_marks_missing_strike_and_control_labels_insufficient():
     assert plan["goes_distance_model"]["status"] == "experimental"
     assert plan["strike_volume_model"]["status"] == "insufficient_data"
     assert plan["takedown_control_model"]["status"] == "insufficient_data"
+    assert plan["winner_model"]["status"] == "blocked"
+    assert plan["odds_calibration_model"]["status"] == "blocked"
 
 
 def test_train_model_creates_metadata_and_metrics(tmp_path: Path):

@@ -1,6 +1,7 @@
 import unittest
 
 import ufc_predictor.api.app as api_app
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from ufc_predictor.api.app import FeedbackRequest, PredictRequest, predict
@@ -120,3 +121,14 @@ def test_feedback_request_accepts_prop_read_feedback():
 def test_feedback_request_rejects_empty_payload():
     with unittest.TestCase().assertRaises(ValidationError):
         FeedbackRequest()
+
+
+def test_model_status_endpoint_is_public_safe():
+    client = TestClient(api_app.app)
+    response = client.get("/api/models/status")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert "models" in payload
+    assert "finish_model" in payload["models"]
+    assert "formula" not in payload["message"].lower()

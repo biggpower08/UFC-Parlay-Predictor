@@ -33,19 +33,23 @@ git status --short
 Write-Host ""
 Write-Host "Generated folders/files that should usually stay uncommitted:"
 $GeneratedPaths = @(
-    ".venv",
-    ".venv312",
+    ".venv*",
+    "docs\.venv",
     "node_modules",
     "app\frontend\node_modules",
     "app\frontend\.next",
     "app\frontend\out",
     ".pytest_cache",
     "pytest_tmp_codex",
+    ".mypy_cache",
+    ".ruff_cache",
+    "htmlcov",
     "__pycache__"
 )
 foreach ($path in $GeneratedPaths) {
-    if (Test-Path $path) {
-        Write-Host "  present: $path"
+    $matches = Resolve-Path -Path $path -ErrorAction SilentlyContinue
+    foreach ($match in $matches) {
+        Write-Host "  present: $($match.Path.Replace($RepoRoot.Path + '\', ''))"
     }
 }
 

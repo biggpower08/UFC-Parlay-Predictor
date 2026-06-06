@@ -1,12 +1,22 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ui = Join-Path $root "app\frontend"
-$python = "C:\Users\trish\AppData\Local\Programs\Python\Python313\python.exe"
-$npm = "C:\Program Files\nodejs\npm.cmd"
-
-if (!(Test-Path $python)) {
-    $python = "python"
+$externalPython = "C:\venvs\mma-ai\Scripts\python.exe"
+$repoPython = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
+$python = if ($env:MMA_AI_PYTHON) {
+    $env:MMA_AI_PYTHON
+} elseif (Test-Path $externalPython) {
+    $externalPython
+} else {
+    $repoPython
 }
+
+Write-Host "Using Python: $python"
+& $python --version
+if ($LASTEXITCODE -ne 0) {
+    throw "Python is not executable: $python"
+}
+$npm = "C:\Program Files\nodejs\npm.cmd"
 
 if (!(Test-Path $npm)) {
     $npm = "npm"
