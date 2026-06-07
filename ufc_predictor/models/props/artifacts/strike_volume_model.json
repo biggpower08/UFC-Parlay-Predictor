@@ -171,7 +171,7 @@
     "source_files": [
       "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\training_imports\\normalized_fights.csv"
     ],
-    "trained_at": "2026-06-07T00:43:17.439505+00:00",
+    "trained_at": "2026-06-07T03:55:42.921824+00:00",
     "data_cutoff_date": "2025-10-04",
     "training_source_status": "experimental",
     "leakage_checked": true,

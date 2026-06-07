@@ -21,20 +21,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ufc_predictor.config import settings
+from ufc_predictor.features.feature_schema import get_feature_schema, normalize_model_family
 from ufc_predictor.training.dataset_builder import build_training_rows, load_fights_csv
 from ufc_predictor.training.metrics import classification_metrics, majority_class_baseline
 
 MODEL_VERSION = "prop_baseline_v1"
-FEATURE_NAMES = [
-    "a_prior_fights",
-    "b_prior_fights",
-    "a_prior_wins",
-    "b_prior_wins",
-    "a_prior_finishes",
-    "b_prior_finishes",
-    "a_prior_decisions",
-    "b_prior_decisions",
-]
+FEATURE_NAMES = get_feature_schema("finish").required_features
 
 MODEL_TARGETS = [
     ("finish_model", "finish_binary"),
@@ -255,6 +247,9 @@ def registry_entry_from_artifact(artifact: dict, artifact_path: Path) -> dict:
     metadata = artifact["metadata"]
     metrics = artifact.get("metrics", {})
     rows_used = int(metadata["training_rows"]) + int(metadata["validation_rows"])
+    schema = get_feature_schema(normalize_model_family(metadata["model_name"]))
+    required_missing = [name for name in schema.required_features if name not in metadata["feature_names"]]
+    optional_present = [name for name in schema.optional_features if name in metadata["feature_names"]]
     return {
         "model_name": metadata["model_name"],
         "target_label": metadata["target_label"],
@@ -273,6 +268,12 @@ def registry_entry_from_artifact(artifact: dict, artifact_path: Path) -> dict:
         "leakage_risk": "low" if metadata.get("leakage_checked") else "unknown_review_needed",
         "runtime_compatible": True,
         "feature_set_name": "prior_history_baseline_v1",
+        "feature_schema_name": schema.schema_name,
+        "feature_schema_version": schema.schema_version,
+        "required_features_available": not required_missing,
+        "optional_feature_coverage": round(len(optional_present) / max(1, len(schema.optional_features)), 4),
+        "missing_runtime_features": required_missing,
+        "feature_factory_supported": True,
         "odds_used": False,
         "segment_metrics_available": False,
         "calibration_metrics_available": bool((metrics.get("validation") or {}).get("log_loss") is not None),
@@ -286,6 +287,7 @@ def registry_entry_from_artifact(artifact: dict, artifact_path: Path) -> dict:
 
 
 def registry_entry_from_plan(model_name: str, plan_entry: dict, audit: dict) -> dict:
+    schema = get_feature_schema(normalize_model_family(model_name))
     return {
         "model_name": model_name,
         "target_label": plan_entry.get("target"),
@@ -304,6 +306,12 @@ def registry_entry_from_plan(model_name: str, plan_entry: dict, audit: dict) -> 
         "leakage_risk": "unknown_review_needed",
         "runtime_compatible": False,
         "feature_set_name": None,
+        "feature_schema_name": schema.schema_name,
+        "feature_schema_version": schema.schema_version,
+        "required_features_available": False,
+        "optional_feature_coverage": 0.0,
+        "missing_runtime_features": schema.required_features,
+        "feature_factory_supported": True,
         "odds_used": False,
         "segment_metrics_available": False,
         "calibration_metrics_available": False,
@@ -317,6 +325,7 @@ def registry_entry_from_plan(model_name: str, plan_entry: dict, audit: dict) -> 
 
 
 def blocked_registry_entry(model_name: str, reason: str, audit: dict) -> dict:
+    schema = get_feature_schema(normalize_model_family(model_name))
     return {
         "model_name": model_name,
         "target_label": None,
@@ -335,6 +344,12 @@ def blocked_registry_entry(model_name: str, reason: str, audit: dict) -> dict:
         "leakage_risk": "unknown_review_needed",
         "runtime_compatible": False,
         "feature_set_name": None,
+        "feature_schema_name": schema.schema_name,
+        "feature_schema_version": schema.schema_version,
+        "required_features_available": False,
+        "optional_feature_coverage": 0.0,
+        "missing_runtime_features": schema.required_features,
+        "feature_factory_supported": model_name != "odds_calibration_model",
         "odds_used": model_name == "odds_calibration_model",
         "segment_metrics_available": False,
         "calibration_metrics_available": False,

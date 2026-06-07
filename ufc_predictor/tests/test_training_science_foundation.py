@@ -1,5 +1,13 @@
 import pandas as pd
+from pathlib import Path
 
+from scripts.train_prop_models import registry_entry_from_artifact
+from ufc_predictor.features.feature_schema import get_feature_schema
+from ufc_predictor.features.matchup_features import (
+    build_historical_feature_set,
+    build_matchup_feature_set,
+    validate_feature_set,
+)
 from ufc_predictor.training.leakage import scan_dataframe
 from ufc_predictor.training.size_context import build_size_context
 from ufc_predictor.training.splits import chronological_split_df, event_grouped_split
@@ -70,6 +78,22 @@ def test_leakage_scanner_flags_outcomes_and_current_fight_stats():
     assert by_column["pre_fight_moneyline_f1"] == "safe_prefight_feature"
 
 
+def test_target_columns_cannot_become_features():
+    schema = get_feature_schema("winner")
+    target_columns = {
+        "f1_wins",
+        "went_distance",
+        "over_2_5",
+        "method_class",
+        "fighter_a_sig_strikes",
+        "fighter_b_takedowns",
+        "grappling_heavy_binary",
+    }
+
+    assert not target_columns.intersection(schema.all_features())
+    assert {"f1_wins", "method_class", "grappling_heavy_binary"} <= set(schema.forbidden_features)
+
+
 def test_chronological_and_event_grouped_splits_are_safe():
     frame = pd.DataFrame(
         [
@@ -89,6 +113,36 @@ def test_chronological_and_event_grouped_splits_are_safe():
     assert set(train["event_name"]).isdisjoint(set(test["event_name"]))
 
 
+def test_permanent_agent_instructions_document_training_rules():
+    text = Path("AGENTS.md").read_text(encoding="utf-8")
+
+    assert "C:\\venvs\\mma-ai\\Scripts\\python.exe" in text
+    assert "pre-fight features only" in text
+    assert "chronological final-test evaluation" in text
+    assert "Do not mark `production_ready` unless" in text
+    assert "--basetemp $TempTestDir" in text
+
+
+def test_model_accuracy_report_includes_baseline_and_relative_improvement():
+    text = Path("docs/model_accuracy_report.md").read_text(encoding="utf-8")
+
+    assert "Baseline" in text
+    assert "Improvement" in text
+    assert "Beats Baseline" in text
+
+
+def test_weak_models_are_not_production_ready_in_registry():
+    registry_path = Path("ufc_predictor/data/processed/model_registry.json")
+    if not registry_path.is_file():
+        return
+    import json
+
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    for model in registry.values():
+        if model.get("beats_baseline") is False or model.get("backtest_beats_baseline") is False:
+            assert model.get("status") != "production_ready"
+
+
 def test_size_context_and_pound_for_pound_mode():
     actual = build_size_context(
         {"Weight Class": "Flyweight", "Height (cm)": 165, "Reach (cm)": 170},
@@ -105,3 +159,142 @@ def test_size_context_and_pound_for_pound_mode():
     assert p4p["label"] == "pound-for-pound view"
     assert p4p["size_features_used"] is False
     assert p4p["estimated_weight_gap_lbs"] == 0
+
+
+def test_historical_feature_generation_uses_only_prior_fights():
+    fights = pd.DataFrame(
+        [
+            {
+                "event": "Early Event",
+                "event_date": "2024-01-01",
+                "fighter_1": "Alpha Fighter",
+                "fighter_2": "Beta Fighter",
+                "result": "win",
+                "method": "KO/TKO",
+                "round": 1,
+            },
+            {
+                "event": "Middle Event",
+                "event_date": "2024-02-01",
+                "fighter_1": "Alpha Fighter",
+                "fighter_2": "Gamma Fighter",
+                "result": "win",
+                "method": "Decision",
+                "round": 3,
+            },
+            {
+                "event": "Target Event",
+                "event_date": "2024-03-01",
+                "fighter_1": "Alpha Fighter",
+                "fighter_2": "Beta Fighter",
+                "result": "win",
+                "method": "Submission",
+                "round": 2,
+            },
+        ]
+    )
+
+    feature_set = build_historical_feature_set(fights.iloc[2], fights, model_family="finish")
+
+    assert feature_set.validation["valid"] is True
+    assert feature_set.features["a_prior_fights"] == 2
+    assert feature_set.features["b_prior_fights"] == 1
+    assert "method" not in feature_set.features
+    assert "winner" not in feature_set.features
+
+
+def test_live_and_historical_feature_outputs_share_schema_keys():
+    schema = get_feature_schema("finish")
+    historical = build_historical_feature_set(
+        pd.Series(
+            {
+                "event_date": "2024-02-01",
+                "fighter_1": "Alpha Fighter",
+                "fighter_2": "Beta Fighter",
+                "result": "win",
+                "method": "Decision",
+                "round": 3,
+            }
+        ),
+        pd.DataFrame(
+            [
+                {
+                    "event_date": "2024-01-01",
+                    "fighter_1": "Alpha Fighter",
+                    "fighter_2": "Beta Fighter",
+                    "result": "win",
+                    "method": "KO/TKO",
+                    "round": 1,
+                }
+            ]
+        ),
+        model_family="finish",
+    )
+    live = build_matchup_feature_set(
+        {"name": "Alpha Fighter", "wins": 10, "losses": 2, "height_cm": 180, "reach_cm": 185, "weight_class": "Lightweight"},
+        {"name": "Beta Fighter", "wins": 8, "losses": 4, "height_cm": 175, "reach_cm": 178, "weight_class": "Lightweight"},
+        mode="live",
+        model_family="finish",
+    )
+
+    assert set(historical.features) == set(schema.all_features())
+    assert set(live.features) == set(schema.all_features())
+    assert live.model_feature_coverage["required_features_available"] is True
+
+
+def test_feature_validation_rejects_label_and_current_fight_columns():
+    schema = get_feature_schema("finish")
+    features = {name: 0 for name in schema.required_features}
+    features["winner"] = "Alpha Fighter"
+    features["fighter_a_sig_strikes"] = 80
+
+    validation = validate_feature_set(features, "finish")
+
+    assert validation["valid"] is False
+    assert "winner" in validation["leakage_columns_found"]
+    assert "fighter_a_sig_strikes" in validation["leakage_columns_found"]
+
+
+def test_runtime_feature_factory_supports_pound_for_pound_mode():
+    feature_set = build_matchup_feature_set(
+        {"name": "Small Fighter", "wins": 5, "losses": 1, "height_cm": 165, "reach_cm": 170, "weight_class": "Flyweight"},
+        {"name": "Large Fighter", "wins": 5, "losses": 1, "height_cm": 190, "reach_cm": 205, "weight_class": "Heavyweight"},
+        mode="live",
+        model_family="winner",
+        feature_mode="pound_for_pound",
+    )
+
+    assert feature_set.features["pound_for_pound_mode"] is True
+    assert feature_set.features["size_features_used"] is False
+    assert feature_set.features["estimated_weight_gap_lbs"] == 0
+    assert feature_set.features["height_gap"] == 0
+
+
+def test_registry_entry_records_feature_schema_metadata(tmp_path):
+    artifact = {
+        "metadata": {
+            "model_name": "finish_model",
+            "target_label": "finish_binary",
+            "model_type": "nearest_centroid_softmax_baseline",
+            "status": "trained",
+            "training_rows": 10,
+            "validation_rows": 5,
+            "date_range": {"min": "2024-01-01", "max": "2024-02-01"},
+            "split_type": "chronological",
+            "leakage_checked": True,
+            "feature_names": get_feature_schema("finish").required_features,
+            "class_distribution": {"0": 5, "1": 10},
+            "limitations": [],
+            "source_datasets": ["synthetic"],
+            "source_files": [],
+            "trained_at": "2024-03-01T00:00:00+00:00",
+        },
+        "metrics": {"validation": {"accuracy": 0.6}, "majority_class_baseline": {"accuracy": 0.5}},
+    }
+
+    entry = registry_entry_from_artifact(artifact, tmp_path / "finish_model.json")
+
+    assert entry["feature_schema_name"] == "finish_v1"
+    assert entry["feature_schema_version"] == "1.0"
+    assert entry["feature_factory_supported"] is True
+    assert entry["required_features_available"] is True

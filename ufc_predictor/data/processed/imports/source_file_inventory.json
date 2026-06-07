@@ -1,0 +1,157 @@
+{
+  "ufc_fight_forecast": {
+    "dataset_key": "ufc_fight_forecast",
+    "source_type": "kaggle",
+    "source_slug_or_repo": "jerzyszocik/ufc-fight-forecast-complete-gold-modeling-dataset",
+    "local_path": "data\\imports\\kaggle\\ufc_fight_forecast",
+    "intended_uses": [
+      "winner modeling",
+      "odds-aware winner modeling",
+      "ranking/odds features",
+      "modeling benchmark"
+    ],
+    "known_risks": [
+      "contains many engineered columns; use leakage scanner before training",
+      "odds timing must be verified"
+    ],
+    "priority": 10,
+    "normalized_outputs_expected": [
+      "fight results",
+      "method labels",
+      "round labels",
+      "odds/research columns"
+    ],
+    "raw_files_detected": []
+  },
+  "ufc_stats_complete": {
+    "dataset_key": "ufc_stats_complete",
+    "source_type": "kaggle",
+    "source_slug_or_repo": "leandroiber/ufc-stats-complete-dataset",
+    "local_path": "data\\imports\\kaggle\\ufc_stats_complete",
+    "intended_uses": [
+      "fight results",
+      "method/round labels",
+      "significant strikes",
+      "takedowns",
+      "control time",
+      "fighter/fight stats"
+    ],
+    "known_risks": [
+      "column names vary by file",
+      "current-fight stats are labels, not pre-fight features"
+    ],
+    "priority": 20,
+    "normalized_outputs_expected": [
+      "fight results",
+      "fight stats",
+      "fighter profiles"
+    ],
+    "raw_files_detected": []
+  },
+  "ufc_1994_2026": {
+    "dataset_key": "ufc_1994_2026",
+    "source_type": "kaggle",
+    "source_slug_or_repo": "jossilva3110/ufc-dataset-1994-2026",
+    "local_path": "data\\imports\\kaggle\\ufc_1994_2026",
+    "intended_uses": [
+      "broad historical coverage",
+      "fighter profiles",
+      "fight stats",
+      "round/strike/control cross-checks"
+    ],
+    "known_risks": [
+      "future-dated or projected rows require review",
+      "source ordering must not replace event dates"
+    ],
+    "priority": 30,
+    "normalized_outputs_expected": [
+      "historical fights",
+      "profile fields",
+      "stats labels"
+    ],
+    "raw_files_detected": []
+  },
+  "ufc_1994_2025": {
+    "dataset_key": "ufc_1994_2025",
+    "source_type": "kaggle",
+    "source_slug_or_repo": "neelagiriaditya/ufc-datasets-1994-2025",
+    "local_path": "data\\imports\\kaggle\\ufc_1994_2025",
+    "intended_uses": [
+      "newer UFCStats scrape cross-check",
+      "results/method/round",
+      "event/fight validation"
+    ],
+    "known_risks": [
+      "may duplicate other UFCStats-derived datasets",
+      "fight identifiers may be source-specific"
+    ],
+    "priority": 40,
+    "normalized_outputs_expected": [
+      "result cross-check rows"
+    ],
+    "raw_files_detected": []
+  },
+  "mdabbert_ultimate": {
+    "dataset_key": "mdabbert_ultimate",
+    "source_type": "kaggle",
+    "source_slug_or_repo": "mdabbert/ultimate-ufc-dataset",
+    "local_path": "data\\imports\\kaggle\\mdabbert_ultimate",
+    "intended_uses": [
+      "odds-aware modeling",
+      "betting market baseline",
+      "winner modeling after leakage audit"
+    ],
+    "known_risks": [
+      "odds timestamps may be unclear",
+      "market data must not be shown as live sportsbook odds"
+    ],
+    "priority": 50,
+    "normalized_outputs_expected": [
+      "winner rows",
+      "odds research fields"
+    ],
+    "raw_files_detected": []
+  },
+  "mdabbert_2010_2020_odds": {
+    "dataset_key": "mdabbert_2010_2020_odds",
+    "source_type": "kaggle",
+    "source_slug_or_repo": "mdabbert/ufc-fights-2010-2020-with-betting-odds",
+    "local_path": "data\\imports\\kaggle\\mdabbert_2010_2020_odds",
+    "intended_uses": [
+      "historical odds comparison",
+      "odds baseline",
+      "calibration experiments"
+    ],
+    "known_risks": [
+      "timestamp quality must be reviewed before headline odds metrics",
+      "coverage limited to 2010-2020"
+    ],
+    "priority": 60,
+    "normalized_outputs_expected": [
+      "historical odds research rows"
+    ],
+    "raw_files_detected": []
+  },
+  "ufc_datalab": {
+    "dataset_key": "ufc_datalab",
+    "source_type": "github",
+    "source_slug_or_repo": "komaksym/UFC-DataLab",
+    "local_path": "data\\imports\\github\\UFC-DataLab",
+    "intended_uses": [
+      "scorecards",
+      "official-stat cross-checks",
+      "round/decision research",
+      "future advanced evaluation"
+    ],
+    "known_risks": [
+      "scorecards are post-fight labels/analysis only",
+      "do not run scraping/OCR scripts in this workflow"
+    ],
+    "priority": 70,
+    "normalized_outputs_expected": [
+      "scorecards",
+      "round/decision supplemental data"
+    ],
+    "raw_files_detected": []
+  }
+}

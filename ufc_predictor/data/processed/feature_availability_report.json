@@ -1,0 +1,18 @@
+{
+  "schema_name": "finish_v1",
+  "schema_version": "1.0",
+  "rows": 16268,
+  "required_features_available": true,
+  "required_feature_missing_rates": {
+    "a_prior_fights": 0.0,
+    "b_prior_fights": 0.0,
+    "a_prior_wins": 0.0,
+    "b_prior_wins": 0.0,
+    "a_prior_finishes": 0.0,
+    "b_prior_finishes": 0.0,
+    "a_prior_decisions": 0.0,
+    "b_prior_decisions": 0.0
+  },
+  "optional_feature_coverage": 0.4521,
+  "missing_runtime_features": []
+}
