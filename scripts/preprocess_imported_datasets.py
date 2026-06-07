@@ -17,6 +17,7 @@ from ufc_predictor.training.importers.github_adapter import adapt_github_dataset
 from ufc_predictor.training.importers.kaggle_adapter import adapt_kaggle_dataset
 from ufc_predictor.training.importers.common_schema import all_common_fields
 from ufc_predictor.training.leakage import scan_dataframe
+from ufc_predictor.training.dataset_builder import deterministic_fighter_orientation, safe_winner_target
 
 
 def main() -> int:
@@ -275,9 +276,10 @@ def _ready(frame: pd.DataFrame, column: str, require_prefight_odds: bool = False
 
 
 def _winner_ready(frame: pd.DataFrame) -> dict:
-    rows = int(frame["f1_wins_safe"].notna().sum()) if "f1_wins_safe" in frame.columns and not frame.empty else 0
+    labels = _safe_winner_labels(frame)
+    rows = int(labels.notna().sum()) if not frame.empty else 0
     has_dates = "event_date" in frame.columns and frame["event_date"].notna().any() if not frame.empty else False
-    distribution = frame["f1_wins_safe"].dropna().astype(str).value_counts().to_dict() if rows else {}
+    distribution = labels.dropna().astype(int).astype(str).value_counts().to_dict() if rows else {}
     if rows < 500:
         return {"status": "insufficient_data", "rows": rows, "reason": "Not enough safe winner labels."}
     if not has_dates:
@@ -290,11 +292,27 @@ def _winner_ready(frame: pd.DataFrame) -> dict:
             "reason": "Winner labels are present, but normalized sources appear winner-oriented; runtime fighter_1/fighter_2 orientation must be corrected before winner-model training.",
         }
     return {
-        "status": "review_needed",
+        "status": "training_data_ready",
         "rows": rows,
         "class_distribution": {str(key): int(value) for key, value in distribution.items()},
-        "reason": "Winner labels exist, but mirrored/duplicate source orientation must be audited before this becomes the headline model.",
+        "reason": "Winner labels use deterministic fighter-name orientation independent of outcome; final model must still beat held-out baseline before production use.",
     }
+
+
+def _safe_winner_labels(frame: pd.DataFrame) -> pd.Series:
+    if frame.empty:
+        return pd.Series(dtype="Float64")
+    labels = []
+    for _, row in frame.iterrows():
+        f1 = row.get("fighter_1_name") or row.get("fighter_1")
+        f2 = row.get("fighter_2_name") or row.get("fighter_2")
+        winner = row.get("winner_name") or row.get("winner")
+        if not f1 or not f2:
+            labels.append(pd.NA)
+            continue
+        safe_f1, safe_f2, _orientation = deterministic_fighter_orientation(str(f1), str(f2))
+        labels.append(safe_winner_target(safe_f1, safe_f2, str(winner) if pd.notna(winner) else None))
+    return pd.Series(labels, dtype="Float64")
 
 
 def _schema_report(frame: pd.DataFrame) -> dict:

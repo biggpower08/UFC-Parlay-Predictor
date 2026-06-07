@@ -3,7 +3,7 @@
 Raw data remains under `data/imports/` and is not committed.
 
 ## Combined Readiness
-- `winner_model`: blocked_orientation_review (32140 rows). Winner labels are present, but normalized sources appear winner-oriented; runtime fighter_1/fighter_2 orientation must be corrected before winner-model training.
+- `winner_model`: training_data_ready (32140 rows). Winner labels use deterministic fighter-name orientation independent of outcome; final model must still beat held-out baseline before production use.
 - `finish_model`: training_data_ready (49355 rows). 
 - `goes_distance_model`: training_data_ready (49355 rows). 
 - `method_model`: training_data_ready (49355 rows). 

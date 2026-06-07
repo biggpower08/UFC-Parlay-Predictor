@@ -16,6 +16,7 @@ import pandas as pd
 
 from ufc_predictor.features.feature_schema import get_feature_schema
 from ufc_predictor.features.matchup_features import build_features_from_snapshots
+from ufc_predictor.utils.helpers import normalize_name
 
 
 DECISION_METHODS = {"u-dec", "s-dec", "m-dec", "dec", "decision", "majority decision", "split decision"}
@@ -90,10 +91,18 @@ def build_training_rows(
 
     for _, fight in df.iterrows():
         result = str(fight.get("result") or "").lower().strip().split("\n")[0]
-        fighter_a = str(fight.get("fighter_1") or "").strip()
-        fighter_b = str(fight.get("fighter_2") or "").strip()
-        if not fighter_a or not fighter_b:
+        source_fighter_1 = str(fight.get("fighter_1") or "").strip()
+        source_fighter_2 = str(fight.get("fighter_2") or "").strip()
+        if not source_fighter_1 or not source_fighter_2:
             continue
+        fighter_a, fighter_b, orientation = deterministic_fighter_orientation(source_fighter_1, source_fighter_2)
+        winner_name = _clean_name(fight.get("winner_name"))
+        if not winner_name and result == "win":
+            winner_name = source_fighter_1
+        loser_name = _clean_name(fight.get("loser_name"))
+        if not loser_name and result == "win":
+            loser_name = source_fighter_2
+        f1_wins_safe = safe_winner_target(fighter_a, fighter_b, winner_name)
 
         method = normalize_method(fight.get("method_group") or fight.get("method"))
         is_decision = method == "Decision"
@@ -122,37 +131,41 @@ def build_training_rows(
                 "weight_class": fight.get("weight_class"),
                 "fighter_a": fighter_a,
                 "fighter_b": fighter_b,
+                "source_fighter_1": source_fighter_1,
+                "source_fighter_2": source_fighter_2,
+                "safe_orientation": orientation,
                 "source": source,
                 **feature_set.features,
                 "source_order": int(fight.get("_source_order", len(rows))),
-                "winner": fight.get("winner_name") if pd.notna(fight.get("winner_name")) else (fighter_a if result == "win" else None),
-                "f1_wins_safe": fight.get("f1_wins_safe") if "f1_wins_safe" in fight.index else None,
+                "winner": winner_name,
+                "f1_wins_safe": f1_wins_safe,
                 "finish_binary": 0 if is_decision else 1,
                 "goes_distance_binary": 1 if is_decision else 0,
                 "method_class": method,
                 "round_number": _safe_int(fight.get("round")),
                 "round_phase_class": round_phase,
-                "fighter_a_sig_strikes": fight.get("fighter_a_sig_strikes"),
-                "fighter_b_sig_strikes": fight.get("fighter_b_sig_strikes"),
+                "fighter_a_sig_strikes": _oriented_value(fight, "fighter_a_sig_strikes", "fighter_b_sig_strikes", orientation),
+                "fighter_b_sig_strikes": _oriented_value(fight, "fighter_b_sig_strikes", "fighter_a_sig_strikes", orientation),
                 "combined_sig_strikes": fight.get("combined_sig_strikes"),
-                "fighter_a_strike_volume_bucket": fight.get("fighter_a_strike_volume_bucket"),
-                "fighter_b_strike_volume_bucket": fight.get("fighter_b_strike_volume_bucket"),
+                "fighter_a_strike_volume_bucket": _oriented_value(fight, "fighter_a_strike_volume_bucket", "fighter_b_strike_volume_bucket", orientation),
+                "fighter_b_strike_volume_bucket": _oriented_value(fight, "fighter_b_strike_volume_bucket", "fighter_a_strike_volume_bucket", orientation),
                 "combined_strike_volume_bucket": fight.get("strike_volume_bucket") or fight.get("combined_strike_volume_bucket"),
-                "fighter_a_50plus_sig_strikes": fight.get("fighter_a_50plus_sig_strikes"),
-                "fighter_b_50plus_sig_strikes": fight.get("fighter_b_50plus_sig_strikes"),
+                "fighter_a_50plus_sig_strikes": _oriented_value(fight, "fighter_a_50plus_sig_strikes", "fighter_b_50plus_sig_strikes", orientation),
+                "fighter_b_50plus_sig_strikes": _oriented_value(fight, "fighter_b_50plus_sig_strikes", "fighter_a_50plus_sig_strikes", orientation),
                 "combined_100plus_sig_strikes": fight.get("combined_100plus_sig_strikes"),
-                "fighter_a_takedowns": fight.get("fighter_a_takedowns"),
-                "fighter_b_takedowns": fight.get("fighter_b_takedowns"),
-                "fighter_a_takedown_1plus": fight.get("fighter_a_takedown_1plus"),
-                "fighter_b_takedown_1plus": fight.get("fighter_b_takedown_1plus"),
+                "fighter_a_takedowns": _oriented_value(fight, "fighter_a_takedowns", "fighter_b_takedowns", orientation),
+                "fighter_b_takedowns": _oriented_value(fight, "fighter_b_takedowns", "fighter_a_takedowns", orientation),
+                "fighter_a_takedown_1plus": _oriented_value(fight, "fighter_a_takedown_1plus", "fighter_b_takedown_1plus", orientation),
+                "fighter_b_takedown_1plus": _oriented_value(fight, "fighter_b_takedown_1plus", "fighter_a_takedown_1plus", orientation),
                 "grappling_heavy_binary": fight.get("grappling_heavy_binary"),
                 "takedown_control_bucket": fight.get("takedown_control_bucket"),
             }
         )
 
-        if result == "win":
-            _update_history(history[fighter_a], won=True, method=method)
-            _update_history(history[fighter_b], won=False, method=None)
+        if winner_name:
+            loser_for_update = loser_name or (source_fighter_2 if normalize_name(winner_name) == normalize_name(source_fighter_1) else source_fighter_1)
+            _update_history(history[winner_name], won=True, method=method)
+            _update_history(history[loser_for_update], won=False, method=None)
         else:
             _update_history(history[fighter_a], won=None, method=None)
             _update_history(history[fighter_b], won=None, method=None)
@@ -267,6 +280,26 @@ def normalize_method(value) -> str:
     return "Other"
 
 
+def deterministic_fighter_orientation(fighter_1: str, fighter_2: str) -> tuple[str, str, str]:
+    left = str(fighter_1 or "").strip()
+    right = str(fighter_2 or "").strip()
+    ordered = sorted([(normalize_name(left), left), (normalize_name(right), right)], key=lambda item: (item[0], item[1].lower()))
+    first = ordered[0][1]
+    second = ordered[1][1]
+    return first, second, "source_order" if first == left and second == right else "name_sorted_swapped"
+
+
+def safe_winner_target(fighter_1: str, fighter_2: str, winner_name: str | None) -> int | None:
+    winner = normalize_name(winner_name or "")
+    if not winner or winner in {"draw", "nc", "no contest", "no_contest"}:
+        return None
+    if winner == normalize_name(fighter_1):
+        return 1
+    if winner == normalize_name(fighter_2):
+        return 0
+    return None
+
+
 def round_phase_label(round_value, is_decision: bool) -> str:
     if is_decision:
         return "decision"
@@ -351,6 +384,19 @@ def _update_history(history: dict[str, int], won: bool | None, method: str | Non
             history["decisions"] += 1
         elif method:
             history["finishes"] += 1
+
+
+def _oriented_value(row: pd.Series, source_key: str, swapped_key: str, orientation: str):
+    if orientation == "name_sorted_swapped":
+        return row.get(swapped_key)
+    return row.get(source_key)
+
+
+def _clean_name(value) -> str | None:
+    if value is None or pd.isna(value):
+        return None
+    text = str(value).strip()
+    return text or None
 
 
 def _safe_int(value) -> int | None:

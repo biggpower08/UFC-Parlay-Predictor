@@ -15,6 +15,7 @@ from ufc_predictor.training.dataset_manifest import DATASET_MANIFEST
 from ufc_predictor.training.deduping import add_deduping_columns, dedupe_summary, stable_fight_key
 from ufc_predictor.training.importers.kaggle_adapter import adapt_kaggle_dataset
 from ufc_predictor.training.targets import build_bettor_targets, safe_f1_wins
+from ufc_predictor.training.dataset_builder import build_training_rows
 
 
 def test_dataset_manifest_includes_all_six_sources():
@@ -196,6 +197,41 @@ def test_source_contribution_report_counts_datasets_by_split():
     assert report["train_rows_by_dataset"] == {"alpha": 1}
     assert report["validation_rows_by_dataset"] == {"alpha": 1}
     assert report["test_rows_by_dataset"] == {"beta": 1}
+
+
+def test_winner_training_orientation_is_independent_of_outcome():
+    fights = pd.DataFrame(
+        [
+            {
+                "event_date": "2024-01-01",
+                "fighter_1": "Winner Zed",
+                "fighter_2": "Alpha Loser",
+                "winner_name": "Winner Zed",
+                "loser_name": "Alpha Loser",
+                "result": "win",
+                "method": "Decision",
+                "round": 3,
+            },
+            {
+                "event_date": "2024-01-02",
+                "fighter_1": "Winner Able",
+                "fighter_2": "Zulu Loser",
+                "winner_name": "Winner Able",
+                "loser_name": "Zulu Loser",
+                "result": "win",
+                "method": "KO/TKO",
+                "round": 1,
+            },
+        ]
+    )
+
+    dataset, _audit = build_training_rows(fights)
+
+    assert set(dataset["f1_wins_safe"].dropna().astype(int)) == {0, 1}
+    assert dataset.loc[0, "fighter_a"] == "Alpha Loser"
+    assert dataset.loc[0, "f1_wins_safe"] == 0
+    assert dataset.loc[1, "fighter_a"] == "Winner Able"
+    assert dataset.loc[1, "f1_wins_safe"] == 1
 
 
 def test_relative_ranking_and_baseline_helpers():

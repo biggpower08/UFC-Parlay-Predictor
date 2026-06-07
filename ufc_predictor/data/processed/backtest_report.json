@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-07T17:15:56.310807+00:00",
+  "generated_at": "2026-06-07T18:18:02.380634+00:00",
   "summary": {
     "fights_simulated": 5537,
     "date_range": {
@@ -7,6 +7,7 @@
       "max": "2026-05-16"
     },
     "models_run": [
+      "winner_model",
       "finish_model",
       "goes_distance_model",
       "method_model",
@@ -15,7 +16,6 @@
       "takedown_control_model"
     ],
     "models_skipped": {
-      "winner_model": "Safe f1/f2 winner orientation is not runtime-compatible yet.",
       "odds_calibration_model": "Trusted pre-fight odds snapshots are not available."
     }
   },
@@ -82,16 +82,7 @@
     }
   },
   "blind_simulation": {
-    "prediction_features": [
-      "a_prior_fights",
-      "b_prior_fights",
-      "a_prior_wins",
-      "b_prior_wins",
-      "a_prior_finishes",
-      "b_prior_finishes",
-      "a_prior_decisions",
-      "b_prior_decisions"
-    ],
+    "prediction_features": "model-specific runtime-compatible feature schemas",
     "hidden_until_scoring": [
       "combined_sig_strikes",
       "fighter_a_sig_strikes",
@@ -118,253 +109,934 @@
     "leakage_scan_blocked_columns": [
       "a_prior_finishes",
       "b_prior_finishes",
-      "fighter_b_takedowns",
-      "finish_binary",
-      "takedown_control_bucket",
       "loser",
-      "result",
       "fighter_b_sig_strikes",
-      "fighter_a_sig_strikes",
       "method",
-      "winner",
-      "finish_time",
-      "finish_round",
-      "fighter_a_takedowns",
-      "goes_distance_binary",
       "method_class",
-      "combined_sig_strikes",
+      "round_phase_class",
+      "finish_time",
       "method_group",
-      "round_phase_class"
+      "result",
+      "fighter_a_sig_strikes",
+      "fighter_a_takedowns",
+      "winner",
+      "finish_binary",
+      "fighter_b_takedowns",
+      "finish_round",
+      "takedown_control_bucket",
+      "combined_sig_strikes",
+      "goes_distance_binary"
     ]
   },
   "models": {
-    "winner_model": {
-      "status": "skipped",
-      "available": false,
-      "reason": "Safe f1/f2 winner orientation is not runtime-compatible yet.",
-      "beats_baseline": false
-    },
     "odds_calibration_model": {
       "status": "skipped",
       "available": false,
       "reason": "Trusted pre-fight odds snapshots are not available.",
       "beats_baseline": false
     },
+    "winner_model": {
+      "status": "backtested",
+      "available": true,
+      "target": "f1_wins_safe",
+      "fights_tested": 3327,
+      "main_metric_name": "accuracy",
+      "main_metric": 0.9092,
+      "baseline_metric": 0.52,
+      "relative_improvement": 0.3892,
+      "beats_baseline": true,
+      "metrics": {
+        "accuracy": 0.9092,
+        "balanced_accuracy": 0.9093,
+        "f1_macro": 0.9091,
+        "roc_auc": 0.9663,
+        "log_loss": 0.2421,
+        "brier_score": 0.0701,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1571,
+            "1.0": 159
+          },
+          "1.0": {
+            "0.0": 143,
+            "1.0": 1454
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.52,
+        "class_counts": {
+          "0.0": 1730,
+          "1.0": 1597
+        }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 98,
+            "coverage_percent": 2.95,
+            "accuracy": 0.6939,
+            "balanced_accuracy": 0.6786,
+            "average_confidence": 0.5256,
+            "actual_hit_rate": 0.6939,
+            "calibration_gap": -0.1683,
+            "class_distribution": {
+              "0.0": 56,
+              "1.0": 42
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 97,
+            "coverage_percent": 2.92,
+            "accuracy": 0.567,
+            "balanced_accuracy": 0.5662,
+            "average_confidence": 0.5739,
+            "actual_hit_rate": 0.567,
+            "calibration_gap": 0.0069,
+            "class_distribution": {
+              "0.0": 56,
+              "1.0": 41
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 131,
+            "coverage_percent": 3.94,
+            "accuracy": 0.5573,
+            "balanced_accuracy": 0.5568,
+            "average_confidence": 0.6248,
+            "actual_hit_rate": 0.5573,
+            "calibration_gap": 0.0676,
+            "class_distribution": {
+              "0.0": 69,
+              "1.0": 62
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 113,
+            "coverage_percent": 3.4,
+            "accuracy": 0.7611,
+            "balanced_accuracy": 0.7641,
+            "average_confidence": 0.6735,
+            "actual_hit_rate": 0.7611,
+            "calibration_gap": -0.0876,
+            "class_distribution": {
+              "0.0": 59,
+              "1.0": 54
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 165,
+            "coverage_percent": 4.96,
+            "accuracy": 0.7939,
+            "balanced_accuracy": 0.7938,
+            "average_confidence": 0.7234,
+            "actual_hit_rate": 0.7939,
+            "calibration_gap": -0.0706,
+            "class_distribution": {
+              "0.0": 83,
+              "1.0": 82
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 206,
+            "coverage_percent": 6.19,
+            "accuracy": 0.801,
+            "balanced_accuracy": 0.7982,
+            "average_confidence": 0.7762,
+            "actual_hit_rate": 0.801,
+            "calibration_gap": -0.0248,
+            "class_distribution": {
+              "1.0": 112,
+              "0.0": 94
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 205,
+            "coverage_percent": 6.16,
+            "accuracy": 0.922,
+            "balanced_accuracy": 0.922,
+            "average_confidence": 0.8265,
+            "actual_hit_rate": 0.922,
+            "calibration_gap": -0.0955,
+            "class_distribution": {
+              "0.0": 103,
+              "1.0": 102
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 332,
+            "coverage_percent": 9.98,
+            "accuracy": 0.9398,
+            "balanced_accuracy": 0.9394,
+            "average_confidence": 0.878,
+            "actual_hit_rate": 0.9398,
+            "calibration_gap": -0.0618,
+            "class_distribution": {
+              "1.0": 173,
+              "0.0": 159
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1980,
+            "coverage_percent": 59.51,
+            "accuracy": 0.9828,
+            "balanced_accuracy": 0.9828,
+            "average_confidence": 0.9674,
+            "actual_hit_rate": 0.9828,
+            "calibration_gap": -0.0154,
+            "class_distribution": {
+              "0.0": 1051,
+              "1.0": 929
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3229,
+            "coverage_percent": 97.05,
+            "accuracy": 0.9158,
+            "balanced_accuracy": 0.9159,
+            "average_confidence": 0.8886,
+            "actual_hit_rate": 0.9158,
+            "calibration_gap": -0.0272,
+            "class_distribution": {
+              "0.0": 1674,
+              "1.0": 1555
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3132,
+            "coverage_percent": 94.14,
+            "accuracy": 0.9266,
+            "balanced_accuracy": 0.9267,
+            "average_confidence": 0.8983,
+            "actual_hit_rate": 0.9266,
+            "calibration_gap": -0.0282,
+            "class_distribution": {
+              "0.0": 1618,
+              "1.0": 1514
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 3001,
+            "coverage_percent": 90.2,
+            "accuracy": 0.9427,
+            "balanced_accuracy": 0.9428,
+            "average_confidence": 0.9103,
+            "actual_hit_rate": 0.9427,
+            "calibration_gap": -0.0324,
+            "class_distribution": {
+              "0.0": 1549,
+              "1.0": 1452
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2888,
+            "coverage_percent": 86.8,
+            "accuracy": 0.9498,
+            "balanced_accuracy": 0.9498,
+            "average_confidence": 0.9196,
+            "actual_hit_rate": 0.9498,
+            "calibration_gap": -0.0302,
+            "class_distribution": {
+              "0.0": 1490,
+              "1.0": 1398
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2723,
+            "coverage_percent": 81.85,
+            "accuracy": 0.9592,
+            "balanced_accuracy": 0.9593,
+            "average_confidence": 0.9314,
+            "actual_hit_rate": 0.9592,
+            "calibration_gap": -0.0278,
+            "class_distribution": {
+              "0.0": 1407,
+              "1.0": 1316
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 2517,
+            "coverage_percent": 75.65,
+            "accuracy": 0.9722,
+            "balanced_accuracy": 0.9722,
+            "average_confidence": 0.9441,
+            "actual_hit_rate": 0.9722,
+            "calibration_gap": -0.028,
+            "class_distribution": {
+              "0.0": 1313,
+              "1.0": 1204
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2517,
+          "coverage_percent": 75.65,
+          "accuracy": 0.9722,
+          "balanced_accuracy": 0.9722,
+          "average_confidence": 0.9441,
+          "actual_hit_rate": 0.9722,
+          "calibration_gap": -0.028,
+          "class_distribution": {
+            "0.0": 1313,
+            "1.0": 1204
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2517,
+          "coverage_percent": 75.65,
+          "accuracy": 0.9722,
+          "balanced_accuracy": 0.9722,
+          "average_confidence": 0.9441,
+          "actual_hit_rate": 0.9722,
+          "calibration_gap": -0.028,
+          "class_distribution": {
+            "0.0": 1313,
+            "1.0": 1204
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      },
+      "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 146,
+          "accuracy": 0.9041,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Bantamweight Bout": {
+          "rows": 131,
+          "accuracy": 0.8702,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight": {
+          "rows": 147,
+          "accuracy": 0.9116,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight Bout": {
+          "rows": 129,
+          "accuracy": 0.8527,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 102,
+          "accuracy": 0.9314,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight Bout": {
+          "rows": 91,
+          "accuracy": 0.8352,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight": {
+          "rows": 88,
+          "accuracy": 0.875,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight Bout": {
+          "rows": 73,
+          "accuracy": 0.8493,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 85,
+          "accuracy": 0.9176,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight Bout": {
+          "rows": 76,
+          "accuracy": 0.8684,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 163,
+          "accuracy": 0.9018,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight Bout": {
+          "rows": 148,
+          "accuracy": 0.9122,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 161,
+          "accuracy": 0.9379,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight Bout": {
+          "rows": 145,
+          "accuracy": 0.8552,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 143,
+          "accuracy": 0.9091,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight Bout": {
+          "rows": 132,
+          "accuracy": 0.8788,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 53,
+          "accuracy": 0.9057,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Bantamweight Bout": {
+          "rows": 45,
+          "accuracy": 0.8444,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 60,
+          "accuracy": 0.9333,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight Bout": {
+          "rows": 54,
+          "accuracy": 0.9444,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 81,
+          "accuracy": 0.963,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight Bout": {
+          "rows": 71,
+          "accuracy": 0.8592,
+          "unstable_sample_warning": true
+        },
+        "weight_class:bantamweight": {
+          "rows": 106,
+          "accuracy": 0.934,
+          "unstable_sample_warning": false
+        },
+        "weight_class:featherweight": {
+          "rows": 108,
+          "accuracy": 0.9537,
+          "unstable_sample_warning": false
+        },
+        "weight_class:flyweight": {
+          "rows": 73,
+          "accuracy": 0.9726,
+          "unstable_sample_warning": true
+        },
+        "weight_class:heavyweight": {
+          "rows": 55,
+          "accuracy": 0.9455,
+          "unstable_sample_warning": true
+        },
+        "weight_class:light heavyweight": {
+          "rows": 63,
+          "accuracy": 0.9524,
+          "unstable_sample_warning": true
+        },
+        "weight_class:lightweight": {
+          "rows": 125,
+          "accuracy": 0.976,
+          "unstable_sample_warning": false
+        },
+        "weight_class:middleweight": {
+          "rows": 113,
+          "accuracy": 0.9558,
+          "unstable_sample_warning": false
+        },
+        "weight_class:welterweight": {
+          "rows": 108,
+          "accuracy": 0.9537,
+          "unstable_sample_warning": false
+        },
+        "weight_class:women's bantamweight": {
+          "rows": 37,
+          "accuracy": 0.973,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's flyweight": {
+          "rows": 49,
+          "accuracy": 0.9796,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's strawweight": {
+          "rows": 61,
+          "accuracy": 0.9508,
+          "unstable_sample_warning": true
+        },
+        "low_fighter_history": {
+          "rows": 267,
+          "accuracy": 0.8577,
+          "unstable_sample_warning": false
+        },
+        "enough_fighter_history": {
+          "rows": 3060,
+          "accuracy": 0.9137,
+          "unstable_sample_warning": false
+        }
+      }
+    },
     "finish_model": {
       "status": "backtested",
       "available": true,
       "target": "finish_binary",
-      "fights_tested": 5537,
+      "fights_tested": 3696,
       "main_metric_name": "accuracy",
-      "main_metric": 0.6101,
-      "baseline_metric": 0.5183,
-      "relative_improvement": 0.0918,
+      "main_metric": 0.8287,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.3146,
       "beats_baseline": true,
       "metrics": {
-        "accuracy": 0.6101,
-        "balanced_accuracy": 0.6082,
-        "f1_macro": 0.608,
-        "roc_auc": 0.662,
-        "log_loss": 0.6708,
-        "brier_score": 0.2389,
+        "accuracy": 0.8287,
+        "balanced_accuracy": 0.8297,
+        "f1_macro": 0.8287,
+        "roc_auc": 0.8994,
+        "log_loss": 0.4212,
+        "brier_score": 0.1288,
         "confusion_matrix": {
           "0": {
-            "0": 1891,
-            "1": 979
+            "0": 1512,
+            "1": 388
           },
           "1": {
-            "0": 1180,
-            "1": 1487
+            "0": 245,
+            "1": 1551
           }
         }
       },
       "baseline": {
         "label": "0",
-        "accuracy": 0.5183,
+        "accuracy": 0.5141,
         "class_counts": {
-          "0": 2870,
-          "1": 2667
+          "0": 1900,
+          "1": 1796
         }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 274,
+            "coverage_percent": 7.41,
+            "accuracy": 0.5401,
+            "balanced_accuracy": 0.5366,
+            "average_confidence": 0.5263,
+            "actual_hit_rate": 0.5401,
+            "calibration_gap": -0.0139,
+            "class_distribution": {
+              "0": 149,
+              "1": 125
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 261,
+            "coverage_percent": 7.06,
+            "accuracy": 0.6054,
+            "balanced_accuracy": 0.6054,
+            "average_confidence": 0.5747,
+            "actual_hit_rate": 0.6054,
+            "calibration_gap": -0.0307,
+            "class_distribution": {
+              "1": 132,
+              "0": 129
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 310,
+            "coverage_percent": 8.39,
+            "accuracy": 0.7355,
+            "balanced_accuracy": 0.7349,
+            "average_confidence": 0.626,
+            "actual_hit_rate": 0.7355,
+            "calibration_gap": -0.1095,
+            "class_distribution": {
+              "0": 167,
+              "1": 143
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 281,
+            "coverage_percent": 7.6,
+            "accuracy": 0.7651,
+            "balanced_accuracy": 0.7676,
+            "average_confidence": 0.6739,
+            "actual_hit_rate": 0.7651,
+            "calibration_gap": -0.0913,
+            "class_distribution": {
+              "0": 160,
+              "1": 121
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 306,
+            "coverage_percent": 8.28,
+            "accuracy": 0.7941,
+            "balanced_accuracy": 0.8022,
+            "average_confidence": 0.7254,
+            "actual_hit_rate": 0.7941,
+            "calibration_gap": -0.0687,
+            "class_distribution": {
+              "0": 170,
+              "1": 136
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 303,
+            "coverage_percent": 8.2,
+            "accuracy": 0.8152,
+            "balanced_accuracy": 0.8182,
+            "average_confidence": 0.7759,
+            "actual_hit_rate": 0.8152,
+            "calibration_gap": -0.0392,
+            "class_distribution": {
+              "0": 156,
+              "1": 147
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 329,
+            "coverage_percent": 8.9,
+            "accuracy": 0.9149,
+            "balanced_accuracy": 0.8976,
+            "average_confidence": 0.8258,
+            "actual_hit_rate": 0.9149,
+            "calibration_gap": -0.089,
+            "class_distribution": {
+              "1": 199,
+              "0": 130
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 398,
+            "coverage_percent": 10.77,
+            "accuracy": 0.9095,
+            "balanced_accuracy": 0.9105,
+            "average_confidence": 0.8769,
+            "actual_hit_rate": 0.9095,
+            "calibration_gap": -0.0326,
+            "class_distribution": {
+              "0": 204,
+              "1": 194
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1234,
+            "coverage_percent": 33.39,
+            "accuracy": 0.9408,
+            "balanced_accuracy": 0.9415,
+            "average_confidence": 0.9623,
+            "actual_hit_rate": 0.9408,
+            "calibration_gap": 0.0215,
+            "class_distribution": {
+              "0": 635,
+              "1": 599
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3422,
+            "coverage_percent": 92.59,
+            "accuracy": 0.8518,
+            "balanced_accuracy": 0.8527,
+            "average_confidence": 0.8179,
+            "actual_hit_rate": 0.8518,
+            "calibration_gap": -0.034,
+            "class_distribution": {
+              "0": 1751,
+              "1": 1671
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3161,
+            "coverage_percent": 85.52,
+            "accuracy": 0.8722,
+            "balanced_accuracy": 0.8733,
+            "average_confidence": 0.8379,
+            "actual_hit_rate": 0.8722,
+            "calibration_gap": -0.0342,
+            "class_distribution": {
+              "0": 1622,
+              "1": 1539
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 2851,
+            "coverage_percent": 77.14,
+            "accuracy": 0.8871,
+            "balanced_accuracy": 0.888,
+            "average_confidence": 0.861,
+            "actual_hit_rate": 0.8871,
+            "calibration_gap": -0.0261,
+            "class_distribution": {
+              "0": 1455,
+              "1": 1396
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2570,
+            "coverage_percent": 69.53,
+            "accuracy": 0.9004,
+            "balanced_accuracy": 0.9008,
+            "average_confidence": 0.8815,
+            "actual_hit_rate": 0.9004,
+            "calibration_gap": -0.0189,
+            "class_distribution": {
+              "0": 1295,
+              "1": 1275
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2264,
+            "coverage_percent": 61.26,
+            "accuracy": 0.9148,
+            "balanced_accuracy": 0.9145,
+            "average_confidence": 0.9025,
+            "actual_hit_rate": 0.9148,
+            "calibration_gap": -0.0122,
+            "class_distribution": {
+              "1": 1139,
+              "0": 1125
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 1961,
+            "coverage_percent": 53.06,
+            "accuracy": 0.9301,
+            "balanced_accuracy": 0.9297,
+            "average_confidence": 0.9221,
+            "actual_hit_rate": 0.9301,
+            "calibration_gap": -0.008,
+            "class_distribution": {
+              "1": 992,
+              "0": 969
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 1961,
+          "coverage_percent": 53.06,
+          "accuracy": 0.9301,
+          "balanced_accuracy": 0.9297,
+          "average_confidence": 0.9221,
+          "actual_hit_rate": 0.9301,
+          "calibration_gap": -0.008,
+          "class_distribution": {
+            "1": 992,
+            "0": 969
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 1961,
+          "coverage_percent": 53.06,
+          "accuracy": 0.9301,
+          "balanced_accuracy": 0.9297,
+          "average_confidence": 0.9221,
+          "actual_hit_rate": 0.9301,
+          "calibration_gap": -0.008,
+          "class_distribution": {
+            "1": 992,
+            "0": 969
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": false
       },
       "segment_metrics": {
         "weight_class:Bantamweight": {
-          "rows": 404,
-          "accuracy": 0.646,
+          "rows": 292,
+          "accuracy": 0.839,
           "unstable_sample_warning": false
         },
         "weight_class:Bantamweight Bout": {
           "rows": 131,
-          "accuracy": 0.6031,
+          "accuracy": 0.8702,
           "unstable_sample_warning": false
         },
         "weight_class:Catch Weight": {
-          "rows": 38,
-          "accuracy": 0.5789,
+          "rows": 30,
+          "accuracy": 0.8,
           "unstable_sample_warning": true
         },
         "weight_class:Featherweight": {
-          "rows": 409,
-          "accuracy": 0.6357,
+          "rows": 297,
+          "accuracy": 0.8451,
           "unstable_sample_warning": false
         },
         "weight_class:Featherweight Bout": {
           "rows": 129,
-          "accuracy": 0.6357,
+          "accuracy": 0.8527,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight": {
-          "rows": 279,
-          "accuracy": 0.5448,
+          "rows": 202,
+          "accuracy": 0.8515,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight Bout": {
           "rows": 91,
-          "accuracy": 0.5385,
+          "accuracy": 0.8132,
           "unstable_sample_warning": true
         },
         "weight_class:Heavyweight": {
-          "rows": 232,
-          "accuracy": 0.6078,
+          "rows": 175,
+          "accuracy": 0.7371,
           "unstable_sample_warning": false
         },
         "weight_class:Heavyweight Bout": {
           "rows": 73,
-          "accuracy": 0.5753,
+          "accuracy": 0.7534,
           "unstable_sample_warning": true
         },
         "weight_class:Light Heavyweight": {
-          "rows": 234,
-          "accuracy": 0.5641,
+          "rows": 175,
+          "accuracy": 0.84,
           "unstable_sample_warning": false
         },
         "weight_class:Light Heavyweight Bout": {
           "rows": 76,
-          "accuracy": 0.5658,
+          "accuracy": 0.8684,
           "unstable_sample_warning": true
         },
         "weight_class:Lightweight": {
-          "rows": 465,
-          "accuracy": 0.5634,
+          "rows": 335,
+          "accuracy": 0.8179,
           "unstable_sample_warning": false
         },
         "weight_class:Lightweight Bout": {
           "rows": 148,
-          "accuracy": 0.5676,
+          "accuracy": 0.8446,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight": {
-          "rows": 442,
-          "accuracy": 0.6697,
+          "rows": 323,
+          "accuracy": 0.8204,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight Bout": {
           "rows": 145,
-          "accuracy": 0.6414,
+          "accuracy": 0.8759,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight": {
-          "rows": 399,
-          "accuracy": 0.5489,
+          "rows": 287,
+          "accuracy": 0.784,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight Bout": {
           "rows": 132,
-          "accuracy": 0.5,
+          "accuracy": 0.7955,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight": {
-          "rows": 144,
-          "accuracy": 0.6458,
+          "rows": 105,
+          "accuracy": 0.9143,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight Bout": {
           "rows": 45,
-          "accuracy": 0.6444,
+          "accuracy": 0.9556,
           "unstable_sample_warning": true
         },
         "weight_class:Women's Flyweight": {
-          "rows": 172,
-          "accuracy": 0.6512,
+          "rows": 122,
+          "accuracy": 0.8443,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Flyweight Bout": {
           "rows": 54,
-          "accuracy": 0.6111,
+          "accuracy": 0.8519,
           "unstable_sample_warning": true
         },
         "weight_class:Women's Strawweight": {
-          "rows": 226,
-          "accuracy": 0.6681,
+          "rows": 162,
+          "accuracy": 0.7901,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Strawweight Bout": {
           "rows": 71,
-          "accuracy": 0.6338,
-          "unstable_sample_warning": true
-        },
-        "weight_class:bantamweight": {
-          "rows": 107,
-          "accuracy": 0.6542,
-          "unstable_sample_warning": false
-        },
-        "weight_class:featherweight": {
-          "rows": 108,
-          "accuracy": 0.6667,
-          "unstable_sample_warning": false
-        },
-        "weight_class:flyweight": {
-          "rows": 73,
-          "accuracy": 0.5753,
-          "unstable_sample_warning": true
-        },
-        "weight_class:heavyweight": {
-          "rows": 55,
-          "accuracy": 0.6182,
-          "unstable_sample_warning": true
-        },
-        "weight_class:light heavyweight": {
-          "rows": 65,
-          "accuracy": 0.5692,
-          "unstable_sample_warning": true
-        },
-        "weight_class:lightweight": {
-          "rows": 126,
-          "accuracy": 0.6032,
-          "unstable_sample_warning": false
-        },
-        "weight_class:middleweight": {
-          "rows": 116,
-          "accuracy": 0.7069,
-          "unstable_sample_warning": false
-        },
-        "weight_class:welterweight": {
-          "rows": 109,
-          "accuracy": 0.5596,
-          "unstable_sample_warning": false
-        },
-        "weight_class:women's bantamweight": {
-          "rows": 37,
-          "accuracy": 0.6216,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's flyweight": {
-          "rows": 49,
-          "accuracy": 0.6939,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's strawweight": {
-          "rows": 61,
-          "accuracy": 0.6393,
+          "accuracy": 0.8451,
           "unstable_sample_warning": true
         },
         "low_fighter_history": {
-          "rows": 631,
-          "accuracy": 0.6006,
+          "rows": 477,
+          "accuracy": 0.8721,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 4906,
-          "accuracy": 0.6113,
+          "rows": 3219,
+          "accuracy": 0.8223,
           "unstable_sample_warning": false
         }
       }
@@ -373,454 +1045,906 @@
       "status": "backtested",
       "available": true,
       "target": "goes_distance_binary",
-      "fights_tested": 5537,
+      "fights_tested": 3696,
       "main_metric_name": "accuracy",
-      "main_metric": 0.6101,
-      "baseline_metric": 0.5183,
-      "relative_improvement": 0.0918,
+      "main_metric": 0.8287,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.3146,
       "beats_baseline": true,
       "metrics": {
-        "accuracy": 0.6101,
-        "balanced_accuracy": 0.6082,
-        "f1_macro": 0.608,
-        "roc_auc": 0.662,
-        "log_loss": 0.6708,
-        "brier_score": 0.2389,
+        "accuracy": 0.8287,
+        "balanced_accuracy": 0.8299,
+        "f1_macro": 0.8287,
+        "roc_auc": 0.9,
+        "log_loss": 0.4193,
+        "brier_score": 0.1279,
         "confusion_matrix": {
           "0": {
-            "0": 1487,
-            "1": 1180
+            "0": 1564,
+            "1": 232
           },
           "1": {
-            "0": 979,
-            "1": 1891
+            "0": 401,
+            "1": 1499
           }
         }
       },
       "baseline": {
         "label": "1",
-        "accuracy": 0.5183,
+        "accuracy": 0.5141,
         "class_counts": {
-          "1": 2870,
-          "0": 2667
+          "1": 1900,
+          "0": 1796
         }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 241,
+            "coverage_percent": 6.52,
+            "accuracy": 0.5021,
+            "balanced_accuracy": 0.5053,
+            "average_confidence": 0.5238,
+            "actual_hit_rate": 0.5021,
+            "calibration_gap": 0.0217,
+            "class_distribution": {
+              "1": 128,
+              "0": 113
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 247,
+            "coverage_percent": 6.68,
+            "accuracy": 0.6397,
+            "balanced_accuracy": 0.6399,
+            "average_confidence": 0.5743,
+            "actual_hit_rate": 0.6397,
+            "calibration_gap": -0.0654,
+            "class_distribution": {
+              "0": 132,
+              "1": 115
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 324,
+            "coverage_percent": 8.77,
+            "accuracy": 0.716,
+            "balanced_accuracy": 0.714,
+            "average_confidence": 0.6243,
+            "actual_hit_rate": 0.716,
+            "calibration_gap": -0.0918,
+            "class_distribution": {
+              "1": 182,
+              "0": 142
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 295,
+            "coverage_percent": 7.98,
+            "accuracy": 0.7424,
+            "balanced_accuracy": 0.7466,
+            "average_confidence": 0.6778,
+            "actual_hit_rate": 0.7424,
+            "calibration_gap": -0.0645,
+            "class_distribution": {
+              "1": 162,
+              "0": 133
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 280,
+            "coverage_percent": 7.58,
+            "accuracy": 0.7714,
+            "balanced_accuracy": 0.7776,
+            "average_confidence": 0.7274,
+            "actual_hit_rate": 0.7714,
+            "calibration_gap": -0.044,
+            "class_distribution": {
+              "1": 148,
+              "0": 132
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 318,
+            "coverage_percent": 8.6,
+            "accuracy": 0.8585,
+            "balanced_accuracy": 0.8632,
+            "average_confidence": 0.7761,
+            "actual_hit_rate": 0.8585,
+            "calibration_gap": -0.0824,
+            "class_distribution": {
+              "1": 180,
+              "0": 138
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 343,
+            "coverage_percent": 9.28,
+            "accuracy": 0.8892,
+            "balanced_accuracy": 0.8809,
+            "average_confidence": 0.8234,
+            "actual_hit_rate": 0.8892,
+            "calibration_gap": -0.0658,
+            "class_distribution": {
+              "0": 187,
+              "1": 156
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 375,
+            "coverage_percent": 10.15,
+            "accuracy": 0.8987,
+            "balanced_accuracy": 0.8884,
+            "average_confidence": 0.8754,
+            "actual_hit_rate": 0.8987,
+            "calibration_gap": -0.0233,
+            "class_distribution": {
+              "0": 212,
+              "1": 163
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1273,
+            "coverage_percent": 34.44,
+            "accuracy": 0.9442,
+            "balanced_accuracy": 0.9451,
+            "average_confidence": 0.9623,
+            "actual_hit_rate": 0.9442,
+            "calibration_gap": 0.0181,
+            "class_distribution": {
+              "1": 666,
+              "0": 607
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3455,
+            "coverage_percent": 93.48,
+            "accuracy": 0.8515,
+            "balanced_accuracy": 0.8525,
+            "average_confidence": 0.8192,
+            "actual_hit_rate": 0.8515,
+            "calibration_gap": -0.0323,
+            "class_distribution": {
+              "1": 1772,
+              "0": 1683
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3208,
+            "coverage_percent": 86.8,
+            "accuracy": 0.8678,
+            "balanced_accuracy": 0.8693,
+            "average_confidence": 0.838,
+            "actual_hit_rate": 0.8678,
+            "calibration_gap": -0.0298,
+            "class_distribution": {
+              "1": 1657,
+              "0": 1551
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 2884,
+            "coverage_percent": 78.03,
+            "accuracy": 0.8849,
+            "balanced_accuracy": 0.886,
+            "average_confidence": 0.862,
+            "actual_hit_rate": 0.8849,
+            "calibration_gap": -0.0228,
+            "class_distribution": {
+              "1": 1475,
+              "0": 1409
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2589,
+            "coverage_percent": 70.05,
+            "accuracy": 0.9011,
+            "balanced_accuracy": 0.9018,
+            "average_confidence": 0.883,
+            "actual_hit_rate": 0.9011,
+            "calibration_gap": -0.0181,
+            "class_distribution": {
+              "1": 1313,
+              "0": 1276
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2309,
+            "coverage_percent": 62.47,
+            "accuracy": 0.9168,
+            "balanced_accuracy": 0.9172,
+            "average_confidence": 0.9019,
+            "actual_hit_rate": 0.9168,
+            "calibration_gap": -0.0149,
+            "class_distribution": {
+              "1": 1165,
+              "0": 1144
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 1991,
+            "coverage_percent": 53.87,
+            "accuracy": 0.9262,
+            "balanced_accuracy": 0.9257,
+            "average_confidence": 0.922,
+            "actual_hit_rate": 0.9262,
+            "calibration_gap": -0.0042,
+            "class_distribution": {
+              "0": 1006,
+              "1": 985
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 1991,
+          "coverage_percent": 53.87,
+          "accuracy": 0.9262,
+          "balanced_accuracy": 0.9257,
+          "average_confidence": 0.922,
+          "actual_hit_rate": 0.9262,
+          "calibration_gap": -0.0042,
+          "class_distribution": {
+            "0": 1006,
+            "1": 985
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 1991,
+          "coverage_percent": 53.87,
+          "accuracy": 0.9262,
+          "balanced_accuracy": 0.9257,
+          "average_confidence": 0.922,
+          "actual_hit_rate": 0.9262,
+          "calibration_gap": -0.0042,
+          "class_distribution": {
+            "0": 1006,
+            "1": 985
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": false
       },
       "segment_metrics": {
         "weight_class:Bantamweight": {
-          "rows": 404,
-          "accuracy": 0.646,
+          "rows": 292,
+          "accuracy": 0.8459,
           "unstable_sample_warning": false
         },
         "weight_class:Bantamweight Bout": {
           "rows": 131,
-          "accuracy": 0.6031,
+          "accuracy": 0.8626,
           "unstable_sample_warning": false
         },
         "weight_class:Catch Weight": {
-          "rows": 38,
-          "accuracy": 0.5789,
+          "rows": 30,
+          "accuracy": 0.8,
           "unstable_sample_warning": true
         },
         "weight_class:Featherweight": {
-          "rows": 409,
-          "accuracy": 0.6357,
+          "rows": 297,
+          "accuracy": 0.8485,
           "unstable_sample_warning": false
         },
         "weight_class:Featherweight Bout": {
           "rows": 129,
-          "accuracy": 0.6357,
+          "accuracy": 0.8295,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight": {
-          "rows": 279,
-          "accuracy": 0.5448,
+          "rows": 202,
+          "accuracy": 0.8465,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight Bout": {
           "rows": 91,
-          "accuracy": 0.5385,
+          "accuracy": 0.8462,
           "unstable_sample_warning": true
         },
         "weight_class:Heavyweight": {
-          "rows": 232,
-          "accuracy": 0.6078,
+          "rows": 175,
+          "accuracy": 0.7429,
           "unstable_sample_warning": false
         },
         "weight_class:Heavyweight Bout": {
           "rows": 73,
-          "accuracy": 0.5753,
+          "accuracy": 0.7397,
           "unstable_sample_warning": true
         },
         "weight_class:Light Heavyweight": {
-          "rows": 234,
-          "accuracy": 0.5641,
+          "rows": 175,
+          "accuracy": 0.8457,
           "unstable_sample_warning": false
         },
         "weight_class:Light Heavyweight Bout": {
           "rows": 76,
-          "accuracy": 0.5658,
+          "accuracy": 0.8684,
           "unstable_sample_warning": true
         },
         "weight_class:Lightweight": {
-          "rows": 465,
-          "accuracy": 0.5634,
+          "rows": 335,
+          "accuracy": 0.8209,
           "unstable_sample_warning": false
         },
         "weight_class:Lightweight Bout": {
           "rows": 148,
-          "accuracy": 0.5676,
+          "accuracy": 0.8784,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight": {
-          "rows": 442,
-          "accuracy": 0.6697,
+          "rows": 323,
+          "accuracy": 0.8111,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight Bout": {
           "rows": 145,
-          "accuracy": 0.6414,
+          "accuracy": 0.8828,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight": {
-          "rows": 399,
-          "accuracy": 0.5489,
+          "rows": 287,
+          "accuracy": 0.7805,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight Bout": {
           "rows": 132,
-          "accuracy": 0.5,
+          "accuracy": 0.7803,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight": {
-          "rows": 144,
-          "accuracy": 0.6458,
+          "rows": 105,
+          "accuracy": 0.9238,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight Bout": {
           "rows": 45,
-          "accuracy": 0.6444,
+          "accuracy": 0.9556,
           "unstable_sample_warning": true
         },
         "weight_class:Women's Flyweight": {
-          "rows": 172,
-          "accuracy": 0.6512,
+          "rows": 122,
+          "accuracy": 0.8279,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Flyweight Bout": {
           "rows": 54,
-          "accuracy": 0.6111,
+          "accuracy": 0.8519,
           "unstable_sample_warning": true
         },
         "weight_class:Women's Strawweight": {
-          "rows": 226,
-          "accuracy": 0.6681,
+          "rows": 162,
+          "accuracy": 0.7716,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Strawweight Bout": {
           "rows": 71,
-          "accuracy": 0.6338,
-          "unstable_sample_warning": true
-        },
-        "weight_class:bantamweight": {
-          "rows": 107,
-          "accuracy": 0.6542,
-          "unstable_sample_warning": false
-        },
-        "weight_class:featherweight": {
-          "rows": 108,
-          "accuracy": 0.6667,
-          "unstable_sample_warning": false
-        },
-        "weight_class:flyweight": {
-          "rows": 73,
-          "accuracy": 0.5753,
-          "unstable_sample_warning": true
-        },
-        "weight_class:heavyweight": {
-          "rows": 55,
-          "accuracy": 0.6182,
-          "unstable_sample_warning": true
-        },
-        "weight_class:light heavyweight": {
-          "rows": 65,
-          "accuracy": 0.5692,
-          "unstable_sample_warning": true
-        },
-        "weight_class:lightweight": {
-          "rows": 126,
-          "accuracy": 0.6032,
-          "unstable_sample_warning": false
-        },
-        "weight_class:middleweight": {
-          "rows": 116,
-          "accuracy": 0.7069,
-          "unstable_sample_warning": false
-        },
-        "weight_class:welterweight": {
-          "rows": 109,
-          "accuracy": 0.5596,
-          "unstable_sample_warning": false
-        },
-        "weight_class:women's bantamweight": {
-          "rows": 37,
-          "accuracy": 0.6216,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's flyweight": {
-          "rows": 49,
-          "accuracy": 0.6939,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's strawweight": {
-          "rows": 61,
-          "accuracy": 0.6393,
+          "accuracy": 0.8451,
           "unstable_sample_warning": true
         },
         "low_fighter_history": {
-          "rows": 631,
-          "accuracy": 0.6006,
+          "rows": 477,
+          "accuracy": 0.8889,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 4906,
-          "accuracy": 0.6113,
+          "rows": 3219,
+          "accuracy": 0.8198,
           "unstable_sample_warning": false
         }
       }
     },
     "method_model": {
-      "status": "weak_or_failed_baseline",
+      "status": "backtested",
       "available": true,
       "target": "method_class",
-      "fights_tested": 5537,
+      "fights_tested": 3696,
       "main_metric_name": "accuracy",
-      "main_metric": 0.3235,
-      "baseline_metric": 0.5183,
-      "relative_improvement": -0.1948,
-      "beats_baseline": false,
+      "main_metric": 0.6656,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.1515,
+      "beats_baseline": true,
       "metrics": {
-        "accuracy": 0.3235,
-        "balanced_accuracy": 0.3337,
-        "f1_macro": 0.2666,
+        "accuracy": 0.6656,
+        "balanced_accuracy": 0.4589,
+        "f1_macro": 0.4272,
         "roc_auc": null,
-        "log_loss": 1.3448,
+        "log_loss": 0.844,
         "brier_score": null,
         "confusion_matrix": {
           "Decision": {
-            "Decision": 801,
-            "KO/TKO": 757,
-            "Other": 549,
-            "Submission": 763
+            "Decision": 1630,
+            "KO/TKO": 193,
+            "Other": 42,
+            "Submission": 35
           },
           "KO/TKO": {
-            "Decision": 190,
-            "KO/TKO": 635,
-            "Other": 287,
-            "Submission": 572
+            "Decision": 228,
+            "KO/TKO": 760,
+            "Other": 41,
+            "Submission": 106
           },
           "Other": {
-            "Decision": 3,
-            "KO/TKO": 8,
-            "Other": 17,
-            "Submission": 26
+            "Decision": 17,
+            "KO/TKO": 13,
+            "Other": 9,
+            "Submission": 4
           },
           "Submission": {
-            "Decision": 120,
-            "KO/TKO": 296,
-            "Other": 175,
-            "Submission": 338
+            "Decision": 165,
+            "KO/TKO": 377,
+            "Other": 15,
+            "Submission": 61
           }
         }
       },
       "baseline": {
         "label": "Decision",
-        "accuracy": 0.5183,
+        "accuracy": 0.5141,
         "class_counts": {
-          "Decision": 2870,
-          "KO/TKO": 1684,
-          "Submission": 929,
-          "Other": 54
+          "Decision": 1900,
+          "KO/TKO": 1135,
+          "Submission": 618,
+          "Other": 43
         }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 468,
+            "coverage_percent": 12.66,
+            "accuracy": 0.5449,
+            "balanced_accuracy": 0.3567,
+            "average_confidence": 0.5265,
+            "actual_hit_rate": 0.5449,
+            "calibration_gap": -0.0184,
+            "class_distribution": {
+              "KO/TKO": 241,
+              "Submission": 114,
+              "Decision": 108,
+              "Other": 5
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 386,
+            "coverage_percent": 10.44,
+            "accuracy": 0.5104,
+            "balanced_accuracy": 0.3495,
+            "average_confidence": 0.5728,
+            "actual_hit_rate": 0.5104,
+            "calibration_gap": 0.0624,
+            "class_distribution": {
+              "KO/TKO": 178,
+              "Submission": 107,
+              "Decision": 95,
+              "Other": 6
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 318,
+            "coverage_percent": 8.6,
+            "accuracy": 0.5912,
+            "balanced_accuracy": 0.3824,
+            "average_confidence": 0.6237,
+            "actual_hit_rate": 0.5912,
+            "calibration_gap": 0.0325,
+            "class_distribution": {
+              "Decision": 135,
+              "KO/TKO": 117,
+              "Submission": 64,
+              "Other": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 298,
+            "coverage_percent": 8.06,
+            "accuracy": 0.6107,
+            "balanced_accuracy": 0.5204,
+            "average_confidence": 0.6739,
+            "actual_hit_rate": 0.6107,
+            "calibration_gap": 0.0632,
+            "class_distribution": {
+              "Decision": 122,
+              "KO/TKO": 108,
+              "Submission": 64,
+              "Other": 4
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 235,
+            "coverage_percent": 6.36,
+            "accuracy": 0.7277,
+            "balanced_accuracy": 0.5153,
+            "average_confidence": 0.7254,
+            "actual_hit_rate": 0.7277,
+            "calibration_gap": -0.0023,
+            "class_distribution": {
+              "Decision": 126,
+              "KO/TKO": 69,
+              "Submission": 37,
+              "Other": 3
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 224,
+            "coverage_percent": 6.06,
+            "accuracy": 0.7589,
+            "balanced_accuracy": 0.5298,
+            "average_confidence": 0.776,
+            "actual_hit_rate": 0.7589,
+            "calibration_gap": 0.0171,
+            "class_distribution": {
+              "Decision": 146,
+              "KO/TKO": 51,
+              "Submission": 25,
+              "Other": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 199,
+            "coverage_percent": 5.38,
+            "accuracy": 0.7889,
+            "balanced_accuracy": 0.3719,
+            "average_confidence": 0.8218,
+            "actual_hit_rate": 0.7889,
+            "calibration_gap": 0.0328,
+            "class_distribution": {
+              "Decision": 152,
+              "KO/TKO": 30,
+              "Submission": 16,
+              "Other": 1
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 208,
+            "coverage_percent": 5.63,
+            "accuracy": 0.8365,
+            "balanced_accuracy": 0.5805,
+            "average_confidence": 0.876,
+            "actual_hit_rate": 0.8365,
+            "calibration_gap": 0.0394,
+            "class_distribution": {
+              "Decision": 172,
+              "KO/TKO": 19,
+              "Submission": 14,
+              "Other": 3
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 714,
+            "coverage_percent": 19.32,
+            "accuracy": 0.9594,
+            "balanced_accuracy": 0.4572,
+            "average_confidence": 0.9582,
+            "actual_hit_rate": 0.9594,
+            "calibration_gap": -0.0012,
+            "class_distribution": {
+              "Decision": 675,
+              "KO/TKO": 18,
+              "Submission": 15,
+              "Other": 6
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 2582,
+            "coverage_percent": 69.86,
+            "accuracy": 0.7452,
+            "balanced_accuracy": 0.4914,
+            "average_confidence": 0.7724,
+            "actual_hit_rate": 0.7452,
+            "calibration_gap": 0.0273,
+            "class_distribution": {
+              "Decision": 1623,
+              "KO/TKO": 590,
+              "Submission": 342,
+              "Other": 27
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 2196,
+            "coverage_percent": 59.42,
+            "accuracy": 0.7864,
+            "balanced_accuracy": 0.5096,
+            "average_confidence": 0.8075,
+            "actual_hit_rate": 0.7864,
+            "calibration_gap": 0.0211,
+            "class_distribution": {
+              "Decision": 1528,
+              "KO/TKO": 412,
+              "Submission": 235,
+              "Other": 21
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 1878,
+            "coverage_percent": 50.81,
+            "accuracy": 0.8195,
+            "balanced_accuracy": 0.5205,
+            "average_confidence": 0.8386,
+            "actual_hit_rate": 0.8195,
+            "calibration_gap": 0.0192,
+            "class_distribution": {
+              "Decision": 1393,
+              "KO/TKO": 295,
+              "Submission": 171,
+              "Other": 19
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 1580,
+            "coverage_percent": 42.75,
+            "accuracy": 0.8589,
+            "balanced_accuracy": 0.5087,
+            "average_confidence": 0.8697,
+            "actual_hit_rate": 0.8589,
+            "calibration_gap": 0.0109,
+            "class_distribution": {
+              "Decision": 1271,
+              "KO/TKO": 187,
+              "Submission": 107,
+              "Other": 15
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 1345,
+            "coverage_percent": 36.39,
+            "accuracy": 0.8818,
+            "balanced_accuracy": 0.4961,
+            "average_confidence": 0.8949,
+            "actual_hit_rate": 0.8818,
+            "calibration_gap": 0.0132,
+            "class_distribution": {
+              "Decision": 1145,
+              "KO/TKO": 118,
+              "Submission": 70,
+              "Other": 12
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 1121,
+            "coverage_percent": 30.33,
+            "accuracy": 0.9063,
+            "balanced_accuracy": 0.4786,
+            "average_confidence": 0.9187,
+            "actual_hit_rate": 0.9063,
+            "calibration_gap": 0.0124,
+            "class_distribution": {
+              "Decision": 999,
+              "KO/TKO": 67,
+              "Submission": 45,
+              "Other": 10
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 1121,
+          "coverage_percent": 30.33,
+          "accuracy": 0.9063,
+          "balanced_accuracy": 0.4786,
+          "average_confidence": 0.9187,
+          "actual_hit_rate": 0.9063,
+          "calibration_gap": 0.0124,
+          "class_distribution": {
+            "Decision": 999,
+            "KO/TKO": 67,
+            "Submission": 45,
+            "Other": 10
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=65%",
+          "sample_count": 1878,
+          "coverage_percent": 50.81,
+          "accuracy": 0.8195,
+          "balanced_accuracy": 0.5205,
+          "average_confidence": 0.8386,
+          "actual_hit_rate": 0.8195,
+          "calibration_gap": 0.0192,
+          "class_distribution": {
+            "Decision": 1393,
+            "KO/TKO": 295,
+            "Submission": 171,
+            "Other": 19
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": false
       },
       "segment_metrics": {
         "weight_class:Bantamweight": {
-          "rows": 404,
-          "accuracy": 0.2797,
+          "rows": 292,
+          "accuracy": 0.7089,
           "unstable_sample_warning": false
         },
         "weight_class:Bantamweight Bout": {
           "rows": 131,
-          "accuracy": 0.2443,
+          "accuracy": 0.7405,
           "unstable_sample_warning": false
         },
         "weight_class:Catch Weight": {
-          "rows": 38,
-          "accuracy": 0.2368,
+          "rows": 30,
+          "accuracy": 0.6667,
           "unstable_sample_warning": true
         },
         "weight_class:Featherweight": {
-          "rows": 409,
-          "accuracy": 0.3423,
+          "rows": 297,
+          "accuracy": 0.633,
           "unstable_sample_warning": false
         },
         "weight_class:Featherweight Bout": {
           "rows": 129,
-          "accuracy": 0.3411,
+          "accuracy": 0.6357,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight": {
-          "rows": 279,
-          "accuracy": 0.2652,
+          "rows": 202,
+          "accuracy": 0.6485,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight Bout": {
           "rows": 91,
-          "accuracy": 0.2747,
+          "accuracy": 0.6264,
           "unstable_sample_warning": true
         },
         "weight_class:Heavyweight": {
-          "rows": 232,
-          "accuracy": 0.1595,
+          "rows": 175,
+          "accuracy": 0.64,
           "unstable_sample_warning": false
         },
         "weight_class:Heavyweight Bout": {
           "rows": 73,
-          "accuracy": 0.137,
+          "accuracy": 0.6575,
           "unstable_sample_warning": true
         },
         "weight_class:Light Heavyweight": {
-          "rows": 234,
-          "accuracy": 0.3974,
+          "rows": 175,
+          "accuracy": 0.6629,
           "unstable_sample_warning": false
         },
         "weight_class:Light Heavyweight Bout": {
           "rows": 76,
-          "accuracy": 0.4079,
+          "accuracy": 0.6974,
           "unstable_sample_warning": true
         },
         "weight_class:Lightweight": {
-          "rows": 465,
-          "accuracy": 0.3226,
+          "rows": 335,
+          "accuracy": 0.6209,
           "unstable_sample_warning": false
         },
         "weight_class:Lightweight Bout": {
           "rows": 148,
-          "accuracy": 0.3311,
+          "accuracy": 0.6892,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight": {
-          "rows": 442,
-          "accuracy": 0.2828,
+          "rows": 323,
+          "accuracy": 0.6223,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight Bout": {
           "rows": 145,
-          "accuracy": 0.3034,
+          "accuracy": 0.6621,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight": {
-          "rows": 399,
-          "accuracy": 0.3133,
+          "rows": 287,
+          "accuracy": 0.6202,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight Bout": {
           "rows": 132,
-          "accuracy": 0.3106,
+          "accuracy": 0.6061,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight": {
-          "rows": 144,
-          "accuracy": 0.4931,
+          "rows": 105,
+          "accuracy": 0.7714,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight Bout": {
           "rows": 45,
-          "accuracy": 0.4889,
+          "accuracy": 0.7778,
           "unstable_sample_warning": true
         },
         "weight_class:Women's Flyweight": {
-          "rows": 172,
-          "accuracy": 0.4419,
+          "rows": 122,
+          "accuracy": 0.7623,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Flyweight Bout": {
           "rows": 54,
-          "accuracy": 0.4074,
+          "accuracy": 0.7963,
           "unstable_sample_warning": true
         },
         "weight_class:Women's Strawweight": {
-          "rows": 226,
-          "accuracy": 0.4071,
+          "rows": 162,
+          "accuracy": 0.6852,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Strawweight Bout": {
           "rows": 71,
-          "accuracy": 0.3803,
-          "unstable_sample_warning": true
-        },
-        "weight_class:bantamweight": {
-          "rows": 107,
-          "accuracy": 0.2897,
-          "unstable_sample_warning": false
-        },
-        "weight_class:featherweight": {
-          "rows": 108,
-          "accuracy": 0.3519,
-          "unstable_sample_warning": false
-        },
-        "weight_class:flyweight": {
-          "rows": 73,
-          "accuracy": 0.2466,
-          "unstable_sample_warning": true
-        },
-        "weight_class:heavyweight": {
-          "rows": 55,
-          "accuracy": 0.1818,
-          "unstable_sample_warning": true
-        },
-        "weight_class:light heavyweight": {
-          "rows": 65,
-          "accuracy": 0.3846,
-          "unstable_sample_warning": true
-        },
-        "weight_class:lightweight": {
-          "rows": 126,
-          "accuracy": 0.3175,
-          "unstable_sample_warning": false
-        },
-        "weight_class:middleweight": {
-          "rows": 116,
-          "accuracy": 0.2845,
-          "unstable_sample_warning": false
-        },
-        "weight_class:welterweight": {
-          "rows": 109,
-          "accuracy": 0.3119,
-          "unstable_sample_warning": false
-        },
-        "weight_class:women's bantamweight": {
-          "rows": 37,
-          "accuracy": 0.5135,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's flyweight": {
-          "rows": 49,
-          "accuracy": 0.4898,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's strawweight": {
-          "rows": 61,
-          "accuracy": 0.4426,
+          "accuracy": 0.7465,
           "unstable_sample_warning": true
         },
         "low_fighter_history": {
-          "rows": 631,
-          "accuracy": 0.1664,
+          "rows": 477,
+          "accuracy": 0.608,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 4906,
-          "accuracy": 0.3437,
+          "rows": 3219,
+          "accuracy": 0.6741,
           "unstable_sample_warning": false
         }
       }
@@ -829,548 +1953,473 @@
       "status": "weak_or_failed_baseline",
       "available": true,
       "target": "round_phase_class",
-      "fights_tested": 5537,
+      "fights_tested": 3696,
       "main_metric_name": "accuracy",
-      "main_metric": 0.1663,
-      "baseline_metric": 0.5183,
-      "relative_improvement": -0.352,
+      "main_metric": 0.3122,
+      "baseline_metric": 0.5141,
+      "relative_improvement": -0.2019,
       "beats_baseline": false,
       "metrics": {
-        "accuracy": 0.1663,
-        "balanced_accuracy": 0.3817,
-        "f1_macro": 0.1414,
+        "accuracy": 0.3122,
+        "balanced_accuracy": 0.3138,
+        "f1_macro": 0.1978,
         "roc_auc": null,
-        "log_loss": 1.7044,
+        "log_loss": 1.5593,
         "brier_score": null,
         "confusion_matrix": {
           "decision": {
-            "decision": 482,
-            "early": 365,
-            "late": 1269,
-            "middle": 117,
-            "unknown": 637
+            "decision": 878,
+            "early": 112,
+            "late": 453,
+            "middle": 189,
+            "unknown": 268
           },
           "early": {
-            "decision": 117,
-            "early": 260,
-            "late": 489,
-            "middle": 117,
-            "unknown": 319
+            "decision": 194,
+            "early": 140,
+            "late": 151,
+            "middle": 171,
+            "unknown": 223
           },
           "late": {
-            "decision": 0,
+            "decision": 3,
             "early": 0,
-            "late": 49,
-            "middle": 5,
-            "unknown": 0
+            "late": 28,
+            "middle": 0,
+            "unknown": 3
           },
           "middle": {
-            "decision": 141,
-            "early": 245,
-            "late": 460,
-            "middle": 123,
-            "unknown": 329
+            "decision": 252,
+            "early": 131,
+            "late": 215,
+            "middle": 108,
+            "unknown": 164
           },
           "unknown": {
-            "decision": 0,
-            "early": 4,
-            "late": 2,
-            "middle": 0,
-            "unknown": 7
+            "decision": 4,
+            "early": 2,
+            "late": 1,
+            "middle": 6,
+            "unknown": 0
           }
         }
       },
       "baseline": {
         "label": "decision",
-        "accuracy": 0.5183,
+        "accuracy": 0.5141,
         "class_counts": {
-          "decision": 2870,
-          "early": 1302,
-          "middle": 1298,
-          "late": 54,
+          "decision": 1900,
+          "early": 879,
+          "middle": 870,
+          "late": 34,
           "unknown": 13
         }
       },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 260,
+            "coverage_percent": 7.03,
+            "accuracy": 0.4654,
+            "balanced_accuracy": 0.2387,
+            "average_confidence": 0.5259,
+            "actual_hit_rate": 0.4654,
+            "calibration_gap": 0.0605,
+            "class_distribution": {
+              "decision": 169,
+              "early": 46,
+              "middle": 45
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 194,
+            "coverage_percent": 5.25,
+            "accuracy": 0.4124,
+            "balanced_accuracy": 0.4085,
+            "average_confidence": 0.5738,
+            "actual_hit_rate": 0.4124,
+            "calibration_gap": 0.1614,
+            "class_distribution": {
+              "decision": 123,
+              "middle": 41,
+              "early": 28,
+              "late": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 154,
+            "coverage_percent": 4.17,
+            "accuracy": 0.5455,
+            "balanced_accuracy": 0.4387,
+            "average_confidence": 0.6218,
+            "actual_hit_rate": 0.5455,
+            "calibration_gap": 0.0763,
+            "class_distribution": {
+              "decision": 102,
+              "early": 23,
+              "middle": 22,
+              "late": 7
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 107,
+            "coverage_percent": 2.9,
+            "accuracy": 0.4579,
+            "balanced_accuracy": 0.412,
+            "average_confidence": 0.673,
+            "actual_hit_rate": 0.4579,
+            "calibration_gap": 0.2151,
+            "class_distribution": {
+              "decision": 71,
+              "early": 17,
+              "middle": 16,
+              "late": 3
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 97,
+            "coverage_percent": 2.62,
+            "accuracy": 0.3918,
+            "balanced_accuracy": 0.3885,
+            "average_confidence": 0.7236,
+            "actual_hit_rate": 0.3918,
+            "calibration_gap": 0.3318,
+            "class_distribution": {
+              "decision": 65,
+              "middle": 19,
+              "early": 11,
+              "late": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 85,
+            "coverage_percent": 2.3,
+            "accuracy": 0.2118,
+            "balanced_accuracy": 0.2664,
+            "average_confidence": 0.774,
+            "actual_hit_rate": 0.2118,
+            "calibration_gap": 0.5622,
+            "class_distribution": {
+              "decision": 47,
+              "early": 18,
+              "middle": 15,
+              "late": 4,
+              "unknown": 1
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 62,
+            "coverage_percent": 1.68,
+            "accuracy": 0.4677,
+            "balanced_accuracy": 0.322,
+            "average_confidence": 0.8265,
+            "actual_hit_rate": 0.4677,
+            "calibration_gap": 0.3588,
+            "class_distribution": {
+              "decision": 41,
+              "middle": 9,
+              "early": 7,
+              "late": 4,
+              "unknown": 1
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 39,
+            "coverage_percent": 1.06,
+            "accuracy": 0.2051,
+            "balanced_accuracy": 0.0988,
+            "average_confidence": 0.8778,
+            "actual_hit_rate": 0.2051,
+            "calibration_gap": 0.6726,
+            "class_distribution": {
+              "decision": 27,
+              "early": 10,
+              "middle": 2
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 40,
+            "coverage_percent": 1.08,
+            "accuracy": 0.075,
+            "balanced_accuracy": 0.25,
+            "average_confidence": 0.9698,
+            "actual_hit_rate": 0.075,
+            "calibration_gap": 0.8948,
+            "class_distribution": {
+              "decision": 20,
+              "early": 9,
+              "middle": 8,
+              "late": 3
+            },
+            "small_sample_warning": true
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 778,
+            "coverage_percent": 21.05,
+            "accuracy": 0.3972,
+            "balanced_accuracy": 0.3157,
+            "average_confidence": 0.6932,
+            "actual_hit_rate": 0.3972,
+            "calibration_gap": 0.296,
+            "class_distribution": {
+              "decision": 496,
+              "middle": 132,
+              "early": 123,
+              "late": 25,
+              "unknown": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 584,
+            "coverage_percent": 15.8,
+            "accuracy": 0.3921,
+            "balanced_accuracy": 0.312,
+            "average_confidence": 0.7329,
+            "actual_hit_rate": 0.3921,
+            "calibration_gap": 0.3408,
+            "class_distribution": {
+              "decision": 373,
+              "early": 95,
+              "middle": 91,
+              "late": 23,
+              "unknown": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 430,
+            "coverage_percent": 11.63,
+            "accuracy": 0.3372,
+            "balanced_accuracy": 0.2972,
+            "average_confidence": 0.7727,
+            "actual_hit_rate": 0.3372,
+            "calibration_gap": 0.4355,
+            "class_distribution": {
+              "decision": 271,
+              "early": 72,
+              "middle": 69,
+              "late": 16,
+              "unknown": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 323,
+            "coverage_percent": 8.74,
+            "accuracy": 0.2972,
+            "balanced_accuracy": 0.2856,
+            "average_confidence": 0.8057,
+            "actual_hit_rate": 0.2972,
+            "calibration_gap": 0.5085,
+            "class_distribution": {
+              "decision": 200,
+              "early": 55,
+              "middle": 53,
+              "late": 13,
+              "unknown": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 226,
+            "coverage_percent": 6.11,
+            "accuracy": 0.2566,
+            "balanced_accuracy": 0.2727,
+            "average_confidence": 0.841,
+            "actual_hit_rate": 0.2566,
+            "calibration_gap": 0.5843,
+            "class_distribution": {
+              "decision": 135,
+              "early": 44,
+              "middle": 34,
+              "late": 11,
+              "unknown": 2
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 141,
+            "coverage_percent": 3.81,
+            "accuracy": 0.2837,
+            "balanced_accuracy": 0.275,
+            "average_confidence": 0.8813,
+            "actual_hit_rate": 0.2837,
+            "calibration_gap": 0.5977,
+            "class_distribution": {
+              "decision": 88,
+              "early": 26,
+              "middle": 19,
+              "late": 7,
+              "unknown": 1
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=55%",
+          "sample_count": 778,
+          "coverage_percent": 21.05,
+          "accuracy": 0.3972,
+          "balanced_accuracy": 0.3157,
+          "average_confidence": 0.6932,
+          "actual_hit_rate": 0.3972,
+          "calibration_gap": 0.296,
+          "class_distribution": {
+            "decision": 496,
+            "middle": 132,
+            "early": 123,
+            "late": 25,
+            "unknown": 2
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=55%",
+          "sample_count": 778,
+          "coverage_percent": 21.05,
+          "accuracy": 0.3972,
+          "balanced_accuracy": 0.3157,
+          "average_confidence": 0.6932,
+          "actual_hit_rate": 0.3972,
+          "calibration_gap": 0.296,
+          "class_distribution": {
+            "decision": 496,
+            "middle": 132,
+            "early": 123,
+            "late": 25,
+            "unknown": 2
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": false,
+        "reaches_95_balanced_accuracy": false
+      },
       "segment_metrics": {
         "weight_class:Bantamweight": {
-          "rows": 404,
-          "accuracy": 0.1535,
+          "rows": 292,
+          "accuracy": 0.3664,
           "unstable_sample_warning": false
         },
         "weight_class:Bantamweight Bout": {
           "rows": 131,
-          "accuracy": 0.1679,
+          "accuracy": 0.3817,
           "unstable_sample_warning": false
         },
         "weight_class:Catch Weight": {
-          "rows": 38,
-          "accuracy": 0.0526,
+          "rows": 30,
+          "accuracy": 0.1,
           "unstable_sample_warning": true
         },
         "weight_class:Featherweight": {
-          "rows": 409,
-          "accuracy": 0.1711,
+          "rows": 297,
+          "accuracy": 0.2492,
           "unstable_sample_warning": false
         },
         "weight_class:Featherweight Bout": {
           "rows": 129,
-          "accuracy": 0.1628,
+          "accuracy": 0.2636,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight": {
-          "rows": 279,
-          "accuracy": 0.19,
+          "rows": 202,
+          "accuracy": 0.3218,
           "unstable_sample_warning": false
         },
         "weight_class:Flyweight Bout": {
           "rows": 91,
-          "accuracy": 0.1868,
+          "accuracy": 0.3187,
           "unstable_sample_warning": true
         },
         "weight_class:Heavyweight": {
-          "rows": 232,
-          "accuracy": 0.1422,
+          "rows": 175,
+          "accuracy": 0.2343,
           "unstable_sample_warning": false
         },
         "weight_class:Heavyweight Bout": {
           "rows": 73,
-          "accuracy": 0.1507,
+          "accuracy": 0.274,
           "unstable_sample_warning": true
         },
         "weight_class:Light Heavyweight": {
-          "rows": 234,
-          "accuracy": 0.094,
+          "rows": 175,
+          "accuracy": 0.2229,
           "unstable_sample_warning": false
         },
         "weight_class:Light Heavyweight Bout": {
           "rows": 76,
-          "accuracy": 0.0789,
+          "accuracy": 0.2763,
           "unstable_sample_warning": true
         },
         "weight_class:Lightweight": {
-          "rows": 465,
-          "accuracy": 0.1763,
+          "rows": 335,
+          "accuracy": 0.3313,
           "unstable_sample_warning": false
         },
         "weight_class:Lightweight Bout": {
           "rows": 148,
-          "accuracy": 0.1622,
+          "accuracy": 0.3378,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight": {
-          "rows": 442,
-          "accuracy": 0.1561,
+          "rows": 323,
+          "accuracy": 0.2384,
           "unstable_sample_warning": false
         },
         "weight_class:Middleweight Bout": {
           "rows": 145,
-          "accuracy": 0.1448,
+          "accuracy": 0.2276,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight": {
-          "rows": 399,
-          "accuracy": 0.1328,
+          "rows": 287,
+          "accuracy": 0.2265,
           "unstable_sample_warning": false
         },
         "weight_class:Welterweight Bout": {
           "rows": 132,
-          "accuracy": 0.1136,
+          "accuracy": 0.2348,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight": {
-          "rows": 144,
-          "accuracy": 0.2153,
+          "rows": 105,
+          "accuracy": 0.5524,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Bantamweight Bout": {
           "rows": 45,
-          "accuracy": 0.2222,
+          "accuracy": 0.5333,
           "unstable_sample_warning": true
         },
         "weight_class:Women's Flyweight": {
-          "rows": 172,
-          "accuracy": 0.1977,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Women's Flyweight Bout": {
-          "rows": 54,
-          "accuracy": 0.1852,
-          "unstable_sample_warning": true
-        },
-        "weight_class:Women's Strawweight": {
-          "rows": 226,
-          "accuracy": 0.2743,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Women's Strawweight Bout": {
-          "rows": 71,
-          "accuracy": 0.2958,
-          "unstable_sample_warning": true
-        },
-        "weight_class:bantamweight": {
-          "rows": 107,
-          "accuracy": 0.1963,
-          "unstable_sample_warning": false
-        },
-        "weight_class:featherweight": {
-          "rows": 108,
-          "accuracy": 0.1667,
-          "unstable_sample_warning": false
-        },
-        "weight_class:flyweight": {
-          "rows": 73,
-          "accuracy": 0.2192,
-          "unstable_sample_warning": true
-        },
-        "weight_class:heavyweight": {
-          "rows": 55,
-          "accuracy": 0.1818,
-          "unstable_sample_warning": true
-        },
-        "weight_class:light heavyweight": {
-          "rows": 65,
-          "accuracy": 0.0769,
-          "unstable_sample_warning": true
-        },
-        "weight_class:lightweight": {
-          "rows": 126,
-          "accuracy": 0.2063,
-          "unstable_sample_warning": false
-        },
-        "weight_class:middleweight": {
-          "rows": 116,
-          "accuracy": 0.1638,
-          "unstable_sample_warning": false
-        },
-        "weight_class:welterweight": {
-          "rows": 109,
-          "accuracy": 0.1284,
-          "unstable_sample_warning": false
-        },
-        "weight_class:women's bantamweight": {
-          "rows": 37,
-          "accuracy": 0.2432,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's flyweight": {
-          "rows": 49,
-          "accuracy": 0.2041,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's strawweight": {
-          "rows": 61,
-          "accuracy": 0.2951,
-          "unstable_sample_warning": true
-        },
-        "low_fighter_history": {
-          "rows": 631,
-          "accuracy": 0.13,
-          "unstable_sample_warning": false
-        },
-        "enough_fighter_history": {
-          "rows": 4906,
-          "accuracy": 0.171,
-          "unstable_sample_warning": false
-        }
-      }
-    },
-    "strike_volume_model": {
-      "status": "backtested",
-      "available": true,
-      "target": "combined_strike_volume_bucket",
-      "fights_tested": 3163,
-      "main_metric_name": "accuracy",
-      "main_metric": 0.4006,
-      "baseline_metric": 0.3721,
-      "relative_improvement": 0.0285,
-      "beats_baseline": true,
-      "metrics": {
-        "accuracy": 0.4006,
-        "balanced_accuracy": 0.3812,
-        "f1_macro": 0.3521,
-        "roc_auc": null,
-        "log_loss": 1.1041,
-        "brier_score": null,
-        "confusion_matrix": {
-          "high": {
-            "high": 723,
-            "low": 389,
-            "medium": 65
-          },
-          "low": {
-            "high": 535,
-            "low": 452,
-            "medium": 61
-          },
-          "medium": {
-            "high": 502,
-            "low": 344,
-            "medium": 92
-          }
-        }
-      },
-      "baseline": {
-        "label": "high",
-        "accuracy": 0.3721,
-        "class_counts": {
-          "high": 1177,
-          "low": 1048,
-          "medium": 938
-        }
-      },
-      "segment_metrics": {
-        "weight_class:Bantamweight": {
-          "rows": 262,
-          "accuracy": 0.4122,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Featherweight": {
-          "rows": 264,
-          "accuracy": 0.4129,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Flyweight": {
-          "rows": 180,
-          "accuracy": 0.4056,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Heavyweight": {
-          "rows": 151,
-          "accuracy": 0.3775,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Light Heavyweight": {
-          "rows": 149,
-          "accuracy": 0.4698,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Lightweight": {
-          "rows": 304,
-          "accuracy": 0.352,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Middleweight": {
-          "rows": 288,
-          "accuracy": 0.4757,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Welterweight": {
-          "rows": 260,
-          "accuracy": 0.3538,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Women's Bantamweight": {
-          "rows": 94,
-          "accuracy": 0.3404,
-          "unstable_sample_warning": true
-        },
-        "weight_class:Women's Flyweight": {
-          "rows": 112,
-          "accuracy": 0.4375,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Women's Strawweight": {
-          "rows": 147,
-          "accuracy": 0.3265,
-          "unstable_sample_warning": false
-        },
-        "weight_class:bantamweight": {
-          "rows": 107,
-          "accuracy": 0.4206,
-          "unstable_sample_warning": false
-        },
-        "weight_class:featherweight": {
-          "rows": 108,
-          "accuracy": 0.4167,
-          "unstable_sample_warning": false
-        },
-        "weight_class:flyweight": {
-          "rows": 73,
-          "accuracy": 0.4247,
-          "unstable_sample_warning": true
-        },
-        "weight_class:heavyweight": {
-          "rows": 55,
-          "accuracy": 0.3818,
-          "unstable_sample_warning": true
-        },
-        "weight_class:light heavyweight": {
-          "rows": 65,
-          "accuracy": 0.4462,
-          "unstable_sample_warning": true
-        },
-        "weight_class:lightweight": {
-          "rows": 126,
-          "accuracy": 0.3571,
-          "unstable_sample_warning": false
-        },
-        "weight_class:middleweight": {
-          "rows": 116,
-          "accuracy": 0.4828,
-          "unstable_sample_warning": false
-        },
-        "weight_class:welterweight": {
-          "rows": 109,
-          "accuracy": 0.3578,
-          "unstable_sample_warning": false
-        },
-        "weight_class:women's bantamweight": {
-          "rows": 37,
-          "accuracy": 0.3514,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's flyweight": {
-          "rows": 49,
-          "accuracy": 0.4898,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's strawweight": {
-          "rows": 61,
-          "accuracy": 0.3115,
-          "unstable_sample_warning": true
-        },
-        "low_fighter_history": {
-          "rows": 385,
-          "accuracy": 0.4234,
-          "unstable_sample_warning": false
-        },
-        "enough_fighter_history": {
-          "rows": 2778,
-          "accuracy": 0.3974,
-          "unstable_sample_warning": false
-        }
-      }
-    },
-    "takedown_control_model": {
-      "status": "weak_or_failed_baseline",
-      "available": true,
-      "target": "grappling_heavy_binary",
-      "fights_tested": 4327,
-      "main_metric_name": "accuracy",
-      "main_metric": 0.5193,
-      "baseline_metric": 0.5653,
-      "relative_improvement": -0.046,
-      "beats_baseline": false,
-      "metrics": {
-        "accuracy": 0.5193,
-        "balanced_accuracy": 0.509,
-        "f1_macro": 0.5089,
-        "roc_auc": 0.5362,
-        "log_loss": 0.6915,
-        "brier_score": 0.2492,
-        "confusion_matrix": {
-          "0.0": {
-            "0.0": 1438,
-            "1.0": 1008
-          },
-          "1.0": {
-            "0.0": 1072,
-            "1.0": 809
-          }
-        }
-      },
-      "baseline": {
-        "label": "0.0",
-        "accuracy": 0.5653,
-        "class_counts": {
-          "0.0": 2446,
-          "1.0": 1881
-        }
-      },
-      "segment_metrics": {
-        "weight_class:Bantamweight": {
-          "rows": 262,
-          "accuracy": 0.542,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Bantamweight Bout": {
-          "rows": 131,
-          "accuracy": 0.5573,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Featherweight": {
-          "rows": 264,
-          "accuracy": 0.4659,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Featherweight Bout": {
-          "rows": 129,
-          "accuracy": 0.4651,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Flyweight": {
-          "rows": 180,
-          "accuracy": 0.5056,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Flyweight Bout": {
-          "rows": 91,
-          "accuracy": 0.5714,
-          "unstable_sample_warning": true
-        },
-        "weight_class:Heavyweight": {
-          "rows": 151,
-          "accuracy": 0.5298,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Heavyweight Bout": {
-          "rows": 73,
-          "accuracy": 0.5205,
-          "unstable_sample_warning": true
-        },
-        "weight_class:Light Heavyweight": {
-          "rows": 149,
-          "accuracy": 0.6577,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Light Heavyweight Bout": {
-          "rows": 76,
-          "accuracy": 0.6842,
-          "unstable_sample_warning": true
-        },
-        "weight_class:Lightweight": {
-          "rows": 304,
-          "accuracy": 0.5362,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Lightweight Bout": {
-          "rows": 148,
-          "accuracy": 0.5405,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Middleweight": {
-          "rows": 288,
-          "accuracy": 0.5382,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Middleweight Bout": {
-          "rows": 145,
-          "accuracy": 0.5931,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Welterweight": {
-          "rows": 260,
-          "accuracy": 0.4923,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Welterweight Bout": {
-          "rows": 132,
-          "accuracy": 0.5606,
-          "unstable_sample_warning": false
-        },
-        "weight_class:Women's Bantamweight": {
-          "rows": 94,
-          "accuracy": 0.5745,
-          "unstable_sample_warning": true
-        },
-        "weight_class:Women's Bantamweight Bout": {
-          "rows": 45,
-          "accuracy": 0.5111,
-          "unstable_sample_warning": true
-        },
-        "weight_class:Women's Flyweight": {
-          "rows": 112,
-          "accuracy": 0.4018,
+          "rows": 122,
+          "accuracy": 0.4016,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Flyweight Bout": {
@@ -1379,78 +2428,836 @@
           "unstable_sample_warning": true
         },
         "weight_class:Women's Strawweight": {
-          "rows": 147,
-          "accuracy": 0.3605,
+          "rows": 162,
+          "accuracy": 0.5617,
           "unstable_sample_warning": false
         },
         "weight_class:Women's Strawweight Bout": {
           "rows": 71,
-          "accuracy": 0.4225,
-          "unstable_sample_warning": true
-        },
-        "weight_class:bantamweight": {
-          "rows": 107,
-          "accuracy": 0.5327,
-          "unstable_sample_warning": false
-        },
-        "weight_class:featherweight": {
-          "rows": 108,
-          "accuracy": 0.4815,
-          "unstable_sample_warning": false
-        },
-        "weight_class:flyweight": {
-          "rows": 73,
-          "accuracy": 0.5342,
-          "unstable_sample_warning": true
-        },
-        "weight_class:heavyweight": {
-          "rows": 55,
-          "accuracy": 0.5273,
-          "unstable_sample_warning": true
-        },
-        "weight_class:light heavyweight": {
-          "rows": 65,
-          "accuracy": 0.6923,
-          "unstable_sample_warning": true
-        },
-        "weight_class:lightweight": {
-          "rows": 126,
-          "accuracy": 0.5317,
-          "unstable_sample_warning": false
-        },
-        "weight_class:middleweight": {
-          "rows": 116,
-          "accuracy": 0.5431,
-          "unstable_sample_warning": false
-        },
-        "weight_class:welterweight": {
-          "rows": 109,
-          "accuracy": 0.5138,
-          "unstable_sample_warning": false
-        },
-        "weight_class:women's bantamweight": {
-          "rows": 37,
-          "accuracy": 0.5676,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's flyweight": {
-          "rows": 49,
-          "accuracy": 0.4082,
-          "unstable_sample_warning": true
-        },
-        "weight_class:women's strawweight": {
-          "rows": 61,
-          "accuracy": 0.377,
+          "accuracy": 0.5915,
           "unstable_sample_warning": true
         },
         "low_fighter_history": {
-          "rows": 581,
-          "accuracy": 0.401,
+          "rows": 477,
+          "accuracy": 0.283,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 3746,
-          "accuracy": 0.5376,
+          "rows": 3219,
+          "accuracy": 0.3166,
+          "unstable_sample_warning": false
+        }
+      }
+    },
+    "strike_volume_model": {
+      "status": "backtested",
+      "available": true,
+      "target": "combined_strike_volume_bucket",
+      "fights_tested": 1322,
+      "main_metric_name": "accuracy",
+      "main_metric": 0.438,
+      "baseline_metric": 0.3623,
+      "relative_improvement": 0.0757,
+      "beats_baseline": true,
+      "metrics": {
+        "accuracy": 0.438,
+        "balanced_accuracy": 0.4356,
+        "f1_macro": 0.4263,
+        "roc_auc": null,
+        "log_loss": 1.1014,
+        "brier_score": null,
+        "confusion_matrix": {
+          "high": {
+            "high": 159,
+            "low": 142,
+            "medium": 178
+          },
+          "low": {
+            "high": 68,
+            "low": 288,
+            "medium": 96
+          },
+          "medium": {
+            "high": 90,
+            "low": 169,
+            "medium": 132
+          }
+        }
+      },
+      "baseline": {
+        "label": "high",
+        "accuracy": 0.3623,
+        "class_counts": {
+          "high": 479,
+          "low": 452,
+          "medium": 391
+        }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 193,
+            "coverage_percent": 14.6,
+            "accuracy": 0.4197,
+            "balanced_accuracy": 0.4337,
+            "average_confidence": 0.5254,
+            "actual_hit_rate": 0.4197,
+            "calibration_gap": 0.1058,
+            "class_distribution": {
+              "high": 83,
+              "low": 55,
+              "medium": 55
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 153,
+            "coverage_percent": 11.57,
+            "accuracy": 0.4771,
+            "balanced_accuracy": 0.4865,
+            "average_confidence": 0.5735,
+            "actual_hit_rate": 0.4771,
+            "calibration_gap": 0.0963,
+            "class_distribution": {
+              "high": 55,
+              "medium": 53,
+              "low": 45
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 131,
+            "coverage_percent": 9.91,
+            "accuracy": 0.4275,
+            "balanced_accuracy": 0.4326,
+            "average_confidence": 0.6252,
+            "actual_hit_rate": 0.4275,
+            "calibration_gap": 0.1978,
+            "class_distribution": {
+              "medium": 47,
+              "high": 42,
+              "low": 42
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 107,
+            "coverage_percent": 8.09,
+            "accuracy": 0.4112,
+            "balanced_accuracy": 0.3873,
+            "average_confidence": 0.6716,
+            "actual_hit_rate": 0.4112,
+            "calibration_gap": 0.2603,
+            "class_distribution": {
+              "low": 41,
+              "high": 33,
+              "medium": 33
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 90,
+            "coverage_percent": 6.81,
+            "accuracy": 0.4778,
+            "balanced_accuracy": 0.4336,
+            "average_confidence": 0.7226,
+            "actual_hit_rate": 0.4778,
+            "calibration_gap": 0.2448,
+            "class_distribution": {
+              "low": 35,
+              "medium": 28,
+              "high": 27
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 83,
+            "coverage_percent": 6.28,
+            "accuracy": 0.6145,
+            "balanced_accuracy": 0.4864,
+            "average_confidence": 0.7773,
+            "actual_hit_rate": 0.6145,
+            "calibration_gap": 0.1628,
+            "class_distribution": {
+              "low": 43,
+              "high": 21,
+              "medium": 19
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 33,
+            "coverage_percent": 2.5,
+            "accuracy": 0.6667,
+            "balanced_accuracy": 0.4444,
+            "average_confidence": 0.8249,
+            "actual_hit_rate": 0.6667,
+            "calibration_gap": 0.1582,
+            "class_distribution": {
+              "low": 19,
+              "high": 9,
+              "medium": 5
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 18,
+            "coverage_percent": 1.36,
+            "accuracy": 0.6111,
+            "balanced_accuracy": 0.3333,
+            "average_confidence": 0.8655,
+            "actual_hit_rate": 0.6111,
+            "calibration_gap": 0.2544,
+            "class_distribution": {
+              "low": 11,
+              "medium": 4,
+              "high": 3
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 4,
+            "coverage_percent": 0.3,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.9401,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.0599,
+            "class_distribution": {
+              "low": 4
+            },
+            "small_sample_warning": true
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 619,
+            "coverage_percent": 46.82,
+            "accuracy": 0.4911,
+            "balanced_accuracy": 0.4629,
+            "average_confidence": 0.6747,
+            "actual_hit_rate": 0.4911,
+            "calibration_gap": 0.1835,
+            "class_distribution": {
+              "low": 240,
+              "high": 190,
+              "medium": 189
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 466,
+            "coverage_percent": 35.25,
+            "accuracy": 0.4957,
+            "balanced_accuracy": 0.4446,
+            "average_confidence": 0.7079,
+            "actual_hit_rate": 0.4957,
+            "calibration_gap": 0.2122,
+            "class_distribution": {
+              "low": 195,
+              "medium": 136,
+              "high": 135
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 335,
+            "coverage_percent": 25.34,
+            "accuracy": 0.5224,
+            "balanced_accuracy": 0.4364,
+            "average_confidence": 0.7402,
+            "actual_hit_rate": 0.5224,
+            "calibration_gap": 0.2178,
+            "class_distribution": {
+              "low": 153,
+              "high": 93,
+              "medium": 89
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 228,
+            "coverage_percent": 17.25,
+            "accuracy": 0.5746,
+            "balanced_accuracy": 0.4508,
+            "average_confidence": 0.7724,
+            "actual_hit_rate": 0.5746,
+            "calibration_gap": 0.1978,
+            "class_distribution": {
+              "low": 112,
+              "high": 60,
+              "medium": 56
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 138,
+            "coverage_percent": 10.44,
+            "accuracy": 0.6377,
+            "balanced_accuracy": 0.4636,
+            "average_confidence": 0.8049,
+            "actual_hit_rate": 0.6377,
+            "calibration_gap": 0.1672,
+            "class_distribution": {
+              "low": 77,
+              "high": 33,
+              "medium": 28
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 55,
+            "coverage_percent": 4.16,
+            "accuracy": 0.6727,
+            "balanced_accuracy": 0.4167,
+            "average_confidence": 0.8465,
+            "actual_hit_rate": 0.6727,
+            "calibration_gap": 0.1738,
+            "class_distribution": {
+              "low": 34,
+              "high": 12,
+              "medium": 9
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 55,
+          "coverage_percent": 4.16,
+          "accuracy": 0.6727,
+          "balanced_accuracy": 0.4167,
+          "average_confidence": 0.8465,
+          "actual_hit_rate": 0.6727,
+          "calibration_gap": 0.1738,
+          "class_distribution": {
+            "low": 34,
+            "high": 12,
+            "medium": 9
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=75%",
+          "sample_count": 138,
+          "coverage_percent": 10.44,
+          "accuracy": 0.6377,
+          "balanced_accuracy": 0.4636,
+          "average_confidence": 0.8049,
+          "actual_hit_rate": 0.6377,
+          "calibration_gap": 0.1672,
+          "class_distribution": {
+            "low": 77,
+            "high": 33,
+            "medium": 28
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": false,
+        "reaches_95_balanced_accuracy": false
+      },
+      "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 150,
+          "accuracy": 0.52,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight": {
+          "rows": 152,
+          "accuracy": 0.5,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 103,
+          "accuracy": 0.4078,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Heavyweight": {
+          "rows": 94,
+          "accuracy": 0.4149,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 90,
+          "accuracy": 0.4556,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 174,
+          "accuracy": 0.3851,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 169,
+          "accuracy": 0.4142,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 148,
+          "accuracy": 0.4189,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 55,
+          "accuracy": 0.4364,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 62,
+          "accuracy": 0.4516,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 83,
+          "accuracy": 0.4217,
+          "unstable_sample_warning": true
+        },
+        "low_fighter_history": {
+          "rows": 231,
+          "accuracy": 0.4762,
+          "unstable_sample_warning": false
+        },
+        "enough_fighter_history": {
+          "rows": 1091,
+          "accuracy": 0.4299,
+          "unstable_sample_warning": false
+        }
+      }
+    },
+    "takedown_control_model": {
+      "status": "backtested",
+      "available": true,
+      "target": "grappling_heavy_binary",
+      "fights_tested": 2486,
+      "main_metric_name": "accuracy",
+      "main_metric": 0.5973,
+      "baseline_metric": 0.5897,
+      "relative_improvement": 0.0076,
+      "beats_baseline": true,
+      "metrics": {
+        "accuracy": 0.5973,
+        "balanced_accuracy": 0.5485,
+        "f1_macro": 0.5333,
+        "roc_auc": 0.6159,
+        "log_loss": 0.6662,
+        "brier_score": 0.2363,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1203,
+            "1.0": 263
+          },
+          "1.0": {
+            "0.0": 738,
+            "1.0": 282
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.5897,
+        "class_counts": {
+          "0.0": 1466,
+          "1.0": 1020
+        }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 437,
+            "coverage_percent": 17.58,
+            "accuracy": 0.4805,
+            "balanced_accuracy": 0.4775,
+            "average_confidence": 0.5243,
+            "actual_hit_rate": 0.4805,
+            "calibration_gap": 0.0438,
+            "class_distribution": {
+              "0.0": 228,
+              "1.0": 209
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 404,
+            "coverage_percent": 16.25,
+            "accuracy": 0.5495,
+            "balanced_accuracy": 0.538,
+            "average_confidence": 0.5766,
+            "actual_hit_rate": 0.5495,
+            "calibration_gap": 0.0271,
+            "class_distribution": {
+              "0.0": 215,
+              "1.0": 189
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 409,
+            "coverage_percent": 16.45,
+            "accuracy": 0.5281,
+            "balanced_accuracy": 0.5247,
+            "average_confidence": 0.625,
+            "actual_hit_rate": 0.5281,
+            "calibration_gap": 0.0969,
+            "class_distribution": {
+              "0.0": 207,
+              "1.0": 202
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 432,
+            "coverage_percent": 17.38,
+            "accuracy": 0.6319,
+            "balanced_accuracy": 0.5389,
+            "average_confidence": 0.676,
+            "actual_hit_rate": 0.6319,
+            "calibration_gap": 0.0441,
+            "class_distribution": {
+              "0.0": 269,
+              "1.0": 163
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 319,
+            "coverage_percent": 12.83,
+            "accuracy": 0.6708,
+            "balanced_accuracy": 0.5681,
+            "average_confidence": 0.7241,
+            "actual_hit_rate": 0.6708,
+            "calibration_gap": 0.0533,
+            "class_distribution": {
+              "0.0": 204,
+              "1.0": 115
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 268,
+            "coverage_percent": 10.78,
+            "accuracy": 0.6791,
+            "balanced_accuracy": 0.5929,
+            "average_confidence": 0.7731,
+            "actual_hit_rate": 0.6791,
+            "calibration_gap": 0.094,
+            "class_distribution": {
+              "0.0": 169,
+              "1.0": 99
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 129,
+            "coverage_percent": 5.19,
+            "accuracy": 0.7752,
+            "balanced_accuracy": 0.5142,
+            "average_confidence": 0.8212,
+            "actual_hit_rate": 0.7752,
+            "calibration_gap": 0.046,
+            "class_distribution": {
+              "0.0": 103,
+              "1.0": 26
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 70,
+            "coverage_percent": 2.82,
+            "accuracy": 0.7143,
+            "balanced_accuracy": 0.5117,
+            "average_confidence": 0.8703,
+            "actual_hit_rate": 0.7143,
+            "calibration_gap": 0.156,
+            "class_distribution": {
+              "0.0": 53,
+              "1.0": 17
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 18,
+            "coverage_percent": 0.72,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.9076,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.0924,
+            "class_distribution": {
+              "0.0": 18
+            },
+            "small_sample_warning": true
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 2049,
+            "coverage_percent": 82.42,
+            "accuracy": 0.6223,
+            "balanced_accuracy": 0.5568,
+            "average_confidence": 0.6842,
+            "actual_hit_rate": 0.6223,
+            "calibration_gap": 0.062,
+            "class_distribution": {
+              "0.0": 1238,
+              "1.0": 811
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 1645,
+            "coverage_percent": 66.17,
+            "accuracy": 0.6401,
+            "balanced_accuracy": 0.5553,
+            "average_confidence": 0.7107,
+            "actual_hit_rate": 0.6401,
+            "calibration_gap": 0.0706,
+            "class_distribution": {
+              "0.0": 1023,
+              "1.0": 622
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 1236,
+            "coverage_percent": 49.72,
+            "accuracy": 0.6772,
+            "balanced_accuracy": 0.5585,
+            "average_confidence": 0.739,
+            "actual_hit_rate": 0.6772,
+            "calibration_gap": 0.0618,
+            "class_distribution": {
+              "0.0": 816,
+              "1.0": 420
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 804,
+            "coverage_percent": 32.34,
+            "accuracy": 0.7015,
+            "balanced_accuracy": 0.5702,
+            "average_confidence": 0.7729,
+            "actual_hit_rate": 0.7015,
+            "calibration_gap": 0.0714,
+            "class_distribution": {
+              "0.0": 547,
+              "1.0": 257
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 485,
+            "coverage_percent": 19.51,
+            "accuracy": 0.7216,
+            "balanced_accuracy": 0.5721,
+            "average_confidence": 0.8049,
+            "actual_hit_rate": 0.7216,
+            "calibration_gap": 0.0833,
+            "class_distribution": {
+              "0.0": 343,
+              "1.0": 142
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 217,
+            "coverage_percent": 8.73,
+            "accuracy": 0.7742,
+            "balanced_accuracy": 0.5178,
+            "average_confidence": 0.8442,
+            "actual_hit_rate": 0.7742,
+            "calibration_gap": 0.07,
+            "class_distribution": {
+              "0.0": 174,
+              "1.0": 43
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 217,
+          "coverage_percent": 8.73,
+          "accuracy": 0.7742,
+          "balanced_accuracy": 0.5178,
+          "average_confidence": 0.8442,
+          "actual_hit_rate": 0.7742,
+          "calibration_gap": 0.07,
+          "class_distribution": {
+            "0.0": 174,
+            "1.0": 43
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=75%",
+          "sample_count": 485,
+          "coverage_percent": 19.51,
+          "accuracy": 0.7216,
+          "balanced_accuracy": 0.5721,
+          "average_confidence": 0.8049,
+          "actual_hit_rate": 0.7216,
+          "calibration_gap": 0.0833,
+          "class_distribution": {
+            "0.0": 343,
+            "1.0": 142
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": false,
+        "reaches_95_balanced_accuracy": false
+      },
+      "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 150,
+          "accuracy": 0.56,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Bantamweight Bout": {
+          "rows": 131,
+          "accuracy": 0.5649,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight": {
+          "rows": 152,
+          "accuracy": 0.5592,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight Bout": {
+          "rows": 129,
+          "accuracy": 0.5659,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 103,
+          "accuracy": 0.5631,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight Bout": {
+          "rows": 91,
+          "accuracy": 0.6154,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight": {
+          "rows": 94,
+          "accuracy": 0.6702,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight Bout": {
+          "rows": 73,
+          "accuracy": 0.6849,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 90,
+          "accuracy": 0.8,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight Bout": {
+          "rows": 76,
+          "accuracy": 0.8158,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 174,
+          "accuracy": 0.523,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight Bout": {
+          "rows": 148,
+          "accuracy": 0.5946,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 169,
+          "accuracy": 0.6154,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight Bout": {
+          "rows": 145,
+          "accuracy": 0.7034,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 148,
+          "accuracy": 0.6149,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight Bout": {
+          "rows": 132,
+          "accuracy": 0.697,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 55,
+          "accuracy": 0.4909,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Bantamweight Bout": {
+          "rows": 45,
+          "accuracy": 0.6,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 62,
+          "accuracy": 0.4355,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight Bout": {
+          "rows": 54,
+          "accuracy": 0.5926,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 83,
+          "accuracy": 0.3855,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight Bout": {
+          "rows": 71,
+          "accuracy": 0.5352,
+          "unstable_sample_warning": true
+        },
+        "low_fighter_history": {
+          "rows": 427,
+          "accuracy": 0.6206,
+          "unstable_sample_warning": false
+        },
+        "enough_fighter_history": {
+          "rows": 2059,
+          "accuracy": 0.5925,
           "unstable_sample_warning": false
         }
       }
@@ -1458,45 +3265,45 @@
   },
   "overall_ranking": [
     {
+      "model": "winner_model",
+      "status": "backtested",
+      "relative_improvement": 0.3892,
+      "beats_baseline": true
+    },
+    {
       "model": "finish_model",
       "status": "backtested",
-      "relative_improvement": 0.0918,
+      "relative_improvement": 0.3146,
       "beats_baseline": true
     },
     {
       "model": "goes_distance_model",
       "status": "backtested",
-      "relative_improvement": 0.0918,
+      "relative_improvement": 0.3146,
+      "beats_baseline": true
+    },
+    {
+      "model": "method_model",
+      "status": "backtested",
+      "relative_improvement": 0.1515,
       "beats_baseline": true
     },
     {
       "model": "strike_volume_model",
       "status": "backtested",
-      "relative_improvement": 0.0285,
+      "relative_improvement": 0.0757,
       "beats_baseline": true
     },
     {
       "model": "takedown_control_model",
-      "status": "weak_or_failed_baseline",
-      "relative_improvement": -0.046,
-      "beats_baseline": false
-    },
-    {
-      "model": "method_model",
-      "status": "weak_or_failed_baseline",
-      "relative_improvement": -0.1948,
-      "beats_baseline": false
+      "status": "backtested",
+      "relative_improvement": 0.0076,
+      "beats_baseline": true
     },
     {
       "model": "round_phase_model",
       "status": "weak_or_failed_baseline",
-      "relative_improvement": -0.352,
-      "beats_baseline": false
-    },
-    {
-      "model": "winner_model",
-      "status": "skipped",
-      "relative_improvement": null,
+      "relative_improvement": -0.2019,
       "beats_baseline": false
     },
     {
@@ -1509,21 +3316,21 @@
   "examples": {
     "best_predictions": [
       {
-        "fight_id": "2024-06-01|nan|Islam Makhachev|Dustin Poirier|43092",
-        "event_date": "2024-06-01",
-        "matchup": "Islam Makhachev vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.769,
+        "fight_id": "2025-11-01|nan|Alice Ardelean|Montserrat Conejo Ruiz|42357",
+        "event_date": "2025-11-01",
+        "matchup": "Alice Ardelean vs Montserrat Conejo Ruiz",
+        "model": "method_model",
+        "confidence": 0.9967,
         "correct": true,
-        "predicted": "late",
+        "predicted": "Decision",
         "actual": {
-          "winner": "Islam Makhachev",
-          "method": "Submission",
-          "finish_round": 5.0,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "late",
+          "winner": "Alice Ardelean",
+          "method": "Decision",
+          "finish_round": 3.0,
+          "went_distance": true,
+          "finish_binary": 0,
+          "goes_distance_binary": 1,
+          "round_phase_class": "decision",
           "combined_sig_strikes": null,
           "fighter_1_sig_strikes_landed": null,
           "fighter_2_sig_strikes_landed": null,
@@ -1533,191 +3340,119 @@
         }
       },
       {
-        "fight_id": "2024-06-01|UFC 302: Makhachev vs. Poirier|Islam Makhachev|Dustin Poirier|34495",
-        "event_date": "2024-06-01",
-        "matchup": "Islam Makhachev vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.7673,
+        "fight_id": "2024-09-28|nan|Gabriel Miranda|Morgan Charriere|42929",
+        "event_date": "2024-09-28",
+        "matchup": "Gabriel Miranda vs Morgan Charriere",
+        "model": "goes_distance_model",
+        "confidence": 0.9966,
         "correct": true,
-        "predicted": "late",
+        "predicted": "0",
         "actual": {
-          "winner": "Islam Makhachev",
-          "method": "Submission",
-          "finish_round": 5.0,
+          "winner": "Morgan Charriere",
+          "method": "KO/TKO",
+          "finish_round": 2.0,
           "went_distance": false,
           "finish_binary": 1,
           "goes_distance_binary": 0,
-          "round_phase_class": "late",
-          "combined_sig_strikes": 162.0,
-          "fighter_1_sig_strikes_landed": 88.0,
-          "fighter_2_sig_strikes_landed": 74.0,
-          "fighter_1_takedowns_landed": 5.0,
-          "fighter_2_takedowns_landed": 0.0,
-          "grappling_heavy_binary": 1.0
-        }
-      },
-      {
-        "fight_id": "2024-06-01|nan|Islam Makhachev|Dustin Poirier|24589",
-        "event_date": "2024-06-01",
-        "matchup": "Islam Makhachev vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.7654,
-        "correct": true,
-        "predicted": "late",
-        "actual": {
-          "winner": "Islam Makhachev",
-          "method": "Submission",
-          "finish_round": 5.0,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "late",
+          "round_phase_class": "middle",
           "combined_sig_strikes": null,
           "fighter_1_sig_strikes_landed": null,
           "fighter_2_sig_strikes_landed": null,
-          "fighter_1_takedowns_landed": 5.0,
-          "fighter_2_takedowns_landed": 0.0,
+          "fighter_1_takedowns_landed": null,
+          "fighter_2_takedowns_landed": null,
+          "grappling_heavy_binary": null
+        }
+      },
+      {
+        "fight_id": "2025-03-22|nan|Felipe dos Santos|Lone'er Kavanagh|25006",
+        "event_date": "2025-03-22",
+        "matchup": "Felipe dos Santos vs Lone'er Kavanagh",
+        "model": "method_model",
+        "confidence": 0.9966,
+        "correct": true,
+        "predicted": "Decision",
+        "actual": {
+          "winner": "Lone'er Kavanagh",
+          "method": "Decision",
+          "finish_round": 3.0,
+          "went_distance": true,
+          "finish_binary": 0,
+          "goes_distance_binary": 1,
+          "round_phase_class": "decision",
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
+          "fighter_1_takedowns_landed": 0.0,
+          "fighter_2_takedowns_landed": 4.0,
           "grappling_heavy_binary": 1.0
         }
       },
       {
-        "fight_id": "2024-06-01|UFC 302: Makhachev vs. Poirier|Islam Makhachev|Dustin Poirier|8991",
-        "event_date": "2024-06-01",
-        "matchup": "Islam Makhachev vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.7653,
+        "fight_id": "2024-02-03|nan|Blake Bilder|JeongYeong Lee|24403",
+        "event_date": "2024-02-03",
+        "matchup": "Blake Bilder vs JeongYeong Lee",
+        "model": "method_model",
+        "confidence": 0.9965,
         "correct": true,
-        "predicted": "late",
+        "predicted": "Decision",
+        "actual": {
+          "winner": "JeongYeong Lee",
+          "method": "Decision",
+          "finish_round": 3.0,
+          "went_distance": true,
+          "finish_binary": 0,
+          "goes_distance_binary": 1,
+          "round_phase_class": "decision",
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
+          "fighter_1_takedowns_landed": 0.0,
+          "fighter_2_takedowns_landed": 2.0,
+          "grappling_heavy_binary": 0.0
+        }
+      },
+      {
+        "fight_id": "2024-09-28|UFC Fight Night: Moicano vs. Saint Denis|Gabriel Miranda|Morgan Charriere|8827",
+        "event_date": "2024-09-28",
+        "matchup": "Gabriel Miranda vs Morgan Charriere",
+        "model": "goes_distance_model",
+        "confidence": 0.9965,
+        "correct": true,
+        "predicted": "0",
         "actual": {
           "winner": NaN,
-          "method": "Submission",
-          "finish_round": 5.0,
+          "method": "KO/TKO",
+          "finish_round": 2.0,
           "went_distance": false,
           "finish_binary": 1,
           "goes_distance_binary": 0,
-          "round_phase_class": "late",
-          "combined_sig_strikes": 162.0,
-          "fighter_1_sig_strikes_landed": 88.0,
-          "fighter_2_sig_strikes_landed": 74.0,
-          "fighter_1_takedowns_landed": 5.0,
-          "fighter_2_takedowns_landed": 0.0,
-          "grappling_heavy_binary": 1.0
-        }
-      },
-      {
-        "fight_id": "2024-06-01|UFC 302: Makhachev vs. Poirier|Islam Makhachev|Dustin Poirier|699",
-        "event_date": "2024-06-01",
-        "matchup": "Islam Makhachev vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.7633,
-        "correct": true,
-        "predicted": "late",
-        "actual": {
-          "winner": "Islam Makhachev",
-          "method": "Submission",
-          "finish_round": 5.0,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "late",
-          "combined_sig_strikes": 162.0,
-          "fighter_1_sig_strikes_landed": 88.0,
-          "fighter_2_sig_strikes_landed": 74.0,
-          "fighter_1_takedowns_landed": 5.0,
-          "fighter_2_takedowns_landed": 0.0,
+          "round_phase_class": "middle",
+          "combined_sig_strikes": 30.0,
+          "fighter_1_sig_strikes_landed": 11.0,
+          "fighter_2_sig_strikes_landed": 19.0,
+          "fighter_1_takedowns_landed": 1.0,
+          "fighter_2_takedowns_landed": 2.0,
           "grappling_heavy_binary": 1.0
         }
       }
     ],
     "worst_misses": [
       {
-        "fight_id": "2025-07-19|nan|Max Holloway|Dustin Poirier|42511",
-        "event_date": "2025-07-19",
-        "matchup": "Max Holloway vs Dustin Poirier",
+        "fight_id": "2024-02-03|nan|Draw/NC|Makhmud Muradov|24411",
+        "event_date": "2024-02-03",
+        "matchup": "Draw/NC vs Makhmud Muradov",
         "model": "round_phase_model",
-        "confidence": 0.8077,
+        "confidence": 1.0,
         "correct": false,
         "predicted": "late",
         "actual": {
-          "winner": "Max Holloway",
-          "method": "Decision",
-          "finish_round": 5.0,
-          "went_distance": true,
-          "finish_binary": 0,
-          "goes_distance_binary": 1,
-          "round_phase_class": "decision",
-          "combined_sig_strikes": null,
-          "fighter_1_sig_strikes_landed": null,
-          "fighter_2_sig_strikes_landed": null,
-          "fighter_1_takedowns_landed": null,
-          "fighter_2_takedowns_landed": null,
-          "grappling_heavy_binary": null
-        }
-      },
-      {
-        "fight_id": "2025-07-19|UFC 318: Holloway vs. Poirier 3|Max Holloway|Dustin Poirier|8409",
-        "event_date": "2025-07-19",
-        "matchup": "Max Holloway vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.8076,
-        "correct": false,
-        "predicted": "late",
-        "actual": {
-          "winner": NaN,
-          "method": "Decision",
-          "finish_round": 5.0,
-          "went_distance": true,
-          "finish_binary": 0,
-          "goes_distance_binary": 1,
-          "round_phase_class": "decision",
-          "combined_sig_strikes": 307.0,
-          "fighter_1_sig_strikes_landed": 198.0,
-          "fighter_2_sig_strikes_landed": 109.0,
-          "fighter_1_takedowns_landed": 0.0,
-          "fighter_2_takedowns_landed": 0.0,
-          "grappling_heavy_binary": 0.0
-        }
-      },
-      {
-        "fight_id": "2025-07-19|UFC 318: Holloway vs. Poirier 3|Max Holloway|Dustin Poirier|33887",
-        "event_date": "2025-07-19",
-        "matchup": "Max Holloway vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.8076,
-        "correct": false,
-        "predicted": "late",
-        "actual": {
-          "winner": "Max Holloway",
-          "method": "Decision",
-          "finish_round": 5.0,
-          "went_distance": true,
-          "finish_binary": 0,
-          "goes_distance_binary": 1,
-          "round_phase_class": "decision",
-          "combined_sig_strikes": 307.0,
-          "fighter_1_sig_strikes_landed": 198.0,
-          "fighter_2_sig_strikes_landed": 109.0,
-          "fighter_1_takedowns_landed": 0.0,
-          "fighter_2_takedowns_landed": 0.0,
-          "grappling_heavy_binary": 0.0
-        }
-      },
-      {
-        "fight_id": "2025-07-19|nan|Max Holloway|Dustin Poirier|25169",
-        "event_date": "2025-07-19",
-        "matchup": "Max Holloway vs Dustin Poirier",
-        "model": "round_phase_model",
-        "confidence": 0.8075,
-        "correct": false,
-        "predicted": "late",
-        "actual": {
-          "winner": "Max Holloway",
-          "method": "Decision",
-          "finish_round": 5.0,
-          "went_distance": true,
-          "finish_binary": 0,
-          "goes_distance_binary": 1,
-          "round_phase_class": "decision",
+          "winner": "Draw/NC",
+          "method": "Other",
+          "finish_round": 1.0,
+          "went_distance": false,
+          "finish_binary": 1,
+          "goes_distance_binary": 0,
+          "round_phase_class": "early",
           "combined_sig_strikes": null,
           "fighter_1_sig_strikes_landed": null,
           "fighter_2_sig_strikes_landed": null,
@@ -1727,24 +3462,96 @@
         }
       },
       {
-        "fight_id": "2025-07-19|UFC 318: Holloway vs. Poirier 3|Max Holloway|Dustin Poirier|116",
-        "event_date": "2025-07-19",
-        "matchup": "Max Holloway vs Dustin Poirier",
+        "fight_id": "2025-02-08|nan|Draw/NC|Rodolfo Bellato|24934",
+        "event_date": "2025-02-08",
+        "matchup": "Draw/NC vs Rodolfo Bellato",
         "model": "round_phase_model",
-        "confidence": 0.8074,
+        "confidence": 1.0,
         "correct": false,
         "predicted": "late",
         "actual": {
-          "winner": "Max Holloway",
+          "winner": "Draw/NC",
           "method": "Decision",
-          "finish_round": 5.0,
+          "finish_round": 3.0,
           "went_distance": true,
           "finish_binary": 0,
           "goes_distance_binary": 1,
           "round_phase_class": "decision",
-          "combined_sig_strikes": 307.0,
-          "fighter_1_sig_strikes_landed": 198.0,
-          "fighter_2_sig_strikes_landed": 109.0,
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
+          "fighter_1_takedowns_landed": 0.0,
+          "fighter_2_takedowns_landed": 1.0,
+          "grappling_heavy_binary": 0.0
+        }
+      },
+      {
+        "fight_id": "2025-06-14|nan|Draw/NC|Rodolfo Bellato|25133",
+        "event_date": "2025-06-14",
+        "matchup": "Draw/NC vs Rodolfo Bellato",
+        "model": "round_phase_model",
+        "confidence": 1.0,
+        "correct": false,
+        "predicted": "late",
+        "actual": {
+          "winner": "Draw/NC",
+          "method": "Other",
+          "finish_round": 1.0,
+          "went_distance": false,
+          "finish_binary": 1,
+          "goes_distance_binary": 0,
+          "round_phase_class": "early",
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
+          "fighter_1_takedowns_landed": 0.0,
+          "fighter_2_takedowns_landed": 1.0,
+          "grappling_heavy_binary": 0.0
+        }
+      },
+      {
+        "fight_id": "2023-11-18|nan|Draw/NC|Nikolas Motta|24339",
+        "event_date": "2023-11-18",
+        "matchup": "Draw/NC vs Nikolas Motta",
+        "model": "round_phase_model",
+        "confidence": 0.9999,
+        "correct": false,
+        "predicted": "late",
+        "actual": {
+          "winner": "Draw/NC",
+          "method": "Other",
+          "finish_round": 3.0,
+          "went_distance": false,
+          "finish_binary": 1,
+          "goes_distance_binary": 0,
+          "round_phase_class": "middle",
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
+          "fighter_1_takedowns_landed": 3.0,
+          "fighter_2_takedowns_landed": 0.0,
+          "grappling_heavy_binary": 1.0
+        }
+      },
+      {
+        "fight_id": "2025-09-13|nan|Draw/NC|Sedriques Dumas|25268",
+        "event_date": "2025-09-13",
+        "matchup": "Draw/NC vs Sedriques Dumas",
+        "model": "round_phase_model",
+        "confidence": 0.9999,
+        "correct": false,
+        "predicted": "late",
+        "actual": {
+          "winner": "Draw/NC",
+          "method": "Other",
+          "finish_round": 1.0,
+          "went_distance": false,
+          "finish_binary": 1,
+          "goes_distance_binary": 0,
+          "round_phase_class": "early",
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
           "fighter_1_takedowns_landed": 0.0,
           "fighter_2_takedowns_landed": 0.0,
           "grappling_heavy_binary": 0.0
@@ -1753,9 +3560,9 @@
     ],
     "prop_examples": [
       {
-        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Jose Johnson|Chad Anheliger|956",
-        "matchup": "Jose Johnson vs Chad Anheliger",
-        "fighter_1_over_50_sig_strikes": true,
+        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Chad Anheliger|Jose Johnson|956",
+        "matchup": "Chad Anheliger vs Jose Johnson",
+        "fighter_1_over_50_sig_strikes": false,
         "fighter_2_over_0_5_takedowns": true
       },
       {
@@ -1777,9 +3584,9 @@
         "fighter_2_over_0_5_takedowns": true
       },
       {
-        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Jose Johnson|Chad Anheliger|9258",
-        "matchup": "Jose Johnson vs Chad Anheliger",
-        "fighter_1_over_50_sig_strikes": false,
+        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Chad Anheliger|Jose Johnson|9258",
+        "matchup": "Chad Anheliger vs Jose Johnson",
+        "fighter_1_over_50_sig_strikes": true,
         "fighter_2_over_0_5_takedowns": true
       }
     ]
@@ -1881,14 +3688,14 @@
       "fighter_1_history_count": 0,
       "fighter_2_history_count": 0,
       "minimum_history_count": 0,
-      "fighter_1_win_rate_before": 1234,
-      "fighter_2_win_rate_before": 1570,
+      "fighter_1_win_rate_before": 1399,
+      "fighter_2_win_rate_before": 1405,
       "win_rate_diff": 2301,
-      "fighter_1_finish_win_rate_before": 2375,
-      "fighter_2_finish_win_rate_before": 11978,
+      "fighter_1_finish_win_rate_before": 7329,
+      "fighter_2_finish_win_rate_before": 7024,
       "finish_rate_diff": 13187,
-      "fighter_1_decision_win_rate_before": 2375,
-      "fighter_2_decision_win_rate_before": 11978,
+      "fighter_1_decision_win_rate_before": 7329,
+      "fighter_2_decision_win_rate_before": 7024,
       "decision_rate_diff": 13187,
       "fighter_1_ko_tko_win_rate_before": 49355,
       "fighter_2_ko_tko_win_rate_before": 49355,

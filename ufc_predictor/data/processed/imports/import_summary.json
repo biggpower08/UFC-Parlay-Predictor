@@ -1170,12 +1170,13 @@
     },
     "model_readiness": {
       "winner_model": {
-        "status": "blocked_orientation_review",
+        "status": "training_data_ready",
         "rows": 32140,
         "class_distribution": {
-          "1": 32140
+          "0": 16072,
+          "1": 16068
         },
-        "reason": "Winner labels are present, but normalized sources appear winner-oriented; runtime fighter_1/fighter_2 orientation must be corrected before winner-model training."
+        "reason": "Winner labels use deterministic fighter-name orientation independent of outcome; final model must still beat held-out baseline before production use."
       },
       "finish_model": {
         "status": "training_data_ready",

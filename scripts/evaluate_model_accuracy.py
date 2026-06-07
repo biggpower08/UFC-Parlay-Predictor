@@ -9,12 +9,18 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import ExtraTreesClassifier, HistGradientBoostingClassifier, RandomForestClassifier
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ufc_predictor.config import settings
+from ufc_predictor.features.feature_schema import get_feature_schema
 from ufc_predictor.training.dataset_builder import build_training_rows, load_fights_csv
 from ufc_predictor.training.deduping import stable_fight_key
 
@@ -31,12 +37,46 @@ FEATURE_NAMES = [
 ]
 
 CLASSIFICATION_MODELS = {
+    "winner_model": "f1_wins_safe",
     "finish_model": "finish_binary",
     "goes_distance_model": "goes_distance_binary",
     "method_model": "method_class",
     "round_phase_model": "round_phase_class",
     "strike_volume_model": "combined_strike_volume_bucket",
     "takedown_control_model": "grappling_heavy_binary",
+}
+
+TARGET_COLUMNS = {
+    "winner",
+    "f1_wins_safe",
+    "finish_binary",
+    "goes_distance_binary",
+    "method_class",
+    "round_number",
+    "round_phase_class",
+    "fighter_a_sig_strikes",
+    "fighter_b_sig_strikes",
+    "combined_sig_strikes",
+    "fighter_a_strike_volume_bucket",
+    "fighter_b_strike_volume_bucket",
+    "combined_strike_volume_bucket",
+    "fighter_a_50plus_sig_strikes",
+    "fighter_b_50plus_sig_strikes",
+    "combined_100plus_sig_strikes",
+    "fighter_a_takedowns",
+    "fighter_b_takedowns",
+    "fighter_a_takedown_1plus",
+    "fighter_b_takedown_1plus",
+    "grappling_heavy_binary",
+    "takedown_control_bucket",
+}
+
+SOURCE_PRIORITY = {
+    "ufc_stats_complete": 1,
+    "ufc_1994_2025": 2,
+    "ufc_fight_forecast": 3,
+    "ufc_1994_2026": 4,
+    "mdabbert_ultimate": 5,
 }
 
 REGRESSION_MODELS = {
@@ -74,10 +114,6 @@ def main() -> int:
         models[model_name] = evaluate_classification_model(model_name, target, train, validation, test, by_segment=args.by_segment)
     for model_name, target in REGRESSION_MODELS.items():
         models[model_name] = evaluate_regression_model(model_name, target, train, validation, test, by_segment=args.by_segment)
-    models["winner_model"] = blocked_model(
-        "winner_model",
-        "Winner labels exist in imported data, but known-winner sources are currently winner-oriented after normalization. A runtime winner model needs a safe fighter_1/fighter_2 orientation with mirrored rows kept together before it can be honestly evaluated.",
-    )
     models["odds_calibration_model"] = blocked_model("odds_calibration_model", "Pre-fight odds snapshots are not yet safely matched to outcomes and timestamps.")
 
     ranking = relative_ranking(models)
@@ -143,13 +179,16 @@ def chronological_train_validation_test_split(dataset: pd.DataFrame, validation_
 
 
 def evaluate_classification_model(model_name: str, target: str, train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame, by_segment: bool):
-    rows_train = train.dropna(subset=FEATURE_NAMES + [target]).copy()
-    rows_test = test.dropna(subset=FEATURE_NAMES + [target]).copy()
+    feature_names = feature_names_for_model(train, validation, test, model_name)
+    rows_train = dedupe_model_rows(train.dropna(subset=[target]).copy(), target, feature_names)
+    rows_validation = dedupe_model_rows(validation.dropna(subset=[target]).copy(), target, feature_names)
+    rows_test = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, feature_names)
     if len(rows_train) < 500 or len(rows_test) < 100 or rows_train[target].nunique() < 2:
         return insufficient(model_name, target, len(rows_train), len(rows_test), rows_train, rows_test)
     classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
-    model = fit_nearest_centroid(rows_train[FEATURE_NAMES].astype(float).to_numpy(), rows_train[target].astype(str).tolist(), classes)
-    probs = predict_probabilities(model, rows_test[FEATURE_NAMES].astype(float).to_numpy())
+    selected = select_classifier(rows_train, rows_validation, target, feature_names, classes)
+    model = selected["model"]
+    probs = align_probabilities(np.asarray(model.predict_proba(rows_test[feature_names])), list(model.classes_), classes)
     preds = [classes[int(np.argmax(row))] for row in probs]
     y_true = rows_test[target].astype(str).tolist()
     majority = majority_baseline(y_true)
@@ -164,17 +203,20 @@ def evaluate_classification_model(model_name: str, target: str, train: pd.DataFr
         "status": "evaluated" if beats else "weak_or_failed_baseline",
         "test_rows": int(len(rows_test)),
         "train_rows": int(len(rows_train)),
-        "validation_rows": int(len(validation.dropna(subset=[target]))),
-        "feature_count": len(FEATURE_NAMES),
-        "feature_names": FEATURE_NAMES,
+        "validation_rows": int(len(rows_validation)),
+        "feature_count": len(feature_names),
+        "feature_names": feature_names,
+        "algorithm": selected["algorithm"],
+        "algorithm_comparison": selected["algorithm_comparison"],
         "source_contribution": source_contribution_report(pd.concat([rows_train, rows_test], ignore_index=True), rows_train, validation.dropna(subset=[target]).copy(), rows_test.iloc[0:0].copy(), rows_test),
-        "feature_coverage": feature_coverage(pd.concat([rows_train, rows_test], ignore_index=True), FEATURE_NAMES + [target]),
+        "feature_coverage": feature_coverage(pd.concat([rows_train, rows_test], ignore_index=True), feature_names + [target]),
         "final_test_metric_name": "accuracy",
         "final_test_metric": main,
         "baseline_metric": baseline,
         "relative_improvement": improvement,
         "beats_baseline": beats,
         "metrics": metrics,
+        "selective_prediction": selective_prediction_report(y_true, preds, probs, classes),
         "majority_baseline": majority,
         "split_type": "chronological",
         "segment_metrics": segment_metrics(rows_test.assign(_pred=preds), target) if by_segment else {},
@@ -183,8 +225,8 @@ def evaluate_classification_model(model_name: str, target: str, train: pd.DataFr
 
 
 def evaluate_regression_model(model_name: str, target: str, train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame, by_segment: bool):
-    rows_train = train.dropna(subset=[target]).copy()
-    rows_test = test.dropna(subset=[target]).copy()
+    rows_train = dedupe_model_rows(train.dropna(subset=[target]).copy(), target, FEATURE_NAMES)
+    rows_test = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, FEATURE_NAMES)
     if len(rows_train) < 500 or len(rows_test) < 100:
         return insufficient(model_name, target, len(rows_train), len(rows_test), rows_train, rows_test)
     prediction = float(rows_train[target].astype(float).median())
@@ -239,6 +281,97 @@ def predict_probabilities(model, X):
     return exp / exp.sum(axis=1, keepdims=True)
 
 
+def feature_names_for_model(train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame, model_name: str) -> list[str]:
+    schema = get_feature_schema(model_name)
+    combined = pd.concat([train, validation, test], ignore_index=True)
+    forbidden = set(schema.forbidden_features) | TARGET_COLUMNS
+    features = []
+    for name in schema.all_features():
+        if name not in combined.columns or name in forbidden:
+            continue
+        values = pd.to_numeric(combined[name], errors="coerce")
+        if values.notna().any():
+            features.append(name)
+    return features or FEATURE_NAMES
+
+
+def dedupe_model_rows(rows: pd.DataFrame, target: str, feature_names: list[str]) -> pd.DataFrame:
+    if rows.empty:
+        return rows
+    out = rows.copy()
+    if "_split_fight_key" not in out.columns:
+        out["_split_fight_key"] = out.apply(canonical_split_key, axis=1)
+    out["_source_priority"] = out.get("source_dataset", pd.Series(["unknown"] * len(out), index=out.index)).map(SOURCE_PRIORITY).fillna(99)
+    available_columns = [column for column in [target] + feature_names if column in out.columns]
+    out["_model_completeness"] = out[available_columns].notna().sum(axis=1)
+    out = out.sort_values(["_split_fight_key", "_model_completeness", "_source_priority", "_source_order_for_sort"], ascending=[True, False, True, True], kind="mergesort")
+    return out.drop_duplicates("_split_fight_key", keep="first").copy()
+
+
+def select_classifier(rows_train: pd.DataFrame, rows_validation: pd.DataFrame, target: str, feature_names: list[str], classes: list[str]) -> dict:
+    comparison = []
+    best = None
+    eval_rows = rows_validation if len(rows_validation) >= 100 and rows_validation[target].nunique() >= 2 else rows_train
+    for name, model in classifier_candidates().items():
+        fitted = model.fit(rows_train[feature_names], rows_train[target].astype(str))
+        probs = align_probabilities(np.asarray(fitted.predict_proba(eval_rows[feature_names])), list(fitted.classes_), classes)
+        preds = [classes[int(np.argmax(row))] for row in probs]
+        metrics = classification_metrics(eval_rows[target].astype(str).tolist(), preds, probs, classes)
+        comparison_row = {
+            "algorithm": name,
+            "validation_accuracy": metrics["accuracy"],
+            "validation_balanced_accuracy": metrics["balanced_accuracy"],
+            "validation_log_loss": metrics["log_loss"],
+            "validation_brier_score": metrics.get("brier_score"),
+        }
+        comparison.append(comparison_row)
+        score = (metrics["balanced_accuracy"], metrics["accuracy"], -metrics["log_loss"])
+        if best is None or score > best["score"]:
+            best = {"algorithm": name, "model": fitted, "score": score}
+    return {"algorithm": best["algorithm"], "model": best["model"], "algorithm_comparison": comparison}
+
+
+def classifier_candidates() -> dict[str, Pipeline]:
+    return {
+        "logistic_regression_balanced": Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("scaler", StandardScaler()),
+                ("model", LogisticRegression(max_iter=500, class_weight="balanced", random_state=42)),
+            ]
+        ),
+        "random_forest_balanced": Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("model", RandomForestClassifier(n_estimators=100, min_samples_leaf=8, random_state=42, n_jobs=-1)),
+            ]
+        ),
+        "extra_trees_balanced": Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("model", ExtraTreesClassifier(n_estimators=100, min_samples_leaf=8, random_state=42, n_jobs=-1)),
+            ]
+        ),
+        "hist_gradient_boosting": Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("model", HistGradientBoostingClassifier(max_iter=100, learning_rate=0.06, l2_regularization=0.01, random_state=42)),
+            ]
+        ),
+    }
+
+
+def align_probabilities(probs: np.ndarray, model_classes: list[str], classes: list[str]) -> np.ndarray:
+    aligned = np.zeros((len(probs), len(classes)))
+    index = {str(label): position for position, label in enumerate(model_classes)}
+    for output_index, label in enumerate(classes):
+        if str(label) in index:
+            aligned[:, output_index] = probs[:, index[str(label)]]
+    row_sums = aligned.sum(axis=1)
+    row_sums[row_sums == 0] = 1
+    return aligned / row_sums[:, None]
+
+
 def classification_metrics(y_true, y_pred, probs, classes):
     accuracy = sum(a == p for a, p in zip(y_true, y_pred)) / len(y_true)
     recalls = []
@@ -290,6 +423,70 @@ def brier_score(y_true, probs, classes):
     positive = classes[-1]
     pos_index = len(classes) - 1
     return sum((float(actual == positive) - row[pos_index]) ** 2 for actual, row in zip(y_true, probs)) / len(y_true)
+
+
+def selective_prediction_report(y_true: list[str], y_pred: list[str], probs: np.ndarray, classes: list[str]) -> dict:
+    if not y_true:
+        return {"buckets": [], "thresholds": [], "best_accuracy": None, "best_balanced_accuracy": None}
+    confidence = probs.max(axis=1)
+    rows = pd.DataFrame({"actual": y_true, "predicted": y_pred, "confidence": confidence})
+    buckets = []
+    for low, high in [(0.50, 0.55), (0.55, 0.60), (0.60, 0.65), (0.65, 0.70), (0.70, 0.75), (0.75, 0.80), (0.80, 0.85), (0.85, 0.90), (0.90, 1.01)]:
+        group = rows[(rows["confidence"] >= low) & (rows["confidence"] < high)]
+        buckets.append(confidence_group_metrics(group, len(rows), classes, f"{int(low * 100)}-{int(min(high, 1.0) * 100)}%"))
+    thresholds = []
+    for threshold in [0.55, 0.60, 0.65, 0.70, 0.75, 0.80]:
+        group = rows[rows["confidence"] >= threshold]
+        metrics = confidence_group_metrics(group, len(rows), classes, f">={int(threshold * 100)}%")
+        thresholds.append(metrics)
+    meaningful = [item for item in thresholds if item["sample_count"] >= 50]
+    best_accuracy = max(meaningful, key=lambda item: item["accuracy"] or -1, default=None)
+    best_balanced = max(meaningful, key=lambda item: item["balanced_accuracy"] or -1, default=None)
+    return {
+        "confidence_definition": "max predicted class probability",
+        "buckets": buckets,
+        "thresholds": thresholds,
+        "best_accuracy": best_accuracy,
+        "best_balanced_accuracy": best_balanced,
+        "reaches_80_accuracy": bool(best_accuracy and best_accuracy.get("accuracy", 0) >= 0.8),
+        "reaches_95_balanced_accuracy": bool(best_balanced and best_balanced.get("balanced_accuracy", 0) >= 0.95),
+    }
+
+
+def confidence_group_metrics(group: pd.DataFrame, total_rows: int, classes: list[str], label: str) -> dict:
+    count = int(len(group))
+    if count == 0:
+        return {
+            "bucket": label,
+            "sample_count": 0,
+            "coverage_percent": 0.0,
+            "accuracy": None,
+            "balanced_accuracy": None,
+            "average_confidence": None,
+            "actual_hit_rate": None,
+            "calibration_gap": None,
+            "small_sample_warning": True,
+        }
+    accuracy = float((group["actual"].astype(str) == group["predicted"].astype(str)).mean())
+    recalls = []
+    for cls in classes:
+        cls_rows = group[group["actual"].astype(str) == str(cls)]
+        if len(cls_rows):
+            recalls.append(float((cls_rows["actual"].astype(str) == cls_rows["predicted"].astype(str)).mean()))
+    balanced = sum(recalls) / len(recalls) if recalls else None
+    avg_conf = float(group["confidence"].mean())
+    return {
+        "bucket": label,
+        "sample_count": count,
+        "coverage_percent": round(100 * count / max(1, total_rows), 2),
+        "accuracy": round(accuracy, 4),
+        "balanced_accuracy": round(balanced, 4) if balanced is not None else None,
+        "average_confidence": round(avg_conf, 4),
+        "actual_hit_rate": round(accuracy, 4),
+        "calibration_gap": round(avg_conf - accuracy, 4),
+        "class_distribution": {str(key): int(value) for key, value in group["actual"].astype(str).value_counts().items()},
+        "small_sample_warning": count < 50,
+    }
 
 
 def binary_auc(y_true, probs, classes):
@@ -438,8 +635,15 @@ def update_registry_with_evaluation(models):
     now = datetime.now(timezone.utc).isoformat()
     for name, result in models.items():
         entry = registry.setdefault(name, {"model_name": name})
+        selective = result.get("selective_prediction") or {}
+        best_accuracy = selective.get("best_accuracy") or {}
+        production_status, production_reason = production_status_for_result(result)
         entry.update(
             {
+                "target": result.get("target"),
+                "algorithm": result.get("algorithm"),
+                "feature_count": result.get("feature_count", 0),
+                "feature_names": result.get("feature_names", []),
                 "final_test_metric": result.get("final_test_metric"),
                 "final_test_metric_name": result.get("final_test_metric_name"),
                 "baseline_metric": result.get("baseline_metric"),
@@ -447,6 +651,17 @@ def update_registry_with_evaluation(models):
                 "beats_baseline": result.get("beats_baseline", False),
                 "test_rows": result.get("test_rows", 0),
                 "split_type": result.get("split_type", "chronological"),
+                "brier_score": (result.get("metrics") or {}).get("brier_score"),
+                "log_loss": (result.get("metrics") or {}).get("log_loss"),
+                "balanced_accuracy": (result.get("metrics") or {}).get("balanced_accuracy"),
+                "high_confidence_thresholds": selective.get("thresholds", []),
+                "best_high_conf_accuracy": best_accuracy.get("accuracy"),
+                "best_high_conf_balanced_accuracy": best_accuracy.get("balanced_accuracy"),
+                "best_high_conf_coverage": best_accuracy.get("coverage_percent"),
+                "leakage_risk": "low" if result.get("beats_baseline") else "review_needed",
+                "runtime_compatible": bool(result.get("feature_names")),
+                "production_status": production_status,
+                "production_status_reason": production_reason,
                 "calibration_status": "basic_probability_scores_only",
                 "segment_metrics_available": bool(result.get("segment_metrics")),
                 "evaluated_at": now,
@@ -456,6 +671,18 @@ def update_registry_with_evaluation(models):
             entry["status"] = "experimental"
             entry.setdefault("limitations", []).append("Final held-out evaluation did not clearly support production-ready status.")
     path.write_text(json.dumps(registry, indent=2, default=str), encoding="utf-8")
+
+
+def production_status_for_result(result: dict) -> tuple[str, str]:
+    if result.get("status") == "blocked":
+        return "blocked", "; ".join(result.get("limitations", []))
+    if not result.get("beats_baseline"):
+        return "experimental", "Does not beat final held-out baseline."
+    test_rows = int(result.get("test_rows") or 0)
+    balanced = (result.get("metrics") or {}).get("balanced_accuracy") or 0
+    if test_rows >= 1000 and balanced >= 0.7:
+        return "high_confidence_only", "Beats baseline with useful held-out performance; use selectively until artifact/runtime validation is complete."
+    return "experimental", "Beats baseline but balanced accuracy or sample support is still limited."
 
 
 def write_json(path: Path, payload: dict):
@@ -498,6 +725,15 @@ def markdown_report(payload):
             lines.append(f"### {name}")
             for segment, metrics in model["segment_metrics"].items():
                 lines.append(f"- {segment}: {metrics}")
+    lines.extend(["", "## Selective Prediction / High-Confidence Performance"])
+    lines.append("| Model | Best Threshold | Rows | Coverage | Accuracy | Balanced Accuracy | Avg Confidence | Calibration Gap | 80%+ Accuracy? | 95%+ Balanced? |")
+    lines.append("|---|---|---:|---:|---:|---:|---:|---:|---|---|")
+    for name, model in payload["models"].items():
+        selective = model.get("selective_prediction") or {}
+        best = selective.get("best_accuracy") or {}
+        lines.append(
+            f"| {name} | {best.get('bucket', '')} | {best.get('sample_count', '')} | {best.get('coverage_percent', '')} | {best.get('accuracy', '')} | {best.get('balanced_accuracy', '')} | {best.get('average_confidence', '')} | {best.get('calibration_gap', '')} | {selective.get('reaches_80_accuracy', False)} | {selective.get('reaches_95_balanced_accuracy', False)} |"
+        )
     return "\n".join(lines).strip() + "\n"
 
 

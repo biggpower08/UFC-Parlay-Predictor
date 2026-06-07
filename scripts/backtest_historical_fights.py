@@ -18,11 +18,14 @@ if str(ROOT) not in sys.path:
 from scripts.evaluate_model_accuracy import (
     CLASSIFICATION_MODELS,
     FEATURE_NAMES,
+    align_probabilities,
     chronological_train_validation_test_split,
     classification_metrics,
-    fit_nearest_centroid,
+    dedupe_model_rows,
+    feature_names_for_model,
     majority_baseline,
-    predict_probabilities,
+    select_classifier,
+    selective_prediction_report,
     source_contribution_report,
 )
 from ufc_predictor.config import settings
@@ -117,7 +120,7 @@ def run_backtest(
     if limit is not None and all_test_fights:
         selected_test = selected_test.head(limit).copy()
     leakage_report = scan_dataframe(pd.DataFrame(columns=FEATURE_NAMES + list(FORBIDDEN_BACKTEST_INPUTS)))
-    models = build_backtest_models(train, selected_test, min_train_rows=min_train_rows, min_test_rows=min_test_rows)
+    models = build_backtest_models(train, validation, selected_test, min_train_rows=min_train_rows, min_test_rows=min_test_rows)
     predictions = prediction_records(selected_test, models)
     model_results = score_models(predictions, models, selected_test, train, by_segment=by_segment)
     payload = {
@@ -131,7 +134,7 @@ def run_backtest(
         "split": split_report,
         "source_contribution": source_contribution_report(dataset, train, validation, selected_test),
         "blind_simulation": {
-            "prediction_features": FEATURE_NAMES,
+            "prediction_features": "model-specific runtime-compatible feature schemas",
             "hidden_until_scoring": sorted(FORBIDDEN_BACKTEST_INPUTS),
             "final_test_used_for_training": False,
             "final_test_used_for_preprocessing_fit": False,
@@ -145,13 +148,13 @@ def run_backtest(
     return payload, predictions
 
 
-def build_backtest_models(train: pd.DataFrame, test: pd.DataFrame, min_train_rows: int, min_test_rows: int) -> dict[str, dict[str, Any]]:
+def build_backtest_models(train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame, min_train_rows: int, min_test_rows: int) -> dict[str, dict[str, Any]]:
     models: dict[str, dict[str, Any]] = {
-        "winner_model": {"available": False, "reason": "Safe f1/f2 winner orientation is not runtime-compatible yet."},
         "odds_calibration_model": {"available": False, "reason": "Trusted pre-fight odds snapshots are not available."},
     }
     for model_name, target in CLASSIFICATION_MODELS.items():
-        missing = [column for column in FEATURE_NAMES + [target] if column not in train.columns or column not in test.columns]
+        feature_names = feature_names_for_model(train, pd.DataFrame(), test, model_name)
+        missing = [column for column in [target] if column not in train.columns or column not in test.columns]
         if missing:
             models[model_name] = {
                 "available": False,
@@ -161,8 +164,8 @@ def build_backtest_models(train: pd.DataFrame, test: pd.DataFrame, min_train_row
                 "test_rows": 0,
             }
             continue
-        rows_train = train.dropna(subset=FEATURE_NAMES + [target]).copy()
-        rows_test = test.dropna(subset=FEATURE_NAMES + [target]).copy()
+        rows_train = dedupe_model_rows(train.dropna(subset=[target]).copy(), target, feature_names)
+        rows_test = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, feature_names)
         if len(rows_train) < min_train_rows or len(rows_test) < min_test_rows or rows_train[target].nunique() < 2:
             models[model_name] = {
                 "available": False,
@@ -173,11 +176,15 @@ def build_backtest_models(train: pd.DataFrame, test: pd.DataFrame, min_train_row
             }
             continue
         classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
+        rows_validation = dedupe_model_rows(validation.dropna(subset=[target]).copy(), target, feature_names)
+        selected = select_classifier(rows_train, rows_validation, target, feature_names, classes)
         models[model_name] = {
             "available": True,
             "target": target,
             "classes": classes,
-            "model": fit_nearest_centroid(rows_train[FEATURE_NAMES].astype(float).to_numpy(), rows_train[target].astype(str).tolist(), classes),
+            "feature_names": feature_names,
+            "algorithm": selected["algorithm"],
+            "model": selected["model"],
             "train_rows": int(len(rows_train)),
             "test_rows": int(len(rows_test)),
         }
@@ -186,7 +193,9 @@ def build_backtest_models(train: pd.DataFrame, test: pd.DataFrame, min_train_row
 
 def prediction_records(test: pd.DataFrame, models: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     records = []
-    for row_index, row in test.reset_index(drop=True).iterrows():
+    reset = test.reset_index(drop=True)
+    precomputed = precompute_model_predictions(reset, models)
+    for row_index, row in reset.iterrows():
         record = {
             "fight_id": fight_id(row, row_index),
             "event_date": row.get("event_date"),
@@ -206,16 +215,29 @@ def prediction_records(test: pd.DataFrame, models: dict[str, dict[str, Any]]) ->
             if not info.get("available"):
                 record["models_run"][model_name] = {"available": False, "reason": info.get("reason")}
                 continue
-            if any(pd.isna(row.get(feature)) for feature in FEATURE_NAMES):
-                record["models_run"][model_name] = {"available": False, "reason": "missing pre-fight features"}
-                continue
-            probabilities = predict_probabilities(info["model"], row[FEATURE_NAMES].astype(float).to_numpy().reshape(1, -1))[0]
+            prediction = precomputed[model_name]
+            probabilities = prediction["probabilities"][row_index]
             classes = info["classes"]
-            predicted_class = classes[int(np.argmax(probabilities))]
+            predicted_class = prediction["predicted_classes"][row_index]
             record["models_run"][model_name] = model_prediction_payload(model_name, predicted_class, classes, probabilities)
         record["scoring"] = score_record(record)
         records.append(record)
     return records
+
+
+def precompute_model_predictions(test: pd.DataFrame, models: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    precomputed = {}
+    for model_name, info in models.items():
+        if not info.get("available"):
+            continue
+        feature_names = info.get("feature_names", FEATURE_NAMES)
+        probabilities = align_probabilities(np.asarray(info["model"].predict_proba(test[feature_names])), list(info["model"].classes_), info["classes"])
+        classes = info["classes"]
+        precomputed[model_name] = {
+            "probabilities": probabilities,
+            "predicted_classes": [classes[int(np.argmax(row))] for row in probabilities],
+        }
+    return precomputed
 
 
 def model_prediction_payload(model_name: str, predicted_class: str, classes: list[str], probabilities: np.ndarray) -> dict[str, Any]:
@@ -278,18 +300,15 @@ def score_models(predictions: list[dict[str, Any]], models: dict[str, dict[str, 
             results[model_name] = {"status": "skipped", "available": False, "reason": info.get("reason"), "beats_baseline": False}
             continue
         target = info["target"]
-        missing = [column for column in FEATURE_NAMES + [target] if column not in test.columns]
+        feature_names = info.get("feature_names", FEATURE_NAMES)
+        missing = [column for column in feature_names + [target] if column not in test.columns]
         if missing:
             results[model_name] = {"status": "skipped", "available": False, "reason": f"missing required columns: {', '.join(missing)}", "beats_baseline": False}
             continue
-        rows = test.dropna(subset=FEATURE_NAMES + [target]).copy()
+        rows = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, feature_names)
         y_true = rows[target].astype(str).tolist()
-        preds = []
-        probs = []
-        for _, row in rows.iterrows():
-            probabilities = predict_probabilities(info["model"], row[FEATURE_NAMES].astype(float).to_numpy().reshape(1, -1))[0]
-            probs.append(probabilities)
-            preds.append(info["classes"][int(np.argmax(probabilities))])
+        probs = align_probabilities(np.asarray(info["model"].predict_proba(rows[feature_names])), list(info["model"].classes_), info["classes"])
+        preds = [info["classes"][int(np.argmax(probabilities))] for probabilities in probs]
         metrics = classification_metrics(y_true, preds, np.asarray(probs), info["classes"])
         baseline = majority_baseline(y_true)
         improvement = round(metrics["accuracy"] - baseline["accuracy"], 4) if baseline["accuracy"] is not None else None
@@ -305,6 +324,7 @@ def score_models(predictions: list[dict[str, Any]], models: dict[str, dict[str, 
             "beats_baseline": bool(improvement is not None and improvement > 0),
             "metrics": metrics,
             "baseline": baseline,
+            "selective_prediction": selective_prediction_report(y_true, preds, np.asarray(probs), info["classes"]),
             "segment_metrics": backtest_segments(rows.assign(_pred=preds), target) if by_segment else {},
         }
     return results
