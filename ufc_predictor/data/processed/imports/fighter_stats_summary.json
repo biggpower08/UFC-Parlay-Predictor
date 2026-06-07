@@ -1,0 +1,76 @@
+{
+  "field_coverage": {
+    "fighter_1_sig_strikes_landed": 33530,
+    "fighter_2_sig_strikes_landed": 33530,
+    "fighter_1_takedowns_landed": 42081,
+    "fighter_2_takedowns_landed": 42081,
+    "fighter_1_control_time_seconds": 32987,
+    "fighter_2_control_time_seconds": 32987,
+    "fighter_1_submission_attempts": 33393,
+    "fighter_2_submission_attempts": 33393,
+    "fighter_1_knockdowns": 42081,
+    "fighter_2_knockdowns": 42081
+  },
+  "dataset_contributors": {
+    "mdabbert_ultimate": {
+      "fighter_1_sig_strikes_landed": 0,
+      "fighter_2_sig_strikes_landed": 0,
+      "fighter_1_takedowns_landed": 0,
+      "fighter_2_takedowns_landed": 0,
+      "fighter_1_control_time_seconds": 0,
+      "fighter_2_control_time_seconds": 0,
+      "fighter_1_submission_attempts": 0,
+      "fighter_2_submission_attempts": 0,
+      "fighter_1_knockdowns": 0,
+      "fighter_2_knockdowns": 0
+    },
+    "ufc_1994_2025": {
+      "fighter_1_sig_strikes_landed": 16632,
+      "fighter_2_sig_strikes_landed": 16632,
+      "fighter_1_takedowns_landed": 16632,
+      "fighter_2_takedowns_landed": 16632,
+      "fighter_1_control_time_seconds": 16270,
+      "fighter_2_control_time_seconds": 16270,
+      "fighter_1_submission_attempts": 16632,
+      "fighter_2_submission_attempts": 16632,
+      "fighter_1_knockdowns": 16632,
+      "fighter_2_knockdowns": 16632
+    },
+    "ufc_1994_2026": {
+      "fighter_1_sig_strikes_landed": 0,
+      "fighter_2_sig_strikes_landed": 0,
+      "fighter_1_takedowns_landed": 8551,
+      "fighter_2_takedowns_landed": 8551,
+      "fighter_1_control_time_seconds": 0,
+      "fighter_2_control_time_seconds": 0,
+      "fighter_1_submission_attempts": 8551,
+      "fighter_2_submission_attempts": 8551,
+      "fighter_1_knockdowns": 8551,
+      "fighter_2_knockdowns": 8551
+    },
+    "ufc_fight_forecast": {
+      "fighter_1_sig_strikes_landed": 8210,
+      "fighter_2_sig_strikes_landed": 8210,
+      "fighter_1_takedowns_landed": 8210,
+      "fighter_2_takedowns_landed": 8210,
+      "fighter_1_control_time_seconds": 8210,
+      "fighter_2_control_time_seconds": 8210,
+      "fighter_1_submission_attempts": 8210,
+      "fighter_2_submission_attempts": 8210,
+      "fighter_1_knockdowns": 8210,
+      "fighter_2_knockdowns": 8210
+    },
+    "ufc_stats_complete": {
+      "fighter_1_sig_strikes_landed": 8688,
+      "fighter_2_sig_strikes_landed": 8688,
+      "fighter_1_takedowns_landed": 8688,
+      "fighter_2_takedowns_landed": 8688,
+      "fighter_1_control_time_seconds": 8507,
+      "fighter_2_control_time_seconds": 8507,
+      "fighter_1_submission_attempts": 0,
+      "fighter_2_submission_attempts": 0,
+      "fighter_1_knockdowns": 8688,
+      "fighter_2_knockdowns": 8688
+    }
+  }
+}

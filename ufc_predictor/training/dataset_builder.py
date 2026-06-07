@@ -90,8 +90,6 @@ def build_training_rows(
 
     for _, fight in df.iterrows():
         result = str(fight.get("result") or "").lower().strip().split("\n")[0]
-        if result != "win":
-            continue
         fighter_a = str(fight.get("fighter_1") or "").strip()
         fighter_b = str(fight.get("fighter_2") or "").strip()
         if not fighter_a or not fighter_b:
@@ -118,12 +116,17 @@ def build_training_rows(
             {
                 "event": fight.get("event"),
                 "event_date": _date_string(fight.get("_event_date")),
+                "fight_key": fight.get("fight_key") or fight.get("source_row_id") or fight.get("source_id"),
+                "source_dataset": fight.get("source_dataset") or source,
+                "source_file": fight.get("source_file"),
+                "weight_class": fight.get("weight_class"),
                 "fighter_a": fighter_a,
                 "fighter_b": fighter_b,
                 "source": source,
                 **feature_set.features,
                 "source_order": int(fight.get("_source_order", len(rows))),
-                "winner": fighter_a,
+                "winner": fight.get("winner_name") if pd.notna(fight.get("winner_name")) else (fighter_a if result == "win" else None),
+                "f1_wins_safe": fight.get("f1_wins_safe") if "f1_wins_safe" in fight.index else None,
                 "finish_binary": 0 if is_decision else 1,
                 "goes_distance_binary": 1 if is_decision else 0,
                 "method_class": method,
@@ -147,8 +150,12 @@ def build_training_rows(
             }
         )
 
-        _update_history(history[fighter_a], won=True, method=method)
-        _update_history(history[fighter_b], won=False, method=None)
+        if result == "win":
+            _update_history(history[fighter_a], won=True, method=method)
+            _update_history(history[fighter_b], won=False, method=None)
+        else:
+            _update_history(history[fighter_a], won=None, method=None)
+            _update_history(history[fighter_b], won=None, method=None)
 
     dataset = pd.DataFrame(rows)
     audit = audit_training_dataset(dataset, fights, source, warnings)
@@ -336,9 +343,9 @@ def feature_availability_report(dataset: pd.DataFrame, model_family: str = "fini
     }
 
 
-def _update_history(history: dict[str, int], won: bool, method: str | None) -> None:
+def _update_history(history: dict[str, int], won: bool | None, method: str | None) -> None:
     history["fights"] += 1
-    if won:
+    if won is True:
         history["wins"] += 1
         if method == "Decision":
             history["decisions"] += 1

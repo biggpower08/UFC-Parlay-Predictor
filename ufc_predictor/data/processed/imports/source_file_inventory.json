@@ -21,7 +21,10 @@
       "round labels",
       "odds/research columns"
     ],
-    "raw_files_detected": []
+    "raw_files_detected": [
+      "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_golden.csv",
+      "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_silver.csv"
+    ]
   },
   "ufc_stats_complete": {
     "dataset_key": "ufc_stats_complete",
@@ -46,7 +49,10 @@
       "fight stats",
       "fighter profiles"
     ],
-    "raw_files_detected": []
+    "raw_files_detected": [
+      "data\\imports\\kaggle\\ufc_stats_complete\\clean_ufc_dataset.csv",
+      "data\\imports\\kaggle\\ufc_stats_complete\\win_and_title_data-ufc.json"
+    ]
   },
   "ufc_1994_2026": {
     "dataset_key": "ufc_1994_2026",
@@ -69,7 +75,10 @@
       "profile fields",
       "stats labels"
     ],
-    "raw_files_detected": []
+    "raw_files_detected": [
+      "data\\imports\\kaggle\\ufc_1994_2026\\ufc_fighters_final.csv",
+      "data\\imports\\kaggle\\ufc_1994_2026\\ufc_gold_dataset_final.csv"
+    ]
   },
   "ufc_1994_2025": {
     "dataset_key": "ufc_1994_2025",
@@ -89,7 +98,12 @@
     "normalized_outputs_expected": [
       "result cross-check rows"
     ],
-    "raw_files_detected": []
+    "raw_files_detected": [
+      "data\\imports\\kaggle\\ufc_1994_2025\\event_details.csv",
+      "data\\imports\\kaggle\\ufc_1994_2025\\fight_details.csv",
+      "data\\imports\\kaggle\\ufc_1994_2025\\fighter_details.csv",
+      "data\\imports\\kaggle\\ufc_1994_2025\\UFC.csv"
+    ]
   },
   "mdabbert_ultimate": {
     "dataset_key": "mdabbert_ultimate",
@@ -110,7 +124,10 @@
       "winner rows",
       "odds research fields"
     ],
-    "raw_files_detected": []
+    "raw_files_detected": [
+      "data\\imports\\kaggle\\mdabbert_ultimate\\ufc-master.csv",
+      "data\\imports\\kaggle\\mdabbert_ultimate\\upcoming.csv"
+    ]
   },
   "mdabbert_2010_2020_odds": {
     "dataset_key": "mdabbert_2010_2020_odds",
@@ -130,7 +147,9 @@
     "normalized_outputs_expected": [
       "historical odds research rows"
     ],
-    "raw_files_detected": []
+    "raw_files_detected": [
+      "data\\imports\\kaggle\\mdabbert_2010_2020_odds\\data.csv"
+    ]
   },
   "ufc_datalab": {
     "dataset_key": "ufc_datalab",

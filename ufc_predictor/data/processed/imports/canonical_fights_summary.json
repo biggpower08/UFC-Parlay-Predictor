@@ -1,0 +1,16 @@
+{
+  "rows": 49355,
+  "unique_fight_keys": 32982,
+  "unique_events": 776,
+  "date_range": {
+    "min": "1993-11-12",
+    "max": "2026-05-16"
+  },
+  "datasets_present": [
+    "mdabbert_ultimate",
+    "ufc_1994_2025",
+    "ufc_1994_2026",
+    "ufc_fight_forecast",
+    "ufc_stats_complete"
+  ]
+}

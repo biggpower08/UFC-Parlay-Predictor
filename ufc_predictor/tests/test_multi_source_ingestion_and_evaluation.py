@@ -8,10 +8,11 @@ from scripts.evaluate_model_accuracy import (
     chronological_train_validation_test_split,
     majority_baseline,
     relative_ranking,
+    source_contribution_report,
 )
 from scripts.preprocess_imported_datasets import main as preprocess_main
 from ufc_predictor.training.dataset_manifest import DATASET_MANIFEST
-from ufc_predictor.training.deduping import add_deduping_columns, dedupe_summary
+from ufc_predictor.training.deduping import add_deduping_columns, dedupe_summary, stable_fight_key
 from ufc_predictor.training.importers.kaggle_adapter import adapt_kaggle_dataset
 from ufc_predictor.training.targets import build_bettor_targets, safe_f1_wins
 
@@ -108,6 +109,29 @@ def test_duplicate_and_mirrored_fight_detection():
     assert summary["duplicate_fight_rows"] == 2
 
 
+def test_stable_fight_key_is_independent_of_fighter_order():
+    first = stable_fight_key(
+        {
+            "event_date": "2024-01-01",
+            "event_name": "Event",
+            "fighter_1_name": "Alpha",
+            "fighter_2_name": "Beta",
+            "weight_class": "Lightweight",
+        }
+    )
+    mirrored = stable_fight_key(
+        {
+            "event_date": "2024-01-01",
+            "event_name": "Event",
+            "fighter_1_name": "Beta",
+            "fighter_2_name": "Alpha",
+            "weight_class": "Lightweight",
+        }
+    )
+
+    assert first == mirrored
+
+
 def test_chronological_evaluation_split_holds_out_newest_rows():
     frame = pd.DataFrame(
         [
@@ -120,6 +144,58 @@ def test_chronological_evaluation_split_holds_out_newest_rows():
     assert report["final_test_held_out"] is True
     assert train["_event_date"].max() < validation["_event_date"].min()
     assert validation["_event_date"].max() < test["_event_date"].min()
+
+
+def test_chronological_evaluation_split_keeps_duplicate_fights_together():
+    rows = []
+    for day in range(1, 21):
+        rows.append(
+            {
+                "event_date": f"2024-01-{day:02d}",
+                "event": "Event",
+                "fighter_a": f"Alpha {day}",
+                "fighter_b": f"Beta {day}",
+                "source_order": day * 2,
+                "finish_binary": day % 2,
+                "source_dataset": "source_a",
+            }
+        )
+        rows.append(
+            {
+                "event_date": f"2024-01-{day:02d}",
+                "event": "Event",
+                "fighter_a": f"Beta {day}",
+                "fighter_b": f"Alpha {day}",
+                "source_order": day * 2 + 1,
+                "finish_binary": day % 2,
+                "source_dataset": "source_b",
+            }
+        )
+    frame = pd.DataFrame(rows)
+    frame["fight_key"] = frame.apply(stable_fight_key, axis=1)
+
+    train, validation, test, report = chronological_train_validation_test_split(frame, validation_size=0.2, test_size=0.2)
+
+    assert report["no_cross_split_fight_leakage"] is True
+    assert not (set(train["_split_fight_key"]) & set(validation["_split_fight_key"]))
+    assert not (set(train["_split_fight_key"]) & set(test["_split_fight_key"]))
+    assert not (set(validation["_split_fight_key"]) & set(test["_split_fight_key"]))
+
+
+def test_source_contribution_report_counts_datasets_by_split():
+    frame = pd.DataFrame(
+        [
+            {"source_dataset": "alpha", "fight_key": "1"},
+            {"source_dataset": "alpha", "fight_key": "2"},
+            {"source_dataset": "beta", "fight_key": "3"},
+        ]
+    )
+    report = source_contribution_report(frame, frame.iloc[:1], frame.iloc[1:2], frame.iloc[2:])
+
+    assert report["all_rows_by_dataset"] == {"alpha": 2, "beta": 1}
+    assert report["train_rows_by_dataset"] == {"alpha": 1}
+    assert report["validation_rows_by_dataset"] == {"alpha": 1}
+    assert report["test_rows_by_dataset"] == {"beta": 1}
 
 
 def test_relative_ranking_and_baseline_helpers():
@@ -153,7 +229,7 @@ def test_preprocessing_dry_run_writes_summary_reports(tmp_path, monkeypatch):
         ]
     ).to_csv(dataset / "fights.csv", index=False)
     output = tmp_path / "processed"
-    monkeypatch.chdir(Path.cwd())
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(
         "sys.argv",
         [

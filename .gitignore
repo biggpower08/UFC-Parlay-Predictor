@@ -25,6 +25,11 @@ data/imports/
 data/mentor_silver_run/
 audit.jsonl
 client.log
+kaggle.json
+*.zip
+data/imports/**/*.csv
+data/imports/**/*.parquet
+data/imports/**/*.jsonl
 ufc_predictor/data/imports/
 ufc_predictor/data/processed/training_imports/
 ufc_predictor/static_app/

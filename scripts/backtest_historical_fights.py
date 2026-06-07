@@ -23,6 +23,7 @@ from scripts.evaluate_model_accuracy import (
     fit_nearest_centroid,
     majority_baseline,
     predict_probabilities,
+    source_contribution_report,
 )
 from ufc_predictor.config import settings
 from ufc_predictor.training.dataset_builder import build_training_rows, load_fights_csv
@@ -96,10 +97,10 @@ def main() -> int:
 
 
 def resolve_training_data_path(processed_dir: Path) -> Path:
-    preferred = processed_dir / "training_imports" / "normalized_fights.csv"
+    preferred = processed_dir / "imports" / "normalized_fights_combined.csv"
     if preferred.is_file():
         return preferred
-    return processed_dir / "imports" / "normalized_fights_combined.csv"
+    return processed_dir / "training_imports" / "normalized_fights.csv"
 
 
 def run_backtest(
@@ -128,6 +129,7 @@ def run_backtest(
             "models_skipped": {name: model.get("reason") for name, model in models.items() if not model.get("available")},
         },
         "split": split_report,
+        "source_contribution": source_contribution_report(dataset, train, validation, selected_test),
         "blind_simulation": {
             "prediction_features": FEATURE_NAMES,
             "hidden_until_scoring": sorted(FORBIDDEN_BACKTEST_INPUTS),
@@ -399,6 +401,8 @@ def markdown_report(payload: dict[str, Any], predictions: list[dict[str, Any]]) 
         f"- Date range: {payload['summary']['date_range']}",
         f"- Data hidden before prediction: {', '.join(payload['blind_simulation']['hidden_until_scoring'])}",
         f"- Models run: {', '.join(payload['summary']['models_run']) or 'None'}",
+        f"- Source rows in train: {payload.get('source_contribution', {}).get('train_rows_by_dataset', {})}",
+        f"- Source rows in final test: {payload.get('source_contribution', {}).get('test_rows_by_dataset', {})}",
         "",
         "## Overall Ranking",
         "| Model | Fights Tested | Main Metric | Baseline | Improvement | Beats Baseline | Status |",

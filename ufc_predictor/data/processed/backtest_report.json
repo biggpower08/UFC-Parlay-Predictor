@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-06-07T15:55:36.426206+00:00",
+  "generated_at": "2026-06-07T17:15:56.310807+00:00",
   "summary": {
-    "fights_simulated": 2440,
+    "fights_simulated": 5537,
     "date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
     "models_run": [
       "finish_model",
@@ -21,22 +21,65 @@
   },
   "split": {
     "split_type": "chronological",
-    "train_rows": 11388,
-    "validation_rows": 2440,
-    "test_rows": 2440,
+    "train_rows": 29347,
+    "validation_rows": 6134,
+    "test_rows": 5537,
+    "train_fight_groups": 17253,
+    "validation_fight_groups": 3696,
+    "test_fight_groups": 3696,
+    "canonical_group_key": "fight_key_or_stable_pair_key",
+    "no_cross_split_fight_leakage": true,
+    "cross_split_fight_keys": [],
     "date_range_train": {
-      "min": "1994-03-11",
-      "max": "2020-09-19"
+      "min": "1993-11-12",
+      "max": "2021-07-10"
     },
     "date_range_validation": {
-      "min": "2020-09-26",
-      "max": "2023-03-04"
+      "min": "2021-07-10",
+      "max": "2023-11-18"
     },
     "date_range_test": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
     "final_test_held_out": true
+  },
+  "source_contribution": {
+    "all_rows_by_dataset": {
+      "mdabbert_ultimate": 7190,
+      "ufc_1994_2025": 16674,
+      "ufc_1994_2026": 8551,
+      "ufc_fight_forecast": 8231,
+      "ufc_stats_complete": 8709
+    },
+    "train_rows_by_dataset": {
+      "mdabbert_ultimate": 4771,
+      "ufc_1994_2025": 6176,
+      "ufc_1994_2026": 6154,
+      "ufc_fight_forecast": 6062,
+      "ufc_stats_complete": 6184
+    },
+    "validation_rows_by_dataset": {
+      "mdabbert_ultimate": 1209,
+      "ufc_1994_2025": 1239,
+      "ufc_1994_2026": 1233,
+      "ufc_fight_forecast": 1214,
+      "ufc_stats_complete": 1239
+    },
+    "test_rows_by_dataset": {
+      "mdabbert_ultimate": 1210,
+      "ufc_1994_2025": 922,
+      "ufc_1994_2026": 1164,
+      "ufc_fight_forecast": 955,
+      "ufc_stats_complete": 1286
+    },
+    "unique_fight_groups_by_dataset": {
+      "mdabbert_ultimate": 7190,
+      "ufc_1994_2025": 16674,
+      "ufc_1994_2026": 8551,
+      "ufc_fight_forecast": 8231,
+      "ufc_stats_complete": 8708
+    }
   },
   "blind_simulation": {
     "prediction_features": [
@@ -75,21 +118,21 @@
     "leakage_scan_blocked_columns": [
       "a_prior_finishes",
       "b_prior_finishes",
-      "result",
-      "loser",
-      "finish_binary",
-      "finish_round",
-      "goes_distance_binary",
-      "combined_sig_strikes",
-      "method_class",
-      "fighter_a_sig_strikes",
-      "fighter_b_sig_strikes",
-      "method",
-      "finish_time",
-      "winner",
       "fighter_b_takedowns",
-      "fighter_a_takedowns",
+      "finish_binary",
       "takedown_control_bucket",
+      "loser",
+      "result",
+      "fighter_b_sig_strikes",
+      "fighter_a_sig_strikes",
+      "method",
+      "winner",
+      "finish_time",
+      "finish_round",
+      "fighter_a_takedowns",
+      "goes_distance_binary",
+      "method_class",
+      "combined_sig_strikes",
       "method_group",
       "round_phase_class"
     ]
@@ -111,47 +154,217 @@
       "status": "backtested",
       "available": true,
       "target": "finish_binary",
-      "fights_tested": 2440,
+      "fights_tested": 5537,
       "main_metric_name": "accuracy",
-      "main_metric": 0.5627,
-      "baseline_metric": 0.5201,
-      "relative_improvement": 0.0426,
+      "main_metric": 0.6101,
+      "baseline_metric": 0.5183,
+      "relative_improvement": 0.0918,
       "beats_baseline": true,
       "metrics": {
-        "accuracy": 0.5627,
-        "balanced_accuracy": 0.5604,
-        "f1_macro": 0.5599,
-        "roc_auc": 0.587,
-        "log_loss": 0.6851,
-        "brier_score": 0.246,
+        "accuracy": 0.6101,
+        "balanced_accuracy": 0.6082,
+        "f1_macro": 0.608,
+        "roc_auc": 0.662,
+        "log_loss": 0.6708,
+        "brier_score": 0.2389,
         "confusion_matrix": {
           "0": {
-            "0": 784,
-            "1": 485
+            "0": 1891,
+            "1": 979
           },
           "1": {
-            "0": 582,
-            "1": 589
+            "0": 1180,
+            "1": 1487
           }
         }
       },
       "baseline": {
         "label": "0",
-        "accuracy": 0.5201,
+        "accuracy": 0.5183,
         "class_counts": {
-          "0": 1269,
-          "1": 1171
+          "0": 2870,
+          "1": 2667
         }
       },
       "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 404,
+          "accuracy": 0.646,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Bantamweight Bout": {
+          "rows": 131,
+          "accuracy": 0.6031,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Catch Weight": {
+          "rows": 38,
+          "accuracy": 0.5789,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Featherweight": {
+          "rows": 409,
+          "accuracy": 0.6357,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight Bout": {
+          "rows": 129,
+          "accuracy": 0.6357,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 279,
+          "accuracy": 0.5448,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight Bout": {
+          "rows": 91,
+          "accuracy": 0.5385,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight": {
+          "rows": 232,
+          "accuracy": 0.6078,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Heavyweight Bout": {
+          "rows": 73,
+          "accuracy": 0.5753,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 234,
+          "accuracy": 0.5641,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Light Heavyweight Bout": {
+          "rows": 76,
+          "accuracy": 0.5658,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 465,
+          "accuracy": 0.5634,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight Bout": {
+          "rows": 148,
+          "accuracy": 0.5676,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 442,
+          "accuracy": 0.6697,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight Bout": {
+          "rows": 145,
+          "accuracy": 0.6414,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 399,
+          "accuracy": 0.5489,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight Bout": {
+          "rows": 132,
+          "accuracy": 0.5,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 144,
+          "accuracy": 0.6458,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight Bout": {
+          "rows": 45,
+          "accuracy": 0.6444,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 172,
+          "accuracy": 0.6512,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Flyweight Bout": {
+          "rows": 54,
+          "accuracy": 0.6111,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 226,
+          "accuracy": 0.6681,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Strawweight Bout": {
+          "rows": 71,
+          "accuracy": 0.6338,
+          "unstable_sample_warning": true
+        },
+        "weight_class:bantamweight": {
+          "rows": 107,
+          "accuracy": 0.6542,
+          "unstable_sample_warning": false
+        },
+        "weight_class:featherweight": {
+          "rows": 108,
+          "accuracy": 0.6667,
+          "unstable_sample_warning": false
+        },
+        "weight_class:flyweight": {
+          "rows": 73,
+          "accuracy": 0.5753,
+          "unstable_sample_warning": true
+        },
+        "weight_class:heavyweight": {
+          "rows": 55,
+          "accuracy": 0.6182,
+          "unstable_sample_warning": true
+        },
+        "weight_class:light heavyweight": {
+          "rows": 65,
+          "accuracy": 0.5692,
+          "unstable_sample_warning": true
+        },
+        "weight_class:lightweight": {
+          "rows": 126,
+          "accuracy": 0.6032,
+          "unstable_sample_warning": false
+        },
+        "weight_class:middleweight": {
+          "rows": 116,
+          "accuracy": 0.7069,
+          "unstable_sample_warning": false
+        },
+        "weight_class:welterweight": {
+          "rows": 109,
+          "accuracy": 0.5596,
+          "unstable_sample_warning": false
+        },
+        "weight_class:women's bantamweight": {
+          "rows": 37,
+          "accuracy": 0.6216,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's flyweight": {
+          "rows": 49,
+          "accuracy": 0.6939,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's strawweight": {
+          "rows": 61,
+          "accuracy": 0.6393,
+          "unstable_sample_warning": true
+        },
         "low_fighter_history": {
-          "rows": 1081,
-          "accuracy": 0.5282,
+          "rows": 631,
+          "accuracy": 0.6006,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 1359,
-          "accuracy": 0.5901,
+          "rows": 4906,
+          "accuracy": 0.6113,
           "unstable_sample_warning": false
         }
       }
@@ -160,47 +373,217 @@
       "status": "backtested",
       "available": true,
       "target": "goes_distance_binary",
-      "fights_tested": 2440,
+      "fights_tested": 5537,
       "main_metric_name": "accuracy",
-      "main_metric": 0.5627,
-      "baseline_metric": 0.5201,
-      "relative_improvement": 0.0426,
+      "main_metric": 0.6101,
+      "baseline_metric": 0.5183,
+      "relative_improvement": 0.0918,
       "beats_baseline": true,
       "metrics": {
-        "accuracy": 0.5627,
-        "balanced_accuracy": 0.5604,
-        "f1_macro": 0.5599,
-        "roc_auc": 0.587,
-        "log_loss": 0.6851,
-        "brier_score": 0.246,
+        "accuracy": 0.6101,
+        "balanced_accuracy": 0.6082,
+        "f1_macro": 0.608,
+        "roc_auc": 0.662,
+        "log_loss": 0.6708,
+        "brier_score": 0.2389,
         "confusion_matrix": {
           "0": {
-            "0": 589,
-            "1": 582
+            "0": 1487,
+            "1": 1180
           },
           "1": {
-            "0": 485,
-            "1": 784
+            "0": 979,
+            "1": 1891
           }
         }
       },
       "baseline": {
         "label": "1",
-        "accuracy": 0.5201,
+        "accuracy": 0.5183,
         "class_counts": {
-          "1": 1269,
-          "0": 1171
+          "1": 2870,
+          "0": 2667
         }
       },
       "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 404,
+          "accuracy": 0.646,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Bantamweight Bout": {
+          "rows": 131,
+          "accuracy": 0.6031,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Catch Weight": {
+          "rows": 38,
+          "accuracy": 0.5789,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Featherweight": {
+          "rows": 409,
+          "accuracy": 0.6357,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight Bout": {
+          "rows": 129,
+          "accuracy": 0.6357,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 279,
+          "accuracy": 0.5448,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight Bout": {
+          "rows": 91,
+          "accuracy": 0.5385,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight": {
+          "rows": 232,
+          "accuracy": 0.6078,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Heavyweight Bout": {
+          "rows": 73,
+          "accuracy": 0.5753,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 234,
+          "accuracy": 0.5641,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Light Heavyweight Bout": {
+          "rows": 76,
+          "accuracy": 0.5658,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 465,
+          "accuracy": 0.5634,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight Bout": {
+          "rows": 148,
+          "accuracy": 0.5676,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 442,
+          "accuracy": 0.6697,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight Bout": {
+          "rows": 145,
+          "accuracy": 0.6414,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 399,
+          "accuracy": 0.5489,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight Bout": {
+          "rows": 132,
+          "accuracy": 0.5,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 144,
+          "accuracy": 0.6458,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight Bout": {
+          "rows": 45,
+          "accuracy": 0.6444,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 172,
+          "accuracy": 0.6512,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Flyweight Bout": {
+          "rows": 54,
+          "accuracy": 0.6111,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 226,
+          "accuracy": 0.6681,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Strawweight Bout": {
+          "rows": 71,
+          "accuracy": 0.6338,
+          "unstable_sample_warning": true
+        },
+        "weight_class:bantamweight": {
+          "rows": 107,
+          "accuracy": 0.6542,
+          "unstable_sample_warning": false
+        },
+        "weight_class:featherweight": {
+          "rows": 108,
+          "accuracy": 0.6667,
+          "unstable_sample_warning": false
+        },
+        "weight_class:flyweight": {
+          "rows": 73,
+          "accuracy": 0.5753,
+          "unstable_sample_warning": true
+        },
+        "weight_class:heavyweight": {
+          "rows": 55,
+          "accuracy": 0.6182,
+          "unstable_sample_warning": true
+        },
+        "weight_class:light heavyweight": {
+          "rows": 65,
+          "accuracy": 0.5692,
+          "unstable_sample_warning": true
+        },
+        "weight_class:lightweight": {
+          "rows": 126,
+          "accuracy": 0.6032,
+          "unstable_sample_warning": false
+        },
+        "weight_class:middleweight": {
+          "rows": 116,
+          "accuracy": 0.7069,
+          "unstable_sample_warning": false
+        },
+        "weight_class:welterweight": {
+          "rows": 109,
+          "accuracy": 0.5596,
+          "unstable_sample_warning": false
+        },
+        "weight_class:women's bantamweight": {
+          "rows": 37,
+          "accuracy": 0.6216,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's flyweight": {
+          "rows": 49,
+          "accuracy": 0.6939,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's strawweight": {
+          "rows": 61,
+          "accuracy": 0.6393,
+          "unstable_sample_warning": true
+        },
         "low_fighter_history": {
-          "rows": 1081,
-          "accuracy": 0.5282,
+          "rows": 631,
+          "accuracy": 0.6006,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 1359,
-          "accuracy": 0.5901,
+          "rows": 4906,
+          "accuracy": 0.6113,
           "unstable_sample_warning": false
         }
       }
@@ -209,65 +592,235 @@
       "status": "weak_or_failed_baseline",
       "available": true,
       "target": "method_class",
-      "fights_tested": 2440,
+      "fights_tested": 5537,
       "main_metric_name": "accuracy",
-      "main_metric": 0.2557,
-      "baseline_metric": 0.5201,
-      "relative_improvement": -0.2644,
+      "main_metric": 0.3235,
+      "baseline_metric": 0.5183,
+      "relative_improvement": -0.1948,
       "beats_baseline": false,
       "metrics": {
-        "accuracy": 0.2557,
-        "balanced_accuracy": 0.2427,
-        "f1_macro": 0.2116,
+        "accuracy": 0.3235,
+        "balanced_accuracy": 0.3337,
+        "f1_macro": 0.2666,
         "roc_auc": null,
-        "log_loss": 1.3802,
+        "log_loss": 1.3448,
         "brier_score": null,
         "confusion_matrix": {
           "Decision": {
-            "Decision": 224,
-            "KO/TKO": 387,
-            "Other": 241,
-            "Submission": 417
+            "Decision": 801,
+            "KO/TKO": 757,
+            "Other": 549,
+            "Submission": 763
           },
           "KO/TKO": {
-            "Decision": 57,
-            "KO/TKO": 253,
-            "Other": 143,
-            "Submission": 286
+            "Decision": 190,
+            "KO/TKO": 635,
+            "Other": 287,
+            "Submission": 572
           },
           "Other": {
-            "Decision": 4,
-            "KO/TKO": 3,
-            "Other": 2,
-            "Submission": 11
+            "Decision": 3,
+            "KO/TKO": 8,
+            "Other": 17,
+            "Submission": 26
           },
           "Submission": {
-            "Decision": 39,
-            "KO/TKO": 158,
-            "Other": 70,
-            "Submission": 145
+            "Decision": 120,
+            "KO/TKO": 296,
+            "Other": 175,
+            "Submission": 338
           }
         }
       },
       "baseline": {
         "label": "Decision",
-        "accuracy": 0.5201,
+        "accuracy": 0.5183,
         "class_counts": {
-          "Decision": 1269,
-          "KO/TKO": 739,
-          "Submission": 412,
-          "Other": 20
+          "Decision": 2870,
+          "KO/TKO": 1684,
+          "Submission": 929,
+          "Other": 54
         }
       },
       "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 404,
+          "accuracy": 0.2797,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Bantamweight Bout": {
+          "rows": 131,
+          "accuracy": 0.2443,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Catch Weight": {
+          "rows": 38,
+          "accuracy": 0.2368,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Featherweight": {
+          "rows": 409,
+          "accuracy": 0.3423,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight Bout": {
+          "rows": 129,
+          "accuracy": 0.3411,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 279,
+          "accuracy": 0.2652,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight Bout": {
+          "rows": 91,
+          "accuracy": 0.2747,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight": {
+          "rows": 232,
+          "accuracy": 0.1595,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Heavyweight Bout": {
+          "rows": 73,
+          "accuracy": 0.137,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 234,
+          "accuracy": 0.3974,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Light Heavyweight Bout": {
+          "rows": 76,
+          "accuracy": 0.4079,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 465,
+          "accuracy": 0.3226,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight Bout": {
+          "rows": 148,
+          "accuracy": 0.3311,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 442,
+          "accuracy": 0.2828,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight Bout": {
+          "rows": 145,
+          "accuracy": 0.3034,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 399,
+          "accuracy": 0.3133,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight Bout": {
+          "rows": 132,
+          "accuracy": 0.3106,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 144,
+          "accuracy": 0.4931,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight Bout": {
+          "rows": 45,
+          "accuracy": 0.4889,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 172,
+          "accuracy": 0.4419,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Flyweight Bout": {
+          "rows": 54,
+          "accuracy": 0.4074,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 226,
+          "accuracy": 0.4071,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Strawweight Bout": {
+          "rows": 71,
+          "accuracy": 0.3803,
+          "unstable_sample_warning": true
+        },
+        "weight_class:bantamweight": {
+          "rows": 107,
+          "accuracy": 0.2897,
+          "unstable_sample_warning": false
+        },
+        "weight_class:featherweight": {
+          "rows": 108,
+          "accuracy": 0.3519,
+          "unstable_sample_warning": false
+        },
+        "weight_class:flyweight": {
+          "rows": 73,
+          "accuracy": 0.2466,
+          "unstable_sample_warning": true
+        },
+        "weight_class:heavyweight": {
+          "rows": 55,
+          "accuracy": 0.1818,
+          "unstable_sample_warning": true
+        },
+        "weight_class:light heavyweight": {
+          "rows": 65,
+          "accuracy": 0.3846,
+          "unstable_sample_warning": true
+        },
+        "weight_class:lightweight": {
+          "rows": 126,
+          "accuracy": 0.3175,
+          "unstable_sample_warning": false
+        },
+        "weight_class:middleweight": {
+          "rows": 116,
+          "accuracy": 0.2845,
+          "unstable_sample_warning": false
+        },
+        "weight_class:welterweight": {
+          "rows": 109,
+          "accuracy": 0.3119,
+          "unstable_sample_warning": false
+        },
+        "weight_class:women's bantamweight": {
+          "rows": 37,
+          "accuracy": 0.5135,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's flyweight": {
+          "rows": 49,
+          "accuracy": 0.4898,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's strawweight": {
+          "rows": 61,
+          "accuracy": 0.4426,
+          "unstable_sample_warning": true
+        },
         "low_fighter_history": {
-          "rows": 1081,
-          "accuracy": 0.1721,
+          "rows": 631,
+          "accuracy": 0.1664,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 1359,
-          "accuracy": 0.3223,
+          "rows": 4906,
+          "accuracy": 0.3437,
           "unstable_sample_warning": false
         }
       }
@@ -276,65 +829,247 @@
       "status": "weak_or_failed_baseline",
       "available": true,
       "target": "round_phase_class",
-      "fights_tested": 2440,
+      "fights_tested": 5537,
       "main_metric_name": "accuracy",
-      "main_metric": 0.2279,
-      "baseline_metric": 0.5201,
-      "relative_improvement": -0.2922,
+      "main_metric": 0.1663,
+      "baseline_metric": 0.5183,
+      "relative_improvement": -0.352,
       "beats_baseline": false,
       "metrics": {
-        "accuracy": 0.2279,
-        "balanced_accuracy": 0.4069,
-        "f1_macro": 0.1975,
+        "accuracy": 0.1663,
+        "balanced_accuracy": 0.3817,
+        "f1_macro": 0.1414,
         "roc_auc": null,
-        "log_loss": 1.4673,
+        "log_loss": 1.7044,
         "brier_score": null,
         "confusion_matrix": {
           "decision": {
-            "decision": 225,
-            "early": 476,
-            "late": 503,
-            "middle": 65
+            "decision": 482,
+            "early": 365,
+            "late": 1269,
+            "middle": 117,
+            "unknown": 637
           },
           "early": {
-            "decision": 58,
-            "early": 259,
-            "late": 199,
-            "middle": 59
+            "decision": 117,
+            "early": 260,
+            "late": 489,
+            "middle": 117,
+            "unknown": 319
           },
           "late": {
             "decision": 0,
             "early": 0,
-            "late": 20,
-            "middle": 2
+            "late": 49,
+            "middle": 5,
+            "unknown": 0
           },
           "middle": {
-            "decision": 77,
-            "early": 246,
-            "late": 199,
-            "middle": 52
+            "decision": 141,
+            "early": 245,
+            "late": 460,
+            "middle": 123,
+            "unknown": 329
+          },
+          "unknown": {
+            "decision": 0,
+            "early": 4,
+            "late": 2,
+            "middle": 0,
+            "unknown": 7
           }
         }
       },
       "baseline": {
         "label": "decision",
-        "accuracy": 0.5201,
+        "accuracy": 0.5183,
         "class_counts": {
-          "decision": 1269,
-          "early": 575,
-          "middle": 574,
-          "late": 22
+          "decision": 2870,
+          "early": 1302,
+          "middle": 1298,
+          "late": 54,
+          "unknown": 13
         }
       },
       "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 404,
+          "accuracy": 0.1535,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Bantamweight Bout": {
+          "rows": 131,
+          "accuracy": 0.1679,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Catch Weight": {
+          "rows": 38,
+          "accuracy": 0.0526,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Featherweight": {
+          "rows": 409,
+          "accuracy": 0.1711,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight Bout": {
+          "rows": 129,
+          "accuracy": 0.1628,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 279,
+          "accuracy": 0.19,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight Bout": {
+          "rows": 91,
+          "accuracy": 0.1868,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight": {
+          "rows": 232,
+          "accuracy": 0.1422,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Heavyweight Bout": {
+          "rows": 73,
+          "accuracy": 0.1507,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 234,
+          "accuracy": 0.094,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Light Heavyweight Bout": {
+          "rows": 76,
+          "accuracy": 0.0789,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 465,
+          "accuracy": 0.1763,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight Bout": {
+          "rows": 148,
+          "accuracy": 0.1622,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 442,
+          "accuracy": 0.1561,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight Bout": {
+          "rows": 145,
+          "accuracy": 0.1448,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 399,
+          "accuracy": 0.1328,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight Bout": {
+          "rows": 132,
+          "accuracy": 0.1136,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 144,
+          "accuracy": 0.2153,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight Bout": {
+          "rows": 45,
+          "accuracy": 0.2222,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 172,
+          "accuracy": 0.1977,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Flyweight Bout": {
+          "rows": 54,
+          "accuracy": 0.1852,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 226,
+          "accuracy": 0.2743,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Strawweight Bout": {
+          "rows": 71,
+          "accuracy": 0.2958,
+          "unstable_sample_warning": true
+        },
+        "weight_class:bantamweight": {
+          "rows": 107,
+          "accuracy": 0.1963,
+          "unstable_sample_warning": false
+        },
+        "weight_class:featherweight": {
+          "rows": 108,
+          "accuracy": 0.1667,
+          "unstable_sample_warning": false
+        },
+        "weight_class:flyweight": {
+          "rows": 73,
+          "accuracy": 0.2192,
+          "unstable_sample_warning": true
+        },
+        "weight_class:heavyweight": {
+          "rows": 55,
+          "accuracy": 0.1818,
+          "unstable_sample_warning": true
+        },
+        "weight_class:light heavyweight": {
+          "rows": 65,
+          "accuracy": 0.0769,
+          "unstable_sample_warning": true
+        },
+        "weight_class:lightweight": {
+          "rows": 126,
+          "accuracy": 0.2063,
+          "unstable_sample_warning": false
+        },
+        "weight_class:middleweight": {
+          "rows": 116,
+          "accuracy": 0.1638,
+          "unstable_sample_warning": false
+        },
+        "weight_class:welterweight": {
+          "rows": 109,
+          "accuracy": 0.1284,
+          "unstable_sample_warning": false
+        },
+        "weight_class:women's bantamweight": {
+          "rows": 37,
+          "accuracy": 0.2432,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's flyweight": {
+          "rows": 49,
+          "accuracy": 0.2041,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's strawweight": {
+          "rows": 61,
+          "accuracy": 0.2951,
+          "unstable_sample_warning": true
+        },
         "low_fighter_history": {
-          "rows": 1081,
-          "accuracy": 0.3053,
+          "rows": 631,
+          "accuracy": 0.13,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 1359,
-          "accuracy": 0.1663,
+          "rows": 4906,
+          "accuracy": 0.171,
           "unstable_sample_warning": false
         }
       }
@@ -343,55 +1078,165 @@
       "status": "backtested",
       "available": true,
       "target": "combined_strike_volume_bucket",
-      "fights_tested": 1348,
+      "fights_tested": 3163,
       "main_metric_name": "accuracy",
-      "main_metric": 0.4073,
-      "baseline_metric": 0.3917,
-      "relative_improvement": 0.0156,
+      "main_metric": 0.4006,
+      "baseline_metric": 0.3721,
+      "relative_improvement": 0.0285,
       "beats_baseline": true,
       "metrics": {
-        "accuracy": 0.4073,
-        "balanced_accuracy": 0.3806,
-        "f1_macro": 0.3517,
+        "accuracy": 0.4006,
+        "balanced_accuracy": 0.3812,
+        "f1_macro": 0.3521,
         "roc_auc": null,
-        "log_loss": 1.0993,
+        "log_loss": 1.1041,
         "brier_score": null,
         "confusion_matrix": {
           "high": {
-            "high": 317,
-            "low": 184,
-            "medium": 27
+            "high": 723,
+            "low": 389,
+            "medium": 65
           },
           "low": {
-            "high": 213,
-            "low": 199,
-            "medium": 25
+            "high": 535,
+            "low": 452,
+            "medium": 61
           },
           "medium": {
-            "high": 187,
-            "low": 163,
-            "medium": 33
+            "high": 502,
+            "low": 344,
+            "medium": 92
           }
         }
       },
       "baseline": {
         "label": "high",
-        "accuracy": 0.3917,
+        "accuracy": 0.3721,
         "class_counts": {
-          "high": 528,
-          "low": 437,
-          "medium": 383
+          "high": 1177,
+          "low": 1048,
+          "medium": 938
         }
       },
       "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 262,
+          "accuracy": 0.4122,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight": {
+          "rows": 264,
+          "accuracy": 0.4129,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 180,
+          "accuracy": 0.4056,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Heavyweight": {
+          "rows": 151,
+          "accuracy": 0.3775,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 149,
+          "accuracy": 0.4698,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight": {
+          "rows": 304,
+          "accuracy": 0.352,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 288,
+          "accuracy": 0.4757,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 260,
+          "accuracy": 0.3538,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 94,
+          "accuracy": 0.3404,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 112,
+          "accuracy": 0.4375,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 147,
+          "accuracy": 0.3265,
+          "unstable_sample_warning": false
+        },
+        "weight_class:bantamweight": {
+          "rows": 107,
+          "accuracy": 0.4206,
+          "unstable_sample_warning": false
+        },
+        "weight_class:featherweight": {
+          "rows": 108,
+          "accuracy": 0.4167,
+          "unstable_sample_warning": false
+        },
+        "weight_class:flyweight": {
+          "rows": 73,
+          "accuracy": 0.4247,
+          "unstable_sample_warning": true
+        },
+        "weight_class:heavyweight": {
+          "rows": 55,
+          "accuracy": 0.3818,
+          "unstable_sample_warning": true
+        },
+        "weight_class:light heavyweight": {
+          "rows": 65,
+          "accuracy": 0.4462,
+          "unstable_sample_warning": true
+        },
+        "weight_class:lightweight": {
+          "rows": 126,
+          "accuracy": 0.3571,
+          "unstable_sample_warning": false
+        },
+        "weight_class:middleweight": {
+          "rows": 116,
+          "accuracy": 0.4828,
+          "unstable_sample_warning": false
+        },
+        "weight_class:welterweight": {
+          "rows": 109,
+          "accuracy": 0.3578,
+          "unstable_sample_warning": false
+        },
+        "weight_class:women's bantamweight": {
+          "rows": 37,
+          "accuracy": 0.3514,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's flyweight": {
+          "rows": 49,
+          "accuracy": 0.4898,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's strawweight": {
+          "rows": 61,
+          "accuracy": 0.3115,
+          "unstable_sample_warning": true
+        },
         "low_fighter_history": {
-          "rows": 595,
-          "accuracy": 0.3748,
+          "rows": 385,
+          "accuracy": 0.4234,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 753,
-          "accuracy": 0.4329,
+          "rows": 2778,
+          "accuracy": 0.3974,
           "unstable_sample_warning": false
         }
       }
@@ -400,47 +1245,212 @@
       "status": "weak_or_failed_baseline",
       "available": true,
       "target": "grappling_heavy_binary",
-      "fights_tested": 1348,
+      "fights_tested": 4327,
       "main_metric_name": "accuracy",
-      "main_metric": 0.523,
-      "baseline_metric": 0.549,
-      "relative_improvement": -0.026,
+      "main_metric": 0.5193,
+      "baseline_metric": 0.5653,
+      "relative_improvement": -0.046,
       "beats_baseline": false,
       "metrics": {
-        "accuracy": 0.523,
-        "balanced_accuracy": 0.5176,
-        "f1_macro": 0.5176,
-        "roc_auc": 0.5296,
-        "log_loss": 0.6938,
-        "brier_score": 0.2503,
+        "accuracy": 0.5193,
+        "balanced_accuracy": 0.509,
+        "f1_macro": 0.5089,
+        "roc_auc": 0.5362,
+        "log_loss": 0.6915,
+        "brier_score": 0.2492,
         "confusion_matrix": {
           "0.0": {
-            "0.0": 424,
-            "1.0": 316
+            "0.0": 1438,
+            "1.0": 1008
           },
           "1.0": {
-            "0.0": 327,
-            "1.0": 281
+            "0.0": 1072,
+            "1.0": 809
           }
         }
       },
       "baseline": {
         "label": "0.0",
-        "accuracy": 0.549,
+        "accuracy": 0.5653,
         "class_counts": {
-          "0.0": 740,
-          "1.0": 608
+          "0.0": 2446,
+          "1.0": 1881
         }
       },
       "segment_metrics": {
+        "weight_class:Bantamweight": {
+          "rows": 262,
+          "accuracy": 0.542,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Bantamweight Bout": {
+          "rows": 131,
+          "accuracy": 0.5573,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight": {
+          "rows": 264,
+          "accuracy": 0.4659,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Featherweight Bout": {
+          "rows": 129,
+          "accuracy": 0.4651,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight": {
+          "rows": 180,
+          "accuracy": 0.5056,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Flyweight Bout": {
+          "rows": 91,
+          "accuracy": 0.5714,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Heavyweight": {
+          "rows": 151,
+          "accuracy": 0.5298,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Heavyweight Bout": {
+          "rows": 73,
+          "accuracy": 0.5205,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Light Heavyweight": {
+          "rows": 149,
+          "accuracy": 0.6577,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Light Heavyweight Bout": {
+          "rows": 76,
+          "accuracy": 0.6842,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Lightweight": {
+          "rows": 304,
+          "accuracy": 0.5362,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Lightweight Bout": {
+          "rows": 148,
+          "accuracy": 0.5405,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight": {
+          "rows": 288,
+          "accuracy": 0.5382,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Middleweight Bout": {
+          "rows": 145,
+          "accuracy": 0.5931,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight": {
+          "rows": 260,
+          "accuracy": 0.4923,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Welterweight Bout": {
+          "rows": 132,
+          "accuracy": 0.5606,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Bantamweight": {
+          "rows": 94,
+          "accuracy": 0.5745,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Bantamweight Bout": {
+          "rows": 45,
+          "accuracy": 0.5111,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Flyweight": {
+          "rows": 112,
+          "accuracy": 0.4018,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Flyweight Bout": {
+          "rows": 54,
+          "accuracy": 0.463,
+          "unstable_sample_warning": true
+        },
+        "weight_class:Women's Strawweight": {
+          "rows": 147,
+          "accuracy": 0.3605,
+          "unstable_sample_warning": false
+        },
+        "weight_class:Women's Strawweight Bout": {
+          "rows": 71,
+          "accuracy": 0.4225,
+          "unstable_sample_warning": true
+        },
+        "weight_class:bantamweight": {
+          "rows": 107,
+          "accuracy": 0.5327,
+          "unstable_sample_warning": false
+        },
+        "weight_class:featherweight": {
+          "rows": 108,
+          "accuracy": 0.4815,
+          "unstable_sample_warning": false
+        },
+        "weight_class:flyweight": {
+          "rows": 73,
+          "accuracy": 0.5342,
+          "unstable_sample_warning": true
+        },
+        "weight_class:heavyweight": {
+          "rows": 55,
+          "accuracy": 0.5273,
+          "unstable_sample_warning": true
+        },
+        "weight_class:light heavyweight": {
+          "rows": 65,
+          "accuracy": 0.6923,
+          "unstable_sample_warning": true
+        },
+        "weight_class:lightweight": {
+          "rows": 126,
+          "accuracy": 0.5317,
+          "unstable_sample_warning": false
+        },
+        "weight_class:middleweight": {
+          "rows": 116,
+          "accuracy": 0.5431,
+          "unstable_sample_warning": false
+        },
+        "weight_class:welterweight": {
+          "rows": 109,
+          "accuracy": 0.5138,
+          "unstable_sample_warning": false
+        },
+        "weight_class:women's bantamweight": {
+          "rows": 37,
+          "accuracy": 0.5676,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's flyweight": {
+          "rows": 49,
+          "accuracy": 0.4082,
+          "unstable_sample_warning": true
+        },
+        "weight_class:women's strawweight": {
+          "rows": 61,
+          "accuracy": 0.377,
+          "unstable_sample_warning": true
+        },
         "low_fighter_history": {
-          "rows": 595,
-          "accuracy": 0.4824,
+          "rows": 581,
+          "accuracy": 0.401,
           "unstable_sample_warning": false
         },
         "enough_fighter_history": {
-          "rows": 753,
-          "accuracy": 0.5551,
+          "rows": 3746,
+          "accuracy": 0.5376,
           "unstable_sample_warning": false
         }
       }
@@ -450,37 +1460,37 @@
     {
       "model": "finish_model",
       "status": "backtested",
-      "relative_improvement": 0.0426,
+      "relative_improvement": 0.0918,
       "beats_baseline": true
     },
     {
       "model": "goes_distance_model",
       "status": "backtested",
-      "relative_improvement": 0.0426,
+      "relative_improvement": 0.0918,
       "beats_baseline": true
     },
     {
       "model": "strike_volume_model",
       "status": "backtested",
-      "relative_improvement": 0.0156,
+      "relative_improvement": 0.0285,
       "beats_baseline": true
     },
     {
       "model": "takedown_control_model",
       "status": "weak_or_failed_baseline",
-      "relative_improvement": -0.026,
+      "relative_improvement": -0.046,
       "beats_baseline": false
     },
     {
       "model": "method_model",
       "status": "weak_or_failed_baseline",
-      "relative_improvement": -0.2644,
+      "relative_improvement": -0.1948,
       "beats_baseline": false
     },
     {
       "model": "round_phase_model",
       "status": "weak_or_failed_baseline",
-      "relative_improvement": -0.2922,
+      "relative_improvement": -0.352,
       "beats_baseline": false
     },
     {
@@ -499,17 +1509,41 @@
   "examples": {
     "best_predictions": [
       {
-        "fight_id": "2024-06-01|UFC 302: Makhachev vs. Poirier|Islam Makhachev|Dustin Poirier|8736",
+        "fight_id": "2024-06-01|nan|Islam Makhachev|Dustin Poirier|43092",
         "event_date": "2024-06-01",
         "matchup": "Islam Makhachev vs Dustin Poirier",
         "model": "round_phase_model",
-        "confidence": 0.8043,
+        "confidence": 0.769,
         "correct": true,
         "predicted": "late",
         "actual": {
           "winner": "Islam Makhachev",
           "method": "Submission",
-          "finish_round": 5,
+          "finish_round": 5.0,
+          "went_distance": false,
+          "finish_binary": 1,
+          "goes_distance_binary": 0,
+          "round_phase_class": "late",
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
+          "fighter_1_takedowns_landed": null,
+          "fighter_2_takedowns_landed": null,
+          "grappling_heavy_binary": null
+        }
+      },
+      {
+        "fight_id": "2024-06-01|UFC 302: Makhachev vs. Poirier|Islam Makhachev|Dustin Poirier|34495",
+        "event_date": "2024-06-01",
+        "matchup": "Islam Makhachev vs Dustin Poirier",
+        "model": "round_phase_model",
+        "confidence": 0.7673,
+        "correct": true,
+        "predicted": "late",
+        "actual": {
+          "winner": "Islam Makhachev",
+          "method": "Submission",
+          "finish_round": 5.0,
           "went_distance": false,
           "finish_binary": 1,
           "goes_distance_binary": 0,
@@ -523,17 +1557,17 @@
         }
       },
       {
-        "fight_id": "2024-06-01|ufc-302:-makhachev-vs.-poirier|islam makhachev|dustin poirier|7706",
+        "fight_id": "2024-06-01|nan|Islam Makhachev|Dustin Poirier|24589",
         "event_date": "2024-06-01",
-        "matchup": "islam makhachev vs dustin poirier",
+        "matchup": "Islam Makhachev vs Dustin Poirier",
         "model": "round_phase_model",
-        "confidence": 0.803,
+        "confidence": 0.7654,
         "correct": true,
         "predicted": "late",
         "actual": {
-          "winner": "islam makhachev",
+          "winner": "Islam Makhachev",
           "method": "Submission",
-          "finish_round": 5,
+          "finish_round": 5.0,
           "went_distance": false,
           "finish_binary": 1,
           "goes_distance_binary": 0,
@@ -541,97 +1575,97 @@
           "combined_sig_strikes": null,
           "fighter_1_sig_strikes_landed": null,
           "fighter_2_sig_strikes_landed": null,
-          "fighter_1_takedowns_landed": null,
-          "fighter_2_takedowns_landed": null,
-          "grappling_heavy_binary": null
-        }
-      },
-      {
-        "fight_id": "2024-04-13|ufc-300:-pereira-vs.-hill|max holloway|justin gaethje|7725",
-        "event_date": "2024-04-13",
-        "matchup": "max holloway vs justin gaethje",
-        "model": "round_phase_model",
-        "confidence": 0.8014,
-        "correct": true,
-        "predicted": "late",
-        "actual": {
-          "winner": "max holloway",
-          "method": "KO/TKO",
-          "finish_round": 5,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "late",
-          "combined_sig_strikes": null,
-          "fighter_1_sig_strikes_landed": null,
-          "fighter_2_sig_strikes_landed": null,
-          "fighter_1_takedowns_landed": null,
-          "fighter_2_takedowns_landed": null,
-          "grappling_heavy_binary": null
-        }
-      },
-      {
-        "fight_id": "2024-04-13|UFC 300: Pereira vs. Hill|Max Holloway|Justin Gaethje|8800",
-        "event_date": "2024-04-13",
-        "matchup": "Max Holloway vs Justin Gaethje",
-        "model": "round_phase_model",
-        "confidence": 0.8014,
-        "correct": true,
-        "predicted": "late",
-        "actual": {
-          "winner": "Max Holloway",
-          "method": "KO/TKO",
-          "finish_round": 5,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "late",
-          "combined_sig_strikes": 284.0,
-          "fighter_1_sig_strikes_landed": 181.0,
-          "fighter_2_sig_strikes_landed": 103.0,
-          "fighter_1_takedowns_landed": 0.0,
+          "fighter_1_takedowns_landed": 5.0,
           "fighter_2_takedowns_landed": 0.0,
-          "grappling_heavy_binary": 0.0
+          "grappling_heavy_binary": 1.0
         }
       },
       {
-        "fight_id": "2025-02-15|ufc-fight-night:-cannonier-vs.-rodrigues|jared cannonier|gregory rodrigues|8037",
-        "event_date": "2025-02-15",
-        "matchup": "jared cannonier vs gregory rodrigues",
+        "fight_id": "2024-06-01|UFC 302: Makhachev vs. Poirier|Islam Makhachev|Dustin Poirier|8991",
+        "event_date": "2024-06-01",
+        "matchup": "Islam Makhachev vs Dustin Poirier",
         "model": "round_phase_model",
-        "confidence": 0.7966,
+        "confidence": 0.7653,
         "correct": true,
         "predicted": "late",
         "actual": {
-          "winner": "jared cannonier",
-          "method": "KO/TKO",
-          "finish_round": 4,
+          "winner": NaN,
+          "method": "Submission",
+          "finish_round": 5.0,
           "went_distance": false,
           "finish_binary": 1,
           "goes_distance_binary": 0,
           "round_phase_class": "late",
-          "combined_sig_strikes": null,
-          "fighter_1_sig_strikes_landed": null,
-          "fighter_2_sig_strikes_landed": null,
-          "fighter_1_takedowns_landed": null,
-          "fighter_2_takedowns_landed": null,
-          "grappling_heavy_binary": null
+          "combined_sig_strikes": 162.0,
+          "fighter_1_sig_strikes_landed": 88.0,
+          "fighter_2_sig_strikes_landed": 74.0,
+          "fighter_1_takedowns_landed": 5.0,
+          "fighter_2_takedowns_landed": 0.0,
+          "grappling_heavy_binary": 1.0
+        }
+      },
+      {
+        "fight_id": "2024-06-01|UFC 302: Makhachev vs. Poirier|Islam Makhachev|Dustin Poirier|699",
+        "event_date": "2024-06-01",
+        "matchup": "Islam Makhachev vs Dustin Poirier",
+        "model": "round_phase_model",
+        "confidence": 0.7633,
+        "correct": true,
+        "predicted": "late",
+        "actual": {
+          "winner": "Islam Makhachev",
+          "method": "Submission",
+          "finish_round": 5.0,
+          "went_distance": false,
+          "finish_binary": 1,
+          "goes_distance_binary": 0,
+          "round_phase_class": "late",
+          "combined_sig_strikes": 162.0,
+          "fighter_1_sig_strikes_landed": 88.0,
+          "fighter_2_sig_strikes_landed": 74.0,
+          "fighter_1_takedowns_landed": 5.0,
+          "fighter_2_takedowns_landed": 0.0,
+          "grappling_heavy_binary": 1.0
         }
       }
     ],
     "worst_misses": [
       {
-        "fight_id": "2025-07-19|UFC 318: Holloway vs. Poirier 3|Max Holloway|Dustin Poirier|8153",
+        "fight_id": "2025-07-19|nan|Max Holloway|Dustin Poirier|42511",
         "event_date": "2025-07-19",
         "matchup": "Max Holloway vs Dustin Poirier",
         "model": "round_phase_model",
-        "confidence": 0.8434,
+        "confidence": 0.8077,
         "correct": false,
         "predicted": "late",
         "actual": {
           "winner": "Max Holloway",
           "method": "Decision",
-          "finish_round": 5,
+          "finish_round": 5.0,
+          "went_distance": true,
+          "finish_binary": 0,
+          "goes_distance_binary": 1,
+          "round_phase_class": "decision",
+          "combined_sig_strikes": null,
+          "fighter_1_sig_strikes_landed": null,
+          "fighter_2_sig_strikes_landed": null,
+          "fighter_1_takedowns_landed": null,
+          "fighter_2_takedowns_landed": null,
+          "grappling_heavy_binary": null
+        }
+      },
+      {
+        "fight_id": "2025-07-19|UFC 318: Holloway vs. Poirier 3|Max Holloway|Dustin Poirier|8409",
+        "event_date": "2025-07-19",
+        "matchup": "Max Holloway vs Dustin Poirier",
+        "model": "round_phase_model",
+        "confidence": 0.8076,
+        "correct": false,
+        "predicted": "late",
+        "actual": {
+          "winner": NaN,
+          "method": "Decision",
+          "finish_round": 5.0,
           "went_distance": true,
           "finish_binary": 0,
           "goes_distance_binary": 1,
@@ -645,97 +1679,73 @@
         }
       },
       {
-        "fight_id": "2025-01-18|ufc-311:-makhachev-vs.-moicano|islam makhachev|renato moicano|7846",
-        "event_date": "2025-01-18",
-        "matchup": "islam makhachev vs renato moicano",
+        "fight_id": "2025-07-19|UFC 318: Holloway vs. Poirier 3|Max Holloway|Dustin Poirier|33887",
+        "event_date": "2025-07-19",
+        "matchup": "Max Holloway vs Dustin Poirier",
         "model": "round_phase_model",
-        "confidence": 0.842,
+        "confidence": 0.8076,
         "correct": false,
         "predicted": "late",
         "actual": {
-          "winner": "islam makhachev",
-          "method": "Submission",
-          "finish_round": 1,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "early",
-          "combined_sig_strikes": null,
-          "fighter_1_sig_strikes_landed": null,
-          "fighter_2_sig_strikes_landed": null,
-          "fighter_1_takedowns_landed": null,
-          "fighter_2_takedowns_landed": null,
-          "grappling_heavy_binary": null
-        }
-      },
-      {
-        "fight_id": "2025-01-18|UFC 311: Makhachev vs. Moicano|Islam Makhachev|Renato Moicano|8422",
-        "event_date": "2025-01-18",
-        "matchup": "Islam Makhachev vs Renato Moicano",
-        "model": "round_phase_model",
-        "confidence": 0.842,
-        "correct": false,
-        "predicted": "late",
-        "actual": {
-          "winner": "Islam Makhachev",
-          "method": "Submission",
-          "finish_round": 1,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "early",
-          "combined_sig_strikes": 15.0,
-          "fighter_1_sig_strikes_landed": 6.0,
-          "fighter_2_sig_strikes_landed": 9.0,
-          "fighter_1_takedowns_landed": 1.0,
+          "winner": "Max Holloway",
+          "method": "Decision",
+          "finish_round": 5.0,
+          "went_distance": true,
+          "finish_binary": 0,
+          "goes_distance_binary": 1,
+          "round_phase_class": "decision",
+          "combined_sig_strikes": 307.0,
+          "fighter_1_sig_strikes_landed": 198.0,
+          "fighter_2_sig_strikes_landed": 109.0,
+          "fighter_1_takedowns_landed": 0.0,
           "fighter_2_takedowns_landed": 0.0,
           "grappling_heavy_binary": 0.0
         }
       },
       {
-        "fight_id": "2024-04-13|ufc-300:-pereira-vs.-hill|deiveson figueiredo|cody garbrandt|7521",
-        "event_date": "2024-04-13",
-        "matchup": "deiveson figueiredo vs cody garbrandt",
+        "fight_id": "2025-07-19|nan|Max Holloway|Dustin Poirier|25169",
+        "event_date": "2025-07-19",
+        "matchup": "Max Holloway vs Dustin Poirier",
         "model": "round_phase_model",
-        "confidence": 0.8409,
+        "confidence": 0.8075,
         "correct": false,
         "predicted": "late",
         "actual": {
-          "winner": "deiveson figueiredo",
-          "method": "Submission",
-          "finish_round": 2,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "middle",
+          "winner": "Max Holloway",
+          "method": "Decision",
+          "finish_round": 5.0,
+          "went_distance": true,
+          "finish_binary": 0,
+          "goes_distance_binary": 1,
+          "round_phase_class": "decision",
           "combined_sig_strikes": null,
           "fighter_1_sig_strikes_landed": null,
           "fighter_2_sig_strikes_landed": null,
-          "fighter_1_takedowns_landed": null,
-          "fighter_2_takedowns_landed": null,
-          "grappling_heavy_binary": null
+          "fighter_1_takedowns_landed": 0.0,
+          "fighter_2_takedowns_landed": 0.0,
+          "grappling_heavy_binary": 0.0
         }
       },
       {
-        "fight_id": "2024-04-13|UFC 300: Pereira vs. Hill|Deiveson Figueiredo|Cody Garbrandt|8803",
-        "event_date": "2024-04-13",
-        "matchup": "Deiveson Figueiredo vs Cody Garbrandt",
+        "fight_id": "2025-07-19|UFC 318: Holloway vs. Poirier 3|Max Holloway|Dustin Poirier|116",
+        "event_date": "2025-07-19",
+        "matchup": "Max Holloway vs Dustin Poirier",
         "model": "round_phase_model",
-        "confidence": 0.8409,
+        "confidence": 0.8074,
         "correct": false,
         "predicted": "late",
         "actual": {
-          "winner": "Deiveson Figueiredo",
-          "method": "Submission",
-          "finish_round": 2,
-          "went_distance": false,
-          "finish_binary": 1,
-          "goes_distance_binary": 0,
-          "round_phase_class": "middle",
-          "combined_sig_strikes": 29.0,
-          "fighter_1_sig_strikes_landed": 13.0,
-          "fighter_2_sig_strikes_landed": 16.0,
-          "fighter_1_takedowns_landed": 1.0,
+          "winner": "Max Holloway",
+          "method": "Decision",
+          "finish_round": 5.0,
+          "went_distance": true,
+          "finish_binary": 0,
+          "goes_distance_binary": 1,
+          "round_phase_class": "decision",
+          "combined_sig_strikes": 307.0,
+          "fighter_1_sig_strikes_landed": 198.0,
+          "fighter_2_sig_strikes_landed": 109.0,
+          "fighter_1_takedowns_landed": 0.0,
           "fighter_2_takedowns_landed": 0.0,
           "grappling_heavy_binary": 0.0
         }
@@ -743,49 +1753,49 @@
     ],
     "prop_examples": [
       {
-        "fight_id": "2023-03-04|UFC 285: Jones vs. Gane|Shavkat Rakhmonov|Geoff Neal|9373",
-        "matchup": "Shavkat Rakhmonov vs Geoff Neal",
+        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Jose Johnson|Chad Anheliger|956",
+        "matchup": "Jose Johnson vs Chad Anheliger",
         "fighter_1_over_50_sig_strikes": true,
-        "fighter_2_over_0_5_takedowns": false
+        "fighter_2_over_0_5_takedowns": true
       },
       {
-        "fight_id": "2023-03-04|UFC 285: Jones vs. Gane|Cody Garbrandt|Trevin Jones|9374",
-        "matchup": "Cody Garbrandt vs Trevin Jones",
+        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Joanderson Brito|Jonathan Pearce|959",
+        "matchup": "Joanderson Brito vs Jonathan Pearce",
         "fighter_1_over_50_sig_strikes": false,
         "fighter_2_over_0_5_takedowns": true
       },
       {
-        "fight_id": "2023-03-04|UFC 285: Jones vs. Gane|Alexa Grasso|Valentina Shevchenko|9375",
-        "matchup": "Alexa Grasso vs Valentina Shevchenko",
-        "fighter_1_over_50_sig_strikes": true,
+        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Myktybek Orolbai|Uros Medic|9256",
+        "matchup": "Myktybek Orolbai vs Uros Medic",
+        "fighter_1_over_50_sig_strikes": false,
         "fighter_2_over_0_5_takedowns": true
       },
       {
-        "fight_id": "2023-03-04|UFC 285: Jones vs. Gane|Marc-Andre Barriault|Julian Marquez|9376",
-        "matchup": "Marc-Andre Barriault vs Julian Marquez",
-        "fighter_1_over_50_sig_strikes": true,
-        "fighter_2_over_0_5_takedowns": false
+        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Joanderson Brito|Jonathan Pearce|9257",
+        "matchup": "Joanderson Brito vs Jonathan Pearce",
+        "fighter_1_over_50_sig_strikes": false,
+        "fighter_2_over_0_5_takedowns": true
       },
       {
-        "fight_id": "2023-03-04|UFC 285: Jones vs. Gane|Farid Basharat|Da'Mon Blackshear|9377",
-        "matchup": "Farid Basharat vs Da'Mon Blackshear",
-        "fighter_1_over_50_sig_strikes": true,
+        "fight_id": "2023-11-18|UFC Fight Night: Allen vs. Craig|Jose Johnson|Chad Anheliger|9258",
+        "matchup": "Jose Johnson vs Chad Anheliger",
+        "fighter_1_over_50_sig_strikes": false,
         "fighter_2_over_0_5_takedowns": true
       }
     ]
   },
-  "input_data": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\training_imports\\normalized_fights.csv",
+  "input_data": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\imports\\normalized_fights_combined.csv",
   "training_audit": {
     "source": "imported_csv",
-    "fight_rows": 16268,
-    "fighter_count": 5178,
+    "fight_rows": 49355,
+    "fighter_count": 2804,
     "feature_count": 81,
     "date_range": {
-      "min": "1994-03-11",
-      "max": "2025-10-04"
+      "min": "1993-11-12",
+      "max": "2026-05-16"
     },
     "source_coverage": {
-      "raw_rows": 16268,
+      "raw_rows": 49355,
       "has_event_history": true,
       "has_fight_results": true,
       "has_method_round_time": true,
@@ -794,57 +1804,58 @@
       "has_takedown_control_labels": true
     },
     "label_availability": {
-      "winner": 16268,
-      "finish_binary": 16268,
-      "goes_distance_binary": 16268,
-      "method_class": 16268,
-      "round_number": 16268,
-      "round_phase_class": 16268,
-      "fighter_a_sig_strikes": 8209,
-      "fighter_b_sig_strikes": 8209,
-      "combined_sig_strikes": 8209,
+      "winner": 32140,
+      "finish_binary": 49355,
+      "goes_distance_binary": 49355,
+      "method_class": 49355,
+      "round_number": 48720,
+      "round_phase_class": 49355,
+      "fighter_a_sig_strikes": 33530,
+      "fighter_b_sig_strikes": 33530,
+      "combined_sig_strikes": 33530,
       "fighter_a_strike_volume_bucket": 0,
       "fighter_b_strike_volume_bucket": 0,
-      "combined_strike_volume_bucket": 8209,
-      "fighter_a_50plus_sig_strikes": 8209,
-      "fighter_b_50plus_sig_strikes": 8209,
-      "combined_100plus_sig_strikes": 8209,
-      "fighter_a_takedowns": 8209,
-      "fighter_b_takedowns": 8209,
-      "fighter_a_takedown_1plus": 8209,
-      "fighter_b_takedown_1plus": 8209,
-      "grappling_heavy_binary": 8209,
-      "takedown_control_bucket": 8209
+      "combined_strike_volume_bucket": 33530,
+      "fighter_a_50plus_sig_strikes": 33530,
+      "fighter_b_50plus_sig_strikes": 33530,
+      "combined_100plus_sig_strikes": 33530,
+      "fighter_a_takedowns": 42081,
+      "fighter_b_takedowns": 42081,
+      "fighter_a_takedown_1plus": 42081,
+      "fighter_b_takedown_1plus": 42081,
+      "grappling_heavy_binary": 42081,
+      "takedown_control_bucket": 42081
     },
     "class_distributions": {
       "finish_binary": {
-        "1": 8705,
-        "0": 7563
+        "1": 26244,
+        "0": 23111
       },
       "goes_distance_binary": {
-        "0": 8705,
-        "1": 7563
+        "0": 26244,
+        "1": 23111
       },
       "method_class": {
-        "Submission": 3203,
-        "KO/TKO": 5370,
-        "Decision": 7563,
-        "Other": 132
+        "Submission": 9469,
+        "KO/TKO": 16019,
+        "Other": 756,
+        "Decision": 23111
       },
       "round_phase_class": {
-        "early": 4590,
-        "decision": 7563,
-        "middle": 3951,
-        "late": 164
+        "early": 13510,
+        "middle": 11803,
+        "decision": 23111,
+        "late": 486,
+        "unknown": 445
       },
       "combined_strike_volume_bucket": {
-        "low": 3440,
-        "medium": 2575,
-        "high": 2194
+        "low": 14009,
+        "medium": 10534,
+        "high": 8987
       },
       "grappling_heavy_binary": {
-        "0.0": 4514,
-        "1.0": 3695
+        "0.0": 24105,
+        "1.0": 17976
       }
     },
     "missingness_report": {
@@ -856,60 +1867,60 @@
       "b_prior_finishes": 0,
       "a_prior_decisions": 0,
       "b_prior_decisions": 0,
-      "fighter_1_age": 16268,
-      "fighter_2_age": 16268,
-      "age_diff": 16268,
-      "fighter_1_height": 16268,
-      "fighter_2_height": 16268,
-      "height_diff": 16268,
-      "fighter_1_reach": 16268,
-      "fighter_2_reach": 16268,
-      "reach_diff": 16268,
+      "fighter_1_age": 49355,
+      "fighter_2_age": 49355,
+      "age_diff": 49355,
+      "fighter_1_height": 49355,
+      "fighter_2_height": 49355,
+      "height_diff": 49355,
+      "fighter_1_reach": 49355,
+      "fighter_2_reach": 49355,
+      "reach_diff": 49355,
       "fighter_1_stance_known": 0,
       "fighter_2_stance_known": 0,
       "fighter_1_history_count": 0,
       "fighter_2_history_count": 0,
       "minimum_history_count": 0,
-      "fighter_1_win_rate_before": 2272,
-      "fighter_2_win_rate_before": 2906,
-      "win_rate_diff": 4189,
-      "fighter_1_finish_win_rate_before": 3631,
-      "fighter_2_finish_win_rate_before": 4464,
-      "finish_rate_diff": 6050,
-      "fighter_1_decision_win_rate_before": 3631,
-      "fighter_2_decision_win_rate_before": 4464,
-      "decision_rate_diff": 6050,
-      "fighter_1_ko_tko_win_rate_before": 16268,
-      "fighter_2_ko_tko_win_rate_before": 16268,
-      "ko_tko_rate_diff": 16268,
-      "fighter_1_submission_win_rate_before": 16268,
-      "fighter_2_submission_win_rate_before": 16268,
-      "submission_rate_diff": 16268,
-      "fighter_1_finish_loss_rate_before": 16268,
-      "fighter_2_finish_loss_rate_before": 16268,
-      "fighter_1_decision_loss_rate_before": 16268,
-      "fighter_2_decision_loss_rate_before": 16268,
-      "fighter_1_recent_3_win_rate": 16268,
-      "fighter_2_recent_3_win_rate": 16268,
-      "recent_3_win_rate_diff": 16268,
-      "fighter_1_recent_5_win_rate": 16268,
-      "fighter_2_recent_5_win_rate": 16268,
-      "recent_5_win_rate_diff": 16268,
-      "fighter_1_recent_3_finish_rate": 16268,
-      "fighter_2_recent_3_finish_rate": 16268,
-      "fighter_1_recent_5_finish_rate": 16268,
-      "fighter_2_recent_5_finish_rate": 16268,
-      "fighter_1_days_since_last_fight": 16268,
-      "fighter_2_days_since_last_fight": 16268,
-      "days_since_last_fight_diff": 16268,
-      "fighter_1_fights_last_12_months": 16268,
-      "fighter_2_fights_last_12_months": 16268,
-      "fighter_1_fights_last_24_months": 16268,
-      "fighter_2_fights_last_24_months": 16268,
-      "fighter_1_elo_before_fight": 16268,
-      "fighter_2_elo_before_fight": 16268,
-      "elo_diff": 16268,
-      "elo_expected_fighter_1": 16268,
+      "fighter_1_win_rate_before": 1234,
+      "fighter_2_win_rate_before": 1570,
+      "win_rate_diff": 2301,
+      "fighter_1_finish_win_rate_before": 2375,
+      "fighter_2_finish_win_rate_before": 11978,
+      "finish_rate_diff": 13187,
+      "fighter_1_decision_win_rate_before": 2375,
+      "fighter_2_decision_win_rate_before": 11978,
+      "decision_rate_diff": 13187,
+      "fighter_1_ko_tko_win_rate_before": 49355,
+      "fighter_2_ko_tko_win_rate_before": 49355,
+      "ko_tko_rate_diff": 49355,
+      "fighter_1_submission_win_rate_before": 49355,
+      "fighter_2_submission_win_rate_before": 49355,
+      "submission_rate_diff": 49355,
+      "fighter_1_finish_loss_rate_before": 49355,
+      "fighter_2_finish_loss_rate_before": 49355,
+      "fighter_1_decision_loss_rate_before": 49355,
+      "fighter_2_decision_loss_rate_before": 49355,
+      "fighter_1_recent_3_win_rate": 49355,
+      "fighter_2_recent_3_win_rate": 49355,
+      "recent_3_win_rate_diff": 49355,
+      "fighter_1_recent_5_win_rate": 49355,
+      "fighter_2_recent_5_win_rate": 49355,
+      "recent_5_win_rate_diff": 49355,
+      "fighter_1_recent_3_finish_rate": 49355,
+      "fighter_2_recent_3_finish_rate": 49355,
+      "fighter_1_recent_5_finish_rate": 49355,
+      "fighter_2_recent_5_finish_rate": 49355,
+      "fighter_1_days_since_last_fight": 49355,
+      "fighter_2_days_since_last_fight": 49355,
+      "days_since_last_fight_diff": 49355,
+      "fighter_1_fights_last_12_months": 49355,
+      "fighter_2_fights_last_12_months": 49355,
+      "fighter_1_fights_last_24_months": 49355,
+      "fighter_2_fights_last_24_months": 49355,
+      "fighter_1_elo_before_fight": 49355,
+      "fighter_2_elo_before_fight": 49355,
+      "elo_diff": 49355,
+      "elo_expected_fighter_1": 49355,
       "fighter_1_elo_fights_count_before": 0,
       "fighter_2_elo_fights_count_before": 0,
       "fighter_1_elo_available": 0,
@@ -917,8 +1928,8 @@
       "same_division": 0,
       "cross_division": 0,
       "catchweight": 0,
-      "weight_class_gap": 215,
-      "estimated_weight_gap_lbs": 215,
+      "weight_class_gap": 573,
+      "estimated_weight_gap_lbs": 573,
       "height_gap": 0,
       "reach_gap": 0,
       "unknown_size_context": 0,
@@ -929,27 +1940,27 @@
       "missing_profile_warning": 0,
       "missing_stats_warning": 0,
       "cross_division_warning": 0,
-      "winner": 0,
+      "winner": 17215,
       "finish_binary": 0,
       "goes_distance_binary": 0,
       "method_class": 0,
-      "round_number": 0,
+      "round_number": 635,
       "round_phase_class": 0,
-      "fighter_a_sig_strikes": 8059,
-      "fighter_b_sig_strikes": 8059,
-      "combined_sig_strikes": 8059,
-      "fighter_a_strike_volume_bucket": 16268,
-      "fighter_b_strike_volume_bucket": 16268,
-      "combined_strike_volume_bucket": 8059,
-      "fighter_a_50plus_sig_strikes": 8059,
-      "fighter_b_50plus_sig_strikes": 8059,
-      "combined_100plus_sig_strikes": 8059,
-      "fighter_a_takedowns": 8059,
-      "fighter_b_takedowns": 8059,
-      "fighter_a_takedown_1plus": 8059,
-      "fighter_b_takedown_1plus": 8059,
-      "grappling_heavy_binary": 8059,
-      "takedown_control_bucket": 8059
+      "fighter_a_sig_strikes": 15825,
+      "fighter_b_sig_strikes": 15825,
+      "combined_sig_strikes": 15825,
+      "fighter_a_strike_volume_bucket": 49355,
+      "fighter_b_strike_volume_bucket": 49355,
+      "combined_strike_volume_bucket": 15825,
+      "fighter_a_50plus_sig_strikes": 15825,
+      "fighter_b_50plus_sig_strikes": 15825,
+      "combined_100plus_sig_strikes": 15825,
+      "fighter_a_takedowns": 7274,
+      "fighter_b_takedowns": 7274,
+      "fighter_a_takedown_1plus": 7274,
+      "fighter_b_takedown_1plus": 7274,
+      "grappling_heavy_binary": 7274,
+      "takedown_control_bucket": 7274
     },
     "feature_schema_name": "finish_v1",
     "feature_schema_version": "1.0",
@@ -982,7 +1993,7 @@
     "runtime_compatibility": {
       "schema_name": "finish_v1",
       "schema_version": "1.0",
-      "rows": 16268,
+      "rows": 49355,
       "required_features_available": true,
       "required_feature_missing_rates": {
         "a_prior_fights": 0.0,
@@ -997,7 +2008,9 @@
       "optional_feature_coverage": 0.4521,
       "missing_runtime_features": []
     },
-    "warnings": [],
+    "warnings": [
+      "Some fights are missing event dates."
+    ],
     "training_data_ready": true
   }
 }

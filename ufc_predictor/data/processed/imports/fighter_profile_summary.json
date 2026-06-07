@@ -1,0 +1,13 @@
+{
+  "fighters_found": 2804,
+  "field_coverage": {
+    "fighter_1_height": 25255,
+    "fighter_2_height": 25199,
+    "fighter_1_reach": 24278,
+    "fighter_2_reach": 22312,
+    "fighter_1_stance": 32401,
+    "fighter_2_stance": 32199,
+    "fighter_1_dob": 25087,
+    "fighter_2_dob": 24787
+  }
+}

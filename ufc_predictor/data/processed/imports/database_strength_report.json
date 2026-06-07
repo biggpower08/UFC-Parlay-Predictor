@@ -1,0 +1,296 @@
+{
+  "rows": 49355,
+  "canonical_fights": {
+    "rows": 49355,
+    "unique_fight_keys": 32982,
+    "unique_events": 776,
+    "date_range": {
+      "min": "1993-11-12",
+      "max": "2026-05-16"
+    },
+    "datasets_present": [
+      "mdabbert_ultimate",
+      "ufc_1994_2025",
+      "ufc_1994_2026",
+      "ufc_fight_forecast",
+      "ufc_stats_complete"
+    ]
+  },
+  "fighter_profiles": {
+    "fighters_found": 2804,
+    "field_coverage": {
+      "fighter_1_height": 25255,
+      "fighter_2_height": 25199,
+      "fighter_1_reach": 24278,
+      "fighter_2_reach": 22312,
+      "fighter_1_stance": 32401,
+      "fighter_2_stance": 32199,
+      "fighter_1_dob": 25087,
+      "fighter_2_dob": 24787
+    }
+  },
+  "fighter_stats": {
+    "field_coverage": {
+      "fighter_1_sig_strikes_landed": 33530,
+      "fighter_2_sig_strikes_landed": 33530,
+      "fighter_1_takedowns_landed": 42081,
+      "fighter_2_takedowns_landed": 42081,
+      "fighter_1_control_time_seconds": 32987,
+      "fighter_2_control_time_seconds": 32987,
+      "fighter_1_submission_attempts": 33393,
+      "fighter_2_submission_attempts": 33393,
+      "fighter_1_knockdowns": 42081,
+      "fighter_2_knockdowns": 42081
+    },
+    "dataset_contributors": {
+      "mdabbert_ultimate": {
+        "fighter_1_sig_strikes_landed": 0,
+        "fighter_2_sig_strikes_landed": 0,
+        "fighter_1_takedowns_landed": 0,
+        "fighter_2_takedowns_landed": 0,
+        "fighter_1_control_time_seconds": 0,
+        "fighter_2_control_time_seconds": 0,
+        "fighter_1_submission_attempts": 0,
+        "fighter_2_submission_attempts": 0,
+        "fighter_1_knockdowns": 0,
+        "fighter_2_knockdowns": 0
+      },
+      "ufc_1994_2025": {
+        "fighter_1_sig_strikes_landed": 16632,
+        "fighter_2_sig_strikes_landed": 16632,
+        "fighter_1_takedowns_landed": 16632,
+        "fighter_2_takedowns_landed": 16632,
+        "fighter_1_control_time_seconds": 16270,
+        "fighter_2_control_time_seconds": 16270,
+        "fighter_1_submission_attempts": 16632,
+        "fighter_2_submission_attempts": 16632,
+        "fighter_1_knockdowns": 16632,
+        "fighter_2_knockdowns": 16632
+      },
+      "ufc_1994_2026": {
+        "fighter_1_sig_strikes_landed": 0,
+        "fighter_2_sig_strikes_landed": 0,
+        "fighter_1_takedowns_landed": 8551,
+        "fighter_2_takedowns_landed": 8551,
+        "fighter_1_control_time_seconds": 0,
+        "fighter_2_control_time_seconds": 0,
+        "fighter_1_submission_attempts": 8551,
+        "fighter_2_submission_attempts": 8551,
+        "fighter_1_knockdowns": 8551,
+        "fighter_2_knockdowns": 8551
+      },
+      "ufc_fight_forecast": {
+        "fighter_1_sig_strikes_landed": 8210,
+        "fighter_2_sig_strikes_landed": 8210,
+        "fighter_1_takedowns_landed": 8210,
+        "fighter_2_takedowns_landed": 8210,
+        "fighter_1_control_time_seconds": 8210,
+        "fighter_2_control_time_seconds": 8210,
+        "fighter_1_submission_attempts": 8210,
+        "fighter_2_submission_attempts": 8210,
+        "fighter_1_knockdowns": 8210,
+        "fighter_2_knockdowns": 8210
+      },
+      "ufc_stats_complete": {
+        "fighter_1_sig_strikes_landed": 8688,
+        "fighter_2_sig_strikes_landed": 8688,
+        "fighter_1_takedowns_landed": 8688,
+        "fighter_2_takedowns_landed": 8688,
+        "fighter_1_control_time_seconds": 8507,
+        "fighter_2_control_time_seconds": 8507,
+        "fighter_1_submission_attempts": 0,
+        "fighter_2_submission_attempts": 0,
+        "fighter_1_knockdowns": 8688,
+        "fighter_2_knockdowns": 8688
+      }
+    }
+  },
+  "odds": {
+    "field_coverage": {
+      "fighter_1_moneyline": 13272,
+      "fighter_2_moneyline": 13272,
+      "odds_snapshot_date": 0,
+      "odds_is_prefight": 0
+    },
+    "trusted_prefight_rows": 0,
+    "status": "review_needed"
+  },
+  "datasets": {
+    "ufc_fight_forecast": {
+      "available": true,
+      "rows_normalized": 8231,
+      "files_found": 2,
+      "helps_models": [
+        "finish_model",
+        "goes_distance_model",
+        "method_model",
+        "odds_calibration_model",
+        "round_phase_model",
+        "strike_volume_model",
+        "takedown_control_model",
+        "winner_model"
+      ],
+      "zero_row_reason": null,
+      "deduping": {
+        "rows": 8231,
+        "unique_fight_keys": 8231,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      }
+    },
+    "ufc_stats_complete": {
+      "available": true,
+      "rows_normalized": 8709,
+      "files_found": 2,
+      "helps_models": [
+        "finish_model",
+        "goes_distance_model",
+        "method_model",
+        "round_phase_model",
+        "strike_volume_model",
+        "takedown_control_model",
+        "winner_model"
+      ],
+      "zero_row_reason": null,
+      "deduping": {
+        "rows": 8709,
+        "unique_fight_keys": 8708,
+        "duplicate_fight_rows": 2,
+        "mirrored_candidates": 2
+      }
+    },
+    "ufc_1994_2026": {
+      "available": true,
+      "rows_normalized": 8551,
+      "files_found": 2,
+      "helps_models": [
+        "finish_model",
+        "goes_distance_model",
+        "method_model",
+        "round_phase_model",
+        "takedown_control_model",
+        "winner_model"
+      ],
+      "zero_row_reason": null,
+      "deduping": {
+        "rows": 8551,
+        "unique_fight_keys": 8551,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      }
+    },
+    "ufc_1994_2025": {
+      "available": true,
+      "rows_normalized": 16674,
+      "files_found": 4,
+      "helps_models": [
+        "finish_model",
+        "goes_distance_model",
+        "method_model",
+        "round_phase_model",
+        "strike_volume_model",
+        "takedown_control_model",
+        "winner_model"
+      ],
+      "zero_row_reason": null,
+      "deduping": {
+        "rows": 16674,
+        "unique_fight_keys": 16674,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 402
+      }
+    },
+    "mdabbert_ultimate": {
+      "available": true,
+      "rows_normalized": 7190,
+      "files_found": 2,
+      "helps_models": [
+        "finish_model",
+        "goes_distance_model",
+        "method_model",
+        "odds_calibration_model",
+        "round_phase_model",
+        "winner_model"
+      ],
+      "zero_row_reason": null,
+      "deduping": {
+        "rows": 7190,
+        "unique_fight_keys": 7190,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      }
+    },
+    "mdabbert_2010_2020_odds": {
+      "available": true,
+      "rows_normalized": 0,
+      "files_found": 1,
+      "helps_models": [],
+      "zero_row_reason": "odds-only dataset; retained for odds research until pre-fight timestamp quality is confirmed",
+      "deduping": {
+        "rows": 0,
+        "unique_fight_keys": 0,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      }
+    },
+    "ufc_datalab": {
+      "available": false,
+      "rows_normalized": 0,
+      "files_found": 0,
+      "helps_models": [],
+      "zero_row_reason": "dataset folder missing",
+      "deduping": {
+        "rows": 0,
+        "unique_fight_keys": 0,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      }
+    }
+  },
+  "missing_fields": [
+    "fighter_1_id_source",
+    "fighter_2_id_source",
+    "gender_or_division_group",
+    "title_fight",
+    "catchweight",
+    "fighter_1_total_strikes_landed",
+    "fighter_2_total_strikes_landed",
+    "odds_source",
+    "odds_snapshot_date",
+    "odds_is_prefight",
+    "closing_line_available",
+    "fighter_1_age",
+    "fighter_2_age",
+    "invalid_target_reason",
+    "inside_distance",
+    "fighter_1_by_ko_tko",
+    "fighter_1_by_submission",
+    "fighter_1_by_decision",
+    "fighter_2_by_ko_tko",
+    "fighter_2_by_submission",
+    "fighter_2_by_decision",
+    "ends_round_1",
+    "ends_round_2",
+    "ends_round_3",
+    "ends_before_round_2",
+    "ends_before_round_3",
+    "over_1_5",
+    "over_2_5",
+    "over_3_5",
+    "fighter_1_over_25_sig_strikes",
+    "fighter_1_over_50_sig_strikes",
+    "fighter_1_over_75_sig_strikes",
+    "fighter_2_over_25_sig_strikes",
+    "fighter_2_over_50_sig_strikes",
+    "fighter_2_over_75_sig_strikes",
+    "fighter_1_over_0_5_takedowns",
+    "fighter_1_over_1_5_takedowns",
+    "fighter_1_over_2_5_takedowns",
+    "fighter_2_over_0_5_takedowns",
+    "fighter_2_over_1_5_takedowns",
+    "fighter_2_over_2_5_takedowns",
+    "fighter_1_control_time_over_300_seconds",
+    "fighter_2_control_time_over_300_seconds"
+  ],
+  "source_priority_decision": "Higher-priority UFCStats-derived result/stat datasets provide fight labels first; odds-only datasets are retained for research until timestamp quality is trusted."
+}

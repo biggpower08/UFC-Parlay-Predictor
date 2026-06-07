@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
 
 from ufc_predictor.config import settings
 from ufc_predictor.training.dataset_builder import build_training_rows, load_fights_csv
+from ufc_predictor.training.deduping import stable_fight_key
 
 
 FEATURE_NAMES = [
@@ -52,16 +53,17 @@ def main() -> int:
     parser.add_argument("--validation-size", type=float, default=0.15)
     parser.add_argument("--calibrate", action="store_true")
     parser.add_argument("--by-segment", action="store_true")
+    parser.add_argument("--force-rebuild", action="store_true", help="Require the current combined normalized import file instead of legacy training imports.")
     parser.add_argument("--output-json", default=str(settings.DATA_PROCESSED_DIR / "model_accuracy_report.json"))
     parser.add_argument("--output-md", default="docs/model_accuracy_report.md")
     args = parser.parse_args()
 
     processed_dir = Path(args.processed_dir)
-    input_path = processed_dir / "training_imports" / "normalized_fights.csv"
+    input_path = processed_dir / "imports" / "normalized_fights_combined.csv"
+    if not input_path.is_file() and not args.force_rebuild:
+        input_path = processed_dir / "training_imports" / "normalized_fights.csv"
     if not input_path.is_file():
-        input_path = processed_dir / "imports" / "normalized_fights_combined.csv"
-    if not input_path.is_file():
-        print(json.dumps({"error": "normalized_training_data_missing", "expected": str(input_path), "hint": "Run scripts/import_training_dataset.py or scripts/preprocess_imported_datasets.py first."}, indent=2))
+        print(json.dumps({"error": "normalized_training_data_missing", "expected": str(input_path), "hint": "Run scripts/preprocess_imported_datasets.py --input-root data\\imports --all --write-summary first."}, indent=2))
         return 2
 
     fights = load_fights_csv(input_path)
@@ -72,15 +74,20 @@ def main() -> int:
         models[model_name] = evaluate_classification_model(model_name, target, train, validation, test, by_segment=args.by_segment)
     for model_name, target in REGRESSION_MODELS.items():
         models[model_name] = evaluate_regression_model(model_name, target, train, validation, test, by_segment=args.by_segment)
-    models["winner_model"] = blocked_model("winner_model", "Winner rows are winner/loser oriented in the normalized importer; safe f1/f2 runtime winner evaluation needs mirrored matchup orientation.")
+    models["winner_model"] = blocked_model(
+        "winner_model",
+        "Winner labels exist in imported data, but known-winner sources are currently winner-oriented after normalization. A runtime winner model needs a safe fighter_1/fighter_2 orientation with mirrored rows kept together before it can be honestly evaluated.",
+    )
     models["odds_calibration_model"] = blocked_model("odds_calibration_model", "Pre-fight odds snapshots are not yet safely matched to outcomes and timestamps.")
 
     ranking = relative_ranking(models)
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "input_data": str(input_path),
+        "force_rebuild_requested": bool(args.force_rebuild),
         "audit": audit.to_dict(),
         "split": split_report,
+        "source_contribution": source_contribution_report(dataset, train, validation, test),
         "models": models,
         "relative_ranking": ranking,
         "calibration": {"requested": args.calibrate, "status": "basic_probability_scores_only"},
@@ -96,20 +103,38 @@ def main() -> int:
 def chronological_train_validation_test_split(dataset: pd.DataFrame, validation_size: float, test_size: float):
     rows = dataset.dropna(subset=["event_date"]).copy()
     rows["_event_date"] = pd.to_datetime(rows["event_date"], errors="coerce")
-    rows = rows.dropna(subset=["_event_date"]).sort_values(["_event_date", "source_order"]).reset_index(drop=True)
-    total = len(rows)
-    test_count = max(1, int(total * test_size))
-    validation_count = max(1, int(total * validation_size))
-    train_end = max(1, total - test_count - validation_count)
-    validation_end = total - test_count
-    train = rows.iloc[:train_end].copy()
-    validation = rows.iloc[train_end:validation_end].copy()
-    test = rows.iloc[validation_end:].copy()
+    rows = rows.dropna(subset=["_event_date"]).reset_index(drop=True)
+    rows["_split_fight_key"] = rows.apply(canonical_split_key, axis=1)
+    rows["_source_order_for_sort"] = rows["source_order"] if "source_order" in rows.columns else range(len(rows))
+    group_order = (
+        rows.groupby("_split_fight_key", dropna=False)
+        .agg(_event_date=("_event_date", "min"), _source_order_for_sort=("_source_order_for_sort", "min"))
+        .sort_values(["_event_date", "_source_order_for_sort"], kind="mergesort")
+        .reset_index()
+    )
+    total_groups = len(group_order)
+    test_count = max(1, int(total_groups * test_size))
+    validation_count = max(1, int(total_groups * validation_size))
+    train_end = max(1, total_groups - test_count - validation_count)
+    validation_end = total_groups - test_count
+    train_keys = set(group_order.iloc[:train_end]["_split_fight_key"])
+    validation_keys = set(group_order.iloc[train_end:validation_end]["_split_fight_key"])
+    test_keys = set(group_order.iloc[validation_end:]["_split_fight_key"])
+    train = rows[rows["_split_fight_key"].isin(train_keys)].sort_values(["_event_date", "_source_order_for_sort"], kind="mergesort").copy()
+    validation = rows[rows["_split_fight_key"].isin(validation_keys)].sort_values(["_event_date", "_source_order_for_sort"], kind="mergesort").copy()
+    test = rows[rows["_split_fight_key"].isin(test_keys)].sort_values(["_event_date", "_source_order_for_sort"], kind="mergesort").copy()
+    overlap = cross_split_keys(train, validation, test)
     return train, validation, test, {
         "split_type": "chronological",
         "train_rows": int(len(train)),
         "validation_rows": int(len(validation)),
         "test_rows": int(len(test)),
+        "train_fight_groups": int(len(train_keys)),
+        "validation_fight_groups": int(len(validation_keys)),
+        "test_fight_groups": int(len(test_keys)),
+        "canonical_group_key": "fight_key_or_stable_pair_key",
+        "no_cross_split_fight_leakage": len(overlap) == 0,
+        "cross_split_fight_keys": overlap[:20],
         "date_range_train": date_range(train),
         "date_range_validation": date_range(validation),
         "date_range_test": date_range(test),
@@ -121,7 +146,7 @@ def evaluate_classification_model(model_name: str, target: str, train: pd.DataFr
     rows_train = train.dropna(subset=FEATURE_NAMES + [target]).copy()
     rows_test = test.dropna(subset=FEATURE_NAMES + [target]).copy()
     if len(rows_train) < 500 or len(rows_test) < 100 or rows_train[target].nunique() < 2:
-        return insufficient(model_name, target, len(rows_train), len(rows_test))
+        return insufficient(model_name, target, len(rows_train), len(rows_test), rows_train, rows_test)
     classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
     model = fit_nearest_centroid(rows_train[FEATURE_NAMES].astype(float).to_numpy(), rows_train[target].astype(str).tolist(), classes)
     probs = predict_probabilities(model, rows_test[FEATURE_NAMES].astype(float).to_numpy())
@@ -140,6 +165,10 @@ def evaluate_classification_model(model_name: str, target: str, train: pd.DataFr
         "test_rows": int(len(rows_test)),
         "train_rows": int(len(rows_train)),
         "validation_rows": int(len(validation.dropna(subset=[target]))),
+        "feature_count": len(FEATURE_NAMES),
+        "feature_names": FEATURE_NAMES,
+        "source_contribution": source_contribution_report(pd.concat([rows_train, rows_test], ignore_index=True), rows_train, validation.dropna(subset=[target]).copy(), rows_test.iloc[0:0].copy(), rows_test),
+        "feature_coverage": feature_coverage(pd.concat([rows_train, rows_test], ignore_index=True), FEATURE_NAMES + [target]),
         "final_test_metric_name": "accuracy",
         "final_test_metric": main,
         "baseline_metric": baseline,
@@ -157,7 +186,7 @@ def evaluate_regression_model(model_name: str, target: str, train: pd.DataFrame,
     rows_train = train.dropna(subset=[target]).copy()
     rows_test = test.dropna(subset=[target]).copy()
     if len(rows_train) < 500 or len(rows_test) < 100:
-        return insufficient(model_name, target, len(rows_train), len(rows_test))
+        return insufficient(model_name, target, len(rows_train), len(rows_test), rows_train, rows_test)
     prediction = float(rows_train[target].astype(float).median())
     y = rows_test[target].astype(float).to_numpy()
     preds = np.full(len(y), prediction)
@@ -174,6 +203,10 @@ def evaluate_regression_model(model_name: str, target: str, train: pd.DataFrame,
         "test_rows": int(len(rows_test)),
         "train_rows": int(len(rows_train)),
         "validation_rows": int(len(validation.dropna(subset=[target]))),
+        "feature_count": len(FEATURE_NAMES),
+        "feature_names": FEATURE_NAMES,
+        "source_contribution": source_contribution_report(pd.concat([rows_train, rows_test], ignore_index=True), rows_train, validation.dropna(subset=[target]).copy(), rows_test.iloc[0:0].copy(), rows_test),
+        "feature_coverage": feature_coverage(pd.concat([rows_train, rows_test], ignore_index=True), FEATURE_NAMES + [target]),
         "final_test_metric_name": "mae",
         "final_test_metric": round(mae, 4),
         "baseline_metric": round(baseline_mae, 4),
@@ -291,12 +324,24 @@ def segment_accuracy(group, target):
     return {"rows": int(len(group)), "accuracy": round(float((group[target].astype(str) == group["_pred"].astype(str)).mean()), 4)}
 
 
-def insufficient(model_name, target, train_rows, test_rows):
-    return {"model_name": model_name, "target": target, "status": "insufficient_data", "train_rows": int(train_rows), "test_rows": int(test_rows), "beats_baseline": False, "limitations": ["Not enough held-out rows/classes for honest evaluation."]}
+def insufficient(model_name, target, train_rows, test_rows, rows_train=None, rows_test=None):
+    rows_train = rows_train if rows_train is not None else pd.DataFrame()
+    rows_test = rows_test if rows_test is not None else pd.DataFrame()
+    return {
+        "model_name": model_name,
+        "target": target,
+        "status": "insufficient_data",
+        "train_rows": int(train_rows),
+        "test_rows": int(test_rows),
+        "feature_count": len(FEATURE_NAMES),
+        "source_contribution": source_contribution_report(pd.concat([rows_train, rows_test], ignore_index=True), rows_train, pd.DataFrame(), pd.DataFrame(), rows_test),
+        "beats_baseline": False,
+        "limitations": ["Not enough held-out rows/classes for honest evaluation."],
+    }
 
 
 def blocked_model(model_name, reason):
-    return {"model_name": model_name, "target": None, "status": "blocked", "test_rows": 0, "beats_baseline": False, "limitations": [reason]}
+    return {"model_name": model_name, "target": None, "status": "blocked", "test_rows": 0, "feature_count": 0, "source_contribution": {}, "beats_baseline": False, "limitations": [reason]}
 
 
 def limitations(beats, metrics):
@@ -320,6 +365,71 @@ def date_range(frame):
     if frame.empty:
         return {"min": None, "max": None}
     return {"min": str(frame["_event_date"].min().date()), "max": str(frame["_event_date"].max().date())}
+
+
+def canonical_split_key(row: pd.Series) -> str:
+    for column in ("fight_key", "canonical_fight_id"):
+        value = row.get(column)
+        if value is not None and not pd.isna(value) and str(value).strip():
+            return str(value)
+    return stable_fight_key(
+        {
+            "event_date": row.get("event_date"),
+            "event": row.get("event"),
+            "fighter_1": row.get("fighter_a"),
+            "fighter_2": row.get("fighter_b"),
+            "weight_class": row.get("weight_class"),
+        }
+    )
+
+
+def cross_split_keys(train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame) -> list[str]:
+    train_keys = set(train.get("_split_fight_key", pd.Series(dtype=str)).dropna().astype(str))
+    validation_keys = set(validation.get("_split_fight_key", pd.Series(dtype=str)).dropna().astype(str))
+    test_keys = set(test.get("_split_fight_key", pd.Series(dtype=str)).dropna().astype(str))
+    return sorted((train_keys & validation_keys) | (train_keys & test_keys) | (validation_keys & test_keys))
+
+
+def source_contribution_report(dataset: pd.DataFrame, train: pd.DataFrame, validation: pd.DataFrame, _unused: pd.DataFrame | None = None, test: pd.DataFrame | None = None) -> dict:
+    if test is None:
+        test = _unused if _unused is not None else pd.DataFrame()
+    return {
+        "all_rows_by_dataset": source_counts(dataset),
+        "train_rows_by_dataset": source_counts(train),
+        "validation_rows_by_dataset": source_counts(validation),
+        "test_rows_by_dataset": source_counts(test),
+        "unique_fight_groups_by_dataset": unique_group_counts(dataset),
+    }
+
+
+def source_counts(frame: pd.DataFrame) -> dict[str, int]:
+    if frame.empty:
+        return {}
+    if "source_dataset" not in frame.columns:
+        return {"unknown": int(len(frame))}
+    counts = frame["source_dataset"].fillna("unknown").astype(str).value_counts().sort_index()
+    return {str(key): int(value) for key, value in counts.items()}
+
+
+def unique_group_counts(frame: pd.DataFrame) -> dict[str, int]:
+    if frame.empty:
+        return {}
+    rows = frame.copy()
+    if "_split_fight_key" not in rows.columns:
+        rows["_split_fight_key"] = rows.apply(canonical_split_key, axis=1)
+    if "source_dataset" not in rows.columns:
+        return {"unknown": int(rows["_split_fight_key"].nunique())}
+    return {
+        str(dataset): int(group["_split_fight_key"].nunique())
+        for dataset, group in rows.groupby(rows["source_dataset"].fillna("unknown").astype(str))
+    }
+
+
+def feature_coverage(frame: pd.DataFrame, columns: list[str]) -> dict[str, float]:
+    rows = len(frame)
+    if rows == 0:
+        return {column: 0.0 for column in columns}
+    return {column: round(float(frame[column].notna().sum()) / rows, 4) if column in frame.columns else 0.0 for column in columns}
 
 
 def update_registry_with_evaluation(models):
@@ -364,6 +474,13 @@ def markdown_report(payload):
         f"- Train: {payload['split']['train_rows']} rows, {payload['split']['date_range_train']}",
         f"- Validation: {payload['split']['validation_rows']} rows, {payload['split']['date_range_validation']}",
         f"- Final test: {payload['split']['test_rows']} rows, {payload['split']['date_range_test']}",
+        f"- Fight-group leakage check: {payload['split'].get('no_cross_split_fight_leakage')}",
+        "",
+        "## Source Contributions",
+        f"- All rows by dataset: {payload['source_contribution']['all_rows_by_dataset']}",
+        f"- Train rows by dataset: {payload['source_contribution']['train_rows_by_dataset']}",
+        f"- Validation rows by dataset: {payload['source_contribution']['validation_rows_by_dataset']}",
+        f"- Final test rows by dataset: {payload['source_contribution']['test_rows_by_dataset']}",
         "",
         "## Model Ranking",
         "| Model | Status | Test Rows | Main Metric | Baseline | Improvement | Beats Baseline | Notes |",

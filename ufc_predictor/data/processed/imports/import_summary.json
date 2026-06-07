@@ -3,74 +3,76 @@
   "datasets": {
     "ufc_fight_forecast": {
       "dataset_key": "ufc_fight_forecast",
-      "path": "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset",
+      "path": "data\\imports\\kaggle\\ufc_fight_forecast",
       "available": true,
       "files_found": [
-        "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_golden.csv",
-        "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_silver.csv"
+        "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_golden.csv",
+        "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_silver.csv"
       ],
-      "rows_normalized": 8230,
-      "column_count": 69,
+      "rows_normalized": 8231,
+      "zero_row_reason": null,
+      "column_count": 131,
       "date_range": {
         "min": "1994-03-11",
         "max": "2025-10-04"
       },
       "unique_fighters": 2615,
       "deduping": {
-        "rows": 8230,
-        "unique_fight_keys": 8230,
+        "rows": 8231,
+        "unique_fight_keys": 8231,
         "duplicate_fight_rows": 0,
         "mirrored_candidates": 0
       },
       "labels_available": {
         "f1_wins_safe": 8230,
-        "fight_finished": 8230,
-        "went_distance": 8230,
-        "method_class": 8230,
-        "finish_round": 8230,
-        "fighter_1_sig_strikes_landed": 8209,
-        "fighter_1_takedowns_landed": 8209,
-        "fighter_1_moneyline": 0
+        "fight_finished": 8231,
+        "went_distance": 8231,
+        "method_class": 8231,
+        "finish_round": 8231,
+        "fighter_1_sig_strikes_landed": 8210,
+        "fighter_1_takedowns_landed": 8210,
+        "fighter_1_moneyline": 6322
       },
       "leakage_summary": {
-        "unknown_review_needed": 23,
-        "runtime_available": 1,
-        "label_only": 13,
-        "leakage_excluded": 32
+        "unknown_review_needed": 58,
+        "runtime_available": 10,
+        "label_only": 14,
+        "leakage_excluded": 48,
+        "safe_prefight_feature": 1
       },
       "blocked_columns_preview": [
         "winner_name",
         "loser_name",
         "result",
         "method",
-        "method_group",
-        "finish_binary",
-        "goes_distance_binary",
+        "method_class",
         "finish_round",
         "finish_time",
-        "round_phase_class",
+        "went_distance",
+        "fight_finished",
         "fighter_1_sig_strikes_landed",
         "fighter_2_sig_strikes_landed",
         "fighter_1_sig_strikes_attempted",
         "fighter_2_sig_strikes_attempted",
+        "fighter_1_total_strikes_landed",
+        "fighter_2_total_strikes_landed",
         "fighter_1_takedowns_landed",
         "fighter_2_takedowns_landed",
         "fighter_1_takedowns_attempted",
         "fighter_2_takedowns_attempted",
         "fighter_1_control_time_seconds",
         "fighter_2_control_time_seconds",
-        "combined_sig_strikes",
-        "combined_sig_strikes_attempted",
-        "fighter_a_50plus_sig_strikes",
-        "fighter_b_50plus_sig_strikes",
-        "combined_100plus_sig_strikes",
-        "fighter_a_takedown_1plus",
-        "fighter_b_takedown_1plus",
-        "takedown_control_bucket",
-        "method_class",
-        "went_distance"
+        "fighter_1_submission_attempts",
+        "fighter_2_submission_attempts",
+        "inside_distance",
+        "fighter_1_over_25_sig_strikes",
+        "fighter_1_over_50_sig_strikes",
+        "fighter_1_over_75_sig_strikes",
+        "fighter_2_over_25_sig_strikes",
+        "fighter_2_over_50_sig_strikes",
+        "fighter_2_over_75_sig_strikes"
       ],
-      "odds_timestamp_quality": "unavailable",
+      "odds_timestamp_quality": "review_needed",
       "recommended_uses": [
         "winner modeling",
         "odds-aware winner modeling",
@@ -85,41 +87,41 @@
         "dataset_key": "ufc_fight_forecast",
         "adapter": "kaggle_generic",
         "import_report": {
-          "input_dir": "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset",
+          "input_dir": "data\\imports\\kaggle\\ufc_fight_forecast",
           "output": null,
           "detected_files": [
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_golden.csv",
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_silver.csv"
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_golden.csv",
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_silver.csv"
           ],
           "supported_files": [
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_golden.csv",
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_silver.csv"
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_golden.csv",
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_silver.csv"
           ],
           "unknown_files": [],
           "file_types": {
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_golden.csv": "fight",
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_silver.csv": "fight"
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_golden.csv": "fight",
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_silver.csv": "fight"
           },
-          "rows_read": 16460,
-          "rows_normalized": 8230,
-          "duplicate_fights": 8230,
+          "rows_read": 16462,
+          "rows_normalized": 8231,
+          "duplicate_fights": 8231,
           "missing_columns": {
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_golden.csv": [],
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_silver.csv": []
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_golden.csv": [],
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_silver.csv": []
           },
           "label_availability": {
-            "event_date": 8230,
-            "method_group": 8230,
-            "finish_binary": 8230,
-            "goes_distance_binary": 8230,
-            "round_phase_class": 8230,
-            "fighter_a_sig_strikes": 8209,
-            "fighter_b_sig_strikes": 8209,
-            "combined_sig_strikes": 8209,
-            "fighter_a_takedowns": 8209,
-            "fighter_b_takedowns": 8209,
-            "grappling_heavy_binary": 8209,
-            "takedown_control_bucket": 8209
+            "event_date": 8231,
+            "method_group": 8231,
+            "finish_binary": 8231,
+            "goes_distance_binary": 8231,
+            "round_phase_class": 8231,
+            "fighter_a_sig_strikes": 8210,
+            "fighter_b_sig_strikes": 8210,
+            "combined_sig_strikes": 8210,
+            "fighter_a_takedowns": 8210,
+            "fighter_b_takedowns": 8210,
+            "grappling_heavy_binary": 8210,
+            "takedown_control_bucket": 8210
           },
           "date_range": {
             "min": "1994-03-11",
@@ -130,60 +132,64 @@
             "rows": 0
           },
           "source_files": [
-            "data\\imports\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\UFC_full_data_golden.csv"
+            "data\\imports\\kaggle\\ufc_fight_forecast\\UFC_full_data_golden.csv"
           ],
           "warnings": [
             "No odds snapshot rows detected; odds calibration/value models remain blocked."
           ]
         },
         "target_report": {
-          "rows": 8230,
+          "rows": 8231,
           "valid_winner_targets": 8230,
-          "invalid_winner_targets": 0,
-          "invalid_target_reasons": {},
+          "invalid_winner_targets": 1,
+          "invalid_target_reasons": {
+            "missing_or_non_win_winner": 1
+          },
           "label_availability": {
-            "ends_before_round_2": 8230,
-            "ends_before_round_3": 8230,
-            "ends_round_1": 8230,
-            "ends_round_2": 8230,
-            "ends_round_3": 8230,
+            "closing_line_available": 0,
+            "ends_before_round_2": 8231,
+            "ends_before_round_3": 8231,
+            "ends_round_1": 8231,
+            "ends_round_2": 8231,
+            "ends_round_3": 8231,
             "f1_wins": 8230,
-            "fight_finished": 8230,
+            "fight_finished": 8231,
             "fighter_1_by_decision": 8230,
             "fighter_1_by_ko_tko": 8230,
             "fighter_1_by_submission": 8230,
-            "fighter_1_control_time_over_300_seconds": 8209,
-            "fighter_1_control_time_seconds": 8209,
-            "fighter_1_over_0_5_takedowns": 8209,
-            "fighter_1_over_1_5_takedowns": 8209,
-            "fighter_1_over_25_sig_strikes": 8209,
-            "fighter_1_over_2_5_takedowns": 8209,
-            "fighter_1_over_50_sig_strikes": 8209,
-            "fighter_1_over_75_sig_strikes": 8209,
-            "fighter_1_sig_strikes_landed": 8209,
-            "fighter_1_takedowns_landed": 8209,
+            "fighter_1_control_time_over_300_seconds": 8210,
+            "fighter_1_control_time_seconds": 8210,
+            "fighter_1_over_0_5_takedowns": 8210,
+            "fighter_1_over_1_5_takedowns": 8210,
+            "fighter_1_over_25_sig_strikes": 8210,
+            "fighter_1_over_2_5_takedowns": 8210,
+            "fighter_1_over_50_sig_strikes": 8210,
+            "fighter_1_over_75_sig_strikes": 8210,
+            "fighter_1_sig_strikes_landed": 8210,
+            "fighter_1_takedowns_landed": 8210,
             "fighter_2_by_decision": 8230,
             "fighter_2_by_ko_tko": 8230,
             "fighter_2_by_submission": 8230,
-            "fighter_2_control_time_over_300_seconds": 8209,
-            "fighter_2_control_time_seconds": 8209,
-            "fighter_2_over_0_5_takedowns": 8209,
-            "fighter_2_over_1_5_takedowns": 8209,
-            "fighter_2_over_25_sig_strikes": 8209,
-            "fighter_2_over_2_5_takedowns": 8209,
-            "fighter_2_over_50_sig_strikes": 8209,
-            "fighter_2_over_75_sig_strikes": 8209,
-            "fighter_2_sig_strikes_landed": 8209,
-            "fighter_2_takedowns_landed": 8209,
-            "finish_round": 8230,
-            "goes_distance": 8230,
-            "inside_distance": 8230,
-            "method_class": 8230,
-            "over_1_5": 8230,
-            "over_2_5": 8230,
-            "over_3_5": 8230,
-            "total_sig_strikes_landed": 8209,
-            "went_distance": 8230
+            "fighter_2_control_time_over_300_seconds": 8210,
+            "fighter_2_control_time_seconds": 8210,
+            "fighter_2_over_0_5_takedowns": 8210,
+            "fighter_2_over_1_5_takedowns": 8210,
+            "fighter_2_over_25_sig_strikes": 8210,
+            "fighter_2_over_2_5_takedowns": 8210,
+            "fighter_2_over_50_sig_strikes": 8210,
+            "fighter_2_over_75_sig_strikes": 8210,
+            "fighter_2_sig_strikes_landed": 8210,
+            "fighter_2_takedowns_landed": 8210,
+            "finish_round": 8231,
+            "goes_distance": 8231,
+            "inside_distance": 8231,
+            "method_class": 8231,
+            "odds_source": 0,
+            "over_1_5": 8231,
+            "over_2_5": 8231,
+            "over_3_5": 8231,
+            "total_sig_strikes_landed": 8210,
+            "went_distance": 8231
           }
         },
         "warnings": [
@@ -193,34 +199,75 @@
     },
     "ufc_stats_complete": {
       "dataset_key": "ufc_stats_complete",
-      "path": "data\\imports\\kaggle\\leandroiber__ufc-stats-complete-dataset",
+      "path": "data\\imports\\kaggle\\ufc_stats_complete",
       "available": true,
-      "files_found": [],
-      "rows_normalized": 0,
-      "column_count": 0,
+      "files_found": [
+        "data\\imports\\kaggle\\ufc_stats_complete\\clean_ufc_dataset.csv",
+        "data\\imports\\kaggle\\ufc_stats_complete\\win_and_title_data-ufc.json"
+      ],
+      "rows_normalized": 8709,
+      "zero_row_reason": null,
+      "column_count": 131,
       "date_range": {
-        "min": null,
-        "max": null
+        "min": "1993-11-12",
+        "max": "2026-05-16"
       },
-      "unique_fighters": 0,
+      "unique_fighters": 2695,
       "deduping": {
-        "rows": 0,
-        "unique_fight_keys": 0,
-        "duplicate_fight_rows": 0,
-        "mirrored_candidates": 0
+        "rows": 8709,
+        "unique_fight_keys": 8708,
+        "duplicate_fight_rows": 2,
+        "mirrored_candidates": 2
       },
       "labels_available": {
         "f1_wins_safe": 0,
-        "fight_finished": 0,
-        "went_distance": 0,
-        "method_class": 0,
-        "finish_round": 0,
-        "fighter_1_sig_strikes_landed": 0,
-        "fighter_1_takedowns_landed": 0,
+        "fight_finished": 8709,
+        "went_distance": 8709,
+        "method_class": 8709,
+        "finish_round": 8709,
+        "fighter_1_sig_strikes_landed": 8688,
+        "fighter_1_takedowns_landed": 8688,
         "fighter_1_moneyline": 0
       },
-      "leakage_summary": {},
-      "blocked_columns_preview": [],
+      "leakage_summary": {
+        "unknown_review_needed": 58,
+        "runtime_available": 10,
+        "label_only": 14,
+        "leakage_excluded": 48,
+        "safe_prefight_feature": 1
+      },
+      "blocked_columns_preview": [
+        "winner_name",
+        "loser_name",
+        "result",
+        "method",
+        "method_class",
+        "finish_round",
+        "finish_time",
+        "went_distance",
+        "fight_finished",
+        "fighter_1_sig_strikes_landed",
+        "fighter_2_sig_strikes_landed",
+        "fighter_1_sig_strikes_attempted",
+        "fighter_2_sig_strikes_attempted",
+        "fighter_1_total_strikes_landed",
+        "fighter_2_total_strikes_landed",
+        "fighter_1_takedowns_landed",
+        "fighter_2_takedowns_landed",
+        "fighter_1_takedowns_attempted",
+        "fighter_2_takedowns_attempted",
+        "fighter_1_control_time_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_1_submission_attempts",
+        "fighter_2_submission_attempts",
+        "inside_distance",
+        "fighter_1_over_25_sig_strikes",
+        "fighter_1_over_50_sig_strikes",
+        "fighter_1_over_75_sig_strikes",
+        "fighter_2_over_25_sig_strikes",
+        "fighter_2_over_50_sig_strikes",
+        "fighter_2_over_75_sig_strikes"
+      ],
       "odds_timestamp_quality": "unavailable",
       "recommended_uses": [
         "fight results",
@@ -238,85 +285,183 @@
         "dataset_key": "ufc_stats_complete",
         "adapter": "kaggle_generic",
         "import_report": {
-          "input_dir": "data\\imports\\kaggle\\leandroiber__ufc-stats-complete-dataset",
+          "input_dir": "data\\imports\\kaggle\\ufc_stats_complete",
           "output": null,
-          "detected_files": [],
-          "supported_files": [],
+          "detected_files": [
+            "data\\imports\\kaggle\\ufc_stats_complete\\clean_ufc_dataset.csv"
+          ],
+          "supported_files": [
+            "data\\imports\\kaggle\\ufc_stats_complete\\clean_ufc_dataset.csv"
+          ],
           "unknown_files": [],
-          "file_types": {},
-          "rows_read": 0,
-          "rows_normalized": 0,
+          "file_types": {
+            "data\\imports\\kaggle\\ufc_stats_complete\\clean_ufc_dataset.csv": "fight"
+          },
+          "rows_read": 8709,
+          "rows_normalized": 8709,
           "duplicate_fights": 0,
-          "missing_columns": {},
+          "missing_columns": {
+            "data\\imports\\kaggle\\ufc_stats_complete\\clean_ufc_dataset.csv": []
+          },
           "label_availability": {
-            "event_date": 0,
-            "method_group": 0,
-            "finish_binary": 0,
-            "goes_distance_binary": 0,
-            "round_phase_class": 0,
-            "fighter_a_sig_strikes": 0,
-            "fighter_b_sig_strikes": 0,
-            "combined_sig_strikes": 0,
-            "fighter_a_takedowns": 0,
-            "fighter_b_takedowns": 0,
-            "grappling_heavy_binary": 0,
-            "takedown_control_bucket": 0
+            "event_date": 8709,
+            "method_group": 8709,
+            "finish_binary": 8709,
+            "goes_distance_binary": 8709,
+            "round_phase_class": 8709,
+            "fighter_a_sig_strikes": 8688,
+            "fighter_b_sig_strikes": 8688,
+            "combined_sig_strikes": 8688,
+            "fighter_a_takedowns": 8688,
+            "fighter_b_takedowns": 8688,
+            "grappling_heavy_binary": 8688,
+            "takedown_control_bucket": 8688
           },
           "date_range": {
-            "min": null,
-            "max": null
+            "min": "1993-11-12",
+            "max": "2026-05-16"
           },
           "odds_availability": {
             "files": 0,
             "rows": 0
           },
-          "source_files": [],
+          "source_files": [
+            "data\\imports\\kaggle\\ufc_stats_complete\\clean_ufc_dataset.csv"
+          ],
           "warnings": [
-            "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
-            "No significant-strike labels detected in imported CSVs.",
-            "No takedown/control labels detected in imported CSVs.",
             "No odds snapshot rows detected; odds calibration/value models remain blocked."
           ]
         },
-        "target_report": null,
+        "target_report": {
+          "rows": 8709,
+          "valid_winner_targets": 0,
+          "invalid_winner_targets": 8709,
+          "invalid_target_reasons": {
+            "missing_or_non_win_winner": 8709
+          },
+          "label_availability": {
+            "closing_line_available": 0,
+            "ends_before_round_2": 8709,
+            "ends_before_round_3": 8709,
+            "ends_round_1": 8709,
+            "ends_round_2": 8709,
+            "ends_round_3": 8709,
+            "f1_wins": 0,
+            "fight_finished": 8709,
+            "fighter_1_by_decision": 0,
+            "fighter_1_by_ko_tko": 0,
+            "fighter_1_by_submission": 0,
+            "fighter_1_control_time_over_300_seconds": 8507,
+            "fighter_1_control_time_seconds": 8507,
+            "fighter_1_over_0_5_takedowns": 8688,
+            "fighter_1_over_1_5_takedowns": 8688,
+            "fighter_1_over_25_sig_strikes": 8688,
+            "fighter_1_over_2_5_takedowns": 8688,
+            "fighter_1_over_50_sig_strikes": 8688,
+            "fighter_1_over_75_sig_strikes": 8688,
+            "fighter_1_sig_strikes_landed": 8688,
+            "fighter_1_takedowns_landed": 8688,
+            "fighter_2_by_decision": 0,
+            "fighter_2_by_ko_tko": 0,
+            "fighter_2_by_submission": 0,
+            "fighter_2_control_time_over_300_seconds": 8507,
+            "fighter_2_control_time_seconds": 8507,
+            "fighter_2_over_0_5_takedowns": 8688,
+            "fighter_2_over_1_5_takedowns": 8688,
+            "fighter_2_over_25_sig_strikes": 8688,
+            "fighter_2_over_2_5_takedowns": 8688,
+            "fighter_2_over_50_sig_strikes": 8688,
+            "fighter_2_over_75_sig_strikes": 8688,
+            "fighter_2_sig_strikes_landed": 8688,
+            "fighter_2_takedowns_landed": 8688,
+            "finish_round": 8709,
+            "goes_distance": 8709,
+            "inside_distance": 8709,
+            "method_class": 8709,
+            "odds_source": 0,
+            "over_1_5": 8709,
+            "over_2_5": 8709,
+            "over_3_5": 8709,
+            "total_sig_strikes_landed": 8688,
+            "went_distance": 8709
+          }
+        },
         "warnings": [
-          "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
-          "No significant-strike labels detected in imported CSVs.",
-          "No takedown/control labels detected in imported CSVs.",
           "No odds snapshot rows detected; odds calibration/value models remain blocked."
         ]
       }
     },
     "ufc_1994_2026": {
       "dataset_key": "ufc_1994_2026",
-      "path": "data\\imports\\kaggle\\jossilva3110__ufc-dataset-1994-2026",
+      "path": "data\\imports\\kaggle\\ufc_1994_2026",
       "available": true,
-      "files_found": [],
-      "rows_normalized": 0,
-      "column_count": 0,
+      "files_found": [
+        "data\\imports\\kaggle\\ufc_1994_2026\\ufc_fighters_final.csv",
+        "data\\imports\\kaggle\\ufc_1994_2026\\ufc_gold_dataset_final.csv"
+      ],
+      "rows_normalized": 8551,
+      "zero_row_reason": null,
+      "column_count": 131,
       "date_range": {
-        "min": null,
-        "max": null
+        "min": "1994-03-11",
+        "max": "2026-03-07"
       },
-      "unique_fighters": 0,
+      "unique_fighters": 2646,
       "deduping": {
-        "rows": 0,
-        "unique_fight_keys": 0,
+        "rows": 8551,
+        "unique_fight_keys": 8551,
         "duplicate_fight_rows": 0,
         "mirrored_candidates": 0
       },
       "labels_available": {
-        "f1_wins_safe": 0,
-        "fight_finished": 0,
-        "went_distance": 0,
-        "method_class": 0,
-        "finish_round": 0,
+        "f1_wins_safe": 8551,
+        "fight_finished": 8551,
+        "went_distance": 8551,
+        "method_class": 8551,
+        "finish_round": 8551,
         "fighter_1_sig_strikes_landed": 0,
-        "fighter_1_takedowns_landed": 0,
+        "fighter_1_takedowns_landed": 8551,
         "fighter_1_moneyline": 0
       },
-      "leakage_summary": {},
-      "blocked_columns_preview": [],
+      "leakage_summary": {
+        "unknown_review_needed": 58,
+        "runtime_available": 10,
+        "label_only": 14,
+        "leakage_excluded": 48,
+        "safe_prefight_feature": 1
+      },
+      "blocked_columns_preview": [
+        "winner_name",
+        "loser_name",
+        "result",
+        "method",
+        "method_class",
+        "finish_round",
+        "finish_time",
+        "went_distance",
+        "fight_finished",
+        "fighter_1_sig_strikes_landed",
+        "fighter_2_sig_strikes_landed",
+        "fighter_1_sig_strikes_attempted",
+        "fighter_2_sig_strikes_attempted",
+        "fighter_1_total_strikes_landed",
+        "fighter_2_total_strikes_landed",
+        "fighter_1_takedowns_landed",
+        "fighter_2_takedowns_landed",
+        "fighter_1_takedowns_attempted",
+        "fighter_2_takedowns_attempted",
+        "fighter_1_control_time_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_1_submission_attempts",
+        "fighter_2_submission_attempts",
+        "inside_distance",
+        "fighter_1_over_25_sig_strikes",
+        "fighter_1_over_50_sig_strikes",
+        "fighter_1_over_75_sig_strikes",
+        "fighter_2_over_25_sig_strikes",
+        "fighter_2_over_50_sig_strikes",
+        "fighter_2_over_75_sig_strikes"
+      ],
       "odds_timestamp_quality": "unavailable",
       "recommended_uses": [
         "broad historical coverage",
@@ -332,51 +477,112 @@
         "dataset_key": "ufc_1994_2026",
         "adapter": "kaggle_generic",
         "import_report": {
-          "input_dir": "data\\imports\\kaggle\\jossilva3110__ufc-dataset-1994-2026",
+          "input_dir": "data\\imports\\kaggle\\ufc_1994_2026",
           "output": null,
-          "detected_files": [],
-          "supported_files": [],
+          "detected_files": [
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_fighters_final.csv",
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_gold_dataset_final.csv"
+          ],
+          "supported_files": [
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_fighters_final.csv",
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_gold_dataset_final.csv"
+          ],
           "unknown_files": [],
-          "file_types": {},
-          "rows_read": 0,
-          "rows_normalized": 0,
+          "file_types": {
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_fighters_final.csv": "fighter",
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_gold_dataset_final.csv": "fight"
+          },
+          "rows_read": 13006,
+          "rows_normalized": 8551,
           "duplicate_fights": 0,
-          "missing_columns": {},
+          "missing_columns": {
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_fighters_final.csv": [],
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_gold_dataset_final.csv": []
+          },
           "label_availability": {
-            "event_date": 0,
-            "method_group": 0,
-            "finish_binary": 0,
-            "goes_distance_binary": 0,
-            "round_phase_class": 0,
+            "event_date": 8551,
+            "method_group": 8551,
+            "finish_binary": 8551,
+            "goes_distance_binary": 8551,
+            "round_phase_class": 8551,
             "fighter_a_sig_strikes": 0,
             "fighter_b_sig_strikes": 0,
             "combined_sig_strikes": 0,
-            "fighter_a_takedowns": 0,
-            "fighter_b_takedowns": 0,
-            "grappling_heavy_binary": 0,
-            "takedown_control_bucket": 0
+            "fighter_a_takedowns": 8551,
+            "fighter_b_takedowns": 8551,
+            "grappling_heavy_binary": 8551,
+            "takedown_control_bucket": 8551
           },
           "date_range": {
-            "min": null,
-            "max": null
+            "min": "1994-03-11",
+            "max": "2026-03-07"
           },
           "odds_availability": {
             "files": 0,
             "rows": 0
           },
-          "source_files": [],
+          "source_files": [
+            "data\\imports\\kaggle\\ufc_1994_2026\\ufc_gold_dataset_final.csv"
+          ],
           "warnings": [
-            "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
             "No significant-strike labels detected in imported CSVs.",
-            "No takedown/control labels detected in imported CSVs.",
             "No odds snapshot rows detected; odds calibration/value models remain blocked."
           ]
         },
-        "target_report": null,
+        "target_report": {
+          "rows": 8551,
+          "valid_winner_targets": 8551,
+          "invalid_winner_targets": 0,
+          "invalid_target_reasons": {},
+          "label_availability": {
+            "closing_line_available": 0,
+            "ends_before_round_2": 8551,
+            "ends_before_round_3": 8551,
+            "ends_round_1": 8551,
+            "ends_round_2": 8551,
+            "ends_round_3": 8551,
+            "f1_wins": 8551,
+            "fight_finished": 8551,
+            "fighter_1_by_decision": 8551,
+            "fighter_1_by_ko_tko": 8551,
+            "fighter_1_by_submission": 8551,
+            "fighter_1_control_time_over_300_seconds": 0,
+            "fighter_1_control_time_seconds": 0,
+            "fighter_1_over_0_5_takedowns": 8551,
+            "fighter_1_over_1_5_takedowns": 8551,
+            "fighter_1_over_25_sig_strikes": 0,
+            "fighter_1_over_2_5_takedowns": 8551,
+            "fighter_1_over_50_sig_strikes": 0,
+            "fighter_1_over_75_sig_strikes": 0,
+            "fighter_1_sig_strikes_landed": 0,
+            "fighter_1_takedowns_landed": 8551,
+            "fighter_2_by_decision": 8551,
+            "fighter_2_by_ko_tko": 8551,
+            "fighter_2_by_submission": 8551,
+            "fighter_2_control_time_over_300_seconds": 0,
+            "fighter_2_control_time_seconds": 0,
+            "fighter_2_over_0_5_takedowns": 8551,
+            "fighter_2_over_1_5_takedowns": 8551,
+            "fighter_2_over_25_sig_strikes": 0,
+            "fighter_2_over_2_5_takedowns": 8551,
+            "fighter_2_over_50_sig_strikes": 0,
+            "fighter_2_over_75_sig_strikes": 0,
+            "fighter_2_sig_strikes_landed": 0,
+            "fighter_2_takedowns_landed": 8551,
+            "finish_round": 8551,
+            "goes_distance": 8551,
+            "inside_distance": 8551,
+            "method_class": 8551,
+            "odds_source": 0,
+            "over_1_5": 8551,
+            "over_2_5": 8551,
+            "over_3_5": 8551,
+            "total_sig_strikes_landed": 0,
+            "went_distance": 8551
+          }
+        },
         "warnings": [
-          "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
           "No significant-strike labels detected in imported CSVs.",
-          "No takedown/control labels detected in imported CSVs.",
           "No odds snapshot rows detected; odds calibration/value models remain blocked."
         ]
       }
@@ -384,33 +590,76 @@
     "ufc_1994_2025": {
       "dataset_key": "ufc_1994_2025",
       "path": "data\\imports\\kaggle\\ufc_1994_2025",
-      "available": false,
-      "files_found": [],
-      "rows_normalized": 0,
-      "column_count": 0,
+      "available": true,
+      "files_found": [
+        "data\\imports\\kaggle\\ufc_1994_2025\\event_details.csv",
+        "data\\imports\\kaggle\\ufc_1994_2025\\fight_details.csv",
+        "data\\imports\\kaggle\\ufc_1994_2025\\fighter_details.csv",
+        "data\\imports\\kaggle\\ufc_1994_2025\\UFC.csv"
+      ],
+      "rows_normalized": 16674,
+      "zero_row_reason": null,
+      "column_count": 131,
       "date_range": {
-        "min": null,
-        "max": null
+        "min": "1994-03-11",
+        "max": "2025-09-06"
       },
-      "unique_fighters": 0,
+      "unique_fighters": 2610,
       "deduping": {
-        "rows": 0,
-        "unique_fight_keys": 0,
+        "rows": 16674,
+        "unique_fight_keys": 16674,
         "duplicate_fight_rows": 0,
-        "mirrored_candidates": 0
+        "mirrored_candidates": 402
       },
       "labels_available": {
-        "f1_wins_safe": 0,
-        "fight_finished": 0,
-        "went_distance": 0,
-        "method_class": 0,
-        "finish_round": 0,
-        "fighter_1_sig_strikes_landed": 0,
-        "fighter_1_takedowns_landed": 0,
+        "f1_wins_safe": 8190,
+        "fight_finished": 16674,
+        "went_distance": 16674,
+        "method_class": 16674,
+        "finish_round": 16674,
+        "fighter_1_sig_strikes_landed": 16632,
+        "fighter_1_takedowns_landed": 16632,
         "fighter_1_moneyline": 0
       },
-      "leakage_summary": {},
-      "blocked_columns_preview": [],
+      "leakage_summary": {
+        "unknown_review_needed": 58,
+        "runtime_available": 10,
+        "label_only": 14,
+        "leakage_excluded": 48,
+        "safe_prefight_feature": 1
+      },
+      "blocked_columns_preview": [
+        "winner_name",
+        "loser_name",
+        "result",
+        "method",
+        "method_class",
+        "finish_round",
+        "finish_time",
+        "went_distance",
+        "fight_finished",
+        "fighter_1_sig_strikes_landed",
+        "fighter_2_sig_strikes_landed",
+        "fighter_1_sig_strikes_attempted",
+        "fighter_2_sig_strikes_attempted",
+        "fighter_1_total_strikes_landed",
+        "fighter_2_total_strikes_landed",
+        "fighter_1_takedowns_landed",
+        "fighter_2_takedowns_landed",
+        "fighter_1_takedowns_attempted",
+        "fighter_2_takedowns_attempted",
+        "fighter_1_control_time_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_1_submission_attempts",
+        "fighter_2_submission_attempts",
+        "inside_distance",
+        "fighter_1_over_25_sig_strikes",
+        "fighter_1_over_50_sig_strikes",
+        "fighter_1_over_75_sig_strikes",
+        "fighter_2_over_25_sig_strikes",
+        "fighter_2_over_50_sig_strikes",
+        "fighter_2_over_75_sig_strikes"
+      ],
       "odds_timestamp_quality": "unavailable",
       "recommended_uses": [
         "newer UFCStats scrape cross-check",
@@ -427,62 +676,195 @@
         "import_report": {
           "input_dir": "data\\imports\\kaggle\\ufc_1994_2025",
           "output": null,
-          "detected_files": [],
-          "supported_files": [],
-          "unknown_files": [],
-          "file_types": {},
-          "rows_read": 0,
-          "rows_normalized": 0,
+          "detected_files": [
+            "data\\imports\\kaggle\\ufc_1994_2025\\event_details.csv",
+            "data\\imports\\kaggle\\ufc_1994_2025\\fight_details.csv",
+            "data\\imports\\kaggle\\ufc_1994_2025\\fighter_details.csv",
+            "data\\imports\\kaggle\\ufc_1994_2025\\UFC.csv"
+          ],
+          "supported_files": [
+            "data\\imports\\kaggle\\ufc_1994_2025\\fight_details.csv",
+            "data\\imports\\kaggle\\ufc_1994_2025\\fighter_details.csv",
+            "data\\imports\\kaggle\\ufc_1994_2025\\UFC.csv"
+          ],
+          "unknown_files": [
+            "data\\imports\\kaggle\\ufc_1994_2025\\event_details.csv"
+          ],
+          "file_types": {
+            "data\\imports\\kaggle\\ufc_1994_2025\\event_details.csv": "unknown",
+            "data\\imports\\kaggle\\ufc_1994_2025\\fight_details.csv": "fight",
+            "data\\imports\\kaggle\\ufc_1994_2025\\fighter_details.csv": "fighter",
+            "data\\imports\\kaggle\\ufc_1994_2025\\UFC.csv": "fight"
+          },
+          "rows_read": 19285,
+          "rows_normalized": 16674,
           "duplicate_fights": 0,
-          "missing_columns": {},
-          "label_availability": {},
-          "date_range": {},
-          "odds_availability": {},
-          "source_files": [],
+          "missing_columns": {
+            "data\\imports\\kaggle\\ufc_1994_2025\\fight_details.csv": [],
+            "data\\imports\\kaggle\\ufc_1994_2025\\fighter_details.csv": [],
+            "data\\imports\\kaggle\\ufc_1994_2025\\UFC.csv": []
+          },
+          "label_availability": {
+            "event_date": 8337,
+            "method_group": 16674,
+            "finish_binary": 16674,
+            "goes_distance_binary": 16674,
+            "round_phase_class": 16674,
+            "fighter_a_sig_strikes": 16632,
+            "fighter_b_sig_strikes": 16632,
+            "combined_sig_strikes": 16632,
+            "fighter_a_takedowns": 16632,
+            "fighter_b_takedowns": 16632,
+            "grappling_heavy_binary": 16632,
+            "takedown_control_bucket": 16632
+          },
+          "date_range": {
+            "min": "1994-03-11",
+            "max": "2025-09-06"
+          },
+          "odds_availability": {
+            "files": 0,
+            "rows": 0
+          },
+          "source_files": [
+            "data\\imports\\kaggle\\ufc_1994_2025\\UFC.csv",
+            "data\\imports\\kaggle\\ufc_1994_2025\\fight_details.csv"
+          ],
           "warnings": [
-            "Input directory does not exist."
+            "No odds snapshot rows detected; odds calibration/value models remain blocked."
           ]
         },
-        "target_report": null,
+        "target_report": {
+          "rows": 16674,
+          "valid_winner_targets": 8190,
+          "invalid_winner_targets": 8484,
+          "invalid_target_reasons": {
+            "missing_or_non_win_winner": 8484
+          },
+          "label_availability": {
+            "closing_line_available": 0,
+            "ends_before_round_2": 16674,
+            "ends_before_round_3": 16674,
+            "ends_round_1": 16674,
+            "ends_round_2": 16674,
+            "ends_round_3": 16674,
+            "f1_wins": 8190,
+            "fight_finished": 16674,
+            "fighter_1_by_decision": 8190,
+            "fighter_1_by_ko_tko": 8190,
+            "fighter_1_by_submission": 8190,
+            "fighter_1_control_time_over_300_seconds": 16270,
+            "fighter_1_control_time_seconds": 16270,
+            "fighter_1_over_0_5_takedowns": 16632,
+            "fighter_1_over_1_5_takedowns": 16632,
+            "fighter_1_over_25_sig_strikes": 16632,
+            "fighter_1_over_2_5_takedowns": 16632,
+            "fighter_1_over_50_sig_strikes": 16632,
+            "fighter_1_over_75_sig_strikes": 16632,
+            "fighter_1_sig_strikes_landed": 16632,
+            "fighter_1_takedowns_landed": 16632,
+            "fighter_2_by_decision": 8190,
+            "fighter_2_by_ko_tko": 8190,
+            "fighter_2_by_submission": 8190,
+            "fighter_2_control_time_over_300_seconds": 16270,
+            "fighter_2_control_time_seconds": 16270,
+            "fighter_2_over_0_5_takedowns": 16632,
+            "fighter_2_over_1_5_takedowns": 16632,
+            "fighter_2_over_25_sig_strikes": 16632,
+            "fighter_2_over_2_5_takedowns": 16632,
+            "fighter_2_over_50_sig_strikes": 16632,
+            "fighter_2_over_75_sig_strikes": 16632,
+            "fighter_2_sig_strikes_landed": 16632,
+            "fighter_2_takedowns_landed": 16632,
+            "finish_round": 16674,
+            "goes_distance": 16674,
+            "inside_distance": 16674,
+            "method_class": 16674,
+            "odds_source": 0,
+            "over_1_5": 16674,
+            "over_2_5": 16674,
+            "over_3_5": 16674,
+            "total_sig_strikes_landed": 16632,
+            "went_distance": 16674
+          }
+        },
         "warnings": [
-          "Input directory does not exist."
+          "No odds snapshot rows detected; odds calibration/value models remain blocked."
         ]
       }
     },
     "mdabbert_ultimate": {
       "dataset_key": "mdabbert_ultimate",
-      "path": "data\\imports\\mdabbert__ultimate-ufc-dataset",
+      "path": "data\\imports\\kaggle\\mdabbert_ultimate",
       "available": true,
       "files_found": [
-        "data\\imports\\mdabbert__ultimate-ufc-dataset\\ufc-master.csv",
-        "data\\imports\\mdabbert__ultimate-ufc-dataset\\upcoming.csv"
+        "data\\imports\\kaggle\\mdabbert_ultimate\\ufc-master.csv",
+        "data\\imports\\kaggle\\mdabbert_ultimate\\upcoming.csv"
       ],
-      "rows_normalized": 0,
-      "column_count": 0,
+      "rows_normalized": 7190,
+      "zero_row_reason": null,
+      "column_count": 131,
       "date_range": {
-        "min": null,
-        "max": null
+        "min": "2010-03-21",
+        "max": "2026-04-04"
       },
-      "unique_fighters": 0,
+      "unique_fighters": 2245,
       "deduping": {
-        "rows": 0,
-        "unique_fight_keys": 0,
+        "rows": 7190,
+        "unique_fight_keys": 7190,
         "duplicate_fight_rows": 0,
         "mirrored_candidates": 0
       },
       "labels_available": {
-        "f1_wins_safe": 0,
-        "fight_finished": 0,
-        "went_distance": 0,
-        "method_class": 0,
-        "finish_round": 0,
+        "f1_wins_safe": 7169,
+        "fight_finished": 7190,
+        "went_distance": 7190,
+        "method_class": 7190,
+        "finish_round": 6555,
         "fighter_1_sig_strikes_landed": 0,
         "fighter_1_takedowns_landed": 0,
-        "fighter_1_moneyline": 0
+        "fighter_1_moneyline": 6950
       },
-      "leakage_summary": {},
-      "blocked_columns_preview": [],
-      "odds_timestamp_quality": "unavailable",
+      "leakage_summary": {
+        "unknown_review_needed": 58,
+        "runtime_available": 10,
+        "label_only": 14,
+        "leakage_excluded": 48,
+        "safe_prefight_feature": 1
+      },
+      "blocked_columns_preview": [
+        "winner_name",
+        "loser_name",
+        "result",
+        "method",
+        "method_class",
+        "finish_round",
+        "finish_time",
+        "went_distance",
+        "fight_finished",
+        "fighter_1_sig_strikes_landed",
+        "fighter_2_sig_strikes_landed",
+        "fighter_1_sig_strikes_attempted",
+        "fighter_2_sig_strikes_attempted",
+        "fighter_1_total_strikes_landed",
+        "fighter_2_total_strikes_landed",
+        "fighter_1_takedowns_landed",
+        "fighter_2_takedowns_landed",
+        "fighter_1_takedowns_attempted",
+        "fighter_2_takedowns_attempted",
+        "fighter_1_control_time_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_1_submission_attempts",
+        "fighter_2_submission_attempts",
+        "inside_distance",
+        "fighter_1_over_25_sig_strikes",
+        "fighter_1_over_50_sig_strikes",
+        "fighter_1_over_75_sig_strikes",
+        "fighter_2_over_25_sig_strikes",
+        "fighter_2_over_50_sig_strikes",
+        "fighter_2_over_75_sig_strikes"
+      ],
+      "odds_timestamp_quality": "review_needed",
       "recommended_uses": [
         "odds-aware modeling",
         "betting market baseline",
@@ -496,34 +878,34 @@
         "dataset_key": "mdabbert_ultimate",
         "adapter": "kaggle_generic",
         "import_report": {
-          "input_dir": "data\\imports\\mdabbert__ultimate-ufc-dataset",
+          "input_dir": "data\\imports\\kaggle\\mdabbert_ultimate",
           "output": null,
           "detected_files": [
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\ufc-master.csv",
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\upcoming.csv"
+            "data\\imports\\kaggle\\mdabbert_ultimate\\ufc-master.csv",
+            "data\\imports\\kaggle\\mdabbert_ultimate\\upcoming.csv"
           ],
           "supported_files": [
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\ufc-master.csv",
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\upcoming.csv"
+            "data\\imports\\kaggle\\mdabbert_ultimate\\ufc-master.csv",
+            "data\\imports\\kaggle\\mdabbert_ultimate\\upcoming.csv"
           ],
           "unknown_files": [],
           "file_types": {
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\ufc-master.csv": "odds",
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\upcoming.csv": "odds"
+            "data\\imports\\kaggle\\mdabbert_ultimate\\ufc-master.csv": "fight",
+            "data\\imports\\kaggle\\mdabbert_ultimate\\upcoming.csv": "fight"
           },
           "rows_read": 7190,
-          "rows_normalized": 0,
+          "rows_normalized": 7190,
           "duplicate_fights": 0,
           "missing_columns": {
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\ufc-master.csv": [],
-            "data\\imports\\mdabbert__ultimate-ufc-dataset\\upcoming.csv": []
+            "data\\imports\\kaggle\\mdabbert_ultimate\\ufc-master.csv": [],
+            "data\\imports\\kaggle\\mdabbert_ultimate\\upcoming.csv": []
           },
           "label_availability": {
-            "event_date": 0,
-            "method_group": 0,
-            "finish_binary": 0,
-            "goes_distance_binary": 0,
-            "round_phase_class": 0,
+            "event_date": 7190,
+            "method_group": 7190,
+            "finish_binary": 7190,
+            "goes_distance_binary": 7190,
+            "round_phase_class": 7190,
             "fighter_a_sig_strikes": 0,
             "fighter_b_sig_strikes": 0,
             "combined_sig_strikes": 0,
@@ -533,34 +915,93 @@
             "takedown_control_bucket": 0
           },
           "date_range": {
-            "min": null,
-            "max": null
+            "min": "2010-03-21",
+            "max": "2026-04-04"
           },
           "odds_availability": {
-            "files": 2,
-            "rows": 7190
+            "files": 0,
+            "rows": 0
           },
-          "source_files": [],
+          "source_files": [
+            "data\\imports\\kaggle\\mdabbert_ultimate\\ufc-master.csv",
+            "data\\imports\\kaggle\\mdabbert_ultimate\\upcoming.csv"
+          ],
           "warnings": [
-            "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
             "No significant-strike labels detected in imported CSVs.",
-            "No takedown/control labels detected in imported CSVs."
+            "No takedown/control labels detected in imported CSVs.",
+            "No odds snapshot rows detected; odds calibration/value models remain blocked."
           ]
         },
-        "target_report": null,
+        "target_report": {
+          "rows": 7190,
+          "valid_winner_targets": 7169,
+          "invalid_winner_targets": 21,
+          "invalid_target_reasons": {
+            "missing_or_non_win_winner": 21
+          },
+          "label_availability": {
+            "closing_line_available": 0,
+            "ends_before_round_2": 7190,
+            "ends_before_round_3": 7190,
+            "ends_round_1": 7190,
+            "ends_round_2": 7190,
+            "ends_round_3": 7190,
+            "f1_wins": 7169,
+            "fight_finished": 7190,
+            "fighter_1_by_decision": 7169,
+            "fighter_1_by_ko_tko": 7169,
+            "fighter_1_by_submission": 7169,
+            "fighter_1_control_time_over_300_seconds": 0,
+            "fighter_1_control_time_seconds": 0,
+            "fighter_1_over_0_5_takedowns": 0,
+            "fighter_1_over_1_5_takedowns": 0,
+            "fighter_1_over_25_sig_strikes": 0,
+            "fighter_1_over_2_5_takedowns": 0,
+            "fighter_1_over_50_sig_strikes": 0,
+            "fighter_1_over_75_sig_strikes": 0,
+            "fighter_1_sig_strikes_landed": 0,
+            "fighter_1_takedowns_landed": 0,
+            "fighter_2_by_decision": 7169,
+            "fighter_2_by_ko_tko": 7169,
+            "fighter_2_by_submission": 7169,
+            "fighter_2_control_time_over_300_seconds": 0,
+            "fighter_2_control_time_seconds": 0,
+            "fighter_2_over_0_5_takedowns": 0,
+            "fighter_2_over_1_5_takedowns": 0,
+            "fighter_2_over_25_sig_strikes": 0,
+            "fighter_2_over_2_5_takedowns": 0,
+            "fighter_2_over_50_sig_strikes": 0,
+            "fighter_2_over_75_sig_strikes": 0,
+            "fighter_2_sig_strikes_landed": 0,
+            "fighter_2_takedowns_landed": 0,
+            "finish_round": 6555,
+            "goes_distance": 7190,
+            "inside_distance": 7190,
+            "method_class": 7190,
+            "odds_source": 0,
+            "over_1_5": 7190,
+            "over_2_5": 7190,
+            "over_3_5": 7190,
+            "total_sig_strikes_landed": 0,
+            "went_distance": 7190
+          }
+        },
         "warnings": [
-          "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
           "No significant-strike labels detected in imported CSVs.",
-          "No takedown/control labels detected in imported CSVs."
+          "No takedown/control labels detected in imported CSVs.",
+          "No odds snapshot rows detected; odds calibration/value models remain blocked."
         ]
       }
     },
     "mdabbert_2010_2020_odds": {
       "dataset_key": "mdabbert_2010_2020_odds",
-      "path": "data\\imports\\kaggle\\mdabbert__ufc-fights-2010-2020-with-betting-odds",
+      "path": "data\\imports\\kaggle\\mdabbert_2010_2020_odds",
       "available": true,
-      "files_found": [],
+      "files_found": [
+        "data\\imports\\kaggle\\mdabbert_2010_2020_odds\\data.csv"
+      ],
       "rows_normalized": 0,
+      "zero_row_reason": "odds-only dataset; retained for odds research until pre-fight timestamp quality is confirmed",
       "column_count": 0,
       "date_range": {
         "min": null,
@@ -599,16 +1040,24 @@
         "dataset_key": "mdabbert_2010_2020_odds",
         "adapter": "kaggle_generic",
         "import_report": {
-          "input_dir": "data\\imports\\kaggle\\mdabbert__ufc-fights-2010-2020-with-betting-odds",
+          "input_dir": "data\\imports\\kaggle\\mdabbert_2010_2020_odds",
           "output": null,
-          "detected_files": [],
-          "supported_files": [],
+          "detected_files": [
+            "data\\imports\\kaggle\\mdabbert_2010_2020_odds\\data.csv"
+          ],
+          "supported_files": [
+            "data\\imports\\kaggle\\mdabbert_2010_2020_odds\\data.csv"
+          ],
           "unknown_files": [],
-          "file_types": {},
-          "rows_read": 0,
+          "file_types": {
+            "data\\imports\\kaggle\\mdabbert_2010_2020_odds\\data.csv": "odds"
+          },
+          "rows_read": 5528,
           "rows_normalized": 0,
           "duplicate_fights": 0,
-          "missing_columns": {},
+          "missing_columns": {
+            "data\\imports\\kaggle\\mdabbert_2010_2020_odds\\data.csv": []
+          },
           "label_availability": {
             "event_date": 0,
             "method_group": 0,
@@ -628,23 +1077,21 @@
             "max": null
           },
           "odds_availability": {
-            "files": 0,
-            "rows": 0
+            "files": 1,
+            "rows": 5528
           },
           "source_files": [],
           "warnings": [
             "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
             "No significant-strike labels detected in imported CSVs.",
-            "No takedown/control labels detected in imported CSVs.",
-            "No odds snapshot rows detected; odds calibration/value models remain blocked."
+            "No takedown/control labels detected in imported CSVs."
           ]
         },
         "target_report": null,
         "warnings": [
           "No supported fight rows were normalized. Place downloaded CSVs under data/imports or ufc_predictor/data/imports.",
           "No significant-strike labels detected in imported CSVs.",
-          "No takedown/control labels detected in imported CSVs.",
-          "No odds snapshot rows detected; odds calibration/value models remain blocked."
+          "No takedown/control labels detected in imported CSVs."
         ]
       }
     },
@@ -654,6 +1101,7 @@
       "available": false,
       "files_found": [],
       "rows_normalized": 0,
+      "zero_row_reason": "dataset folder missing",
       "column_count": 0,
       "date_range": {
         "min": null,
@@ -702,55 +1150,359 @@
     }
   },
   "combined": {
-    "rows": 8230,
+    "rows": 49355,
     "datasets_present": [
-      "ufc_fight_forecast"
+      "mdabbert_ultimate",
+      "ufc_1994_2025",
+      "ufc_1994_2026",
+      "ufc_fight_forecast",
+      "ufc_stats_complete"
     ],
     "date_range": {
-      "min": "1994-03-11",
-      "max": "2025-10-04"
+      "min": "1993-11-12",
+      "max": "2026-05-16"
     },
     "deduping": {
-      "rows": 8230,
-      "unique_fight_keys": 8230,
-      "duplicate_fight_rows": 0,
-      "mirrored_candidates": 0
+      "rows": 49355,
+      "unique_fight_keys": 32982,
+      "duplicate_fight_rows": 24725,
+      "mirrored_candidates": 40844
     },
     "model_readiness": {
       "winner_model": {
-        "status": "training_data_ready",
-        "rows": 8230
+        "status": "blocked_orientation_review",
+        "rows": 32140,
+        "class_distribution": {
+          "1": 32140
+        },
+        "reason": "Winner labels are present, but normalized sources appear winner-oriented; runtime fighter_1/fighter_2 orientation must be corrected before winner-model training."
       },
       "finish_model": {
         "status": "training_data_ready",
-        "rows": 8230
+        "rows": 49355
       },
       "goes_distance_model": {
         "status": "training_data_ready",
-        "rows": 8230
+        "rows": 49355
       },
       "method_model": {
         "status": "training_data_ready",
-        "rows": 8230
+        "rows": 49355
       },
       "round_phase_model": {
         "status": "training_data_ready",
-        "rows": 8230
+        "rows": 48720
       },
       "strike_volume_model": {
         "status": "training_data_ready",
-        "rows": 8209
+        "rows": 33530
       },
       "takedown_control_model": {
         "status": "training_data_ready",
-        "rows": 8209
+        "rows": 42081
       },
       "odds_calibration_model": {
         "status": "review_needed",
-        "rows": 0,
+        "rows": 13272,
         "reason": "Odds timestamp quality is not confirmed as pre-fight."
       }
     }
+  },
+  "database_strength": {
+    "rows": 49355,
+    "canonical_fights": {
+      "rows": 49355,
+      "unique_fight_keys": 32982,
+      "unique_events": 776,
+      "date_range": {
+        "min": "1993-11-12",
+        "max": "2026-05-16"
+      },
+      "datasets_present": [
+        "mdabbert_ultimate",
+        "ufc_1994_2025",
+        "ufc_1994_2026",
+        "ufc_fight_forecast",
+        "ufc_stats_complete"
+      ]
+    },
+    "fighter_profiles": {
+      "fighters_found": 2804,
+      "field_coverage": {
+        "fighter_1_height": 25255,
+        "fighter_2_height": 25199,
+        "fighter_1_reach": 24278,
+        "fighter_2_reach": 22312,
+        "fighter_1_stance": 32401,
+        "fighter_2_stance": 32199,
+        "fighter_1_dob": 25087,
+        "fighter_2_dob": 24787
+      }
+    },
+    "fighter_stats": {
+      "field_coverage": {
+        "fighter_1_sig_strikes_landed": 33530,
+        "fighter_2_sig_strikes_landed": 33530,
+        "fighter_1_takedowns_landed": 42081,
+        "fighter_2_takedowns_landed": 42081,
+        "fighter_1_control_time_seconds": 32987,
+        "fighter_2_control_time_seconds": 32987,
+        "fighter_1_submission_attempts": 33393,
+        "fighter_2_submission_attempts": 33393,
+        "fighter_1_knockdowns": 42081,
+        "fighter_2_knockdowns": 42081
+      },
+      "dataset_contributors": {
+        "mdabbert_ultimate": {
+          "fighter_1_sig_strikes_landed": 0,
+          "fighter_2_sig_strikes_landed": 0,
+          "fighter_1_takedowns_landed": 0,
+          "fighter_2_takedowns_landed": 0,
+          "fighter_1_control_time_seconds": 0,
+          "fighter_2_control_time_seconds": 0,
+          "fighter_1_submission_attempts": 0,
+          "fighter_2_submission_attempts": 0,
+          "fighter_1_knockdowns": 0,
+          "fighter_2_knockdowns": 0
+        },
+        "ufc_1994_2025": {
+          "fighter_1_sig_strikes_landed": 16632,
+          "fighter_2_sig_strikes_landed": 16632,
+          "fighter_1_takedowns_landed": 16632,
+          "fighter_2_takedowns_landed": 16632,
+          "fighter_1_control_time_seconds": 16270,
+          "fighter_2_control_time_seconds": 16270,
+          "fighter_1_submission_attempts": 16632,
+          "fighter_2_submission_attempts": 16632,
+          "fighter_1_knockdowns": 16632,
+          "fighter_2_knockdowns": 16632
+        },
+        "ufc_1994_2026": {
+          "fighter_1_sig_strikes_landed": 0,
+          "fighter_2_sig_strikes_landed": 0,
+          "fighter_1_takedowns_landed": 8551,
+          "fighter_2_takedowns_landed": 8551,
+          "fighter_1_control_time_seconds": 0,
+          "fighter_2_control_time_seconds": 0,
+          "fighter_1_submission_attempts": 8551,
+          "fighter_2_submission_attempts": 8551,
+          "fighter_1_knockdowns": 8551,
+          "fighter_2_knockdowns": 8551
+        },
+        "ufc_fight_forecast": {
+          "fighter_1_sig_strikes_landed": 8210,
+          "fighter_2_sig_strikes_landed": 8210,
+          "fighter_1_takedowns_landed": 8210,
+          "fighter_2_takedowns_landed": 8210,
+          "fighter_1_control_time_seconds": 8210,
+          "fighter_2_control_time_seconds": 8210,
+          "fighter_1_submission_attempts": 8210,
+          "fighter_2_submission_attempts": 8210,
+          "fighter_1_knockdowns": 8210,
+          "fighter_2_knockdowns": 8210
+        },
+        "ufc_stats_complete": {
+          "fighter_1_sig_strikes_landed": 8688,
+          "fighter_2_sig_strikes_landed": 8688,
+          "fighter_1_takedowns_landed": 8688,
+          "fighter_2_takedowns_landed": 8688,
+          "fighter_1_control_time_seconds": 8507,
+          "fighter_2_control_time_seconds": 8507,
+          "fighter_1_submission_attempts": 0,
+          "fighter_2_submission_attempts": 0,
+          "fighter_1_knockdowns": 8688,
+          "fighter_2_knockdowns": 8688
+        }
+      }
+    },
+    "odds": {
+      "field_coverage": {
+        "fighter_1_moneyline": 13272,
+        "fighter_2_moneyline": 13272,
+        "odds_snapshot_date": 0,
+        "odds_is_prefight": 0
+      },
+      "trusted_prefight_rows": 0,
+      "status": "review_needed"
+    },
+    "datasets": {
+      "ufc_fight_forecast": {
+        "available": true,
+        "rows_normalized": 8231,
+        "files_found": 2,
+        "helps_models": [
+          "finish_model",
+          "goes_distance_model",
+          "method_model",
+          "odds_calibration_model",
+          "round_phase_model",
+          "strike_volume_model",
+          "takedown_control_model",
+          "winner_model"
+        ],
+        "zero_row_reason": null,
+        "deduping": {
+          "rows": 8231,
+          "unique_fight_keys": 8231,
+          "duplicate_fight_rows": 0,
+          "mirrored_candidates": 0
+        }
+      },
+      "ufc_stats_complete": {
+        "available": true,
+        "rows_normalized": 8709,
+        "files_found": 2,
+        "helps_models": [
+          "finish_model",
+          "goes_distance_model",
+          "method_model",
+          "round_phase_model",
+          "strike_volume_model",
+          "takedown_control_model",
+          "winner_model"
+        ],
+        "zero_row_reason": null,
+        "deduping": {
+          "rows": 8709,
+          "unique_fight_keys": 8708,
+          "duplicate_fight_rows": 2,
+          "mirrored_candidates": 2
+        }
+      },
+      "ufc_1994_2026": {
+        "available": true,
+        "rows_normalized": 8551,
+        "files_found": 2,
+        "helps_models": [
+          "finish_model",
+          "goes_distance_model",
+          "method_model",
+          "round_phase_model",
+          "takedown_control_model",
+          "winner_model"
+        ],
+        "zero_row_reason": null,
+        "deduping": {
+          "rows": 8551,
+          "unique_fight_keys": 8551,
+          "duplicate_fight_rows": 0,
+          "mirrored_candidates": 0
+        }
+      },
+      "ufc_1994_2025": {
+        "available": true,
+        "rows_normalized": 16674,
+        "files_found": 4,
+        "helps_models": [
+          "finish_model",
+          "goes_distance_model",
+          "method_model",
+          "round_phase_model",
+          "strike_volume_model",
+          "takedown_control_model",
+          "winner_model"
+        ],
+        "zero_row_reason": null,
+        "deduping": {
+          "rows": 16674,
+          "unique_fight_keys": 16674,
+          "duplicate_fight_rows": 0,
+          "mirrored_candidates": 402
+        }
+      },
+      "mdabbert_ultimate": {
+        "available": true,
+        "rows_normalized": 7190,
+        "files_found": 2,
+        "helps_models": [
+          "finish_model",
+          "goes_distance_model",
+          "method_model",
+          "odds_calibration_model",
+          "round_phase_model",
+          "winner_model"
+        ],
+        "zero_row_reason": null,
+        "deduping": {
+          "rows": 7190,
+          "unique_fight_keys": 7190,
+          "duplicate_fight_rows": 0,
+          "mirrored_candidates": 0
+        }
+      },
+      "mdabbert_2010_2020_odds": {
+        "available": true,
+        "rows_normalized": 0,
+        "files_found": 1,
+        "helps_models": [],
+        "zero_row_reason": "odds-only dataset; retained for odds research until pre-fight timestamp quality is confirmed",
+        "deduping": {
+          "rows": 0,
+          "unique_fight_keys": 0,
+          "duplicate_fight_rows": 0,
+          "mirrored_candidates": 0
+        }
+      },
+      "ufc_datalab": {
+        "available": false,
+        "rows_normalized": 0,
+        "files_found": 0,
+        "helps_models": [],
+        "zero_row_reason": "dataset folder missing",
+        "deduping": {
+          "rows": 0,
+          "unique_fight_keys": 0,
+          "duplicate_fight_rows": 0,
+          "mirrored_candidates": 0
+        }
+      }
+    },
+    "missing_fields": [
+      "fighter_1_id_source",
+      "fighter_2_id_source",
+      "gender_or_division_group",
+      "title_fight",
+      "catchweight",
+      "fighter_1_total_strikes_landed",
+      "fighter_2_total_strikes_landed",
+      "odds_source",
+      "odds_snapshot_date",
+      "odds_is_prefight",
+      "closing_line_available",
+      "fighter_1_age",
+      "fighter_2_age",
+      "invalid_target_reason",
+      "inside_distance",
+      "fighter_1_by_ko_tko",
+      "fighter_1_by_submission",
+      "fighter_1_by_decision",
+      "fighter_2_by_ko_tko",
+      "fighter_2_by_submission",
+      "fighter_2_by_decision",
+      "ends_round_1",
+      "ends_round_2",
+      "ends_round_3",
+      "ends_before_round_2",
+      "ends_before_round_3",
+      "over_1_5",
+      "over_2_5",
+      "over_3_5",
+      "fighter_1_over_25_sig_strikes",
+      "fighter_1_over_50_sig_strikes",
+      "fighter_1_over_75_sig_strikes",
+      "fighter_2_over_25_sig_strikes",
+      "fighter_2_over_50_sig_strikes",
+      "fighter_2_over_75_sig_strikes",
+      "fighter_1_over_0_5_takedowns",
+      "fighter_1_over_1_5_takedowns",
+      "fighter_1_over_2_5_takedowns",
+      "fighter_2_over_0_5_takedowns",
+      "fighter_2_over_1_5_takedowns",
+      "fighter_2_over_2_5_takedowns",
+      "fighter_1_control_time_over_300_seconds",
+      "fighter_2_control_time_over_300_seconds"
+    ],
+    "source_priority_decision": "Higher-priority UFCStats-derived result/stat datasets provide fight labels first; odds-only datasets are retained for research until timestamp quality is trusted."
   },
   "source_7_note": "UFCStats live scraping is intentionally not part of this pass; use it later for refresh/cross-checking after local datasets are stable."
 }

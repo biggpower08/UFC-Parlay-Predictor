@@ -25,28 +25,32 @@ SUPPORTED_FILE_NAMES = {
 }
 
 EVENT_ALIASES = ["event_name", "event", "event_title", "event_url"]
-DATE_ALIASES = ["event_date", "date", "fight_date", "eventdate"]
+DATE_ALIASES = ["event_date", "eventdate", "event_date_utc", "date", "fight_date", "event_date_local"]
 WEIGHT_ALIASES = ["weight_class", "weightclass", "bout_weight", "division"]
-METHOD_ALIASES = ["method", "win_by", "finish_method", "method_group", "result"]
-ROUND_ALIASES = ["round", "last_round", "end_round", "finish_round"]
-TIME_ALIASES = ["time", "finish_time", "end_time"]
-SCHEDULED_ROUNDS_ALIASES = ["scheduled_rounds", "format", "total_rounds"]
-WINNER_ALIASES = ["winner", "winner_name", "winning_fighter", "fighter_1", "w_fighter"]
+METHOD_ALIASES = ["method", "win_by", "finish", "finish_method", "method_group", "result"]
+ROUND_ALIASES = ["round", "round_num", "last_round", "end_round", "end_round_num", "finish_round"]
+TIME_ALIASES = ["time", "finish_time", "finish_round_time", "end_time", "end_time_sec", "match_time_sec"]
+SCHEDULED_ROUNDS_ALIASES = ["scheduled_rounds", "format", "time_format", "total_rounds", "num_rounds", "no_of_rounds"]
+WINNER_ALIASES = ["winner", "winner_name", "winning_fighter", "winner_fighter", "w_fighter"]
 LOSER_ALIASES = ["loser", "loser_name", "losing_fighter", "fighter_2", "l_fighter"]
-RED_ALIASES = ["r_fighter", "red_fighter", "redfighter", "fighter_a", "fighter_a_name", "f_1_name", "fighter_1"]
-BLUE_ALIASES = ["b_fighter", "blue_fighter", "bluefighter", "fighter_b", "fighter_b_name", "f_2_name", "fighter_2"]
+RED_ALIASES = ["r_fighter", "r_name", "red_fighter", "redfighter", "fighter_a", "fighter_a_name", "f_1_name", "fighter_1"]
+BLUE_ALIASES = ["b_fighter", "b_name", "blue_fighter", "bluefighter", "fighter_b", "fighter_b_name", "f_2_name", "fighter_2"]
 RED_RESULT_ALIASES = ["winner_red_blue", "winner_color", "winner_corner"]
 
-RED_SIG_LANDED = ["r_sig_str_landed", "r_sig_str", "r_sig_strikes_landed", "red_sig_str_landed", "fighter_a_sig_strikes_landed", "f_1_sig_strikes_succ", "f_1_sig_strikes_succ_total"]
-BLUE_SIG_LANDED = ["b_sig_str_landed", "b_sig_str", "b_sig_strikes_landed", "blue_sig_str_landed", "fighter_b_sig_strikes_landed", "f_2_sig_strikes_succ", "f_2_sig_strikes_succ_total"]
-RED_SIG_ATTEMPTED = ["r_sig_str_attempted", "r_sig_str_att", "red_sig_str_attempted", "fighter_a_sig_strikes_attempted", "f_1_sig_strikes_att", "f_1_sig_strikes_att_total"]
-BLUE_SIG_ATTEMPTED = ["b_sig_str_attempted", "b_sig_str_att", "blue_sig_str_attempted", "fighter_b_sig_strikes_attempted", "f_2_sig_strikes_att", "f_2_sig_strikes_att_total"]
-RED_TD_LANDED = ["r_td_landed", "r_td", "r_takedowns_landed", "red_takedowns_landed", "fighter_a_takedowns_landed", "f_1_takedown_succ", "f_1_td_1_succ_total"]
-BLUE_TD_LANDED = ["b_td_landed", "b_td", "b_takedowns_landed", "blue_takedowns_landed", "fighter_b_takedowns_landed", "f_2_takedown_succ", "f_2_td_1_succ_total"]
-RED_TD_ATTEMPTED = ["r_td_attempted", "r_td_att", "red_takedowns_attempted", "fighter_a_takedowns_attempted", "f_1_takedown_att", "f_1_td_1_att_total"]
-BLUE_TD_ATTEMPTED = ["b_td_attempted", "b_td_att", "blue_takedowns_attempted", "fighter_b_takedowns_attempted", "f_2_takedown_att", "f_2_td_1_att_total"]
-RED_CONTROL = ["r_ctrl", "r_control", "red_control_time", "fighter_a_control_time_seconds", "f_1_ctrl_time_sec"]
-BLUE_CONTROL = ["b_ctrl", "b_control", "blue_control_time", "fighter_b_control_time_seconds", "f_2_ctrl_time_sec"]
+RED_SIG_LANDED = ["r_sig_str_landed", "r_sig_str", "r_sig_strikes_landed", "red_sig_str_landed", "fighter_a_sig_strikes_landed", "f1_sig_str_landed", "f_1_sig_strikes_succ", "f_1_sig_strikes_succ_total", "f_1_sig_landed"]
+BLUE_SIG_LANDED = ["b_sig_str_landed", "b_sig_str", "b_sig_strikes_landed", "blue_sig_str_landed", "fighter_b_sig_strikes_landed", "f2_sig_str_landed", "f_2_sig_strikes_succ", "f_2_sig_strikes_succ_total", "f_2_sig_landed"]
+RED_SIG_ATTEMPTED = ["r_sig_str_attempted", "r_sig_str_atmpted", "r_sig_str_att", "red_sig_str_attempted", "fighter_a_sig_strikes_attempted", "f1_sig_str_attempted", "f_1_sig_strikes_att", "f_1_sig_strikes_att_total", "f_1_sig_att"]
+BLUE_SIG_ATTEMPTED = ["b_sig_str_attempted", "b_sig_str_atmpted", "b_sig_str_att", "blue_sig_str_attempted", "fighter_b_sig_strikes_attempted", "f2_sig_str_attempted", "f_2_sig_strikes_att", "f_2_sig_strikes_att_total", "f_2_sig_att"]
+RED_TD_LANDED = ["r_td_landed", "r_td", "r_takedowns_landed", "red_takedowns_landed", "fighter_a_takedowns_landed", "f1_td_landed", "f_1_takedown_succ", "f_1_td_1_succ_total"]
+BLUE_TD_LANDED = ["b_td_landed", "b_td", "b_takedowns_landed", "blue_takedowns_landed", "fighter_b_takedowns_landed", "f2_td_landed", "f_2_takedown_succ", "f_2_td_1_succ_total"]
+RED_TD_ATTEMPTED = ["r_td_attempted", "r_td_atmpted", "r_td_att", "red_takedowns_attempted", "fighter_a_takedowns_attempted", "f1_td_attempted", "f_1_takedown_att", "f_1_td_1_att_total"]
+BLUE_TD_ATTEMPTED = ["b_td_attempted", "b_td_atmpted", "b_td_att", "blue_takedowns_attempted", "fighter_b_takedowns_attempted", "f2_td_attempted", "f_2_takedown_att", "f_2_td_1_att_total"]
+RED_CONTROL = ["r_ctrl", "r_control", "red_control_time", "fighter_a_control_time_seconds", "f1_ctrl", "f_1_ctrl_time_sec", "f1_ctrl_time_sec"]
+BLUE_CONTROL = ["b_ctrl", "b_control", "blue_control_time", "fighter_b_control_time_seconds", "f2_ctrl", "f_2_ctrl_time_sec", "f2_ctrl_time_sec"]
+RED_SUB_ATT = ["r_sub_att", "r_submission_att", "f1_sub_att", "f_1_submission_att", "fighter_a_submission_attempts"]
+BLUE_SUB_ATT = ["b_sub_att", "b_submission_att", "f2_sub_att", "f_2_submission_att", "fighter_b_submission_attempts"]
+RED_KD = ["r_kd", "r_knockdowns", "f1_kd", "f_1_knockdowns", "fighter_a_knockdowns"]
+BLUE_KD = ["b_kd", "b_knockdowns", "f2_kd", "f_2_knockdowns", "fighter_b_knockdowns"]
 ODDS_ALIASES = ["moneyline", "odds", "opening_odds", "closing_odds", "r_odds", "b_odds", "fighter_odds", "odds_1", "odds_2", "f_1_odds", "f_2_odds"]
 SPORTSBOOK_ALIASES = ["sportsbook", "book", "provider", "source"]
 SNAPSHOT_DATE_ALIASES = ["snapshot_date", "scrape_date", "odds_date", "timestamp", "fetched_at"]
@@ -211,7 +215,7 @@ def _normalize_csv(path: Path) -> tuple[pd.DataFrame, list[str]]:
         names = _winner_loser(row, winner_col, loser_col, red_col, blue_col)
         if not names:
             continue
-        winner, loser, winner_side = names
+        fighter_one, fighter_two, fighter_one_side, winner_name = names
         method = normalize_method(row.get(method_col))
         is_decision = method == "Decision"
         round_number = _safe_int(row.get(round_col)) if round_col else None
@@ -225,7 +229,11 @@ def _normalize_csv(path: Path) -> tuple[pd.DataFrame, list[str]]:
         blue_td_attempted = _stat_attempt(row, BLUE_TD_LANDED, BLUE_TD_ATTEMPTED)
         red_control = _control_seconds(_first_value(row, RED_CONTROL))
         blue_control = _control_seconds(_first_value(row, BLUE_CONTROL))
-        winner_is_red = winner_side == "red"
+        red_sub_att = _stat_value(row, RED_SUB_ATT)
+        blue_sub_att = _stat_value(row, BLUE_SUB_ATT)
+        red_kd = _stat_value(row, RED_KD)
+        blue_kd = _stat_value(row, BLUE_KD)
+        winner_is_red = fighter_one_side == "red"
         records.append(
             {
                 "event": _first_value(row, EVENT_ALIASES),
@@ -235,18 +243,20 @@ def _normalize_csv(path: Path) -> tuple[pd.DataFrame, list[str]]:
                 "source_order": index,
                 "source_file": str(path),
                 "source_dataset": path.parent.name or "local_csv",
-                "source_id": _source_id(path, index, winner, loser, row.get(method_col), round_number),
+                "source_id": _source_id(path, index, fighter_one, fighter_two, row.get(method_col), round_number),
+                "fight_id_source": row.get("fight_id") or row.get("fight_url"),
+                "event_id_source": row.get("event_id") or row.get("event_url"),
                 "weight_class": _first_value(row, WEIGHT_ALIASES),
                 "scheduled_rounds": _first_value(row, SCHEDULED_ROUNDS_ALIASES),
-                "fighter_1": winner,
-                "fighter_2": loser,
-                "fighter_a_name": winner,
-                "fighter_b_name": loser,
-                "fighter_a_normalized_name": _normalize_name(winner),
-                "fighter_b_normalized_name": _normalize_name(loser),
-                "winner_name": winner,
-                "loser_name": loser,
-                "result": "win",
+                "fighter_1": fighter_one,
+                "fighter_2": fighter_two,
+                "fighter_a_name": fighter_one,
+                "fighter_b_name": fighter_two,
+                "fighter_a_normalized_name": _normalize_name(fighter_one),
+                "fighter_b_normalized_name": _normalize_name(fighter_two),
+                "winner_name": winner_name,
+                "loser_name": _opponent_name(winner_name, fighter_one, fighter_two),
+                "result": "win" if winner_name else None,
                 "method": row.get(method_col),
                 "method_group": method,
                 "finish_binary": 0 if is_decision else 1,
@@ -264,6 +274,23 @@ def _normalize_csv(path: Path) -> tuple[pd.DataFrame, list[str]]:
                 "fighter_b_takedowns_attempted": blue_td_attempted if winner_is_red else red_td_attempted,
                 "fighter_a_control_time_seconds": red_control if winner_is_red else blue_control,
                 "fighter_b_control_time_seconds": blue_control if winner_is_red else red_control,
+                "fighter_a_submission_attempts": red_sub_att if winner_is_red else blue_sub_att,
+                "fighter_b_submission_attempts": blue_sub_att if winner_is_red else red_sub_att,
+                "fighter_a_knockdowns": red_kd if winner_is_red else blue_kd,
+                "fighter_b_knockdowns": blue_kd if winner_is_red else red_kd,
+                "fighter_1_height": _first_value(row, ["r_height", "f1_height_cm", "f_1_fighter_height_cm"]) if winner_is_red else _first_value(row, ["b_height", "f2_height_cm", "f_2_fighter_height_cm"]),
+                "fighter_2_height": _first_value(row, ["b_height", "f2_height_cm", "f_2_fighter_height_cm"]) if winner_is_red else _first_value(row, ["r_height", "f1_height_cm", "f_1_fighter_height_cm"]),
+                "fighter_1_reach": _first_value(row, ["r_reach", "f1_reach_cm", "f_1_fighter_reach_cm"]) if winner_is_red else _first_value(row, ["b_reach", "f2_reach_cm", "f_2_fighter_reach_cm"]),
+                "fighter_2_reach": _first_value(row, ["b_reach", "f2_reach_cm", "f_2_fighter_reach_cm"]) if winner_is_red else _first_value(row, ["r_reach", "f1_reach_cm", "f_1_fighter_reach_cm"]),
+                "fighter_1_stance": _first_value(row, ["r_stance", "f1_stance", "f_1_fighter_stance"]) if winner_is_red else _first_value(row, ["b_stance", "f2_stance", "f_2_fighter_stance"]),
+                "fighter_2_stance": _first_value(row, ["b_stance", "f2_stance", "f_2_fighter_stance"]) if winner_is_red else _first_value(row, ["r_stance", "f1_stance", "f_1_fighter_stance"]),
+                "fighter_1_dob": _date_value(_first_value(row, ["r_dob", "f1_dob", "f_1_fighter_dob"])) if winner_is_red else _date_value(_first_value(row, ["b_dob", "f2_dob", "f_2_fighter_dob"])),
+                "fighter_2_dob": _date_value(_first_value(row, ["b_dob", "f2_dob", "f_2_fighter_dob"])) if winner_is_red else _date_value(_first_value(row, ["r_dob", "f1_dob", "f_1_fighter_dob"])),
+                "fighter_1_moneyline": _first_value(row, ["r_odds", "f_1_odds", "odds_1"]) if winner_is_red else _first_value(row, ["b_odds", "f_2_odds", "odds_2"]),
+                "fighter_2_moneyline": _first_value(row, ["b_odds", "f_2_odds", "odds_2"]) if winner_is_red else _first_value(row, ["r_odds", "f_1_odds", "odds_1"]),
+                "odds_source": _first_value(row, SPORTSBOOK_ALIASES),
+                "odds_snapshot_date": _date_value(_first_value(row, SNAPSHOT_DATE_ALIASES)),
+                "odds_is_prefight": _prefight_flag(_first_value(row, SNAPSHOT_DATE_ALIASES), _first_value(row, DATE_ALIASES)),
             }
         )
     return pd.DataFrame(records), missing
@@ -327,21 +354,31 @@ def _winner_loser(row, winner_col, loser_col, red_col, blue_col):
         loser = _clean_name(row.get(loser_col))
         if winner and loser and winner.lower() != loser.lower():
             winner_side = _winner_side_from_names(winner, row, red_col, blue_col)
-            return winner, loser, winner_side
+            return winner, loser, winner_side, winner
     red = _clean_name(row.get(red_col)) if red_col else ""
     blue = _clean_name(row.get(blue_col)) if blue_col else ""
     if not red or not blue:
         return None
     marker = str(_first_value(row, RED_RESULT_ALIASES) or row.get("winner", "")).strip().lower()
     if marker in {"red", "r", "red_fighter", "r_fighter"}:
-        return red, blue, "red"
+        return red, blue, "red", red
     if marker in {"blue", "b", "blue_fighter", "b_fighter"}:
-        return blue, red, "blue"
+        return blue, red, "blue", blue
     winner = _clean_name(row.get(winner_col)) if winner_col else ""
     if winner and winner.lower() == red.lower():
-        return red, blue, "red"
+        return red, blue, "red", red
     if winner and winner.lower() == blue.lower():
-        return blue, red, "blue"
+        return blue, red, "blue", blue
+    return red, blue, "red", None
+
+
+def _opponent_name(winner_name: str | None, fighter_one: str, fighter_two: str) -> str | None:
+    if not winner_name:
+        return None
+    if winner_name.lower() == fighter_one.lower():
+        return fighter_two
+    if winner_name.lower() == fighter_two.lower():
+        return fighter_one
     return None
 
 
@@ -426,6 +463,14 @@ def _date_value(value) -> str | None:
     if pd.isna(parsed):
         return None
     return str(parsed.date())
+
+
+def _prefight_flag(snapshot_value, event_value) -> bool | None:
+    snapshot = pd.to_datetime(snapshot_value, errors="coerce")
+    event = pd.to_datetime(event_value, errors="coerce")
+    if pd.isna(snapshot) or pd.isna(event):
+        return None
+    return bool(snapshot <= event)
 
 
 def _safe_int(value) -> int | None:

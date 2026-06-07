@@ -79,26 +79,26 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.621262+00:00",
-    "final_test_metric": 0.5627,
+    "final_test_metric": 0.6101,
     "final_test_metric_name": "accuracy",
-    "baseline_metric": 0.5201,
-    "relative_improvement": 0.0426,
+    "baseline_metric": 0.5183,
+    "relative_improvement": 0.0918,
     "beats_baseline": true,
-    "test_rows": 2440,
+    "test_rows": 5537,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": true,
-    "backtest_fights": 2440,
+    "backtest_fights": 5537,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.5627,
-    "backtest_baseline": 0.5201,
-    "backtest_relative_improvement": 0.0426,
+    "backtest_main_metric": 0.6101,
+    "backtest_baseline": 0.5183,
+    "backtest_relative_improvement": 0.0918,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "goes_distance_model": {
     "model_name": "goes_distance_model",
@@ -180,26 +180,26 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.702582+00:00",
-    "final_test_metric": 0.5627,
+    "final_test_metric": 0.6101,
     "final_test_metric_name": "accuracy",
-    "baseline_metric": 0.5201,
-    "relative_improvement": 0.0426,
+    "baseline_metric": 0.5183,
+    "relative_improvement": 0.0918,
     "beats_baseline": true,
-    "test_rows": 2440,
+    "test_rows": 5537,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": true,
-    "backtest_fights": 2440,
+    "backtest_fights": 5537,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.5627,
-    "backtest_baseline": 0.5201,
-    "backtest_relative_improvement": 0.0426,
+    "backtest_main_metric": 0.6101,
+    "backtest_baseline": 0.5183,
+    "backtest_relative_improvement": 0.0918,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "method_model": {
     "model_name": "method_model",
@@ -306,26 +306,26 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.776894+00:00",
-    "final_test_metric": 0.2557,
+    "final_test_metric": 0.3235,
     "final_test_metric_name": "accuracy",
-    "baseline_metric": 0.5201,
-    "relative_improvement": -0.2644,
+    "baseline_metric": 0.5183,
+    "relative_improvement": -0.1948,
     "beats_baseline": false,
-    "test_rows": 2440,
+    "test_rows": 5537,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": true,
-    "backtest_fights": 2440,
+    "backtest_fights": 5537,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.2557,
-    "backtest_baseline": 0.5201,
-    "backtest_relative_improvement": -0.2644,
+    "backtest_main_metric": 0.3235,
+    "backtest_baseline": 0.5183,
+    "backtest_relative_improvement": -0.1948,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "round_model": {
     "model_name": "round_model",
@@ -525,26 +525,26 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.921824+00:00",
-    "final_test_metric": 0.4073,
+    "final_test_metric": 0.4006,
     "final_test_metric_name": "accuracy",
-    "baseline_metric": 0.3917,
-    "relative_improvement": 0.0156,
+    "baseline_metric": 0.3721,
+    "relative_improvement": 0.0285,
     "beats_baseline": true,
-    "test_rows": 1348,
+    "test_rows": 3163,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": true,
-    "backtest_fights": 1348,
+    "backtest_fights": 3163,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.4073,
-    "backtest_baseline": 0.3917,
-    "backtest_relative_improvement": 0.0156,
+    "backtest_main_metric": 0.4006,
+    "backtest_baseline": 0.3721,
+    "backtest_relative_improvement": 0.0285,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "takedown_control_model": {
     "model_name": "takedown_control_model",
@@ -628,26 +628,26 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.985443+00:00",
-    "final_test_metric": 0.523,
+    "final_test_metric": 0.5193,
     "final_test_metric_name": "accuracy",
-    "baseline_metric": 0.549,
-    "relative_improvement": -0.026,
+    "baseline_metric": 0.5653,
+    "relative_improvement": -0.046,
     "beats_baseline": false,
-    "test_rows": 1348,
+    "test_rows": 4327,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": true,
-    "backtest_fights": 1348,
+    "backtest_fights": 4327,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.523,
-    "backtest_baseline": 0.549,
-    "backtest_relative_improvement": -0.026,
+    "backtest_main_metric": 0.5193,
+    "backtest_baseline": 0.5653,
+    "backtest_relative_improvement": -0.046,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "winner_model": {
     "model_name": "winner_model",
@@ -705,19 +705,19 @@
     "beats_baseline": false,
     "test_rows": 0,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": false,
     "backtest_fights": 0,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
     "backtest_main_metric": null,
     "backtest_baseline": null,
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "Safe f1/f2 winner orientation is not runtime-compatible yet.",
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "odds_calibration_model": {
     "model_name": "odds_calibration_model",
@@ -775,56 +775,56 @@
     "beats_baseline": false,
     "test_rows": 0,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": false,
     "backtest_fights": 0,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
     "backtest_main_metric": null,
     "backtest_baseline": null,
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "Trusted pre-fight odds snapshots are not available.",
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "round_phase_model": {
     "model_name": "round_phase_model",
-    "final_test_metric": 0.2279,
+    "final_test_metric": 0.1663,
     "final_test_metric_name": "accuracy",
-    "baseline_metric": 0.5201,
-    "relative_improvement": -0.2922,
+    "baseline_metric": 0.5183,
+    "relative_improvement": -0.352,
     "beats_baseline": false,
-    "test_rows": 2440,
+    "test_rows": 5537,
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00",
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00",
     "backtested": true,
-    "backtest_fights": 2440,
+    "backtest_fights": 5537,
     "backtest_date_range": {
-      "min": "2023-03-04",
-      "max": "2025-10-04"
+      "min": "2023-11-18",
+      "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.2279,
-    "backtest_baseline": 0.5201,
-    "backtest_relative_improvement": -0.2922,
+    "backtest_main_metric": 0.1663,
+    "backtest_baseline": 0.5183,
+    "backtest_relative_improvement": -0.352,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T15:55:36.426206+00:00"
+    "backtested_at": "2026-06-07T17:15:56.310807+00:00"
   },
   "strike_volume_regression": {
     "model_name": "strike_volume_regression",
-    "final_test_metric": 55.3286,
+    "final_test_metric": 53.2381,
     "final_test_metric_name": "mae",
-    "baseline_metric": 52.5681,
-    "relative_improvement": -0.0525,
+    "baseline_metric": 51.1448,
+    "relative_improvement": -0.0409,
     "beats_baseline": false,
-    "test_rows": 1348,
+    "test_rows": 3163,
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": false,
-    "evaluated_at": "2026-06-07T04:46:01.201815+00:00"
+    "evaluated_at": "2026-06-07T17:13:02.502534+00:00"
   }
 }

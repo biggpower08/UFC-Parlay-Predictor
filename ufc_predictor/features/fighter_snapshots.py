@@ -163,21 +163,23 @@ def _fight_summary(row: pd.Series, side: str) -> dict[str, Any] | None:
         return None
     prefix = "fighter_a" if side == "fighter_1" else "fighter_b"
     opponent_prefix = "fighter_b" if side == "fighter_1" else "fighter_a"
+    common_prefix = "fighter_1" if side == "fighter_1" else "fighter_2"
+    common_opponent_prefix = "fighter_2" if side == "fighter_1" else "fighter_1"
     return {
         "event_date": _timestamp_or_none(_first_present(row, ["_event_date", "event_date"])),
         "result": result,
         "method": method,
         "is_decision": method == "Decision",
-        "sig_strikes_landed": _number(row.get(f"{prefix}_sig_strikes")),
-        "sig_strikes_absorbed": _number(row.get(f"{opponent_prefix}_sig_strikes")),
-        "sig_strike_attempts": _number(row.get(f"{prefix}_sig_strikes_attempted")),
-        "opponent_sig_strike_attempts": _number(row.get(f"{opponent_prefix}_sig_strikes_attempted")),
-        "takedowns_landed": _number(row.get(f"{prefix}_takedowns")),
-        "takedowns_attempted": _number(row.get(f"{prefix}_takedowns_attempted")),
-        "opponent_takedowns_landed": _number(row.get(f"{opponent_prefix}_takedowns")),
-        "opponent_takedowns_attempted": _number(row.get(f"{opponent_prefix}_takedowns_attempted")),
-        "control_time_seconds": _number(row.get(f"{prefix}_control_time_seconds")),
-        "submission_attempts": _number(row.get(f"{prefix}_submission_attempts")),
+        "sig_strikes_landed": _number(_first_present(row, [f"{prefix}_sig_strikes", f"{common_prefix}_sig_strikes_landed"])),
+        "sig_strikes_absorbed": _number(_first_present(row, [f"{opponent_prefix}_sig_strikes", f"{common_opponent_prefix}_sig_strikes_landed"])),
+        "sig_strike_attempts": _number(_first_present(row, [f"{prefix}_sig_strikes_attempted", f"{common_prefix}_sig_strikes_attempted"])),
+        "opponent_sig_strike_attempts": _number(_first_present(row, [f"{opponent_prefix}_sig_strikes_attempted", f"{common_opponent_prefix}_sig_strikes_attempted"])),
+        "takedowns_landed": _number(_first_present(row, [f"{prefix}_takedowns", f"{common_prefix}_takedowns_landed"])),
+        "takedowns_attempted": _number(_first_present(row, [f"{prefix}_takedowns_attempted", f"{common_prefix}_takedowns_attempted"])),
+        "opponent_takedowns_landed": _number(_first_present(row, [f"{opponent_prefix}_takedowns", f"{common_opponent_prefix}_takedowns_landed"])),
+        "opponent_takedowns_attempted": _number(_first_present(row, [f"{opponent_prefix}_takedowns_attempted", f"{common_opponent_prefix}_takedowns_attempted"])),
+        "control_time_seconds": _number(_first_present(row, [f"{prefix}_control_time_seconds", f"{common_prefix}_control_time_seconds"])),
+        "submission_attempts": _number(_first_present(row, [f"{prefix}_submission_attempts", f"{common_prefix}_submission_attempts"])),
     }
 
 
