@@ -237,36 +237,6 @@ h1 {
   padding: 18px;
 }
 
-.product-card-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.product-card-grid a {
-  display: grid;
-  gap: 8px;
-  min-height: 112px;
-  padding: 14px;
-  border: 1px solid rgba(36, 246, 255, 0.18);
-  border-radius: 6px;
-  color: #edf8ff;
-  background: rgba(8, 17, 27, 0.62);
-  text-decoration: none;
-}
-
-.product-card-grid a:hover {
-  border-color: rgba(36, 246, 255, 0.42);
-  background: rgba(36, 246, 255, 0.08);
-}
-
-.product-card-grid span {
-  color: #c9d8e2;
-  line-height: 1.45;
-  font-size: 0.9rem;
-}
-
 .fighter-input {
   position: relative;
   display: grid;
@@ -1103,7 +1073,6 @@ input::placeholder {
   .topbar,
   .match-card,
   .match-options,
-  .product-card-grid,
   .pricing-grid,
   .premium-placeholder-grid,
   .credit-pack-grid,

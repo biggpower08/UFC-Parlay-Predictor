@@ -22,6 +22,9 @@ ufc_predictor/data/processed/scrape_cache/
 ufc_predictor/data/processed/scrape_debug/
 ufc_predictor/data/processed/*.db
 data/imports/
+data/mentor_silver_run/
+audit.jsonl
+client.log
 ufc_predictor/data/imports/
 ufc_predictor/data/processed/training_imports/
 ufc_predictor/static_app/

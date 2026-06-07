@@ -27,27 +27,27 @@ SUPPORTED_FILE_NAMES = {
 EVENT_ALIASES = ["event_name", "event", "event_title", "event_url"]
 DATE_ALIASES = ["event_date", "date", "fight_date", "eventdate"]
 WEIGHT_ALIASES = ["weight_class", "weightclass", "bout_weight", "division"]
-METHOD_ALIASES = ["method", "win_by", "finish_method", "method_group"]
+METHOD_ALIASES = ["method", "win_by", "finish_method", "method_group", "result"]
 ROUND_ALIASES = ["round", "last_round", "end_round", "finish_round"]
 TIME_ALIASES = ["time", "finish_time", "end_time"]
 SCHEDULED_ROUNDS_ALIASES = ["scheduled_rounds", "format", "total_rounds"]
 WINNER_ALIASES = ["winner", "winner_name", "winning_fighter", "fighter_1", "w_fighter"]
 LOSER_ALIASES = ["loser", "loser_name", "losing_fighter", "fighter_2", "l_fighter"]
-RED_ALIASES = ["r_fighter", "red_fighter", "redfighter", "fighter_a", "fighter_a_name"]
-BLUE_ALIASES = ["b_fighter", "blue_fighter", "bluefighter", "fighter_b", "fighter_b_name"]
+RED_ALIASES = ["r_fighter", "red_fighter", "redfighter", "fighter_a", "fighter_a_name", "f_1_name", "fighter_1"]
+BLUE_ALIASES = ["b_fighter", "blue_fighter", "bluefighter", "fighter_b", "fighter_b_name", "f_2_name", "fighter_2"]
 RED_RESULT_ALIASES = ["winner_red_blue", "winner_color", "winner_corner"]
 
-RED_SIG_LANDED = ["r_sig_str_landed", "r_sig_str", "r_sig_strikes_landed", "red_sig_str_landed", "fighter_a_sig_strikes_landed"]
-BLUE_SIG_LANDED = ["b_sig_str_landed", "b_sig_str", "b_sig_strikes_landed", "blue_sig_str_landed", "fighter_b_sig_strikes_landed"]
-RED_SIG_ATTEMPTED = ["r_sig_str_attempted", "r_sig_str_att", "red_sig_str_attempted", "fighter_a_sig_strikes_attempted"]
-BLUE_SIG_ATTEMPTED = ["b_sig_str_attempted", "b_sig_str_att", "blue_sig_str_attempted", "fighter_b_sig_strikes_attempted"]
-RED_TD_LANDED = ["r_td_landed", "r_td", "r_takedowns_landed", "red_takedowns_landed", "fighter_a_takedowns_landed"]
-BLUE_TD_LANDED = ["b_td_landed", "b_td", "b_takedowns_landed", "blue_takedowns_landed", "fighter_b_takedowns_landed"]
-RED_TD_ATTEMPTED = ["r_td_attempted", "r_td_att", "red_takedowns_attempted", "fighter_a_takedowns_attempted"]
-BLUE_TD_ATTEMPTED = ["b_td_attempted", "b_td_att", "blue_takedowns_attempted", "fighter_b_takedowns_attempted"]
-RED_CONTROL = ["r_ctrl", "r_control", "red_control_time", "fighter_a_control_time_seconds"]
-BLUE_CONTROL = ["b_ctrl", "b_control", "blue_control_time", "fighter_b_control_time_seconds"]
-ODDS_ALIASES = ["moneyline", "odds", "opening_odds", "closing_odds", "r_odds", "b_odds", "fighter_odds"]
+RED_SIG_LANDED = ["r_sig_str_landed", "r_sig_str", "r_sig_strikes_landed", "red_sig_str_landed", "fighter_a_sig_strikes_landed", "f_1_sig_strikes_succ", "f_1_sig_strikes_succ_total"]
+BLUE_SIG_LANDED = ["b_sig_str_landed", "b_sig_str", "b_sig_strikes_landed", "blue_sig_str_landed", "fighter_b_sig_strikes_landed", "f_2_sig_strikes_succ", "f_2_sig_strikes_succ_total"]
+RED_SIG_ATTEMPTED = ["r_sig_str_attempted", "r_sig_str_att", "red_sig_str_attempted", "fighter_a_sig_strikes_attempted", "f_1_sig_strikes_att", "f_1_sig_strikes_att_total"]
+BLUE_SIG_ATTEMPTED = ["b_sig_str_attempted", "b_sig_str_att", "blue_sig_str_attempted", "fighter_b_sig_strikes_attempted", "f_2_sig_strikes_att", "f_2_sig_strikes_att_total"]
+RED_TD_LANDED = ["r_td_landed", "r_td", "r_takedowns_landed", "red_takedowns_landed", "fighter_a_takedowns_landed", "f_1_takedown_succ", "f_1_td_1_succ_total"]
+BLUE_TD_LANDED = ["b_td_landed", "b_td", "b_takedowns_landed", "blue_takedowns_landed", "fighter_b_takedowns_landed", "f_2_takedown_succ", "f_2_td_1_succ_total"]
+RED_TD_ATTEMPTED = ["r_td_attempted", "r_td_att", "red_takedowns_attempted", "fighter_a_takedowns_attempted", "f_1_takedown_att", "f_1_td_1_att_total"]
+BLUE_TD_ATTEMPTED = ["b_td_attempted", "b_td_att", "blue_takedowns_attempted", "fighter_b_takedowns_attempted", "f_2_takedown_att", "f_2_td_1_att_total"]
+RED_CONTROL = ["r_ctrl", "r_control", "red_control_time", "fighter_a_control_time_seconds", "f_1_ctrl_time_sec"]
+BLUE_CONTROL = ["b_ctrl", "b_control", "blue_control_time", "fighter_b_control_time_seconds", "f_2_ctrl_time_sec"]
+ODDS_ALIASES = ["moneyline", "odds", "opening_odds", "closing_odds", "r_odds", "b_odds", "fighter_odds", "odds_1", "odds_2", "f_1_odds", "f_2_odds"]
 SPORTSBOOK_ALIASES = ["sportsbook", "book", "provider", "source"]
 SNAPSHOT_DATE_ALIASES = ["snapshot_date", "scrape_date", "odds_date", "timestamp", "fetched_at"]
 
@@ -107,13 +107,13 @@ def import_training_csvs(input_dir: str | Path, output: str | Path | None = None
         if file_type == "fight":
             report.supported_files.append(str(path))
             frame, missing = _normalize_csv(path)
-            report.rows_read += int(len(frame)) if not frame.empty else int(len(pd.read_csv(path)))
+            report.rows_read += int(len(frame)) if not frame.empty else _count_csv_rows(path)
             report.missing_columns[str(path)] = missing
             if not frame.empty:
                 normalized_frames.append(frame)
         elif file_type in {"fighter", "odds"}:
             report.supported_files.append(str(path))
-            rows = int(len(pd.read_csv(path)))
+            rows = _count_csv_rows(path)
             report.rows_read += rows
             report.missing_columns[str(path)] = []
             if file_type == "odds":
@@ -190,7 +190,7 @@ def _looks_like_fight_csv(path: Path) -> bool:
 
 
 def _normalize_csv(path: Path) -> tuple[pd.DataFrame, list[str]]:
-    raw = _standardize_columns(pd.read_csv(path))
+    raw = _standardize_columns(pd.read_csv(path, low_memory=False))
     columns = raw.columns
     missing = []
     winner_col = _first_existing(columns, WINNER_ALIASES)
@@ -267,6 +267,15 @@ def _normalize_csv(path: Path) -> tuple[pd.DataFrame, list[str]]:
             }
         )
     return pd.DataFrame(records), missing
+
+
+def _count_csv_rows(path: Path) -> int:
+    try:
+        with path.open("rb") as handle:
+            line_count = sum(1 for _ in handle)
+    except OSError:
+        return 0
+    return max(0, line_count - 1)
 
 
 def _finalize_normalized(df: pd.DataFrame) -> pd.DataFrame:

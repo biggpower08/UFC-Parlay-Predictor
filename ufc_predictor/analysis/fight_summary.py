@@ -148,6 +148,7 @@ def _sections(stats_a, stats_b, comparison, prediction, labels, drivers, warning
             "title": "Main prediction read",
             "body": (
                 f"{opener}, with {labels['confidence'].lower()} and {labels['volatility'].lower()} volatility. "
+                f"{_ensemble_signal_read(prediction)} "
                 "This is a winner-probability forecast first; "
                 "the notes below translate the matchup into scenario projections without treating them as exact outcomes."
             ),
@@ -226,10 +227,10 @@ def _prop_reads(stats_a, stats_b, comparison, prediction, labels, warnings, matc
     distance_prediction = prop_predictions.get("goes_distance_model", {})
     method_prediction = prop_predictions.get("method_model", {})
     round_prediction = prop_predictions.get("round_model", {})
-    finish_supported = finish_prediction.get("status") in {"trained", "experimental"} and finish_prediction.get("label")
-    distance_supported = distance_prediction.get("status") in {"trained", "experimental"} and distance_prediction.get("label")
-    method_supported = method_prediction.get("status") in {"trained", "experimental"} and method_prediction.get("label")
-    round_supported = round_prediction.get("status") in {"trained", "experimental"} and round_prediction.get("label")
+    finish_supported = finish_prediction.get("status") == "trained" and finish_prediction.get("label")
+    distance_supported = distance_prediction.get("status") == "trained" and distance_prediction.get("label")
+    method_supported = method_prediction.get("status") == "trained" and method_prediction.get("label")
+    round_supported = round_prediction.get("status") == "trained" and round_prediction.get("label")
     method_style = _method_prop_style(favorite, underdog, prediction)
     prop_reads = [
         {
@@ -477,6 +478,29 @@ def _drivers(stats_a, stats_b, prediction, labels, warnings):
                 "explanation": "Elo is limited because at least one fighter does not have computed Elo history.",
             }
         )
+    breakdown = prediction.get("ensemble_breakdown") or {}
+    if breakdown:
+        used = [
+            label
+            for key, label in (
+                ("winner_model_signal", "winner model"),
+                ("elo_signal", "Elo"),
+                ("strike_volume_signal", "strike-volume context"),
+                ("takedown_control_signal", "grappling/control context"),
+            )
+            if (breakdown.get(key) or {}).get("used_in_score")
+        ]
+        drivers.append(
+            {
+                "label": "Signal mix",
+                "direction": "available" if used else "limited",
+                "explanation": (
+                    f"The final read used {', '.join(used)} as scoring signals."
+                    if used
+                    else "The final read had limited scoring signals and kept unsupported models out of the number."
+                ),
+            }
+        )
     drivers.append(
         {
             "label": "Data quality",
@@ -493,6 +517,28 @@ def _drivers(stats_a, stats_b, prediction, labels, warnings):
             }
         )
     return drivers
+
+
+def _ensemble_signal_read(prediction: dict) -> str:
+    breakdown = prediction.get("ensemble_breakdown") or {}
+    if not breakdown:
+        return "The final read combines the available statistical signals."
+    used = [
+        label
+        for key, label in (
+            ("winner_model_signal", "the winner model"),
+            ("elo_signal", "Elo"),
+            ("strike_volume_signal", "a small strike-volume context signal"),
+            ("takedown_control_signal", "a small grappling/control context signal"),
+        )
+        if (breakdown.get(key) or {}).get("used_in_score")
+    ]
+    unavailable_count = len(breakdown.get("unavailable_models") or [])
+    if used and unavailable_count:
+        return f"The final read leaned on {', '.join(used)} while leaving unavailable or weak models out of the score."
+    if used:
+        return f"The final read leaned on {', '.join(used)}."
+    return "The final read kept unavailable or weak supporting models out of the score."
 
 
 def _favorite_stats(stats_a, stats_b, prediction):

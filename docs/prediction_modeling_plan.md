@@ -1,0 +1,93 @@
+# Prediction Modeling Plan
+
+The app should grow into a fight outcome probability engine. Winner probability is only one part of the product.
+
+## Response Design
+
+Future prediction responses should support these groups.
+
+### Winner
+
+- Fighter A win probability
+- Fighter B win probability
+- no-odds winner model signal
+- odds-aware winner model signal if valid pre-fight odds are supplied
+- Elo signal
+- confidence and volatility
+
+### Method
+
+- Fighter A by KO/TKO
+- Fighter A by submission
+- Fighter A by decision
+- Fighter B by KO/TKO
+- Fighter B by submission
+- Fighter B by decision
+
+### Timing
+
+- ends Round 1
+- ends Round 2
+- ends Round 3
+- ends before Round 2
+- ends before Round 3
+- over 1.5
+- over 2.5
+- over 3.5 when scheduled rounds allow
+- goes distance
+
+### Strike Volume
+
+- Fighter A expected significant strikes
+- Fighter B expected significant strikes
+- Fighter A 25+/50+/75+ significant strikes
+- Fighter B 25+/50+/75+ significant strikes
+
+A fighter can clear a significant-strike threshold and still lose. Strike targets must be trained independently from the winner target.
+
+### Takedown / Control
+
+- Fighter A expected takedowns
+- Fighter B expected takedowns
+- Fighter A 1+/2+/3+ takedowns
+- Fighter B 1+/2+/3+ takedowns
+- likely control-heavy path
+
+A fighter can clear a takedown/control target and still lose. These probabilities should not be forced to follow winner probability.
+
+### Odds
+
+Only if real pre-fight odds are supplied:
+
+- model fair probability
+- model fair line
+- market comparison
+- market disagreement flag
+
+Do not show fake sportsbook odds, fake edges, units, ROI, or bet-placement UI.
+
+### Context Modes
+
+- `actual_fight`: includes size, division, reach, and cross-division context
+- `pound_for_pound`: reduces or removes size advantages and focuses on skill/rating/profile
+
+Public labels can say:
+
+- same division
+- possible cross-division
+- cross-division
+- size context limited
+- pound-for-pound view
+
+Do not expose formulas or internal implementation details publicly.
+
+## Model Status Rules
+
+- `production_ready`: chronological split, low leakage risk, runtime-compatible, calibrated, beats baseline clearly
+- `production_candidate`: promising but needs another validation pass
+- `trained`: artifact and metrics exist
+- `experimental`: useful offline or scenario signal, but weak validation or runtime limitations remain
+- `offline_benchmark`: useful for comparison but not runtime-compatible
+- `insufficient_data`: labels/rows too sparse
+- `blocked`: required source data is missing
+- `not_trained`: no artifact or metadata

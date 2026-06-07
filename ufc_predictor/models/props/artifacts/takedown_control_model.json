@@ -1,0 +1,155 @@
+{
+  "model_name": "takedown_control_model",
+  "model_version": "prop_baseline_v1",
+  "model_type": "nearest_centroid_softmax_baseline",
+  "feature_names": [
+    "a_prior_fights",
+    "b_prior_fights",
+    "a_prior_wins",
+    "b_prior_wins",
+    "a_prior_finishes",
+    "b_prior_finishes",
+    "a_prior_decisions",
+    "b_prior_decisions"
+  ],
+  "classes": [
+    "0.0",
+    "1.0"
+  ],
+  "centroids": [
+    [
+      0.99594972673197,
+      0.9623125716783099,
+      0.9488566532419069,
+      0.9026395040648242,
+      0.8714196493484931,
+      0.785187836082033,
+      0.7230185215648383,
+      0.7636708798845994
+    ],
+    [
+      0.9313231104161929,
+      0.8074548690645998,
+      0.8848647440060854,
+      0.756295544874202,
+      0.7207466458432243,
+      0.6622123155773313,
+      0.7900227227452605,
+      0.6342053525194244
+    ]
+  ],
+  "scales": [
+    5.295867022728544,
+    5.619671084368841,
+    3.664963469847128,
+    3.7739238870592318,
+    2.4059124441775745,
+    2.487086654861547,
+    1.9100003009547546,
+    1.9035197431306665
+  ],
+  "metrics": {
+    "train": {
+      "accuracy": 0.5235,
+      "balanced_accuracy": 0.5355,
+      "log_loss": 0.6936,
+      "roc_auc": 0.5485,
+      "confusion_matrix": {
+        "0.0": {
+          "0.0": 1486,
+          "1.0": 2118
+        },
+        "1.0": {
+          "0.0": 1011,
+          "1.0": 1952
+        }
+      },
+      "per_class_recall": {
+        "0.0": 0.4123,
+        "1.0": 0.6588
+      }
+    },
+    "validation": {
+      "accuracy": 0.5219,
+      "balanced_accuracy": 0.5189,
+      "log_loss": 0.6925,
+      "roc_auc": 0.5382,
+      "confusion_matrix": {
+        "0.0": {
+          "0.0": 498,
+          "1.0": 412
+        },
+        "1.0": {
+          "0.0": 373,
+          "1.0": 359
+        }
+      },
+      "per_class_recall": {
+        "0.0": 0.5473,
+        "1.0": 0.4904
+      }
+    },
+    "majority_class_baseline": {
+      "label": "0.0",
+      "accuracy": 0.5542,
+      "class_counts": {
+        "1.0": 732,
+        "0.0": 910
+      }
+    },
+    "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated."
+  },
+  "metadata": {
+    "model_name": "takedown_control_model",
+    "model_type": "nearest_centroid_softmax_baseline",
+    "target_label": "grappling_heavy_binary",
+    "status": "experimental",
+    "training_rows": 6567,
+    "validation_rows": 1642,
+    "date_range": {
+      "min": "1994-03-11",
+      "max": "2025-10-04"
+    },
+    "data_source": "imported_csv",
+    "input_path": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\training_imports\\normalized_fights.csv",
+    "split_type": "chronological",
+    "feature_names": [
+      "a_prior_fights",
+      "b_prior_fights",
+      "a_prior_wins",
+      "b_prior_wins",
+      "a_prior_finishes",
+      "b_prior_finishes",
+      "a_prior_decisions",
+      "b_prior_decisions"
+    ],
+    "class_distribution": {
+      "0.0": 4514,
+      "1.0": 3695
+    },
+    "baseline_metrics": {
+      "label": "0.0",
+      "accuracy": 0.5542,
+      "class_counts": {
+        "1.0": 732,
+        "0.0": 910
+      }
+    },
+    "source_datasets": [
+      "imported_csv"
+    ],
+    "source_files": [
+      "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\training_imports\\normalized_fights.csv"
+    ],
+    "trained_at": "2026-06-07T00:43:17.561024+00:00",
+    "data_cutoff_date": "2025-10-04",
+    "training_source_status": "experimental",
+    "leakage_checked": true,
+    "limitations": [
+      "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection.",
+      "Validation accuracy does not beat the majority-class baseline; keep this as an experimental read.",
+      "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+    ],
+    "model_version": "prop_baseline_v1"
+  }
+}

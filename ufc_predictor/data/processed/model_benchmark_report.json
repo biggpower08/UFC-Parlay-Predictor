@@ -1,0 +1,103 @@
+{
+  "models": [
+    {
+      "model": "expert_signal_model",
+      "status": "blocked",
+      "rows_used": 0,
+      "main_metric": null,
+      "baseline": null,
+      "beats_baseline": null,
+      "leakage_risk": "unknown_review_needed",
+      "runtime_compatible": false,
+      "notes": "No verified pre-fight expert timestamped signal dataset is available."
+    },
+    {
+      "model": "finish_model",
+      "status": "trained",
+      "rows_used": 16268,
+      "main_metric": 0.5486,
+      "baseline": 0.5031,
+      "beats_baseline": true,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+    },
+    {
+      "model": "goes_distance_model",
+      "status": "trained",
+      "rows_used": 16268,
+      "main_metric": 0.5486,
+      "baseline": 0.5031,
+      "beats_baseline": true,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+    },
+    {
+      "model": "method_model",
+      "status": "experimental",
+      "rows_used": 16268,
+      "main_metric": 0.2667,
+      "baseline": 0.4969,
+      "beats_baseline": false,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "odds_calibration_model",
+      "status": "blocked",
+      "rows_used": 0,
+      "main_metric": null,
+      "baseline": null,
+      "beats_baseline": null,
+      "leakage_risk": "unknown_review_needed",
+      "runtime_compatible": false,
+      "notes": "Historical odds snapshots are not available, so odds calibration/value modeling is blocked."
+    },
+    {
+      "model": "round_model",
+      "status": "experimental",
+      "rows_used": 16268,
+      "main_metric": 0.2382,
+      "baseline": 0.4969,
+      "beats_baseline": false,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "strike_volume_model",
+      "status": "experimental",
+      "rows_used": 8209,
+      "main_metric": 0.4093,
+      "baseline": 0.3806,
+      "beats_baseline": true,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "takedown_control_model",
+      "status": "experimental",
+      "rows_used": 8209,
+      "main_metric": 0.5219,
+      "baseline": 0.5542,
+      "beats_baseline": false,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "winner_model",
+      "status": "blocked",
+      "rows_used": 16268,
+      "main_metric": null,
+      "baseline": null,
+      "beats_baseline": null,
+      "leakage_risk": "unknown_review_needed",
+      "runtime_compatible": false,
+      "notes": "Winner prediction already uses the existing sklearn/Elo pipeline; this pass does not retrain it."
+    }
+  ]
+}

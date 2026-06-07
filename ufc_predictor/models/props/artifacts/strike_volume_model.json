@@ -1,0 +1,185 @@
+{
+  "model_name": "strike_volume_model",
+  "model_version": "prop_baseline_v1",
+  "model_type": "nearest_centroid_softmax_baseline",
+  "feature_names": [
+    "a_prior_fights",
+    "b_prior_fights",
+    "a_prior_wins",
+    "b_prior_wins",
+    "a_prior_finishes",
+    "b_prior_finishes",
+    "a_prior_decisions",
+    "b_prior_decisions"
+  ],
+  "classes": [
+    "high",
+    "low",
+    "medium"
+  ],
+  "centroids": [
+    [
+      1.1940959009634746,
+      1.1108888285793628,
+      1.1547168030538304,
+      1.0489274446269061,
+      0.932215897275744,
+      0.8579689847420657,
+      1.041447518254729,
+      0.9586079332338797
+    ],
+    [
+      0.831802569408383,
+      0.7846124219487759,
+      0.7889470587650543,
+      0.7290738090110722,
+      0.759305838900471,
+      0.6603066628893167,
+      0.5574024165010825,
+      0.5827253317812353
+    ],
+    [
+      0.98288450802618,
+      0.8778123404409814,
+      0.9251112160452022,
+      0.8261466897972808,
+      0.7680998542141105,
+      0.7294686648438028,
+      0.8076008228667803,
+      0.6848171394451804
+    ]
+  ],
+  "scales": [
+    5.295867022728544,
+    5.619671084368841,
+    3.664963469847128,
+    3.7739238870592318,
+    2.4059124441775745,
+    2.487086654861547,
+    1.9100003009547546,
+    1.9035197431306665
+  ],
+  "metrics": {
+    "train": {
+      "accuracy": 0.4226,
+      "balanced_accuracy": 0.3971,
+      "log_loss": 1.0699,
+      "roc_auc": null,
+      "confusion_matrix": {
+        "high": {
+          "high": 724,
+          "low": 733,
+          "medium": 112
+        },
+        "low": {
+          "high": 825,
+          "low": 1890,
+          "medium": 178
+        },
+        "medium": {
+          "high": 724,
+          "low": 1220,
+          "medium": 161
+        }
+      },
+      "per_class_recall": {
+        "high": 0.4614,
+        "low": 0.6533,
+        "medium": 0.0765
+      }
+    },
+    "validation": {
+      "accuracy": 0.4093,
+      "balanced_accuracy": 0.3857,
+      "log_loss": 1.0963,
+      "roc_auc": null,
+      "confusion_matrix": {
+        "high": {
+          "high": 368,
+          "low": 228,
+          "medium": 29
+        },
+        "low": {
+          "high": 250,
+          "low": 262,
+          "medium": 35
+        },
+        "medium": {
+          "high": 214,
+          "low": 214,
+          "medium": 42
+        }
+      },
+      "per_class_recall": {
+        "high": 0.5888,
+        "low": 0.479,
+        "medium": 0.0894
+      }
+    },
+    "majority_class_baseline": {
+      "label": "high",
+      "accuracy": 0.3806,
+      "class_counts": {
+        "low": 547,
+        "high": 625,
+        "medium": 470
+      }
+    },
+    "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated."
+  },
+  "metadata": {
+    "model_name": "strike_volume_model",
+    "model_type": "nearest_centroid_softmax_baseline",
+    "target_label": "combined_strike_volume_bucket",
+    "status": "experimental",
+    "training_rows": 6567,
+    "validation_rows": 1642,
+    "date_range": {
+      "min": "1994-03-11",
+      "max": "2025-10-04"
+    },
+    "data_source": "imported_csv",
+    "input_path": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\training_imports\\normalized_fights.csv",
+    "split_type": "chronological",
+    "feature_names": [
+      "a_prior_fights",
+      "b_prior_fights",
+      "a_prior_wins",
+      "b_prior_wins",
+      "a_prior_finishes",
+      "b_prior_finishes",
+      "a_prior_decisions",
+      "b_prior_decisions"
+    ],
+    "class_distribution": {
+      "low": 3440,
+      "medium": 2575,
+      "high": 2194
+    },
+    "baseline_metrics": {
+      "label": "high",
+      "accuracy": 0.3806,
+      "class_counts": {
+        "low": 547,
+        "high": 625,
+        "medium": 470
+      }
+    },
+    "source_datasets": [
+      "imported_csv"
+    ],
+    "source_files": [
+      "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\training_imports\\normalized_fights.csv"
+    ],
+    "trained_at": "2026-06-07T00:43:17.439505+00:00",
+    "data_cutoff_date": "2025-10-04",
+    "training_source_status": "experimental",
+    "leakage_checked": true,
+    "limitations": [
+      "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection.",
+      "Balanced accuracy is weak, so this model should not drive confident public wording yet.",
+      "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+    ],
+    "model_version": "prop_baseline_v1"
+  }
+}

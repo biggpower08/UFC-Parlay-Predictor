@@ -89,7 +89,25 @@ def feature_dict_from_analysis_stats(stats_a: dict, stats_b: dict) -> dict:
             return 0.0
         return value if value == value else 0.0
 
+    def record_wins(stats):
+        record = str(stats.get("Record") or "")
+        first = record.split("-")[0].strip()
+        try:
+            return float(first)
+        except ValueError:
+            return 0.0
+
+    elo_fights_a = num(stats_a, "Elo Fights")
+    elo_fights_b = num(stats_b, "Elo Fights")
     return {
+        "a_prior_fights": elo_fights_a,
+        "b_prior_fights": elo_fights_b,
+        "a_prior_wins": record_wins(stats_a),
+        "b_prior_wins": record_wins(stats_b),
+        "a_prior_finishes": 0.0,
+        "b_prior_finishes": 0.0,
+        "a_prior_decisions": 0.0,
+        "b_prior_decisions": 0.0,
         "delta_slpm": num(stats_a, "SLpM") - num(stats_b, "SLpM"),
         "delta_str_acc": num(stats_a, "Str Acc %") - num(stats_b, "Str Acc %"),
         "delta_str_def": num(stats_a, "Str Def %") - num(stats_b, "Str Def %"),
@@ -112,7 +130,14 @@ def predict_supported_prop_models(stats_a: dict, stats_b: dict) -> dict:
     features = feature_dict_from_analysis_stats(stats_a, stats_b)
     return {
         model_name: predict_prop_model(model_name, features)
-        for model_name in ("finish_model", "goes_distance_model", "method_model", "round_model")
+        for model_name in (
+            "finish_model",
+            "goes_distance_model",
+            "method_model",
+            "round_model",
+            "strike_volume_model",
+            "takedown_control_model",
+        )
     }
 
 

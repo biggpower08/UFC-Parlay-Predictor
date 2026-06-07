@@ -30,12 +30,36 @@ CURATED_KAGGLE_DATASETS: tuple[TrainingDatasetSource, ...] = (
         notes="Verify license before commercial use. Prefer pre-fight feature columns over current-fight stat columns.",
     ),
     TrainingDatasetSource(
-        slug="mdabbert/ultimate-ufc-dataset",
-        name="Ultimate UFC Dataset",
+        slug="leandroiber/ufc-stats-complete-dataset",
+        name="UFC Stats Complete Dataset",
         source_type="kaggle",
-        best_use="Broad UFC fight/fighter history with event and result labels.",
-        helps_models=("finish_model", "goes_distance_model", "method_model", "round_model"),
-        notes="Useful for chronological labels when event dates are present.",
+        best_use="Complete UFCStats-style fight and fighter statistics.",
+        helps_models=("finish_model", "goes_distance_model", "method_model", "round_model", "strike_volume_model", "takedown_control_model"),
+        notes="Preferred Kaggle source for strike/takedown/control labels if available.",
+    ),
+    TrainingDatasetSource(
+        slug="jossilva3110/ufc-dataset-1994-2026",
+        name="UFC Dataset 1994-2026",
+        source_type="kaggle",
+        best_use="Long historical fight/stat coverage with result labels.",
+        helps_models=("finish_model", "goes_distance_model", "method_model", "round_model", "strike_volume_model", "takedown_control_model"),
+        notes="Use only fields that are known before the fight as model inputs; fight stats are labels.",
+    ),
+    TrainingDatasetSource(
+        slug="leandroiber/mmastats",
+        name="MMAStats Complete Database",
+        source_type="kaggle",
+        best_use="Granular MMA technical stats.",
+        helps_models=("strike_volume_model", "takedown_control_model", "finish_model", "method_model"),
+        notes="Importer will report whether UFC-only filtering and label coverage are sufficient.",
+    ),
+    TrainingDatasetSource(
+        slug="alexmagnus24/ufc-fight-statistics-july-2016-nov-2024",
+        name="UFC Fight Statistics July 2016-Nov 2024",
+        source_type="kaggle",
+        best_use="Round/fight-level statistics with strike and round labels.",
+        helps_models=("strike_volume_model", "round_model", "finish_model", "method_model"),
+        notes="Useful for strike-volume labels if significant-strike columns are present.",
     ),
     TrainingDatasetSource(
         slug="jerzyszocik/ufc-betting-odds-daily-dataset",
@@ -46,34 +70,15 @@ CURATED_KAGGLE_DATASETS: tuple[TrainingDatasetSource, ...] = (
         notes="Do not expose fake odds. Train odds calibration only after odds rows are matched to fight outcomes.",
     ),
     TrainingDatasetSource(
-        slug="cadelueker/ufc-fighter-and-fight-stats-as-of-04-9-2025",
-        name="UFC Fighter and Fight Stats as of 04-09-2025",
+        slug="mdabbert/ufc-fights-2010-2020-with-betting-odds",
+        name="UFC Fights 2010-2020 with Betting Odds",
         source_type="kaggle",
-        best_use="Fight and fighter statistics, including possible strike/takedown labels.",
-        helps_models=("strike_volume_model", "takedown_control_model", "finish_model", "method_model"),
-        notes="Current-fight stats may be labels only, not pre-fight features.",
-    ),
-    TrainingDatasetSource(
-        slug="rajaisrarkiani/ufc-fights-and-fighter-stats-dataset",
-        name="UFC Fights and Fighter Stats Dataset",
-        source_type="kaggle",
-        best_use="Fight-level outcomes and fighter statistics.",
-        helps_models=("finish_model", "goes_distance_model", "method_model", "round_model", "strike_volume_model", "takedown_control_model"),
-        notes="Column coverage varies; importer will report missing labels.",
-    ),
-)
-
-CURATED_GITHUB_SOURCES: tuple[TrainingDatasetSource, ...] = (
-    TrainingDatasetSource(
-        slug="https://github.com/komaksym/UFC-DataLab",
-        name="UFC DataLab",
-        source_type="github",
-        best_use="UFCStats-style CSV research source if the repo license and files fit the app.",
-        helps_models=("finish_model", "goes_distance_model", "method_model", "round_model", "strike_volume_model", "takedown_control_model"),
-        notes="Review license and CSV structure before commercial use.",
+        best_use="Historical moneyline odds matched to fights.",
+        helps_models=("odds_calibration_model",),
+        notes="Use for odds calibration only if fight outcomes can be matched without leakage.",
     ),
 )
 
 
 def curated_training_sources() -> list[dict]:
-    return [source.to_dict() for source in (*CURATED_KAGGLE_DATASETS, *CURATED_GITHUB_SOURCES)]
+    return [source.to_dict() for source in CURATED_KAGGLE_DATASETS]

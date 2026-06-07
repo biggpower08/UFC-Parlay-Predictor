@@ -6,10 +6,10 @@ This is a manual, review-first workflow. It is intentionally not a destructive a
 
 ## 1. Download or update datasets
 
-Download curated datasets manually and place CSV files in:
+Download curated Kaggle datasets manually and place CSV files in:
 
 ```powershell
-C:\dev\mma-ai\data\imports
+C:\dev\mma-ai\data\imports\kaggle
 ```
 
 or:
@@ -23,11 +23,12 @@ Do not commit raw datasets.
 Optional helper for the stored Kaggle source catalog:
 
 ```powershell
-& $env:MMA_AI_PYTHON scripts\download_training_datasets.py --dry-run
-& $env:MMA_AI_PYTHON scripts\download_training_datasets.py --copy --output-dir data\imports
+& $env:MMA_AI_PYTHON scripts\download_kaggle_datasets.py --dry-run
+& $env:MMA_AI_PYTHON scripts\download_kaggle_datasets.py
+& $env:MMA_AI_PYTHON scripts\download_kaggle_datasets.py --only betting_odds_daily
 ```
 
-If Kaggle asks for credentials, download the files manually and keep them in `data\imports`.
+If Kaggle asks for credentials, download the files manually and keep them in `data\imports\kaggle`.
 
 ## 2. Dry-run the importer
 
@@ -35,7 +36,7 @@ If Kaggle asks for credentials, download the files manually and keep them in `da
 cd C:\dev\mma-ai
 $env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
 
-& $env:MMA_AI_PYTHON scripts\import_training_dataset.py --input-dir data\imports --dry-run
+& $env:MMA_AI_PYTHON scripts\import_training_dataset.py --input-dir data\imports\kaggle --dry-run
 ```
 
 Review:
@@ -51,7 +52,7 @@ Review:
 ## 3. Run the importer
 
 ```powershell
-& $env:MMA_AI_PYTHON scripts\import_training_dataset.py --input-dir data\imports
+& $env:MMA_AI_PYTHON scripts\import_training_dataset.py --input-dir data\imports\kaggle
 ```
 
 This writes normalized imported fight rows under `ufc_predictor\data\processed\training_imports`.

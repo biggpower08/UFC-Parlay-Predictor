@@ -1,8 +1,9 @@
 """Train honest dedicated prop-model baselines when labels exist.
 
-Current cached CSV data has fight result/method/round labels but no event dates
-and no per-fight strike or takedown/control labels. Models trained from this
-data are therefore marked experimental, not production-ready.
+Imported Kaggle/local CSV data can provide event dates, method/round labels,
+and fight-stat labels. Artifacts are marked trained only when the data is
+chronological and validation clears a simple majority-class baseline; weak
+but usable baselines are saved as experimental.
 """
 
 from __future__ import annotations
@@ -191,11 +192,12 @@ def train_model(model_name: str, target: str, dataset, audit: dict, test_size: f
         "calibration_notes": "Baseline probabilities are centroid-distance softmax scores and are not calibrated.",
     }
     now = datetime.now(timezone.utc).isoformat()
+    final_status, status_notes = final_status_from_metrics(status, metrics)
     metadata = {
         "model_name": model_name,
         "model_type": "nearest_centroid_softmax_baseline",
         "target_label": target,
-        "status": status,
+        "status": final_status,
         "training_rows": int(len(train_rows)),
         "validation_rows": int(len(validation_rows)),
         "date_range": audit.get("date_range"),
@@ -209,9 +211,9 @@ def train_model(model_name: str, target: str, dataset, audit: dict, test_size: f
         "source_files": [input_path],
         "trained_at": now,
         "data_cutoff_date": audit.get("date_range", {}).get("max") or f"source_order_{int(rows['source_order'].max())}",
-        "training_source_status": "credible" if status == "trained" else "experimental",
+        "training_source_status": "credible" if final_status == "trained" else "experimental",
         "leakage_checked": True,
-        "limitations": limitations_for_status(status, audit),
+        "limitations": limitations_for_status(final_status, audit, status_notes),
         "model_version": MODEL_VERSION,
     }
     return {
@@ -227,26 +229,59 @@ def train_model(model_name: str, target: str, dataset, audit: dict, test_size: f
     }
 
 
+def final_status_from_metrics(planned_status: str, metrics: dict) -> tuple[str, list[str]]:
+    if planned_status != "trained":
+        return planned_status, []
+    validation = metrics.get("validation", {})
+    baseline = metrics.get("majority_class_baseline", {})
+    validation_accuracy = float(validation.get("accuracy") or 0.0)
+    baseline_accuracy = float(baseline.get("accuracy") or 0.0)
+    balanced_accuracy = float(validation.get("balanced_accuracy") or 0.0)
+    notes = []
+    if validation_accuracy <= baseline_accuracy:
+        notes.append(
+            "Validation accuracy does not beat the majority-class baseline; keep this as an experimental read."
+        )
+    if balanced_accuracy < 0.45:
+        notes.append(
+            "Balanced accuracy is weak, so this model should not drive confident public wording yet."
+        )
+    if notes:
+        return "experimental", notes
+    return "trained", []
+
+
 def registry_entry_from_artifact(artifact: dict, artifact_path: Path) -> dict:
     metadata = artifact["metadata"]
     metrics = artifact.get("metrics", {})
+    rows_used = int(metadata["training_rows"]) + int(metadata["validation_rows"])
     return {
         "model_name": metadata["model_name"],
         "target_label": metadata["target_label"],
+        "model_family": "bettor_prop_read",
+        "model_type": metadata.get("model_type"),
         "status": metadata["status"],
+        "source_datasets": metadata.get("source_datasets", []),
+        "source_files": metadata.get("source_files", []),
+        "headline_metric_source": "chronological_validation" if metadata.get("split_type") == "chronological" else metadata.get("split_type"),
+        "rows_used": rows_used,
         "artifact_path": str(artifact_path),
         "training_rows": metadata["training_rows"],
         "validation_rows": metadata["validation_rows"],
         "date_range": metadata["date_range"],
         "split_type": metadata["split_type"],
+        "leakage_risk": "low" if metadata.get("leakage_checked") else "unknown_review_needed",
+        "runtime_compatible": True,
+        "feature_set_name": "prior_history_baseline_v1",
+        "odds_used": False,
+        "segment_metrics_available": False,
+        "calibration_metrics_available": bool((metrics.get("validation") or {}).get("log_loss") is not None),
         "metrics": metrics.get("validation", {}),
         "baseline_metrics": metrics.get("majority_class_baseline", {}),
         "feature_names": metadata["feature_names"],
         "class_distribution": metadata["class_distribution"],
         "limitations": metadata["limitations"],
         "trained_at": metadata["trained_at"],
-        "source_datasets": metadata.get("source_datasets", []),
-        "source_files": metadata.get("source_files", []),
     }
 
 
@@ -254,20 +289,30 @@ def registry_entry_from_plan(model_name: str, plan_entry: dict, audit: dict) -> 
     return {
         "model_name": model_name,
         "target_label": plan_entry.get("target"),
+        "model_family": "bettor_prop_read",
+        "model_type": None,
         "status": plan_entry["status"],
+        "source_datasets": [audit.get("source")],
+        "source_files": [],
+        "headline_metric_source": "unavailable",
+        "rows_used": 0,
         "artifact_path": None,
         "training_rows": 0,
         "validation_rows": 0,
         "date_range": audit.get("date_range"),
         "split_type": "chronological" if audit.get("source_coverage", {}).get("has_event_date") else "unavailable",
+        "leakage_risk": "unknown_review_needed",
+        "runtime_compatible": False,
+        "feature_set_name": None,
+        "odds_used": False,
+        "segment_metrics_available": False,
+        "calibration_metrics_available": False,
         "metrics": {},
         "baseline_metrics": {},
         "feature_names": FEATURE_NAMES,
         "class_distribution": plan_entry.get("class_distribution", {}),
         "limitations": [plan_entry.get("reason", "Training data is not sufficient.")],
         "trained_at": None,
-        "source_datasets": [audit.get("source")],
-        "source_files": [],
     }
 
 
@@ -275,20 +320,30 @@ def blocked_registry_entry(model_name: str, reason: str, audit: dict) -> dict:
     return {
         "model_name": model_name,
         "target_label": None,
+        "model_family": "winner" if model_name == "winner_model" else "odds_calibration",
+        "model_type": None,
         "status": "blocked",
+        "source_datasets": [audit.get("source")],
+        "source_files": [],
+        "headline_metric_source": "unavailable",
+        "rows_used": 0,
         "artifact_path": None,
         "training_rows": 0,
         "validation_rows": 0,
         "date_range": audit.get("date_range"),
         "split_type": "unavailable",
+        "leakage_risk": "unknown_review_needed",
+        "runtime_compatible": False,
+        "feature_set_name": None,
+        "odds_used": model_name == "odds_calibration_model",
+        "segment_metrics_available": False,
+        "calibration_metrics_available": False,
         "metrics": {},
         "baseline_metrics": {},
         "feature_names": [],
         "class_distribution": {},
         "limitations": [reason],
         "trained_at": None,
-        "source_datasets": [audit.get("source")],
-        "source_files": [],
     }
 
 
@@ -312,10 +367,14 @@ def predict_probabilities(model: dict, X) -> np.ndarray:
     return exp / exp.sum(axis=1, keepdims=True)
 
 
-def limitations_for_status(status: str, audit: dict) -> list[str]:
+def limitations_for_status(status: str, audit: dict, extra_notes: list[str] | None = None) -> list[str]:
     limitations = []
     if status == "experimental":
-        limitations.append("Event dates are missing; split uses reversed source order and should not be treated as production-grade chronological validation.")
+        if audit.get("source_coverage", {}).get("has_event_date"):
+            limitations.append("Validation is weak; treat this as an experimental model-supported read, not a confident prop projection.")
+        else:
+            limitations.append("Event dates are missing; split uses reversed source order and should not be treated as production-grade chronological validation.")
+    limitations.extend(extra_notes or [])
     limitations.extend(audit.get("warnings", []))
     limitations.append("Features are limited to pre-fight rolling win/finish/decision history from the available source order.")
     return limitations

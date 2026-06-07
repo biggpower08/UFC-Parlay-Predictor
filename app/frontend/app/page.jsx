@@ -448,25 +448,6 @@ export default function App() {
         <b className={`matchup-mini-badge ${matchupType.severity}`}>{compactMatchupLabel(matchupType)}</b>
       </section>
 
-      <section className="product-card-grid" aria-label="Product sections">
-        <a href="/analysis">
-          <strong>Full Analysis</strong>
-          <span>Paths to victory, method leans, key exchanges, and uncertainty notes.</span>
-        </a>
-        <a href="/stats">
-          <strong>Matchup Stats</strong>
-          <span>Records, physical stats, Elo status, and fighter comparison data.</span>
-        </a>
-        <a href="/odds">
-          <strong>Betting Reads</strong>
-          <span>Model-informed prop angles without fake odds or bet placement.</span>
-        </a>
-        <a href="/pricing">
-          <strong>Pricing</strong>
-          <span>Free now, with Premium and Pro plans prepared for future launch.</span>
-        </a>
-      </section>
-
       {message && (
         <div className="message">
           <span>{message}</span>

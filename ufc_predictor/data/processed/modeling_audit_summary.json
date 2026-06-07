@@ -1,0 +1,187 @@
+{
+  "steps": [
+    {
+      "name": "leakage_scan",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/scan_data_leakage.py --input-dir data\\imports --output ufc_predictor\\data\\processed\\leakage_report.json --markdown-output docs\\leakage_report.md",
+      "returncode": 0,
+      "allowed_failure": false,
+      "stdout_tail": "{\n  \"output\": \"ufc_predictor\\\\data\\\\processed\\\\leakage_report.json\",\n  \"markdown_output\": \"docs\\\\leakage_report.md\",\n  \"files_scanned\": 13\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "import_training_dataset",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/import_training_dataset.py --input-dir data\\imports",
+      "returncode": 0,
+      "allowed_failure": false,
+      "stdout_tail": "and-fight-stats-as-of-04-9-2025\\\\fighters.csv\": [],\n        \"data\\\\imports\\\\cadelueker__ufc-fighter-and-fight-stats-as-of-04-9-2025\\\\fights.csv\": [],\n        \"data\\\\imports\\\\jerzyszocik__ufc-betting-odds-daily-dataset\\\\UFC_betting_odds.csv\": [],\n        \"data\\\\imports\\\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\\\UFC_full_data_golden.csv\": [],\n        \"data\\\\imports\\\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\\\UFC_full_data_silver.csv\": [],\n        \"data\\\\imports\\\\kaggle\\\\jerzyszocik__ufc-betting-odds-daily-dataset\\\\UFC_betting_odds.csv\": [],\n        \"data\\\\imports\\\\kaggle\\\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\\\UFC_full_data_golden.csv\": [],\n        \"data\\\\imports\\\\kaggle\\\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\\\UFC_full_data_silver.csv\": [],\n        \"data\\\\imports\\\\mdabbert__ultimate-ufc-dataset\\\\ufc-master.csv\": [],\n        \"data\\\\imports\\\\mdabbert__ultimate-ufc-dataset\\\\upcoming.csv\": []\n      },\n      \"label_availability\": {\n        \"event_date\": 16268,\n        \"method_group\": 16268,\n        \"finish_binary\": 16268,\n        \"goes_distance_binary\": 16268,\n        \"round_phase_class\": 16268,\n        \"fighter_a_sig_strikes\": 8209,\n        \"fighter_b_sig_strikes\": 8209,\n        \"combined_sig_strikes\": 8209,\n        \"fighter_a_takedowns\": 8209,\n        \"fighter_b_takedowns\": 8209,\n        \"grappling_heavy_binary\": 8209,\n        \"takedown_control_bucket\": 8209\n      },\n      \"date_range\": {\n        \"min\": \"1994-03-11\",\n        \"max\": \"2025-10-04\"\n      },\n      \"odds_availability\": {\n        \"files\": 4,\n        \"rows\": 367304\n      },\n      \"source_files\": [\n        \"data\\\\imports\\\\cadelueker__ufc-fighter-and-fight-stats-as-of-04-9-2025\\\\enhanced_fights.csv\",\n        \"data\\\\imports\\\\jerzyszocik__ufc-fight-forecast-complete-gold-modeling-dataset\\\\UFC_full_data_golden.csv\"\n      ],\n      \"warnings\": []\n    }\n  ],\n  \"combined_rows_normalized\": 16268,\n  \"wrote_normalized_data\": true\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "training_data_audit",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/audit_training_data.py --input-dir data\\imports --output ufc_predictor\\data\\processed\\data_audit_report.json --markdown-output docs\\data_audit_report.md --include-mentor-silver --mentor-zip C:\\Users\\trish\\Downloads\\ufcpredictions.zip",
+      "returncode": 0,
+      "allowed_failure": false,
+      "stdout_tail": "{\n  \"output\": \"ufc_predictor\\\\data\\\\processed\\\\data_audit_report.json\",\n  \"markdown_output\": \"docs\\\\data_audit_report.md\",\n  \"model_readiness\": {\n    \"winner_model\": {\n      \"status\": \"offline_benchmark\",\n      \"rows\": 16268,\n      \"reason\": \"Winner target exists, but normalized winner/loser rows are not enough for runtime-compatible f1/f2 prediction.\"\n    },\n    \"finish_model\": {\n      \"status\": \"training_data_ready\",\n      \"rows\": 16268,\n      \"reason\": \"\"\n    },\n    \"goes_distance_model\": {\n      \"status\": \"training_data_ready\",\n      \"rows\": 16268,\n      \"reason\": \"\"\n    },\n    \"method_model\": {\n      \"status\": \"training_data_ready\",\n      \"rows\": 16268,\n      \"reason\": \"Multiclass method remains harder and must beat baseline before production use.\"\n    },\n    \"round_phase_model\": {\n      \"status\": \"training_data_ready\",\n      \"rows\": 16268,\n      \"reason\": \"Round-phase label exists; exact round props remain future work.\"\n    },\n    \"strike_volume_model\": {\n      \"status\": \"training_data_ready\",\n      \"rows\": 8209,\n      \"reason\": \"Strike props are independent of winner and need segment calibration.\"\n    },\n    \"takedown_control_model\": {\n      \"status\": \"training_data_ready\",\n      \"rows\": 8209,\n      \"reason\": \"Takedown/control props are independent of winner and need segment calibration.\"\n    },\n    \"odds_calibration_model\": {\n      \"status\": \"blocked\",\n      \"reason\": \"Odds rows were detected separately, but are not yet safely matched to fight outcomes and timestamps.\"\n    },\n    \"expert_signal_model\": {\n      \"status\": \"blocked\",\n      \"reason\": \"No verified pre-fight expert timestamped signal dataset is available.\"\n    }\n  }\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "training_dataset_dry_run",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/build_training_dataset.py --source imported_csv --dry-run --missingness-report",
+      "returncode": 0,
+      "allowed_failure": false,
+      "stdout_tail": "lume_bucket\": 0,\n    \"combined_strike_volume_bucket\": 8209,\n    \"fighter_a_50plus_sig_strikes\": 8209,\n    \"fighter_b_50plus_sig_strikes\": 8209,\n    \"combined_100plus_sig_strikes\": 8209,\n    \"fighter_a_takedowns\": 8209,\n    \"fighter_b_takedowns\": 8209,\n    \"fighter_a_takedown_1plus\": 8209,\n    \"fighter_b_takedown_1plus\": 8209,\n    \"grappling_heavy_binary\": 8209,\n    \"takedown_control_bucket\": 8209\n  },\n  \"class_distributions\": {\n    \"finish_binary\": {\n      \"1\": 8705,\n      \"0\": 7563\n    },\n    \"goes_distance_binary\": {\n      \"0\": 8705,\n      \"1\": 7563\n    },\n    \"method_class\": {\n      \"Submission\": 3203,\n      \"KO/TKO\": 5370,\n      \"Decision\": 7563,\n      \"Other\": 132\n    },\n    \"round_phase_class\": {\n      \"early\": 4590,\n      \"decision\": 7563,\n      \"middle\": 3951,\n      \"late\": 164\n    },\n    \"combined_strike_volume_bucket\": {\n      \"low\": 3440,\n      \"medium\": 2575,\n      \"high\": 2194\n    },\n    \"grappling_heavy_binary\": {\n      \"0.0\": 4514,\n      \"1.0\": 3695\n    }\n  },\n  \"missingness_report\": {\n    \"a_prior_fights\": 0,\n    \"b_prior_fights\": 0,\n    \"a_prior_wins\": 0,\n    \"b_prior_wins\": 0,\n    \"a_prior_finishes\": 0,\n    \"b_prior_finishes\": 0,\n    \"a_prior_decisions\": 0,\n    \"b_prior_decisions\": 0,\n    \"winner\": 0,\n    \"finish_binary\": 0,\n    \"goes_distance_binary\": 0,\n    \"method_class\": 0,\n    \"round_number\": 0,\n    \"round_phase_class\": 0,\n    \"fighter_a_sig_strikes\": 8059,\n    \"fighter_b_sig_strikes\": 8059,\n    \"combined_sig_strikes\": 8059,\n    \"fighter_a_strike_volume_bucket\": 16268,\n    \"fighter_b_strike_volume_bucket\": 16268,\n    \"combined_strike_volume_bucket\": 8059,\n    \"fighter_a_50plus_sig_strikes\": 8059,\n    \"fighter_b_50plus_sig_strikes\": 8059,\n    \"combined_100plus_sig_strikes\": 8059,\n    \"fighter_a_takedowns\": 8059,\n    \"fighter_b_takedowns\": 8059,\n    \"fighter_a_takedown_1plus\": 8059,\n    \"fighter_b_takedown_1plus\": 8059,\n    \"grappling_heavy_binary\": 8059,\n    \"takedown_control_bucket\": 8059\n  },\n  \"warnings\": [],\n  \"training_data_ready\": true\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "winner_silver_benchmark_audit",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/train_winner_model.py --source silver --dry-run --split chronological",
+      "returncode": 0,
+      "allowed_failure": true,
+      "stdout_tail": "y_ko_tko\": 8230,\n      \"fighter_1_by_submission\": 8230,\n      \"fighter_1_control_time_over_300_seconds\": 8210,\n      \"fighter_1_control_time_seconds\": 8210,\n      \"fighter_1_over_0_5_takedowns\": 8210,\n      \"fighter_1_over_1_5_takedowns\": 8210,\n      \"fighter_1_over_25_sig_strikes\": 8210,\n      \"fighter_1_over_2_5_takedowns\": 8210,\n      \"fighter_1_over_50_sig_strikes\": 8210,\n      \"fighter_1_over_75_sig_strikes\": 8210,\n      \"fighter_1_sig_strikes_landed\": 8210,\n      \"fighter_1_takedowns_landed\": 8210,\n      \"fighter_2_by_decision\": 8230,\n      \"fighter_2_by_ko_tko\": 8230,\n      \"fighter_2_by_submission\": 8230,\n      \"fighter_2_control_time_over_300_seconds\": 8210,\n      \"fighter_2_control_time_seconds\": 8210,\n      \"fighter_2_over_0_5_takedowns\": 8210,\n      \"fighter_2_over_1_5_takedowns\": 8210,\n      \"fighter_2_over_25_sig_strikes\": 8210,\n      \"fighter_2_over_2_5_takedowns\": 8210,\n      \"fighter_2_over_50_sig_strikes\": 8210,\n      \"fighter_2_over_75_sig_strikes\": 8210,\n      \"fighter_2_sig_strikes_landed\": 8210,\n      \"fighter_2_takedowns_landed\": 8210,\n      \"finish_round\": 8231,\n      \"goes_distance\": 8231,\n      \"inside_distance\": 8231,\n      \"method_class\": 8231,\n      \"over_1_5\": 8231,\n      \"over_2_5\": 8231,\n      \"over_3_5\": 8231,\n      \"total_sig_strikes_landed\": 8210,\n      \"went_distance\": 8231\n    }\n  },\n  \"split\": {\n    \"split_type\": \"chronological\",\n    \"status\": \"ok\",\n    \"train_rows\": 6584,\n    \"test_rows\": 1646,\n    \"model_status_modifier\": \"none\"\n  },\n  \"train_rows\": 6584,\n  \"test_rows\": 1646,\n  \"leakage_summary\": {\n    \"unknown_review_needed\": 278,\n    \"label_only\": 10,\n    \"runtime_available\": 29,\n    \"leakage_excluded\": 86\n  },\n  \"runtime_compatible\": false,\n  \"decision\": \"offline_benchmark_until_runtime_feature_builder_and_chronological_metrics_are implemented\",\n  \"reason\": \"Mentor Silver features are valuable, but production winner training needs safe f1/f2 orientation, chronological validation, and runtime-compatible feature creation.\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "prop_training_plan",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/train_prop_models.py --source imported_csv --dry-run",
+      "returncode": 0,
+      "allowed_failure": false,
+      "stdout_tail": " \"rows\": 16268,\n      \"class_distribution\": {\n        \"1\": 8705,\n        \"0\": 7563\n      },\n      \"reason\": \"Event dates are available.\"\n    },\n    \"goes_distance_model\": {\n      \"target\": \"goes_distance_binary\",\n      \"status\": \"trained\",\n      \"rows\": 16268,\n      \"class_distribution\": {\n        \"0\": 8705,\n        \"1\": 7563\n      },\n      \"reason\": \"Event dates are available.\"\n    },\n    \"method_model\": {\n      \"target\": \"method_class\",\n      \"status\": \"trained\",\n      \"rows\": 16268,\n      \"class_distribution\": {\n        \"Submission\": 3203,\n        \"KO/TKO\": 5370,\n        \"Decision\": 7563,\n        \"Other\": 132\n      },\n      \"reason\": \"Event dates are available.\"\n    },\n    \"round_model\": {\n      \"target\": \"round_phase_class\",\n      \"status\": \"trained\",\n      \"rows\": 16268,\n      \"class_distribution\": {\n        \"early\": 4590,\n        \"decision\": 7563,\n        \"middle\": 3951,\n        \"late\": 164\n      },\n      \"reason\": \"Event dates are available.\"\n    },\n    \"strike_volume_model\": {\n      \"target\": \"combined_strike_volume_bucket\",\n      \"status\": \"trained\",\n      \"rows\": 8209,\n      \"class_distribution\": {\n        \"low\": 3440,\n        \"medium\": 2575,\n        \"high\": 2194\n      },\n      \"reason\": \"Event dates are available.\"\n    },\n    \"takedown_control_model\": {\n      \"target\": \"grappling_heavy_binary\",\n      \"status\": \"trained\",\n      \"rows\": 8209,\n      \"class_distribution\": {\n        \"0.0\": 4514,\n        \"1.0\": 3695\n      },\n      \"reason\": \"Event dates are available.\"\n    },\n    \"winner_model\": {\n      \"target\": null,\n      \"status\": \"blocked\",\n      \"rows\": 0,\n      \"class_distribution\": {},\n      \"reason\": \"Winner prediction already uses the existing sklearn/Elo pipeline; this pass does not retrain it.\"\n    },\n    \"odds_calibration_model\": {\n      \"target\": null,\n      \"status\": \"blocked\",\n      \"rows\": 0,\n      \"class_distribution\": {},\n      \"reason\": \"Historical odds snapshots are not available, so odds calibration/value modeling is blocked.\"\n    }\n  }\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "benchmark_report",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/benchmark_training_models.py --output ufc_predictor\\data\\processed\\model_benchmark_report.json --markdown-output docs\\model_benchmark_report.md",
+      "returncode": 0,
+      "allowed_failure": false,
+      "stdout_tail": "\"Validation is weak; treat this as an experimental model-supported read, not a confident prop projection.\"\n    },\n    {\n      \"model\": \"odds_calibration_model\",\n      \"status\": \"blocked\",\n      \"rows_used\": 0,\n      \"main_metric\": null,\n      \"baseline\": null,\n      \"beats_baseline\": null,\n      \"leakage_risk\": \"unknown_review_needed\",\n      \"runtime_compatible\": false,\n      \"notes\": \"Historical odds snapshots are not available, so odds calibration/value modeling is blocked.\"\n    },\n    {\n      \"model\": \"round_model\",\n      \"status\": \"experimental\",\n      \"rows_used\": 16268,\n      \"main_metric\": 0.2382,\n      \"baseline\": 0.4969,\n      \"beats_baseline\": false,\n      \"leakage_risk\": \"low\",\n      \"runtime_compatible\": true,\n      \"notes\": \"Validation is weak; treat this as an experimental model-supported read, not a confident prop projection.\"\n    },\n    {\n      \"model\": \"strike_volume_model\",\n      \"status\": \"experimental\",\n      \"rows_used\": 8209,\n      \"main_metric\": 0.4093,\n      \"baseline\": 0.3806,\n      \"beats_baseline\": true,\n      \"leakage_risk\": \"low\",\n      \"runtime_compatible\": true,\n      \"notes\": \"Validation is weak; treat this as an experimental model-supported read, not a confident prop projection.\"\n    },\n    {\n      \"model\": \"takedown_control_model\",\n      \"status\": \"experimental\",\n      \"rows_used\": 8209,\n      \"main_metric\": 0.5219,\n      \"baseline\": 0.5542,\n      \"beats_baseline\": false,\n      \"leakage_risk\": \"low\",\n      \"runtime_compatible\": true,\n      \"notes\": \"Validation is weak; treat this as an experimental model-supported read, not a confident prop projection.\"\n    },\n    {\n      \"model\": \"winner_model\",\n      \"status\": \"blocked\",\n      \"rows_used\": 16268,\n      \"main_metric\": null,\n      \"baseline\": null,\n      \"beats_baseline\": null,\n      \"leakage_risk\": \"unknown_review_needed\",\n      \"runtime_compatible\": false,\n      \"notes\": \"Winner prediction already uses the existing sklearn/Elo pipeline; this pass does not retrain it.\"\n    }\n  ]\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "name": "segment_evaluation",
+      "command": "C:\\venvs\\mma-ai\\Scripts\\python.exe scripts/evaluate_model_segments.py --output ufc_predictor\\data\\processed\\segment_evaluation_report.json --markdown-output docs\\segment_evaluation_report.md",
+      "returncode": 0,
+      "allowed_failure": false,
+      "stdout_tail": "{\n  \"output\": \"ufc_predictor\\\\data\\\\processed\\\\segment_evaluation_report.json\",\n  \"markdown_output\": \"docs\\\\segment_evaluation_report.md\",\n  \"models\": 9\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "registry_validation": {
+    "valid": true,
+    "missing_fields": {}
+  },
+  "leakage_risk": {
+    "classification_counts": {
+      "unknown_review_needed": 10282,
+      "leakage_excluded": 417,
+      "label_only": 27,
+      "runtime_available": 1221
+    },
+    "high_risk_review_needed": true,
+    "note": "Leakage columns in raw files are expected; the key is excluding them from features."
+  },
+  "final_summary_table": [
+    {
+      "model": "expert_signal_model",
+      "status": "blocked",
+      "rows_used": 0,
+      "main_metric": null,
+      "baseline": null,
+      "beats_baseline": null,
+      "leakage_risk": "unknown_review_needed",
+      "runtime_compatible": false,
+      "notes": "No verified pre-fight expert timestamped signal dataset is available."
+    },
+    {
+      "model": "finish_model",
+      "status": "trained",
+      "rows_used": 16268,
+      "main_metric": 0.5486,
+      "baseline": 0.5031,
+      "beats_baseline": true,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+    },
+    {
+      "model": "goes_distance_model",
+      "status": "trained",
+      "rows_used": 16268,
+      "main_metric": 0.5486,
+      "baseline": 0.5031,
+      "beats_baseline": true,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
+    },
+    {
+      "model": "method_model",
+      "status": "experimental",
+      "rows_used": 16268,
+      "main_metric": 0.2667,
+      "baseline": 0.4969,
+      "beats_baseline": false,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "odds_calibration_model",
+      "status": "blocked",
+      "rows_used": 0,
+      "main_metric": null,
+      "baseline": null,
+      "beats_baseline": null,
+      "leakage_risk": "unknown_review_needed",
+      "runtime_compatible": false,
+      "notes": "Historical odds snapshots are not available, so odds calibration/value modeling is blocked."
+    },
+    {
+      "model": "round_model",
+      "status": "experimental",
+      "rows_used": 16268,
+      "main_metric": 0.2382,
+      "baseline": 0.4969,
+      "beats_baseline": false,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "strike_volume_model",
+      "status": "experimental",
+      "rows_used": 8209,
+      "main_metric": 0.4093,
+      "baseline": 0.3806,
+      "beats_baseline": true,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "takedown_control_model",
+      "status": "experimental",
+      "rows_used": 8209,
+      "main_metric": 0.5219,
+      "baseline": 0.5542,
+      "beats_baseline": false,
+      "leakage_risk": "low",
+      "runtime_compatible": true,
+      "notes": "Validation is weak; treat this as an experimental model-supported read, not a confident prop projection."
+    },
+    {
+      "model": "winner_model",
+      "status": "blocked",
+      "rows_used": 16268,
+      "main_metric": null,
+      "baseline": null,
+      "beats_baseline": null,
+      "leakage_risk": "unknown_review_needed",
+      "runtime_compatible": false,
+      "notes": "Winner prediction already uses the existing sklearn/Elo pipeline; this pass does not retrain it."
+    }
+  ],
+  "notes": [
+    "Raw Kaggle/GitHub/manual/expert files are training inputs only and must not be committed.",
+    "Supabase remains the production database; deployed runtime should use Supabase plus small bundled artifacts."
+  ]
+}

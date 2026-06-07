@@ -1,0 +1,166 @@
+{
+  "models": [
+    {
+      "model": "expert_signal_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "finish_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "goes_distance_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "method_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "odds_calibration_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "round_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "strike_volume_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "takedown_control_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    },
+    {
+      "model": "winner_model",
+      "segment_metrics_available": false,
+      "segments_expected": [
+        "mens_heavyweight",
+        "mens_lightweight",
+        "womens_strawweight",
+        "womens_flyweight",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "odds_available",
+        "odds_missing",
+        "high_confidence",
+        "low_confidence"
+      ],
+      "reason": "Row-level validation predictions with segment labels are not saved yet."
+    }
+  ]
+}
