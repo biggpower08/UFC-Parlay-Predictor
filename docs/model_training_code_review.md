@@ -9,6 +9,52 @@ The training pipeline now separates label creation from fighter orientation, use
 - Target: `f1_wins_safe = 1` only when the safely oriented fighter 1 won.
 - Result: winner labels are no longer constant.
 
+## Winner Feature List Summary
+The winner model currently uses runtime-compatible pre-fight history, form, Elo availability/count, matchup-size context, and data-quality flags. The exact feature list is written in `docs/winner_model_leakage_audit.md`.
+
+Flagged review terms:
+- `a_prior_finishes`
+- `b_prior_finishes`
+
+Those are prior-history fields, not current-fight labels. Removing suspicious finish-named features did not collapse winner performance in the audit.
+
+## Source-Holdout Summary
+- `mdabbert_ultimate`: strong.
+- `ufc_1994_2025`: strong.
+- `ufc_1994_2026`: acceptable but weaker.
+- `ufc_fight_forecast`: weak transfer result.
+- `ufc_stats_complete`: insufficient safe winner rows in the holdout slice.
+
+Because source holdout is mixed, winner model cannot be marked `production_ready`.
+
+## Runtime Parity Summary
+Runtime parity passed for the current winner feature set. The live feature factory can generate all current winner features, but production use still depends on stable source-holdout and cold-start behavior.
+
+## Selective Prediction Policy
+High-confidence performance may be reported only with:
+- confidence threshold
+- row count
+- coverage percentage
+- accuracy
+- balanced accuracy
+- calibration gap
+- small-sample warning when applicable
+
+High-confidence accuracy must not be described as overall model accuracy.
+
+## Production Readiness Gates
+A model can only be `production_ready` if all gates pass:
+- beats chronological final-test baseline
+- leakage risk is low
+- duplicate/mirrored fight leakage is prevented
+- source-holdout performance is stable
+- runtime parity passes
+- calibration is acceptable
+- high-confidence performance is not tiny-sample noise
+- cold-start/low-history segments are not dangerously poor
+
+If source holdout fails while other metrics are strong, status must be `high_confidence_only` or `production_candidate`, not `production_ready`.
+
 ## Leakage Controls
 - Target/result columns are excluded from feature schemas.
 - Current-fight strike/takedown/method labels remain labels, not features.

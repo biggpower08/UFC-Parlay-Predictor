@@ -131,7 +131,7 @@ def main() -> int:
     write_json(Path(args.output_json), payload)
     Path(args.output_md).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output_md).write_text(markdown_report(payload), encoding="utf-8")
-    update_registry_with_evaluation(models)
+    update_registry_with_evaluation(models, split_report)
     print(json.dumps({"output_json": args.output_json, "output_md": args.output_md, "ranking": ranking}, indent=2, default=str))
     return 0
 
@@ -629,15 +629,16 @@ def feature_coverage(frame: pd.DataFrame, columns: list[str]) -> dict[str, float
     return {column: round(float(frame[column].notna().sum()) / rows, 4) if column in frame.columns else 0.0 for column in columns}
 
 
-def update_registry_with_evaluation(models):
+def update_registry_with_evaluation(models, split_report: dict | None = None):
     path = settings.MODEL_REGISTRY_JSON
     registry = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    winner_audit = load_winner_audit()
     now = datetime.now(timezone.utc).isoformat()
     for name, result in models.items():
         entry = registry.setdefault(name, {"model_name": name})
         selective = result.get("selective_prediction") or {}
         best_accuracy = selective.get("best_accuracy") or {}
-        production_status, production_reason = production_status_for_result(result)
+        gates = production_gate_result(name, result, split_report or {}, winner_audit)
         entry.update(
             {
                 "target": result.get("target"),
@@ -660,8 +661,12 @@ def update_registry_with_evaluation(models):
                 "best_high_conf_coverage": best_accuracy.get("coverage_percent"),
                 "leakage_risk": "low" if result.get("beats_baseline") else "review_needed",
                 "runtime_compatible": bool(result.get("feature_names")),
-                "production_status": production_status,
-                "production_status_reason": production_reason,
+                "production_status": gates["production_status"],
+                "production_status_reason": gates["production_status_reason"],
+                "passed_gates": gates["passed_gates"],
+                "failed_gates": gates["failed_gates"],
+                "recommended_use": gates["recommended_use"],
+                "public_warning_text": gates["public_warning_text"],
                 "calibration_status": "basic_probability_scores_only",
                 "segment_metrics_available": bool(result.get("segment_metrics")),
                 "evaluated_at": now,
@@ -670,7 +675,159 @@ def update_registry_with_evaluation(models):
         if not result.get("beats_baseline", False) and entry.get("status") == "trained":
             entry["status"] = "experimental"
             entry.setdefault("limitations", []).append("Final held-out evaluation did not clearly support production-ready status.")
+    backfill_registry_gate_fields(registry, models, split_report or {}, winner_audit, now)
     path.write_text(json.dumps(registry, indent=2, default=str), encoding="utf-8")
+
+
+def backfill_registry_gate_fields(registry: dict, models: dict, split_report: dict, winner_audit: dict, evaluated_at: str) -> None:
+    legacy_aliases = {"round_model": "round_phase_model"}
+    required_fields = {
+        "production_status",
+        "production_status_reason",
+        "failed_gates",
+        "passed_gates",
+        "recommended_use",
+        "public_warning_text",
+    }
+    for name, entry in registry.items():
+        if required_fields.issubset(entry):
+            continue
+        model_result = models.get(name) or models.get(legacy_aliases.get(name, ""))
+        if model_result:
+            gate_name = legacy_aliases.get(name, name)
+            gates = production_gate_result(gate_name, model_result, split_report, winner_audit)
+        else:
+            gates = gate_payload(
+                entry.get("production_status") or entry.get("status") or "not_trained",
+                entry.get("limitations") or ["No current evaluation result is available for this registry entry."],
+                [],
+                ["current_evaluation_missing"],
+                "research only",
+                "This model has not passed current production-readiness evaluation gates.",
+            )
+        entry.update(
+            {
+                "production_status": gates["production_status"],
+                "production_status_reason": gates["production_status_reason"],
+                "passed_gates": gates["passed_gates"],
+                "failed_gates": gates["failed_gates"],
+                "recommended_use": gates["recommended_use"],
+                "public_warning_text": gates["public_warning_text"],
+                "evaluated_at": entry.get("evaluated_at", evaluated_at),
+            }
+        )
+
+
+def load_winner_audit() -> dict:
+    path = settings.DATA_PROCESSED_DIR / "winner_model_leakage_audit.json"
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def production_gate_result(model_name: str, result: dict, split_report: dict | None = None, winner_audit: dict | None = None) -> dict:
+    split_report = split_report or {}
+    winner_audit = winner_audit or {}
+    passed: list[str] = []
+    failed: list[str] = []
+
+    if result.get("status") == "blocked":
+        return gate_payload(
+            "blocked",
+            result.get("limitations", ["Model is blocked."]),
+            passed,
+            ["model_blocked"],
+            "not available",
+            "This model is blocked until required data quality gates pass.",
+        )
+
+    _gate(bool(result.get("beats_baseline")), "beats_chronological_baseline", passed, failed)
+    _gate((result.get("metrics") or {}).get("balanced_accuracy", 0) >= 0.45, "balanced_accuracy_not_dangerously_low", passed, failed)
+    _gate(bool(split_report.get("no_cross_split_fight_leakage")), "duplicate_mirrored_fight_leakage_prevented", passed, failed)
+    _gate(bool(result.get("feature_names")), "runtime_feature_schema_exists", passed, failed)
+    _gate(calibration_is_acceptable(result), "calibration_acceptable", passed, failed)
+    _gate(high_confidence_not_tiny(result), "high_confidence_not_tiny_sample_noise", passed, failed)
+
+    if model_name == "winner_model":
+        audit_status = winner_audit.get("final_status", {})
+        _gate(bool(audit_status.get("leakage_scan_ok")), "winner_leakage_audit_passes", passed, failed)
+        _gate(bool(audit_status.get("runtime_parity_ok")), "runtime_parity_passes", passed, failed)
+        _gate(bool(audit_status.get("source_holdout_ok")), "source_holdout_stable", passed, failed)
+        _gate(bool(audit_status.get("low_history_ok")), "cold_start_low_history_not_dangerously_poor", passed, failed)
+        if audit_status.get("status") in {"high_confidence_only", "production_candidate"} and "source_holdout_stable" in passed:
+            failed.append("source_holdout_manual_review_required")
+    else:
+        failed.append("source_holdout_not_run")
+        if model_name == "odds_calibration_model":
+            failed.append("trusted_prefight_odds_timestamps_missing")
+
+    if "beats_chronological_baseline" not in passed:
+        status = "weak_or_failed_baseline"
+        recommended = "research only"
+        warning = "This model did not beat the chronological baseline and should not be used for user-facing confidence."
+    elif model_name == "odds_calibration_model" or "trusted_prefight_odds_timestamps_missing" in failed:
+        status = "blocked"
+        recommended = "not available"
+        warning = "Odds calibration is blocked until pre-fight odds timestamps are trusted."
+    elif not failed:
+        status = "production_ready"
+        recommended = "eligible for production after artifact deployment review"
+        warning = "Model passed automated production gates, but fight predictions remain uncertain."
+    elif model_name == "winner_model" and (
+        "source_holdout_stable" not in passed or "winner_leakage_audit_passes" not in passed
+    ):
+        status = "high_confidence_only"
+        recommended = "research/high-confidence selective predictions only"
+        warning = "Use only as selective model evidence; winner audit gates are not strong enough for production-ready status."
+    elif (result.get("metrics") or {}).get("balanced_accuracy", 0) >= 0.7 and "high_confidence_not_tiny_sample_noise" in passed:
+        status = "production_candidate"
+        recommended = "candidate for limited internal validation"
+        warning = "Model is promising but still has failed production gates."
+    else:
+        status = "experimental"
+        recommended = "research only"
+        warning = "Model has not passed enough production-readiness gates for public confidence claims."
+
+    return gate_payload(status, failed, passed, failed, recommended, warning)
+
+
+def gate_payload(status: str, reason_parts, passed: list[str], failed: list[str], recommended_use: str, warning: str) -> dict:
+    reasons = reason_parts if isinstance(reason_parts, list) else [str(reason_parts)]
+    return {
+        "production_status": status,
+        "production_status_reason": "; ".join(str(item) for item in reasons if item) or status,
+        "passed_gates": sorted(set(passed)),
+        "failed_gates": sorted(set(failed)),
+        "recommended_use": recommended_use,
+        "public_warning_text": warning,
+    }
+
+
+def _gate(condition: bool, name: str, passed: list[str], failed: list[str]) -> None:
+    if condition:
+        passed.append(name)
+    else:
+        failed.append(name)
+
+
+def calibration_is_acceptable(result: dict) -> bool:
+    metrics = result.get("metrics") or {}
+    brier = metrics.get("brier_score")
+    logloss = metrics.get("log_loss")
+    if brier is not None:
+        return brier <= 0.20
+    if logloss is not None:
+        return logloss <= 1.0
+    return False
+
+
+def high_confidence_not_tiny(result: dict) -> bool:
+    selective = result.get("selective_prediction") or {}
+    best = selective.get("best_accuracy") or {}
+    return int(best.get("sample_count") or 0) >= 100 and float(best.get("coverage_percent") or 0) >= 5
 
 
 def production_status_for_result(result: dict) -> tuple[str, str]:
@@ -733,6 +890,15 @@ def markdown_report(payload):
         best = selective.get("best_accuracy") or {}
         lines.append(
             f"| {name} | {best.get('bucket', '')} | {best.get('sample_count', '')} | {best.get('coverage_percent', '')} | {best.get('accuracy', '')} | {best.get('balanced_accuracy', '')} | {best.get('average_confidence', '')} | {best.get('calibration_gap', '')} | {selective.get('reaches_80_accuracy', False)} | {selective.get('reaches_95_balanced_accuracy', False)} |"
+        )
+    lines.extend(["", "## Production Readiness Gates"])
+    lines.append("| Model | Production Status | Passed Gates | Failed Gates | Recommended Use |")
+    lines.append("|---|---|---|---|---|")
+    winner_audit = load_winner_audit()
+    for name, model in payload["models"].items():
+        gates = production_gate_result(name, model, payload.get("split", {}), winner_audit)
+        lines.append(
+            f"| {name} | {gates['production_status']} | {', '.join(gates['passed_gates'])} | {', '.join(gates['failed_gates'])} | {gates['recommended_use']} |"
         )
     return "\n".join(lines).strip() + "\n"
 

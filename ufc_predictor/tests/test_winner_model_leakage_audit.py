@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 from scripts.audit_winner_model_leakage import classify_feature, final_status, leakage_scan, runtime_parity_report
-from scripts.evaluate_model_accuracy import chronological_train_validation_test_split
+from scripts.evaluate_model_accuracy import chronological_train_validation_test_split, production_gate_result
 from ufc_predictor.training.deduping import stable_fight_key
 
 
@@ -65,6 +65,108 @@ def test_winner_model_cannot_be_production_ready_when_runtime_parity_fails():
     assert status["status"] == "high_confidence_only"
 
 
+def test_source_holdout_weakness_blocks_production_ready():
+    result = {
+        "status": "evaluated",
+        "beats_baseline": True,
+        "feature_names": ["a_prior_fights"],
+        "test_rows": 1000,
+        "metrics": {"balanced_accuracy": 0.9, "brier_score": 0.1, "log_loss": 0.3},
+        "selective_prediction": {"best_accuracy": {"sample_count": 200, "coverage_percent": 20}},
+    }
+    split = {"no_cross_split_fight_leakage": True}
+    audit = {
+        "final_status": {
+            "leakage_scan_ok": True,
+            "runtime_parity_ok": True,
+            "source_holdout_ok": False,
+            "low_history_ok": True,
+        }
+    }
+
+    gates = production_gate_result("winner_model", result, split, audit)
+
+    assert gates["production_status"] == "high_confidence_only"
+    assert "source_holdout_stable" in gates["failed_gates"]
+    assert gates["public_warning_text"]
+
+
+def test_high_confidence_only_status_is_allowed_when_manual_review_gate_fails():
+    result = {
+        "status": "evaluated",
+        "beats_baseline": True,
+        "feature_names": ["a_prior_fights"],
+        "test_rows": 1000,
+        "metrics": {"balanced_accuracy": 0.9, "brier_score": 0.1, "log_loss": 0.3},
+        "selective_prediction": {"best_accuracy": {"sample_count": 200, "coverage_percent": 20}},
+    }
+    split = {"no_cross_split_fight_leakage": True}
+    audit = {
+        "final_status": {
+            "leakage_scan_ok": True,
+            "runtime_parity_ok": True,
+            "source_holdout_ok": True,
+            "low_history_ok": True,
+            "status": "high_confidence_only",
+        }
+    }
+
+    gates = production_gate_result("winner_model", result, split, audit)
+
+    assert gates["production_status"] == "production_candidate"
+    assert "source_holdout_manual_review_required" in gates["failed_gates"]
+
+
+def test_winner_leakage_audit_blocks_production_ready():
+    result = {
+        "status": "evaluated",
+        "beats_baseline": True,
+        "feature_names": ["a_prior_fights"],
+        "test_rows": 1000,
+        "metrics": {"balanced_accuracy": 0.9, "brier_score": 0.1, "log_loss": 0.3},
+        "selective_prediction": {"best_accuracy": {"sample_count": 200, "coverage_percent": 20}},
+    }
+    split = {"no_cross_split_fight_leakage": True}
+    audit = {
+        "final_status": {
+            "leakage_scan_ok": False,
+            "runtime_parity_ok": True,
+            "source_holdout_ok": True,
+            "low_history_ok": True,
+        }
+    }
+
+    gates = production_gate_result("winner_model", result, split, audit)
+
+    assert gates["production_status"] == "high_confidence_only"
+    assert "winner_leakage_audit_passes" in gates["failed_gates"]
+
+
+def test_weak_and_odds_models_get_blocked_or_experimental_gate_statuses():
+    weak = production_gate_result(
+        "round_phase_model",
+        {
+            "status": "weak_or_failed_baseline",
+            "beats_baseline": False,
+            "feature_names": ["a_prior_fights"],
+            "metrics": {"balanced_accuracy": 0.3, "log_loss": 1.2},
+            "selective_prediction": {"best_accuracy": {"sample_count": 200, "coverage_percent": 20}},
+        },
+        {"no_cross_split_fight_leakage": True},
+        {},
+    )
+    odds = production_gate_result(
+        "odds_calibration_model",
+        {"status": "blocked", "limitations": ["Pre-fight odds timestamps are not trusted."]},
+        {"no_cross_split_fight_leakage": True},
+        {},
+    )
+
+    assert weak["production_status"] == "weak_or_failed_baseline"
+    assert odds["production_status"] == "blocked"
+    assert "model_blocked" in odds["failed_gates"]
+
+
 def test_committed_winner_audit_report_shape_if_present():
     path = Path("ufc_predictor/data/processed/winner_model_leakage_audit.json")
     if not path.is_file():
@@ -75,3 +177,16 @@ def test_committed_winner_audit_report_shape_if_present():
     assert "source_holdout_results" in report
     assert any(item["variant"] == "shuffle_label_sanity_check" for item in report["ablation_results"])
     assert "runtime_parity" in report
+
+
+def test_registry_entries_have_production_gate_fields_if_present():
+    path = Path("ufc_predictor/data/processed/model_registry.json")
+    if not path.is_file():
+        return
+    registry = json.loads(path.read_text(encoding="utf-8"))
+    for name, entry in registry.items():
+        assert entry.get("production_status_reason"), name
+        assert "failed_gates" in entry, name
+        assert "passed_gates" in entry, name
+        if entry.get("production_status") == "high_confidence_only":
+            assert entry.get("public_warning_text"), name

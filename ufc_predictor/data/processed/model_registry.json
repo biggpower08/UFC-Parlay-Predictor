@@ -118,7 +118,7 @@
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -130,7 +130,7 @@
     "backtest_relative_improvement": 0.3146,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": "finish_binary",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 40,
@@ -232,8 +232,21 @@
     "best_high_conf_accuracy": 0.9301,
     "best_high_conf_balanced_accuracy": 0.9297,
     "best_high_conf_coverage": 53.06,
-    "production_status": "high_confidence_only",
-    "production_status_reason": "Beats baseline with useful held-out performance; use selectively until artifact/runtime validation is complete."
+    "production_status": "production_candidate",
+    "production_status_reason": "source_holdout_not_run",
+    "passed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "calibration_acceptable",
+      "duplicate_mirrored_fight_leakage_prevented",
+      "high_confidence_not_tiny_sample_noise",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "candidate for limited internal validation",
+    "public_warning_text": "Model is promising but still has failed production gates."
   },
   "goes_distance_model": {
     "model_name": "goes_distance_model",
@@ -354,7 +367,7 @@
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -366,7 +379,7 @@
     "backtest_relative_improvement": 0.3146,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": "goes_distance_binary",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 40,
@@ -468,8 +481,21 @@
     "best_high_conf_accuracy": 0.9262,
     "best_high_conf_balanced_accuracy": 0.9257,
     "best_high_conf_coverage": 53.87,
-    "production_status": "high_confidence_only",
-    "production_status_reason": "Beats baseline with useful held-out performance; use selectively until artifact/runtime validation is complete."
+    "production_status": "production_candidate",
+    "production_status_reason": "source_holdout_not_run",
+    "passed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "calibration_acceptable",
+      "duplicate_mirrored_fight_leakage_prevented",
+      "high_confidence_not_tiny_sample_noise",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "candidate for limited internal validation",
+    "public_warning_text": "Model is promising but still has failed production gates."
   },
   "method_model": {
     "model_name": "method_model",
@@ -615,7 +641,7 @@
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -627,7 +653,7 @@
     "backtest_relative_improvement": 0.1515,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": "method_class",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 40,
@@ -742,7 +768,20 @@
     "best_high_conf_balanced_accuracy": 0.4786,
     "best_high_conf_coverage": 30.33,
     "production_status": "experimental",
-    "production_status_reason": "Beats baseline but balanced accuracy or sample support is still limited."
+    "production_status_reason": "source_holdout_not_run",
+    "passed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "calibration_acceptable",
+      "duplicate_mirrored_fight_leakage_prevented",
+      "high_confidence_not_tiny_sample_noise",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "research only",
+    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims."
   },
   "round_model": {
     "model_name": "round_model",
@@ -848,7 +887,23 @@
       "Balanced accuracy is weak, so this model should not drive confident public wording yet.",
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
-    "trained_at": "2026-06-07T03:55:42.870309+00:00"
+    "trained_at": "2026-06-07T03:55:42.870309+00:00",
+    "production_status": "weak_or_failed_baseline",
+    "production_status_reason": "beats_chronological_baseline; balanced_accuracy_not_dangerously_low; calibration_acceptable; source_holdout_not_run",
+    "passed_gates": [
+      "duplicate_mirrored_fight_leakage_prevented",
+      "high_confidence_not_tiny_sample_noise",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "calibration_acceptable",
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "research only",
+    "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence.",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00"
   },
   "strike_volume_model": {
     "model_name": "strike_volume_model",
@@ -981,7 +1036,7 @@
     "beats_baseline": true,
     "test_rows": 1322,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": true,
     "backtest_fights": 1322,
     "backtest_date_range": {
@@ -993,7 +1048,7 @@
     "backtest_relative_improvement": 0.0757,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": "combined_strike_volume_bucket",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 40,
@@ -1102,7 +1157,20 @@
     "best_high_conf_balanced_accuracy": 0.4167,
     "best_high_conf_coverage": 4.16,
     "production_status": "experimental",
-    "production_status_reason": "Beats baseline but balanced accuracy or sample support is still limited."
+    "production_status_reason": "balanced_accuracy_not_dangerously_low; calibration_acceptable; high_confidence_not_tiny_sample_noise; source_holdout_not_run",
+    "passed_gates": [
+      "beats_chronological_baseline",
+      "duplicate_mirrored_fight_leakage_prevented",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "calibration_acceptable",
+      "high_confidence_not_tiny_sample_noise",
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "research only",
+    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims."
   },
   "takedown_control_model": {
     "model_name": "takedown_control_model",
@@ -1225,7 +1293,7 @@
     "beats_baseline": true,
     "test_rows": 2486,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": true,
     "backtest_fights": 2486,
     "backtest_date_range": {
@@ -1237,7 +1305,7 @@
     "backtest_relative_improvement": 0.0076,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": "grappling_heavy_binary",
     "algorithm": "random_forest_balanced",
     "feature_count": 40,
@@ -1340,7 +1408,20 @@
     "best_high_conf_balanced_accuracy": 0.5178,
     "best_high_conf_coverage": 8.73,
     "production_status": "experimental",
-    "production_status_reason": "Beats baseline but balanced accuracy or sample support is still limited."
+    "production_status_reason": "calibration_acceptable; source_holdout_not_run",
+    "passed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "duplicate_mirrored_fight_leakage_prevented",
+      "high_confidence_not_tiny_sample_noise",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "calibration_acceptable",
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "research only",
+    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims."
   },
   "winner_model": {
     "model_name": "winner_model",
@@ -1439,7 +1520,7 @@
     "beats_baseline": true,
     "test_rows": 3327,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": true,
     "backtest_fights": 3327,
     "backtest_date_range": {
@@ -1451,7 +1532,7 @@
     "backtest_relative_improvement": 0.3892,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": "f1_wins_safe",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 40,
@@ -1554,13 +1635,29 @@
     "best_high_conf_balanced_accuracy": 0.9722,
     "best_high_conf_coverage": 75.65,
     "production_status": "high_confidence_only",
-    "production_status_reason": "Do not mark production_ready until runtime parity, source holdout, cold-start, and calibration are reviewed together.",
+    "production_status_reason": "winner_leakage_audit_passes; source_holdout_stable",
     "leakage_audit_report": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\winner_model_leakage_audit.json",
     "winner_leakage_audit_status": "high_confidence_only",
     "runtime_parity": true,
-    "source_holdout_ok": true,
+    "source_holdout_ok": false,
     "low_history_ok": true,
-    "audited_at": "2026-06-07T18:40:15.777535+00:00"
+    "audited_at": "2026-06-07T19:00:26.235437+00:00",
+    "passed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "calibration_acceptable",
+      "cold_start_low_history_not_dangerously_poor",
+      "duplicate_mirrored_fight_leakage_prevented",
+      "high_confidence_not_tiny_sample_noise",
+      "runtime_feature_schema_exists",
+      "runtime_parity_passes"
+    ],
+    "failed_gates": [
+      "source_holdout_stable",
+      "winner_leakage_audit_passes"
+    ],
+    "recommended_use": "research/high-confidence selective predictions only",
+    "public_warning_text": "Use only as selective model evidence; winner audit gates are not strong enough for production-ready status."
   },
   "odds_calibration_model": {
     "model_name": "odds_calibration_model",
@@ -1618,7 +1715,7 @@
     "beats_baseline": false,
     "test_rows": 0,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": false,
     "backtest_fights": 0,
     "backtest_date_range": {
@@ -1630,7 +1727,7 @@
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "Trusted pre-fight odds snapshots are not available.",
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": null,
     "algorithm": null,
     "feature_count": 0,
@@ -1642,7 +1739,13 @@
     "best_high_conf_balanced_accuracy": null,
     "best_high_conf_coverage": null,
     "production_status": "blocked",
-    "production_status_reason": "Pre-fight odds snapshots are not yet safely matched to outcomes and timestamps."
+    "production_status_reason": "Pre-fight odds snapshots are not yet safely matched to outcomes and timestamps.",
+    "passed_gates": [],
+    "failed_gates": [
+      "model_blocked"
+    ],
+    "recommended_use": "not available",
+    "public_warning_text": "This model is blocked until required data quality gates pass."
   },
   "round_phase_model": {
     "model_name": "round_phase_model",
@@ -1655,7 +1758,7 @@
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -1667,7 +1770,7 @@
     "backtest_relative_improvement": -0.2019,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-07T18:18:02.380634+00:00",
+    "backtested_at": "2026-06-07T19:10:56.945416+00:00",
     "target": "round_phase_class",
     "algorithm": "logistic_regression_balanced",
     "feature_count": 40,
@@ -1831,8 +1934,21 @@
     "best_high_conf_coverage": 21.05,
     "leakage_risk": "review_needed",
     "runtime_compatible": true,
-    "production_status": "experimental",
-    "production_status_reason": "Does not beat final held-out baseline."
+    "production_status": "weak_or_failed_baseline",
+    "production_status_reason": "beats_chronological_baseline; balanced_accuracy_not_dangerously_low; calibration_acceptable; source_holdout_not_run",
+    "passed_gates": [
+      "duplicate_mirrored_fight_leakage_prevented",
+      "high_confidence_not_tiny_sample_noise",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "calibration_acceptable",
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "research only",
+    "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence."
   },
   "strike_volume_regression": {
     "model_name": "strike_volume_regression",
@@ -1845,7 +1961,7 @@
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": false,
-    "evaluated_at": "2026-06-07T18:21:01.816094+00:00",
+    "evaluated_at": "2026-06-07T19:08:58.140975+00:00",
     "target": "combined_sig_strikes",
     "algorithm": null,
     "feature_count": 8,
@@ -1868,7 +1984,20 @@
     "best_high_conf_coverage": null,
     "leakage_risk": "review_needed",
     "runtime_compatible": true,
-    "production_status": "experimental",
-    "production_status_reason": "Does not beat final held-out baseline."
+    "production_status": "weak_or_failed_baseline",
+    "production_status_reason": "beats_chronological_baseline; balanced_accuracy_not_dangerously_low; calibration_acceptable; high_confidence_not_tiny_sample_noise; source_holdout_not_run",
+    "passed_gates": [
+      "duplicate_mirrored_fight_leakage_prevented",
+      "runtime_feature_schema_exists"
+    ],
+    "failed_gates": [
+      "balanced_accuracy_not_dangerously_low",
+      "beats_chronological_baseline",
+      "calibration_acceptable",
+      "high_confidence_not_tiny_sample_noise",
+      "source_holdout_not_run"
+    ],
+    "recommended_use": "research only",
+    "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence."
   }
 }

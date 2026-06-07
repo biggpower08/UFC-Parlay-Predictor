@@ -22,6 +22,18 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 | round_phase_model | 3696 | 0.3122 | 0.5141 | -0.2019 | False | weak_or_failed_baseline |
 | odds_calibration_model | 0 |  |  |  | False | skipped |
 
+## Production Readiness Gates
+| Model | Production Status | Failed Gates | Public Warning |
+|---|---|---|---|
+| odds_calibration_model | blocked | model_blocked | This model is blocked until required data quality gates pass. |
+| winner_model | high_confidence_only | source_holdout_stable, winner_leakage_audit_passes | Use only as selective model evidence; winner audit gates are not strong enough for production-ready status. |
+| finish_model | production_candidate | source_holdout_not_run | Model is promising but still has failed production gates. |
+| goes_distance_model | production_candidate | source_holdout_not_run | Model is promising but still has failed production gates. |
+| method_model | experimental | source_holdout_not_run | Model has not passed enough production-readiness gates for public confidence claims. |
+| round_phase_model | weak_or_failed_baseline | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, calibration_acceptable, source_holdout_not_run | This model did not beat the chronological baseline and should not be used for user-facing confidence. |
+| strike_volume_model | experimental | balanced_accuracy_not_dangerously_low, calibration_acceptable, high_confidence_not_tiny_sample_noise, source_holdout_not_run | Model has not passed enough production-readiness gates for public confidence claims. |
+| takedown_control_model | experimental | calibration_acceptable, source_holdout_not_run | Model has not passed enough production-readiness gates for public confidence claims. |
+
 ## Models Not Run
 - `odds_calibration_model`: Trusted pre-fight odds snapshots are not available.
 

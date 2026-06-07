@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-07T18:18:02.380634+00:00",
+  "generated_at": "2026-06-07T19:10:56.945416+00:00",
   "summary": {
     "fights_simulated": 5537,
     "date_range": {
@@ -110,22 +110,22 @@
       "a_prior_finishes",
       "b_prior_finishes",
       "loser",
-      "fighter_b_sig_strikes",
-      "method",
-      "method_class",
-      "round_phase_class",
-      "finish_time",
-      "method_group",
-      "result",
-      "fighter_a_sig_strikes",
-      "fighter_a_takedowns",
-      "winner",
-      "finish_binary",
       "fighter_b_takedowns",
-      "finish_round",
-      "takedown_control_bucket",
+      "fighter_b_sig_strikes",
+      "method_group",
+      "fighter_a_sig_strikes",
+      "finish_binary",
+      "method_class",
+      "result",
+      "winner",
+      "method",
+      "goes_distance_binary",
       "combined_sig_strikes",
-      "goes_distance_binary"
+      "finish_time",
+      "finish_round",
+      "fighter_a_takedowns",
+      "takedown_control_bucket",
+      "round_phase_class"
     ]
   },
   "models": {

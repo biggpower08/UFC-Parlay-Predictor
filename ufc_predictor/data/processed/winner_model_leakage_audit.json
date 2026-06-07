@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-07T18:40:15.777535+00:00",
+  "generated_at": "2026-06-07T19:00:26.235437+00:00",
   "input_data": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\imports\\normalized_fights_combined.csv",
   "training_audit": {
     "source": "imported_csv",
@@ -5135,7 +5135,8 @@
     "status": "high_confidence_only",
     "runtime_parity_ok": true,
     "leakage_scan_ok": false,
-    "source_holdout_ok": true,
+    "source_holdout_ok": false,
+    "source_holdout_min_balanced_accuracy": 0.65,
     "low_history_ok": true,
     "reason": "Do not mark production_ready until runtime parity, source holdout, cold-start, and calibration are reviewed together."
   }

@@ -285,7 +285,12 @@ def target_distribution(dataset: pd.DataFrame) -> dict[str, int]:
 def final_status(payload: dict[str, Any], full: dict[str, Any]) -> dict[str, Any]:
     runtime_ok = payload["runtime_parity"]["runtime_compatible"]
     leakage_ok = payload["leakage_scan"]["passed"] and not payload["leakage_scan"]["suspicious_review_needed"]
-    source_ok = all(result.get("metrics", {}).get("balanced_accuracy", 0) >= 0.55 for result in payload["source_holdout_results"] if result.get("status") != "insufficient_rows")
+    source_holdout_min_balanced_accuracy = 0.65
+    source_ok = all(
+        result.get("metrics", {}).get("balanced_accuracy", 0) >= source_holdout_min_balanced_accuracy
+        for result in payload["source_holdout_results"]
+        if result.get("status") != "insufficient_rows"
+    )
     cold_ok = payload["stress_tests"].get("low_history_any_fighter_under_3", {}).get("metrics", {}).get("balanced_accuracy", 0) >= 0.55
     if runtime_ok and leakage_ok and source_ok and cold_ok and full["metrics"]["balanced_accuracy"] >= 0.7:
         status = "production_candidate"
@@ -298,6 +303,7 @@ def final_status(payload: dict[str, Any], full: dict[str, Any]) -> dict[str, Any
         "runtime_parity_ok": runtime_ok,
         "leakage_scan_ok": leakage_ok,
         "source_holdout_ok": source_ok,
+        "source_holdout_min_balanced_accuracy": source_holdout_min_balanced_accuracy,
         "low_history_ok": cold_ok,
         "reason": "Do not mark production_ready until runtime parity, source holdout, cold-start, and calibration are reviewed together.",
     }

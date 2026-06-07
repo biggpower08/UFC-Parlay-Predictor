@@ -83,7 +83,8 @@ Winner model audit status: `high_confidence_only`. This report treats the high w
   "status": "high_confidence_only",
   "runtime_parity_ok": true,
   "leakage_scan_ok": false,
-  "source_holdout_ok": true,
+  "source_holdout_ok": false,
+  "source_holdout_min_balanced_accuracy": 0.65,
   "low_history_ok": true,
   "reason": "Do not mark production_ready until runtime parity, source holdout, cold-start, and calibration are reviewed together."
 }

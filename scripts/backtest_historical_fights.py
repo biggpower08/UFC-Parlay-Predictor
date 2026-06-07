@@ -411,6 +411,7 @@ def update_registry_with_backtest(payload: dict[str, Any]) -> None:
 
 
 def markdown_report(payload: dict[str, Any], predictions: list[dict[str, Any]]) -> str:
+    registry = load_registry()
     lines = [
         "# Historical Fight Backtest Report",
         "",
@@ -431,6 +432,12 @@ def markdown_report(payload: dict[str, Any], predictions: list[dict[str, Any]]) 
     for item in payload["overall_ranking"]:
         model = payload["models"][item["model"]]
         lines.append(f"| {item['model']} | {model.get('fights_tested', 0)} | {model.get('main_metric', '')} | {model.get('baseline_metric', '')} | {model.get('relative_improvement', '')} | {model.get('beats_baseline', False)} | {model.get('status')} |")
+    lines.extend(["", "## Production Readiness Gates"])
+    lines.append("| Model | Production Status | Failed Gates | Public Warning |")
+    lines.append("|---|---|---|---|")
+    for name in payload["models"]:
+        entry = registry.get(name, {})
+        lines.append(f"| {name} | {entry.get('production_status', 'not_evaluated')} | {', '.join(entry.get('failed_gates', []))} | {entry.get('public_warning_text', '')} |")
     lines.extend(["", "## Models Not Run"])
     for name, reason in payload["summary"]["models_skipped"].items():
         lines.append(f"- `{name}`: {reason}")
@@ -451,6 +458,16 @@ def markdown_report(payload: dict[str, Any], predictions: list[dict[str, Any]]) 
                 lines.append(f"- {segment}: {metrics}")
     lines.extend(["", "## Next Steps", "- Improve safe winner-model orientation before backtesting winner probabilities.", "- Add trusted pre-fight odds timestamps before odds calibration.", "- Keep weak models out of production-ready status until they beat baseline."])
     return "\n".join(lines).strip() + "\n"
+
+
+def load_registry() -> dict[str, Any]:
+    path = settings.MODEL_REGISTRY_JSON
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
 
 
 def debug_fight(predictions: list[dict[str, Any]], fight_id_value: str) -> dict[str, Any] | None:

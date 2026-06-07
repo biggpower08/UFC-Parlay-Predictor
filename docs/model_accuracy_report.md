@@ -209,3 +209,16 @@ Models were evaluated on the newest chronological holdout from normalized histor
 | takedown_control_model | >=80% | 217 | 8.73 | 0.7742 | 0.5178 | 0.8442 | 0.07 | False | False |
 | strike_volume_regression |  |  |  |  |  |  |  | False | False |
 | odds_calibration_model |  |  |  |  |  |  |  | False | False |
+
+## Production Readiness Gates
+| Model | Production Status | Passed Gates | Failed Gates | Recommended Use |
+|---|---|---|---|---|
+| winner_model | high_confidence_only | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, calibration_acceptable, cold_start_low_history_not_dangerously_poor, duplicate_mirrored_fight_leakage_prevented, high_confidence_not_tiny_sample_noise, runtime_feature_schema_exists, runtime_parity_passes | source_holdout_stable, winner_leakage_audit_passes | research/high-confidence selective predictions only |
+| finish_model | production_candidate | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, calibration_acceptable, duplicate_mirrored_fight_leakage_prevented, high_confidence_not_tiny_sample_noise, runtime_feature_schema_exists | source_holdout_not_run | candidate for limited internal validation |
+| goes_distance_model | production_candidate | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, calibration_acceptable, duplicate_mirrored_fight_leakage_prevented, high_confidence_not_tiny_sample_noise, runtime_feature_schema_exists | source_holdout_not_run | candidate for limited internal validation |
+| method_model | experimental | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, calibration_acceptable, duplicate_mirrored_fight_leakage_prevented, high_confidence_not_tiny_sample_noise, runtime_feature_schema_exists | source_holdout_not_run | research only |
+| round_phase_model | weak_or_failed_baseline | duplicate_mirrored_fight_leakage_prevented, high_confidence_not_tiny_sample_noise, runtime_feature_schema_exists | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, calibration_acceptable, source_holdout_not_run | research only |
+| strike_volume_model | experimental | beats_chronological_baseline, duplicate_mirrored_fight_leakage_prevented, runtime_feature_schema_exists | balanced_accuracy_not_dangerously_low, calibration_acceptable, high_confidence_not_tiny_sample_noise, source_holdout_not_run | research only |
+| takedown_control_model | experimental | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, duplicate_mirrored_fight_leakage_prevented, high_confidence_not_tiny_sample_noise, runtime_feature_schema_exists | calibration_acceptable, source_holdout_not_run | research only |
+| strike_volume_regression | weak_or_failed_baseline | duplicate_mirrored_fight_leakage_prevented, runtime_feature_schema_exists | balanced_accuracy_not_dangerously_low, beats_chronological_baseline, calibration_acceptable, high_confidence_not_tiny_sample_noise, source_holdout_not_run | research only |
+| odds_calibration_model | blocked |  | model_blocked | not available |
