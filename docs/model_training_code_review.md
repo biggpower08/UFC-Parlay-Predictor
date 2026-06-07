@@ -31,3 +31,5 @@ The training pipeline now separates label creation from fighter orientation, use
 - Source duplicate quality still needs periodic auditing.
 - Odds rows are not production-training-ready without trusted pre-fight timestamps.
 - Method and round-phase labels need better target decomposition before public confidence claims.
+- Winner model source-transfer is not uniformly strong; the red-team audit found `ufc_fight_forecast` holdout weakness.
+- High-confidence winner performance should be used as selective evidence only until source-holdout stability is improved.

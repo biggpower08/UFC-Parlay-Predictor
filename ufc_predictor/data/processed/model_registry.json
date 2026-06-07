@@ -1554,7 +1554,13 @@
     "best_high_conf_balanced_accuracy": 0.9722,
     "best_high_conf_coverage": 75.65,
     "production_status": "high_confidence_only",
-    "production_status_reason": "Beats baseline with useful held-out performance; use selectively until artifact/runtime validation is complete."
+    "production_status_reason": "Do not mark production_ready until runtime parity, source holdout, cold-start, and calibration are reviewed together.",
+    "leakage_audit_report": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\winner_model_leakage_audit.json",
+    "winner_leakage_audit_status": "high_confidence_only",
+    "runtime_parity": true,
+    "source_holdout_ok": true,
+    "low_history_ok": true,
+    "audited_at": "2026-06-07T18:40:15.777535+00:00"
   },
   "odds_calibration_model": {
     "model_name": "odds_calibration_model",

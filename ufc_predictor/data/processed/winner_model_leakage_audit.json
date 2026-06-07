@@ -1,0 +1,5142 @@
+{
+  "generated_at": "2026-06-07T18:40:15.777535+00:00",
+  "input_data": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\imports\\normalized_fights_combined.csv",
+  "training_audit": {
+    "source": "imported_csv",
+    "fight_rows": 49355,
+    "fighter_count": 2804,
+    "feature_count": 81,
+    "date_range": {
+      "min": "1993-11-12",
+      "max": "2026-05-16"
+    },
+    "source_coverage": {
+      "raw_rows": 49355,
+      "has_event_history": true,
+      "has_fight_results": true,
+      "has_method_round_time": true,
+      "has_event_date": true,
+      "has_significant_strike_totals": true,
+      "has_takedown_control_labels": true
+    },
+    "label_availability": {
+      "winner": 32140,
+      "finish_binary": 49355,
+      "goes_distance_binary": 49355,
+      "method_class": 49355,
+      "round_number": 48720,
+      "round_phase_class": 49355,
+      "fighter_a_sig_strikes": 33530,
+      "fighter_b_sig_strikes": 33530,
+      "combined_sig_strikes": 33530,
+      "fighter_a_strike_volume_bucket": 0,
+      "fighter_b_strike_volume_bucket": 0,
+      "combined_strike_volume_bucket": 33530,
+      "fighter_a_50plus_sig_strikes": 33530,
+      "fighter_b_50plus_sig_strikes": 33530,
+      "combined_100plus_sig_strikes": 33530,
+      "fighter_a_takedowns": 42081,
+      "fighter_b_takedowns": 42081,
+      "fighter_a_takedown_1plus": 42081,
+      "fighter_b_takedown_1plus": 42081,
+      "grappling_heavy_binary": 42081,
+      "takedown_control_bucket": 42081
+    },
+    "class_distributions": {
+      "finish_binary": {
+        "1": 26244,
+        "0": 23111
+      },
+      "goes_distance_binary": {
+        "0": 26244,
+        "1": 23111
+      },
+      "method_class": {
+        "Submission": 9469,
+        "KO/TKO": 16019,
+        "Other": 756,
+        "Decision": 23111
+      },
+      "round_phase_class": {
+        "early": 13510,
+        "middle": 11803,
+        "decision": 23111,
+        "late": 486,
+        "unknown": 445
+      },
+      "combined_strike_volume_bucket": {
+        "low": 14009,
+        "medium": 10534,
+        "high": 8987
+      },
+      "grappling_heavy_binary": {
+        "0.0": 24105,
+        "1.0": 17976
+      }
+    },
+    "missingness_report": {
+      "a_prior_fights": 0,
+      "b_prior_fights": 0,
+      "a_prior_wins": 0,
+      "b_prior_wins": 0,
+      "a_prior_finishes": 0,
+      "b_prior_finishes": 0,
+      "a_prior_decisions": 0,
+      "b_prior_decisions": 0,
+      "fighter_1_age": 49355,
+      "fighter_2_age": 49355,
+      "age_diff": 49355,
+      "fighter_1_height": 49355,
+      "fighter_2_height": 49355,
+      "height_diff": 49355,
+      "fighter_1_reach": 49355,
+      "fighter_2_reach": 49355,
+      "reach_diff": 49355,
+      "fighter_1_stance_known": 0,
+      "fighter_2_stance_known": 0,
+      "fighter_1_history_count": 0,
+      "fighter_2_history_count": 0,
+      "minimum_history_count": 0,
+      "fighter_1_win_rate_before": 1399,
+      "fighter_2_win_rate_before": 1405,
+      "win_rate_diff": 2301,
+      "fighter_1_finish_win_rate_before": 7329,
+      "fighter_2_finish_win_rate_before": 7024,
+      "finish_rate_diff": 13187,
+      "fighter_1_decision_win_rate_before": 7329,
+      "fighter_2_decision_win_rate_before": 7024,
+      "decision_rate_diff": 13187,
+      "fighter_1_ko_tko_win_rate_before": 49355,
+      "fighter_2_ko_tko_win_rate_before": 49355,
+      "ko_tko_rate_diff": 49355,
+      "fighter_1_submission_win_rate_before": 49355,
+      "fighter_2_submission_win_rate_before": 49355,
+      "submission_rate_diff": 49355,
+      "fighter_1_finish_loss_rate_before": 49355,
+      "fighter_2_finish_loss_rate_before": 49355,
+      "fighter_1_decision_loss_rate_before": 49355,
+      "fighter_2_decision_loss_rate_before": 49355,
+      "fighter_1_recent_3_win_rate": 49355,
+      "fighter_2_recent_3_win_rate": 49355,
+      "recent_3_win_rate_diff": 49355,
+      "fighter_1_recent_5_win_rate": 49355,
+      "fighter_2_recent_5_win_rate": 49355,
+      "recent_5_win_rate_diff": 49355,
+      "fighter_1_recent_3_finish_rate": 49355,
+      "fighter_2_recent_3_finish_rate": 49355,
+      "fighter_1_recent_5_finish_rate": 49355,
+      "fighter_2_recent_5_finish_rate": 49355,
+      "fighter_1_days_since_last_fight": 49355,
+      "fighter_2_days_since_last_fight": 49355,
+      "days_since_last_fight_diff": 49355,
+      "fighter_1_fights_last_12_months": 49355,
+      "fighter_2_fights_last_12_months": 49355,
+      "fighter_1_fights_last_24_months": 49355,
+      "fighter_2_fights_last_24_months": 49355,
+      "fighter_1_elo_before_fight": 49355,
+      "fighter_2_elo_before_fight": 49355,
+      "elo_diff": 49355,
+      "elo_expected_fighter_1": 49355,
+      "fighter_1_elo_fights_count_before": 0,
+      "fighter_2_elo_fights_count_before": 0,
+      "fighter_1_elo_available": 0,
+      "fighter_2_elo_available": 0,
+      "same_division": 0,
+      "cross_division": 0,
+      "catchweight": 0,
+      "weight_class_gap": 573,
+      "estimated_weight_gap_lbs": 573,
+      "height_gap": 0,
+      "reach_gap": 0,
+      "unknown_size_context": 0,
+      "size_context_quality": 0,
+      "pound_for_pound_mode": 0,
+      "size_features_used": 0,
+      "low_sample_warning": 0,
+      "missing_profile_warning": 0,
+      "missing_stats_warning": 0,
+      "cross_division_warning": 0,
+      "winner": 17215,
+      "finish_binary": 0,
+      "goes_distance_binary": 0,
+      "method_class": 0,
+      "round_number": 635,
+      "round_phase_class": 0,
+      "fighter_a_sig_strikes": 15825,
+      "fighter_b_sig_strikes": 15825,
+      "combined_sig_strikes": 15825,
+      "fighter_a_strike_volume_bucket": 49355,
+      "fighter_b_strike_volume_bucket": 49355,
+      "combined_strike_volume_bucket": 15825,
+      "fighter_a_50plus_sig_strikes": 15825,
+      "fighter_b_50plus_sig_strikes": 15825,
+      "combined_100plus_sig_strikes": 15825,
+      "fighter_a_takedowns": 7274,
+      "fighter_b_takedowns": 7274,
+      "fighter_a_takedown_1plus": 7274,
+      "fighter_b_takedown_1plus": 7274,
+      "grappling_heavy_binary": 7274,
+      "takedown_control_bucket": 7274
+    },
+    "feature_schema_name": "finish_v1",
+    "feature_schema_version": "1.0",
+    "feature_validation": {
+      "forbidden_features_present": [],
+      "labels_kept_separate": [
+        "combined_sig_strikes",
+        "fighter_a_sig_strikes",
+        "fighter_a_takedowns",
+        "fighter_b_sig_strikes",
+        "fighter_b_takedowns",
+        "finish_binary",
+        "goes_distance_binary",
+        "grappling_heavy_binary",
+        "method_class",
+        "round_phase_class",
+        "winner"
+      ],
+      "required_features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions"
+      ]
+    },
+    "runtime_compatibility": {
+      "schema_name": "finish_v1",
+      "schema_version": "1.0",
+      "rows": 49355,
+      "required_features_available": true,
+      "required_feature_missing_rates": {
+        "a_prior_fights": 0.0,
+        "b_prior_fights": 0.0,
+        "a_prior_wins": 0.0,
+        "b_prior_wins": 0.0,
+        "a_prior_finishes": 0.0,
+        "b_prior_finishes": 0.0,
+        "a_prior_decisions": 0.0,
+        "b_prior_decisions": 0.0
+      },
+      "optional_feature_coverage": 0.4521,
+      "missing_runtime_features": []
+    },
+    "warnings": [
+      "Some fights are missing event dates."
+    ],
+    "training_data_ready": true
+  },
+  "split": {
+    "split_type": "chronological",
+    "train_rows": 29347,
+    "validation_rows": 6134,
+    "test_rows": 5537,
+    "train_fight_groups": 17253,
+    "validation_fight_groups": 3696,
+    "test_fight_groups": 3696,
+    "canonical_group_key": "fight_key_or_stable_pair_key",
+    "no_cross_split_fight_leakage": true,
+    "cross_split_fight_keys": [],
+    "date_range_train": {
+      "min": "1993-11-12",
+      "max": "2021-07-10"
+    },
+    "date_range_validation": {
+      "min": "2021-07-10",
+      "max": "2023-11-18"
+    },
+    "date_range_test": {
+      "min": "2023-11-18",
+      "max": "2026-05-16"
+    },
+    "final_test_held_out": true
+  },
+  "winner_target_distribution": {
+    "0": 16072,
+    "1": 16068
+  },
+  "winner_feature_list": [
+    {
+      "feature": "a_prior_fights",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "b_prior_fights",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "a_prior_wins",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "b_prior_wins",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "a_prior_finishes",
+      "classification": "suspicious_review_needed",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "finish"
+      ]
+    },
+    {
+      "feature": "b_prior_finishes",
+      "classification": "suspicious_review_needed",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "finish"
+      ]
+    },
+    {
+      "feature": "a_prior_decisions",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "decision"
+      ]
+    },
+    {
+      "feature": "b_prior_decisions",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "decision"
+      ]
+    },
+    {
+      "feature": "fighter_1_stance_known",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_2_stance_known",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_1_history_count",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_2_history_count",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "minimum_history_count",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_1_win_rate_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_2_win_rate_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "win_rate_diff",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_1_finish_win_rate_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "finish"
+      ]
+    },
+    {
+      "feature": "fighter_2_finish_win_rate_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "finish"
+      ]
+    },
+    {
+      "feature": "finish_rate_diff",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "finish"
+      ]
+    },
+    {
+      "feature": "fighter_1_decision_win_rate_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "decision"
+      ]
+    },
+    {
+      "feature": "fighter_2_decision_win_rate_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "decision"
+      ]
+    },
+    {
+      "feature": "decision_rate_diff",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": [
+        "decision"
+      ]
+    },
+    {
+      "feature": "fighter_1_elo_fights_count_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_2_elo_fights_count_before",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_1_elo_available",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "fighter_2_elo_available",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "same_division",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "cross_division",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "catchweight",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "weight_class_gap",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "estimated_weight_gap_lbs",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "height_gap",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "reach_gap",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "unknown_size_context",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "pound_for_pound_mode",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "size_features_used",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "low_sample_warning",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "missing_profile_warning",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "missing_stats_warning",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    },
+    {
+      "feature": "cross_division_warning",
+      "classification": "runtime_available",
+      "runtime_can_generate": true,
+      "flagged_terms": []
+    }
+  ],
+  "leakage_scan": {
+    "feature_count": 40,
+    "suspicious_review_needed": [
+      {
+        "feature": "a_prior_finishes",
+        "classification": "suspicious_review_needed",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "finish"
+        ]
+      },
+      {
+        "feature": "b_prior_finishes",
+        "classification": "suspicious_review_needed",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "finish"
+        ]
+      }
+    ],
+    "leakage_excluded_in_feature_set": [],
+    "passed": true
+  },
+  "time_aware_snapshot_sample": {
+    "sampled_fights": 100,
+    "passed": true,
+    "checks_preview": [
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Chad Anheliger",
+        "fighter_2": "Jose Johnson",
+        "a_prior_fights": 10,
+        "b_prior_fights": 5,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Brendan Allen",
+        "fighter_2": "Paul Craig",
+        "a_prior_fights": 60,
+        "b_prior_fights": 78,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Myktybek Orolbai",
+        "fighter_2": "Uros Medic",
+        "a_prior_fights": 0,
+        "b_prior_fights": 20,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Joanderson Brito",
+        "fighter_2": "Jonathan Pearce",
+        "a_prior_fights": 20,
+        "b_prior_fights": 30,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Chase Hooper",
+        "fighter_2": "Jordan Leavitt",
+        "a_prior_fights": 35,
+        "b_prior_fights": 30,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Ailin Perez",
+        "fighter_2": "Lucie Pudilova",
+        "a_prior_fights": 10,
+        "b_prior_fights": 44,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Brendan Allen",
+        "fighter_2": "Paul Craig",
+        "a_prior_fights": 61,
+        "b_prior_fights": 79,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Chase Hooper",
+        "fighter_2": "Jordan Leavitt",
+        "a_prior_fights": 36,
+        "b_prior_fights": 31,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Myktybek Orolbai",
+        "fighter_2": "Uros Medic",
+        "a_prior_fights": 1,
+        "b_prior_fights": 21,
+        "current_fight_not_counted": true
+      },
+      {
+        "event_date": "2023-11-18",
+        "fighter_1": "Joanderson Brito",
+        "fighter_2": "Jonathan Pearce",
+        "a_prior_fights": 21,
+        "b_prior_fights": 31,
+        "current_fight_not_counted": true
+      }
+    ]
+  },
+  "runtime_parity": {
+    "features": [
+      {
+        "feature": "a_prior_fights",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "b_prior_fights",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "a_prior_wins",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "b_prior_wins",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "a_prior_finishes",
+        "classification": "suspicious_review_needed",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "finish"
+        ]
+      },
+      {
+        "feature": "b_prior_finishes",
+        "classification": "suspicious_review_needed",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "finish"
+        ]
+      },
+      {
+        "feature": "a_prior_decisions",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "decision"
+        ]
+      },
+      {
+        "feature": "b_prior_decisions",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "decision"
+        ]
+      },
+      {
+        "feature": "fighter_1_stance_known",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_2_stance_known",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_1_history_count",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_2_history_count",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "minimum_history_count",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_1_win_rate_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_2_win_rate_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "win_rate_diff",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_1_finish_win_rate_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "finish"
+        ]
+      },
+      {
+        "feature": "fighter_2_finish_win_rate_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "finish"
+        ]
+      },
+      {
+        "feature": "finish_rate_diff",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "finish"
+        ]
+      },
+      {
+        "feature": "fighter_1_decision_win_rate_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "decision"
+        ]
+      },
+      {
+        "feature": "fighter_2_decision_win_rate_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "decision"
+        ]
+      },
+      {
+        "feature": "decision_rate_diff",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": [
+          "decision"
+        ]
+      },
+      {
+        "feature": "fighter_1_elo_fights_count_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_2_elo_fights_count_before",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_1_elo_available",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "fighter_2_elo_available",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "same_division",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "cross_division",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "catchweight",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "weight_class_gap",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "estimated_weight_gap_lbs",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "height_gap",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "reach_gap",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "unknown_size_context",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "pound_for_pound_mode",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "size_features_used",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "low_sample_warning",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "missing_profile_warning",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "missing_stats_warning",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      },
+      {
+        "feature": "cross_division_warning",
+        "classification": "runtime_available",
+        "runtime_can_generate": true,
+        "flagged_terms": []
+      }
+    ],
+    "runtime_compatible": true,
+    "missing_runtime_features": []
+  },
+  "ablation_results": [
+    {
+      "variant": "full_current_feature_set",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 17086,
+      "validation_rows": 3666,
+      "test_rows": 3327,
+      "metrics": {
+        "accuracy": 0.9092,
+        "balanced_accuracy": 0.9093,
+        "f1_macro": 0.9091,
+        "roc_auc": 0.9663,
+        "log_loss": 0.2421,
+        "brier_score": 0.0701,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1571,
+            "1.0": 159
+          },
+          "1.0": {
+            "0.0": 143,
+            "1.0": 1454
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.52,
+        "class_counts": {
+          "0.0": 1730,
+          "1.0": 1597
+        }
+      },
+      "relative_improvement": 0.3892,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 98,
+            "coverage_percent": 2.95,
+            "accuracy": 0.6939,
+            "balanced_accuracy": 0.6786,
+            "average_confidence": 0.5256,
+            "actual_hit_rate": 0.6939,
+            "calibration_gap": -0.1683,
+            "class_distribution": {
+              "0.0": 56,
+              "1.0": 42
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 97,
+            "coverage_percent": 2.92,
+            "accuracy": 0.567,
+            "balanced_accuracy": 0.5662,
+            "average_confidence": 0.5739,
+            "actual_hit_rate": 0.567,
+            "calibration_gap": 0.0069,
+            "class_distribution": {
+              "0.0": 56,
+              "1.0": 41
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 131,
+            "coverage_percent": 3.94,
+            "accuracy": 0.5573,
+            "balanced_accuracy": 0.5568,
+            "average_confidence": 0.6248,
+            "actual_hit_rate": 0.5573,
+            "calibration_gap": 0.0676,
+            "class_distribution": {
+              "0.0": 69,
+              "1.0": 62
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 113,
+            "coverage_percent": 3.4,
+            "accuracy": 0.7611,
+            "balanced_accuracy": 0.7641,
+            "average_confidence": 0.6735,
+            "actual_hit_rate": 0.7611,
+            "calibration_gap": -0.0876,
+            "class_distribution": {
+              "0.0": 59,
+              "1.0": 54
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 165,
+            "coverage_percent": 4.96,
+            "accuracy": 0.7939,
+            "balanced_accuracy": 0.7938,
+            "average_confidence": 0.7234,
+            "actual_hit_rate": 0.7939,
+            "calibration_gap": -0.0706,
+            "class_distribution": {
+              "0.0": 83,
+              "1.0": 82
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 206,
+            "coverage_percent": 6.19,
+            "accuracy": 0.801,
+            "balanced_accuracy": 0.7982,
+            "average_confidence": 0.7762,
+            "actual_hit_rate": 0.801,
+            "calibration_gap": -0.0248,
+            "class_distribution": {
+              "1.0": 112,
+              "0.0": 94
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 205,
+            "coverage_percent": 6.16,
+            "accuracy": 0.922,
+            "balanced_accuracy": 0.922,
+            "average_confidence": 0.8265,
+            "actual_hit_rate": 0.922,
+            "calibration_gap": -0.0955,
+            "class_distribution": {
+              "0.0": 103,
+              "1.0": 102
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 332,
+            "coverage_percent": 9.98,
+            "accuracy": 0.9398,
+            "balanced_accuracy": 0.9394,
+            "average_confidence": 0.878,
+            "actual_hit_rate": 0.9398,
+            "calibration_gap": -0.0618,
+            "class_distribution": {
+              "1.0": 173,
+              "0.0": 159
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1980,
+            "coverage_percent": 59.51,
+            "accuracy": 0.9828,
+            "balanced_accuracy": 0.9828,
+            "average_confidence": 0.9674,
+            "actual_hit_rate": 0.9828,
+            "calibration_gap": -0.0154,
+            "class_distribution": {
+              "0.0": 1051,
+              "1.0": 929
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3229,
+            "coverage_percent": 97.05,
+            "accuracy": 0.9158,
+            "balanced_accuracy": 0.9159,
+            "average_confidence": 0.8886,
+            "actual_hit_rate": 0.9158,
+            "calibration_gap": -0.0272,
+            "class_distribution": {
+              "0.0": 1674,
+              "1.0": 1555
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3132,
+            "coverage_percent": 94.14,
+            "accuracy": 0.9266,
+            "balanced_accuracy": 0.9267,
+            "average_confidence": 0.8983,
+            "actual_hit_rate": 0.9266,
+            "calibration_gap": -0.0282,
+            "class_distribution": {
+              "0.0": 1618,
+              "1.0": 1514
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 3001,
+            "coverage_percent": 90.2,
+            "accuracy": 0.9427,
+            "balanced_accuracy": 0.9428,
+            "average_confidence": 0.9103,
+            "actual_hit_rate": 0.9427,
+            "calibration_gap": -0.0324,
+            "class_distribution": {
+              "0.0": 1549,
+              "1.0": 1452
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2888,
+            "coverage_percent": 86.8,
+            "accuracy": 0.9498,
+            "balanced_accuracy": 0.9498,
+            "average_confidence": 0.9196,
+            "actual_hit_rate": 0.9498,
+            "calibration_gap": -0.0302,
+            "class_distribution": {
+              "0.0": 1490,
+              "1.0": 1398
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2723,
+            "coverage_percent": 81.85,
+            "accuracy": 0.9592,
+            "balanced_accuracy": 0.9593,
+            "average_confidence": 0.9314,
+            "actual_hit_rate": 0.9592,
+            "calibration_gap": -0.0278,
+            "class_distribution": {
+              "0.0": 1407,
+              "1.0": 1316
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 2517,
+            "coverage_percent": 75.65,
+            "accuracy": 0.9722,
+            "balanced_accuracy": 0.9722,
+            "average_confidence": 0.9441,
+            "actual_hit_rate": 0.9722,
+            "calibration_gap": -0.028,
+            "class_distribution": {
+              "0.0": 1313,
+              "1.0": 1204
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2517,
+          "coverage_percent": 75.65,
+          "accuracy": 0.9722,
+          "balanced_accuracy": 0.9722,
+          "average_confidence": 0.9441,
+          "actual_hit_rate": 0.9722,
+          "calibration_gap": -0.028,
+          "class_distribution": {
+            "0.0": 1313,
+            "1.0": 1204
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2517,
+          "coverage_percent": 75.65,
+          "accuracy": 0.9722,
+          "balanced_accuracy": 0.9722,
+          "average_confidence": 0.9441,
+          "actual_hit_rate": 0.9722,
+          "calibration_gap": -0.028,
+          "class_distribution": {
+            "0.0": 1313,
+            "1.0": 1204
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      }
+    },
+    {
+      "variant": "remove_suspicious_named_features",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 38,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 17086,
+      "validation_rows": 3666,
+      "test_rows": 3327,
+      "metrics": {
+        "accuracy": 0.9092,
+        "balanced_accuracy": 0.9093,
+        "f1_macro": 0.9091,
+        "roc_auc": 0.9678,
+        "log_loss": 0.2381,
+        "brier_score": 0.0685,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1571,
+            "1.0": 159
+          },
+          "1.0": {
+            "0.0": 143,
+            "1.0": 1454
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.52,
+        "class_counts": {
+          "0.0": 1730,
+          "1.0": 1597
+        }
+      },
+      "relative_improvement": 0.3892,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 101,
+            "coverage_percent": 3.04,
+            "accuracy": 0.5248,
+            "balanced_accuracy": 0.513,
+            "average_confidence": 0.5235,
+            "actual_hit_rate": 0.5248,
+            "calibration_gap": -0.0013,
+            "class_distribution": {
+              "0.0": 62,
+              "1.0": 39
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 106,
+            "coverage_percent": 3.19,
+            "accuracy": 0.6321,
+            "balanced_accuracy": 0.6228,
+            "average_confidence": 0.572,
+            "actual_hit_rate": 0.6321,
+            "calibration_gap": -0.0601,
+            "class_distribution": {
+              "0.0": 62,
+              "1.0": 44
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 121,
+            "coverage_percent": 3.64,
+            "accuracy": 0.6364,
+            "balanced_accuracy": 0.6286,
+            "average_confidence": 0.6259,
+            "actual_hit_rate": 0.6364,
+            "calibration_gap": -0.0105,
+            "class_distribution": {
+              "1.0": 68,
+              "0.0": 53
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 136,
+            "coverage_percent": 4.09,
+            "accuracy": 0.7353,
+            "balanced_accuracy": 0.7368,
+            "average_confidence": 0.6776,
+            "actual_hit_rate": 0.7353,
+            "calibration_gap": -0.0577,
+            "class_distribution": {
+              "0.0": 76,
+              "1.0": 60
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 143,
+            "coverage_percent": 4.3,
+            "accuracy": 0.7273,
+            "balanced_accuracy": 0.727,
+            "average_confidence": 0.727,
+            "actual_hit_rate": 0.7273,
+            "calibration_gap": -0.0003,
+            "class_distribution": {
+              "0.0": 75,
+              "1.0": 68
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 184,
+            "coverage_percent": 5.53,
+            "accuracy": 0.875,
+            "balanced_accuracy": 0.8741,
+            "average_confidence": 0.7762,
+            "actual_hit_rate": 0.875,
+            "calibration_gap": -0.0988,
+            "class_distribution": {
+              "1.0": 98,
+              "0.0": 86
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 222,
+            "coverage_percent": 6.67,
+            "accuracy": 0.8874,
+            "balanced_accuracy": 0.8874,
+            "average_confidence": 0.8249,
+            "actual_hit_rate": 0.8874,
+            "calibration_gap": -0.0625,
+            "class_distribution": {
+              "1.0": 115,
+              "0.0": 107
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 350,
+            "coverage_percent": 10.52,
+            "accuracy": 0.96,
+            "balanced_accuracy": 0.96,
+            "average_confidence": 0.8773,
+            "actual_hit_rate": 0.96,
+            "calibration_gap": -0.0827,
+            "class_distribution": {
+              "0.0": 178,
+              "1.0": 172
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1964,
+            "coverage_percent": 59.03,
+            "accuracy": 0.9827,
+            "balanced_accuracy": 0.9826,
+            "average_confidence": 0.9677,
+            "actual_hit_rate": 0.9827,
+            "calibration_gap": -0.0149,
+            "class_distribution": {
+              "0.0": 1031,
+              "1.0": 933
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3226,
+            "coverage_percent": 96.96,
+            "accuracy": 0.9213,
+            "balanced_accuracy": 0.9213,
+            "average_confidence": 0.8884,
+            "actual_hit_rate": 0.9213,
+            "calibration_gap": -0.0328,
+            "class_distribution": {
+              "0.0": 1668,
+              "1.0": 1558
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3120,
+            "coverage_percent": 93.78,
+            "accuracy": 0.9311,
+            "balanced_accuracy": 0.9311,
+            "average_confidence": 0.8992,
+            "actual_hit_rate": 0.9311,
+            "calibration_gap": -0.0319,
+            "class_distribution": {
+              "0.0": 1606,
+              "1.0": 1514
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 2999,
+            "coverage_percent": 90.14,
+            "accuracy": 0.943,
+            "balanced_accuracy": 0.943,
+            "average_confidence": 0.9102,
+            "actual_hit_rate": 0.943,
+            "calibration_gap": -0.0328,
+            "class_distribution": {
+              "0.0": 1553,
+              "1.0": 1446
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2863,
+            "coverage_percent": 86.05,
+            "accuracy": 0.9528,
+            "balanced_accuracy": 0.9528,
+            "average_confidence": 0.9213,
+            "actual_hit_rate": 0.9528,
+            "calibration_gap": -0.0316,
+            "class_distribution": {
+              "0.0": 1477,
+              "1.0": 1386
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2720,
+            "coverage_percent": 81.76,
+            "accuracy": 0.9647,
+            "balanced_accuracy": 0.9647,
+            "average_confidence": 0.9315,
+            "actual_hit_rate": 0.9647,
+            "calibration_gap": -0.0332,
+            "class_distribution": {
+              "0.0": 1402,
+              "1.0": 1318
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 2536,
+            "coverage_percent": 76.22,
+            "accuracy": 0.9712,
+            "balanced_accuracy": 0.9712,
+            "average_confidence": 0.9428,
+            "actual_hit_rate": 0.9712,
+            "calibration_gap": -0.0285,
+            "class_distribution": {
+              "0.0": 1316,
+              "1.0": 1220
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2536,
+          "coverage_percent": 76.22,
+          "accuracy": 0.9712,
+          "balanced_accuracy": 0.9712,
+          "average_confidence": 0.9428,
+          "actual_hit_rate": 0.9712,
+          "calibration_gap": -0.0285,
+          "class_distribution": {
+            "0.0": 1316,
+            "1.0": 1220
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2536,
+          "coverage_percent": 76.22,
+          "accuracy": 0.9712,
+          "balanced_accuracy": 0.9712,
+          "average_confidence": 0.9428,
+          "actual_hit_rate": 0.9712,
+          "calibration_gap": -0.0285,
+          "class_distribution": {
+            "0.0": 1316,
+            "1.0": 1220
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      }
+    },
+    {
+      "variant": "basic_history_only",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 10,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "minimum_history_count",
+        "win_rate_diff"
+      ],
+      "train_rows": 17086,
+      "validation_rows": 3666,
+      "test_rows": 3327,
+      "metrics": {
+        "accuracy": 0.9152,
+        "balanced_accuracy": 0.915,
+        "f1_macro": 0.9151,
+        "roc_auc": 0.9698,
+        "log_loss": 0.2329,
+        "brier_score": 0.0661,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1594,
+            "1.0": 136
+          },
+          "1.0": {
+            "0.0": 146,
+            "1.0": 1451
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.52,
+        "class_counts": {
+          "0.0": 1730,
+          "1.0": 1597
+        }
+      },
+      "relative_improvement": 0.3952,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 113,
+            "coverage_percent": 3.4,
+            "accuracy": 0.5752,
+            "balanced_accuracy": 0.5753,
+            "average_confidence": 0.5222,
+            "actual_hit_rate": 0.5752,
+            "calibration_gap": -0.0531,
+            "class_distribution": {
+              "0.0": 61,
+              "1.0": 52
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 90,
+            "coverage_percent": 2.71,
+            "accuracy": 0.6111,
+            "balanced_accuracy": 0.6049,
+            "average_confidence": 0.5766,
+            "actual_hit_rate": 0.6111,
+            "calibration_gap": -0.0345,
+            "class_distribution": {
+              "0.0": 47,
+              "1.0": 43
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 123,
+            "coverage_percent": 3.7,
+            "accuracy": 0.6341,
+            "balanced_accuracy": 0.6394,
+            "average_confidence": 0.6244,
+            "actual_hit_rate": 0.6341,
+            "calibration_gap": -0.0097,
+            "class_distribution": {
+              "0.0": 71,
+              "1.0": 52
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 122,
+            "coverage_percent": 3.67,
+            "accuracy": 0.7623,
+            "balanced_accuracy": 0.7565,
+            "average_confidence": 0.6765,
+            "actual_hit_rate": 0.7623,
+            "calibration_gap": -0.0858,
+            "class_distribution": {
+              "0.0": 64,
+              "1.0": 58
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 147,
+            "coverage_percent": 4.42,
+            "accuracy": 0.8435,
+            "balanced_accuracy": 0.8437,
+            "average_confidence": 0.7245,
+            "actual_hit_rate": 0.8435,
+            "calibration_gap": -0.119,
+            "class_distribution": {
+              "0.0": 74,
+              "1.0": 73
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 159,
+            "coverage_percent": 4.78,
+            "accuracy": 0.8365,
+            "balanced_accuracy": 0.8369,
+            "average_confidence": 0.7759,
+            "actual_hit_rate": 0.8365,
+            "calibration_gap": -0.0605,
+            "class_distribution": {
+              "1.0": 81,
+              "0.0": 78
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 264,
+            "coverage_percent": 7.94,
+            "accuracy": 0.8712,
+            "balanced_accuracy": 0.8713,
+            "average_confidence": 0.8281,
+            "actual_hit_rate": 0.8712,
+            "calibration_gap": -0.0431,
+            "class_distribution": {
+              "0.0": 137,
+              "1.0": 127
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 368,
+            "coverage_percent": 11.06,
+            "accuracy": 0.9674,
+            "balanced_accuracy": 0.9652,
+            "average_confidence": 0.8765,
+            "actual_hit_rate": 0.9674,
+            "calibration_gap": -0.0909,
+            "class_distribution": {
+              "0.0": 210,
+              "1.0": 158
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1941,
+            "coverage_percent": 58.34,
+            "accuracy": 0.9845,
+            "balanced_accuracy": 0.9846,
+            "average_confidence": 0.964,
+            "actual_hit_rate": 0.9845,
+            "calibration_gap": -0.0205,
+            "class_distribution": {
+              "0.0": 988,
+              "1.0": 953
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3214,
+            "coverage_percent": 96.6,
+            "accuracy": 0.9272,
+            "balanced_accuracy": 0.9269,
+            "average_confidence": 0.8878,
+            "actual_hit_rate": 0.9272,
+            "calibration_gap": -0.0394,
+            "class_distribution": {
+              "0.0": 1669,
+              "1.0": 1545
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3124,
+            "coverage_percent": 93.9,
+            "accuracy": 0.9363,
+            "balanced_accuracy": 0.9362,
+            "average_confidence": 0.8968,
+            "actual_hit_rate": 0.9363,
+            "calibration_gap": -0.0395,
+            "class_distribution": {
+              "0.0": 1622,
+              "1.0": 1502
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 3001,
+            "coverage_percent": 90.2,
+            "accuracy": 0.9487,
+            "balanced_accuracy": 0.9485,
+            "average_confidence": 0.908,
+            "actual_hit_rate": 0.9487,
+            "calibration_gap": -0.0407,
+            "class_distribution": {
+              "0.0": 1551,
+              "1.0": 1450
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2879,
+            "coverage_percent": 86.53,
+            "accuracy": 0.9566,
+            "balanced_accuracy": 0.9565,
+            "average_confidence": 0.9178,
+            "actual_hit_rate": 0.9566,
+            "calibration_gap": -0.0388,
+            "class_distribution": {
+              "0.0": 1487,
+              "1.0": 1392
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2732,
+            "coverage_percent": 82.12,
+            "accuracy": 0.9627,
+            "balanced_accuracy": 0.9626,
+            "average_confidence": 0.9282,
+            "actual_hit_rate": 0.9627,
+            "calibration_gap": -0.0345,
+            "class_distribution": {
+              "0.0": 1413,
+              "1.0": 1319
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 2573,
+            "coverage_percent": 77.34,
+            "accuracy": 0.9705,
+            "balanced_accuracy": 0.9704,
+            "average_confidence": 0.9376,
+            "actual_hit_rate": 0.9705,
+            "calibration_gap": -0.0329,
+            "class_distribution": {
+              "0.0": 1335,
+              "1.0": 1238
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2573,
+          "coverage_percent": 77.34,
+          "accuracy": 0.9705,
+          "balanced_accuracy": 0.9704,
+          "average_confidence": 0.9376,
+          "actual_hit_rate": 0.9705,
+          "calibration_gap": -0.0329,
+          "class_distribution": {
+            "0.0": 1335,
+            "1.0": 1238
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2573,
+          "coverage_percent": 77.34,
+          "accuracy": 0.9705,
+          "balanced_accuracy": 0.9704,
+          "average_confidence": 0.9376,
+          "actual_hit_rate": 0.9705,
+          "calibration_gap": -0.0329,
+          "class_distribution": {
+            "0.0": 1335,
+            "1.0": 1238
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      }
+    },
+    {
+      "variant": "elo_history_only",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 15,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available"
+      ],
+      "train_rows": 17086,
+      "validation_rows": 3666,
+      "test_rows": 3327,
+      "metrics": {
+        "accuracy": 0.9255,
+        "balanced_accuracy": 0.9253,
+        "f1_macro": 0.9253,
+        "roc_auc": 0.9724,
+        "log_loss": 0.2377,
+        "brier_score": 0.0661,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1606,
+            "1.0": 124
+          },
+          "1.0": {
+            "0.0": 124,
+            "1.0": 1473
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.52,
+        "class_counts": {
+          "0.0": 1730,
+          "1.0": 1597
+        }
+      },
+      "relative_improvement": 0.4055,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 133,
+            "coverage_percent": 4.0,
+            "accuracy": 0.5865,
+            "balanced_accuracy": 0.5866,
+            "average_confidence": 0.5229,
+            "actual_hit_rate": 0.5865,
+            "calibration_gap": -0.0636,
+            "class_distribution": {
+              "1.0": 67,
+              "0.0": 66
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 113,
+            "coverage_percent": 3.4,
+            "accuracy": 0.708,
+            "balanced_accuracy": 0.7053,
+            "average_confidence": 0.5762,
+            "actual_hit_rate": 0.708,
+            "calibration_gap": -0.1317,
+            "class_distribution": {
+              "0.0": 65,
+              "1.0": 48
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 147,
+            "coverage_percent": 4.42,
+            "accuracy": 0.8027,
+            "balanced_accuracy": 0.8023,
+            "average_confidence": 0.6241,
+            "actual_hit_rate": 0.8027,
+            "calibration_gap": -0.1786,
+            "class_distribution": {
+              "0.0": 87,
+              "1.0": 60
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 145,
+            "coverage_percent": 4.36,
+            "accuracy": 0.7448,
+            "balanced_accuracy": 0.7446,
+            "average_confidence": 0.6772,
+            "actual_hit_rate": 0.7448,
+            "calibration_gap": -0.0677,
+            "class_distribution": {
+              "0.0": 73,
+              "1.0": 72
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 169,
+            "coverage_percent": 5.08,
+            "accuracy": 0.9172,
+            "balanced_accuracy": 0.9165,
+            "average_confidence": 0.7261,
+            "actual_hit_rate": 0.9172,
+            "calibration_gap": -0.1911,
+            "class_distribution": {
+              "0.0": 100,
+              "1.0": 69
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 247,
+            "coverage_percent": 7.42,
+            "accuracy": 0.8947,
+            "balanced_accuracy": 0.8928,
+            "average_confidence": 0.7756,
+            "actual_hit_rate": 0.8947,
+            "calibration_gap": -0.1191,
+            "class_distribution": {
+              "0.0": 140,
+              "1.0": 107
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 323,
+            "coverage_percent": 9.71,
+            "accuracy": 0.9288,
+            "balanced_accuracy": 0.9285,
+            "average_confidence": 0.8273,
+            "actual_hit_rate": 0.9288,
+            "calibration_gap": -0.1015,
+            "class_distribution": {
+              "0.0": 166,
+              "1.0": 157
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 377,
+            "coverage_percent": 11.33,
+            "accuracy": 0.9576,
+            "balanced_accuracy": 0.9577,
+            "average_confidence": 0.8753,
+            "actual_hit_rate": 0.9576,
+            "calibration_gap": -0.0822,
+            "class_distribution": {
+              "1.0": 195,
+              "0.0": 182
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1673,
+            "coverage_percent": 50.29,
+            "accuracy": 0.991,
+            "balanced_accuracy": 0.9911,
+            "average_confidence": 0.9654,
+            "actual_hit_rate": 0.991,
+            "calibration_gap": -0.0256,
+            "class_distribution": {
+              "0.0": 851,
+              "1.0": 822
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3194,
+            "coverage_percent": 96.0,
+            "accuracy": 0.9396,
+            "balanced_accuracy": 0.9395,
+            "average_confidence": 0.8709,
+            "actual_hit_rate": 0.9396,
+            "calibration_gap": -0.0687,
+            "class_distribution": {
+              "0.0": 1664,
+              "1.0": 1530
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3081,
+            "coverage_percent": 92.61,
+            "accuracy": 0.9481,
+            "balanced_accuracy": 0.948,
+            "average_confidence": 0.8817,
+            "actual_hit_rate": 0.9481,
+            "calibration_gap": -0.0664,
+            "class_distribution": {
+              "0.0": 1599,
+              "1.0": 1482
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 2934,
+            "coverage_percent": 88.19,
+            "accuracy": 0.9554,
+            "balanced_accuracy": 0.9553,
+            "average_confidence": 0.8946,
+            "actual_hit_rate": 0.9554,
+            "calibration_gap": -0.0607,
+            "class_distribution": {
+              "0.0": 1512,
+              "1.0": 1422
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2789,
+            "coverage_percent": 83.83,
+            "accuracy": 0.9663,
+            "balanced_accuracy": 0.9663,
+            "average_confidence": 0.9059,
+            "actual_hit_rate": 0.9663,
+            "calibration_gap": -0.0604,
+            "class_distribution": {
+              "0.0": 1439,
+              "1.0": 1350
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2620,
+            "coverage_percent": 78.75,
+            "accuracy": 0.9695,
+            "balanced_accuracy": 0.9694,
+            "average_confidence": 0.9175,
+            "actual_hit_rate": 0.9695,
+            "calibration_gap": -0.0519,
+            "class_distribution": {
+              "0.0": 1339,
+              "1.0": 1281
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 2373,
+            "coverage_percent": 71.33,
+            "accuracy": 0.9772,
+            "balanced_accuracy": 0.9772,
+            "average_confidence": 0.9323,
+            "actual_hit_rate": 0.9772,
+            "calibration_gap": -0.045,
+            "class_distribution": {
+              "0.0": 1199,
+              "1.0": 1174
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2373,
+          "coverage_percent": 71.33,
+          "accuracy": 0.9772,
+          "balanced_accuracy": 0.9772,
+          "average_confidence": 0.9323,
+          "actual_hit_rate": 0.9772,
+          "calibration_gap": -0.045,
+          "class_distribution": {
+            "0.0": 1199,
+            "1.0": 1174
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2373,
+          "coverage_percent": 71.33,
+          "accuracy": 0.9772,
+          "balanced_accuracy": 0.9772,
+          "average_confidence": 0.9323,
+          "actual_hit_rate": 0.9772,
+          "calibration_gap": -0.045,
+          "class_distribution": {
+            "0.0": 1199,
+            "1.0": 1174
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      }
+    },
+    {
+      "variant": "runtime_compatible_only",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 17086,
+      "validation_rows": 3666,
+      "test_rows": 3327,
+      "metrics": {
+        "accuracy": 0.9092,
+        "balanced_accuracy": 0.9093,
+        "f1_macro": 0.9091,
+        "roc_auc": 0.9663,
+        "log_loss": 0.2421,
+        "brier_score": 0.0701,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1571,
+            "1.0": 159
+          },
+          "1.0": {
+            "0.0": 143,
+            "1.0": 1454
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.52,
+        "class_counts": {
+          "0.0": 1730,
+          "1.0": 1597
+        }
+      },
+      "relative_improvement": 0.3892,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 98,
+            "coverage_percent": 2.95,
+            "accuracy": 0.6939,
+            "balanced_accuracy": 0.6786,
+            "average_confidence": 0.5256,
+            "actual_hit_rate": 0.6939,
+            "calibration_gap": -0.1683,
+            "class_distribution": {
+              "0.0": 56,
+              "1.0": 42
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 97,
+            "coverage_percent": 2.92,
+            "accuracy": 0.567,
+            "balanced_accuracy": 0.5662,
+            "average_confidence": 0.5739,
+            "actual_hit_rate": 0.567,
+            "calibration_gap": 0.0069,
+            "class_distribution": {
+              "0.0": 56,
+              "1.0": 41
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 131,
+            "coverage_percent": 3.94,
+            "accuracy": 0.5573,
+            "balanced_accuracy": 0.5568,
+            "average_confidence": 0.6248,
+            "actual_hit_rate": 0.5573,
+            "calibration_gap": 0.0676,
+            "class_distribution": {
+              "0.0": 69,
+              "1.0": 62
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 113,
+            "coverage_percent": 3.4,
+            "accuracy": 0.7611,
+            "balanced_accuracy": 0.7641,
+            "average_confidence": 0.6735,
+            "actual_hit_rate": 0.7611,
+            "calibration_gap": -0.0876,
+            "class_distribution": {
+              "0.0": 59,
+              "1.0": 54
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 165,
+            "coverage_percent": 4.96,
+            "accuracy": 0.7939,
+            "balanced_accuracy": 0.7938,
+            "average_confidence": 0.7234,
+            "actual_hit_rate": 0.7939,
+            "calibration_gap": -0.0706,
+            "class_distribution": {
+              "0.0": 83,
+              "1.0": 82
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 206,
+            "coverage_percent": 6.19,
+            "accuracy": 0.801,
+            "balanced_accuracy": 0.7982,
+            "average_confidence": 0.7762,
+            "actual_hit_rate": 0.801,
+            "calibration_gap": -0.0248,
+            "class_distribution": {
+              "1.0": 112,
+              "0.0": 94
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 205,
+            "coverage_percent": 6.16,
+            "accuracy": 0.922,
+            "balanced_accuracy": 0.922,
+            "average_confidence": 0.8265,
+            "actual_hit_rate": 0.922,
+            "calibration_gap": -0.0955,
+            "class_distribution": {
+              "0.0": 103,
+              "1.0": 102
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 332,
+            "coverage_percent": 9.98,
+            "accuracy": 0.9398,
+            "balanced_accuracy": 0.9394,
+            "average_confidence": 0.878,
+            "actual_hit_rate": 0.9398,
+            "calibration_gap": -0.0618,
+            "class_distribution": {
+              "1.0": 173,
+              "0.0": 159
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 1980,
+            "coverage_percent": 59.51,
+            "accuracy": 0.9828,
+            "balanced_accuracy": 0.9828,
+            "average_confidence": 0.9674,
+            "actual_hit_rate": 0.9828,
+            "calibration_gap": -0.0154,
+            "class_distribution": {
+              "0.0": 1051,
+              "1.0": 929
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 3229,
+            "coverage_percent": 97.05,
+            "accuracy": 0.9158,
+            "balanced_accuracy": 0.9159,
+            "average_confidence": 0.8886,
+            "actual_hit_rate": 0.9158,
+            "calibration_gap": -0.0272,
+            "class_distribution": {
+              "0.0": 1674,
+              "1.0": 1555
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 3132,
+            "coverage_percent": 94.14,
+            "accuracy": 0.9266,
+            "balanced_accuracy": 0.9267,
+            "average_confidence": 0.8983,
+            "actual_hit_rate": 0.9266,
+            "calibration_gap": -0.0282,
+            "class_distribution": {
+              "0.0": 1618,
+              "1.0": 1514
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 3001,
+            "coverage_percent": 90.2,
+            "accuracy": 0.9427,
+            "balanced_accuracy": 0.9428,
+            "average_confidence": 0.9103,
+            "actual_hit_rate": 0.9427,
+            "calibration_gap": -0.0324,
+            "class_distribution": {
+              "0.0": 1549,
+              "1.0": 1452
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 2888,
+            "coverage_percent": 86.8,
+            "accuracy": 0.9498,
+            "balanced_accuracy": 0.9498,
+            "average_confidence": 0.9196,
+            "actual_hit_rate": 0.9498,
+            "calibration_gap": -0.0302,
+            "class_distribution": {
+              "0.0": 1490,
+              "1.0": 1398
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 2723,
+            "coverage_percent": 81.85,
+            "accuracy": 0.9592,
+            "balanced_accuracy": 0.9593,
+            "average_confidence": 0.9314,
+            "actual_hit_rate": 0.9592,
+            "calibration_gap": -0.0278,
+            "class_distribution": {
+              "0.0": 1407,
+              "1.0": 1316
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 2517,
+            "coverage_percent": 75.65,
+            "accuracy": 0.9722,
+            "balanced_accuracy": 0.9722,
+            "average_confidence": 0.9441,
+            "actual_hit_rate": 0.9722,
+            "calibration_gap": -0.028,
+            "class_distribution": {
+              "0.0": 1313,
+              "1.0": 1204
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2517,
+          "coverage_percent": 75.65,
+          "accuracy": 0.9722,
+          "balanced_accuracy": 0.9722,
+          "average_confidence": 0.9441,
+          "actual_hit_rate": 0.9722,
+          "calibration_gap": -0.028,
+          "class_distribution": {
+            "0.0": 1313,
+            "1.0": 1204
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 2517,
+          "coverage_percent": 75.65,
+          "accuracy": 0.9722,
+          "balanced_accuracy": 0.9722,
+          "average_confidence": 0.9441,
+          "actual_hit_rate": 0.9722,
+          "calibration_gap": -0.028,
+          "class_distribution": {
+            "0.0": 1313,
+            "1.0": 1204
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      }
+    },
+    {
+      "variant": "shuffle_label_sanity_check",
+      "algorithm": "random_forest_balanced",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 17086,
+      "validation_rows": 3666,
+      "test_rows": 3327,
+      "metrics": {
+        "accuracy": 0.4731,
+        "balanced_accuracy": 0.474,
+        "f1_macro": 0.4731,
+        "roc_auc": 0.4625,
+        "log_loss": 0.7145,
+        "brier_score": 0.2603,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 783,
+            "1.0": 947
+          },
+          "1.0": {
+            "0.0": 806,
+            "1.0": 791
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.52,
+        "class_counts": {
+          "0.0": 1730,
+          "1.0": 1597
+        }
+      },
+      "relative_improvement": -0.0469,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 1802,
+            "coverage_percent": 54.16,
+            "accuracy": 0.4989,
+            "balanced_accuracy": 0.499,
+            "average_confidence": 0.5234,
+            "actual_hit_rate": 0.4989,
+            "calibration_gap": 0.0245,
+            "class_distribution": {
+              "0.0": 911,
+              "1.0": 891
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 1015,
+            "coverage_percent": 30.51,
+            "accuracy": 0.4522,
+            "balanced_accuracy": 0.4538,
+            "average_confidence": 0.5726,
+            "actual_hit_rate": 0.4522,
+            "calibration_gap": 0.1204,
+            "class_distribution": {
+              "0.0": 531,
+              "1.0": 484
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 378,
+            "coverage_percent": 11.36,
+            "accuracy": 0.4524,
+            "balanced_accuracy": 0.4574,
+            "average_confidence": 0.6202,
+            "actual_hit_rate": 0.4524,
+            "calibration_gap": 0.1678,
+            "class_distribution": {
+              "0.0": 213,
+              "1.0": 165
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 112,
+            "coverage_percent": 3.37,
+            "accuracy": 0.3661,
+            "balanced_accuracy": 0.3666,
+            "average_confidence": 0.668,
+            "actual_hit_rate": 0.3661,
+            "calibration_gap": 0.3019,
+            "class_distribution": {
+              "0.0": 66,
+              "1.0": 46
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 19,
+            "coverage_percent": 0.57,
+            "accuracy": 0.2105,
+            "balanced_accuracy": 0.1989,
+            "average_confidence": 0.7162,
+            "actual_hit_rate": 0.2105,
+            "calibration_gap": 0.5056,
+            "class_distribution": {
+              "1.0": 11,
+              "0.0": 8
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 1,
+            "coverage_percent": 0.03,
+            "accuracy": 0.0,
+            "balanced_accuracy": 0.0,
+            "average_confidence": 0.7782,
+            "actual_hit_rate": 0.0,
+            "calibration_gap": 0.7782,
+            "class_distribution": {
+              "0.0": 1
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 0,
+            "coverage_percent": 0.0,
+            "accuracy": null,
+            "balanced_accuracy": null,
+            "average_confidence": null,
+            "actual_hit_rate": null,
+            "calibration_gap": null,
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 0,
+            "coverage_percent": 0.0,
+            "accuracy": null,
+            "balanced_accuracy": null,
+            "average_confidence": null,
+            "actual_hit_rate": null,
+            "calibration_gap": null,
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 0,
+            "coverage_percent": 0.0,
+            "accuracy": null,
+            "balanced_accuracy": null,
+            "average_confidence": null,
+            "actual_hit_rate": null,
+            "calibration_gap": null,
+            "small_sample_warning": true
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 1525,
+            "coverage_percent": 45.84,
+            "accuracy": 0.4426,
+            "balanced_accuracy": 0.4451,
+            "average_confidence": 0.5933,
+            "actual_hit_rate": 0.4426,
+            "calibration_gap": 0.1507,
+            "class_distribution": {
+              "0.0": 819,
+              "1.0": 706
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 510,
+            "coverage_percent": 15.33,
+            "accuracy": 0.4235,
+            "balanced_accuracy": 0.4276,
+            "average_confidence": 0.6346,
+            "actual_hit_rate": 0.4235,
+            "calibration_gap": 0.2111,
+            "class_distribution": {
+              "0.0": 288,
+              "1.0": 222
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 132,
+            "coverage_percent": 3.97,
+            "accuracy": 0.3409,
+            "balanced_accuracy": 0.3421,
+            "average_confidence": 0.6758,
+            "actual_hit_rate": 0.3409,
+            "calibration_gap": 0.3348,
+            "class_distribution": {
+              "0.0": 75,
+              "1.0": 57
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 20,
+            "coverage_percent": 0.6,
+            "accuracy": 0.2,
+            "balanced_accuracy": 0.1919,
+            "average_confidence": 0.7193,
+            "actual_hit_rate": 0.2,
+            "calibration_gap": 0.5193,
+            "class_distribution": {
+              "1.0": 11,
+              "0.0": 9
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 1,
+            "coverage_percent": 0.03,
+            "accuracy": 0.0,
+            "balanced_accuracy": 0.0,
+            "average_confidence": 0.7782,
+            "actual_hit_rate": 0.0,
+            "calibration_gap": 0.7782,
+            "class_distribution": {
+              "0.0": 1
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 0,
+            "coverage_percent": 0.0,
+            "accuracy": null,
+            "balanced_accuracy": null,
+            "average_confidence": null,
+            "actual_hit_rate": null,
+            "calibration_gap": null,
+            "small_sample_warning": true
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=55%",
+          "sample_count": 1525,
+          "coverage_percent": 45.84,
+          "accuracy": 0.4426,
+          "balanced_accuracy": 0.4451,
+          "average_confidence": 0.5933,
+          "actual_hit_rate": 0.4426,
+          "calibration_gap": 0.1507,
+          "class_distribution": {
+            "0.0": 819,
+            "1.0": 706
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=55%",
+          "sample_count": 1525,
+          "coverage_percent": 45.84,
+          "accuracy": 0.4426,
+          "balanced_accuracy": 0.4451,
+          "average_confidence": 0.5933,
+          "actual_hit_rate": 0.4426,
+          "calibration_gap": 0.1507,
+          "class_distribution": {
+            "0.0": 819,
+            "1.0": 706
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": false,
+        "reaches_95_balanced_accuracy": false
+      }
+    }
+  ],
+  "source_holdout_results": [
+    {
+      "variant": "holdout_mdabbert_ultimate",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 12315,
+      "validation_rows": 2457,
+      "test_rows": 1189,
+      "metrics": {
+        "accuracy": 0.8797,
+        "balanced_accuracy": 0.88,
+        "f1_macro": 0.8797,
+        "roc_auc": 0.945,
+        "log_loss": 0.3109,
+        "brier_score": 0.0912,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 537,
+            "1.0": 79
+          },
+          "1.0": {
+            "0.0": 64,
+            "1.0": 509
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.5181,
+        "class_counts": {
+          "0.0": 616,
+          "1.0": 573
+        }
+      },
+      "relative_improvement": 0.3616,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 51,
+            "coverage_percent": 4.29,
+            "accuracy": 0.6275,
+            "balanced_accuracy": 0.6219,
+            "average_confidence": 0.5261,
+            "actual_hit_rate": 0.6275,
+            "calibration_gap": -0.1014,
+            "class_distribution": {
+              "0.0": 28,
+              "1.0": 23
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 42,
+            "coverage_percent": 3.53,
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.4977,
+            "average_confidence": 0.5766,
+            "actual_hit_rate": 0.5,
+            "calibration_gap": 0.0766,
+            "class_distribution": {
+              "1.0": 22,
+              "0.0": 20
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 60,
+            "coverage_percent": 5.05,
+            "accuracy": 0.6833,
+            "balanced_accuracy": 0.6889,
+            "average_confidence": 0.6239,
+            "actual_hit_rate": 0.6833,
+            "calibration_gap": -0.0595,
+            "class_distribution": {
+              "0.0": 34,
+              "1.0": 26
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 45,
+            "coverage_percent": 3.78,
+            "accuracy": 0.6444,
+            "balanced_accuracy": 0.6481,
+            "average_confidence": 0.6763,
+            "actual_hit_rate": 0.6444,
+            "calibration_gap": 0.0319,
+            "class_distribution": {
+              "1.0": 27,
+              "0.0": 18
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 71,
+            "coverage_percent": 5.97,
+            "accuracy": 0.8592,
+            "balanced_accuracy": 0.8591,
+            "average_confidence": 0.727,
+            "actual_hit_rate": 0.8592,
+            "calibration_gap": -0.1322,
+            "class_distribution": {
+              "0.0": 36,
+              "1.0": 35
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 80,
+            "coverage_percent": 6.73,
+            "accuracy": 0.8,
+            "balanced_accuracy": 0.8,
+            "average_confidence": 0.7751,
+            "actual_hit_rate": 0.8,
+            "calibration_gap": -0.0249,
+            "class_distribution": {
+              "0.0": 40,
+              "1.0": 40
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 98,
+            "coverage_percent": 8.24,
+            "accuracy": 0.8571,
+            "balanced_accuracy": 0.8587,
+            "average_confidence": 0.8249,
+            "actual_hit_rate": 0.8571,
+            "calibration_gap": -0.0323,
+            "class_distribution": {
+              "0.0": 61,
+              "1.0": 37
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 139,
+            "coverage_percent": 11.69,
+            "accuracy": 0.9209,
+            "balanced_accuracy": 0.9191,
+            "average_confidence": 0.872,
+            "actual_hit_rate": 0.9209,
+            "calibration_gap": -0.0488,
+            "class_distribution": {
+              "0.0": 77,
+              "1.0": 62
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 603,
+            "coverage_percent": 50.71,
+            "accuracy": 0.9718,
+            "balanced_accuracy": 0.9718,
+            "average_confidence": 0.9723,
+            "actual_hit_rate": 0.9718,
+            "calibration_gap": 0.0005,
+            "class_distribution": {
+              "0.0": 302,
+              "1.0": 301
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 1138,
+            "coverage_percent": 95.71,
+            "accuracy": 0.891,
+            "balanced_accuracy": 0.8914,
+            "average_confidence": 0.8735,
+            "actual_hit_rate": 0.891,
+            "calibration_gap": -0.0175,
+            "class_distribution": {
+              "0.0": 588,
+              "1.0": 550
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 1096,
+            "coverage_percent": 92.18,
+            "accuracy": 0.906,
+            "balanced_accuracy": 0.9064,
+            "average_confidence": 0.8849,
+            "actual_hit_rate": 0.906,
+            "calibration_gap": -0.0211,
+            "class_distribution": {
+              "0.0": 568,
+              "1.0": 528
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 1036,
+            "coverage_percent": 87.13,
+            "accuracy": 0.9189,
+            "balanced_accuracy": 0.9191,
+            "average_confidence": 0.9,
+            "actual_hit_rate": 0.9189,
+            "calibration_gap": -0.0189,
+            "class_distribution": {
+              "0.0": 534,
+              "1.0": 502
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 991,
+            "coverage_percent": 83.35,
+            "accuracy": 0.9314,
+            "balanced_accuracy": 0.9319,
+            "average_confidence": 0.9102,
+            "actual_hit_rate": 0.9314,
+            "calibration_gap": -0.0212,
+            "class_distribution": {
+              "0.0": 516,
+              "1.0": 475
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 920,
+            "coverage_percent": 77.38,
+            "accuracy": 0.937,
+            "balanced_accuracy": 0.9375,
+            "average_confidence": 0.9243,
+            "actual_hit_rate": 0.937,
+            "calibration_gap": -0.0126,
+            "class_distribution": {
+              "0.0": 480,
+              "1.0": 440
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 840,
+            "coverage_percent": 70.65,
+            "accuracy": 0.95,
+            "balanced_accuracy": 0.9506,
+            "average_confidence": 0.9385,
+            "actual_hit_rate": 0.95,
+            "calibration_gap": -0.0115,
+            "class_distribution": {
+              "0.0": 440,
+              "1.0": 400
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 840,
+          "coverage_percent": 70.65,
+          "accuracy": 0.95,
+          "balanced_accuracy": 0.9506,
+          "average_confidence": 0.9385,
+          "actual_hit_rate": 0.95,
+          "calibration_gap": -0.0115,
+          "class_distribution": {
+            "0.0": 440,
+            "1.0": 400
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 840,
+          "coverage_percent": 70.65,
+          "accuracy": 0.95,
+          "balanced_accuracy": 0.9506,
+          "average_confidence": 0.9385,
+          "actual_hit_rate": 0.95,
+          "calibration_gap": -0.0115,
+          "class_distribution": {
+            "0.0": 440,
+            "1.0": 400
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      },
+      "source": "mdabbert_ultimate"
+    },
+    {
+      "variant": "holdout_ufc_1994_2025",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 16987,
+      "validation_rows": 3656,
+      "test_rows": 914,
+      "metrics": {
+        "accuracy": 0.9092,
+        "balanced_accuracy": 0.9096,
+        "f1_macro": 0.909,
+        "roc_auc": 0.9748,
+        "log_loss": 0.297,
+        "brier_score": 0.0827,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 435,
+            "1.0": 47
+          },
+          "1.0": {
+            "0.0": 36,
+            "1.0": 396
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.5274,
+        "class_counts": {
+          "0.0": 482,
+          "1.0": 432
+        }
+      },
+      "relative_improvement": 0.3818,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 60,
+            "coverage_percent": 6.56,
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5017,
+            "average_confidence": 0.5268,
+            "actual_hit_rate": 0.5,
+            "calibration_gap": 0.0268,
+            "class_distribution": {
+              "0.0": 33,
+              "1.0": 27
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 68,
+            "coverage_percent": 7.44,
+            "accuracy": 0.7206,
+            "balanced_accuracy": 0.7005,
+            "average_confidence": 0.5723,
+            "actual_hit_rate": 0.7206,
+            "calibration_gap": -0.1483,
+            "class_distribution": {
+              "0.0": 42,
+              "1.0": 26
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 52,
+            "coverage_percent": 5.69,
+            "accuracy": 0.8462,
+            "balanced_accuracy": 0.8482,
+            "average_confidence": 0.6268,
+            "actual_hit_rate": 0.8462,
+            "calibration_gap": -0.2193,
+            "class_distribution": {
+              "0.0": 28,
+              "1.0": 24
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 82,
+            "coverage_percent": 8.97,
+            "accuracy": 0.7805,
+            "balanced_accuracy": 0.7862,
+            "average_confidence": 0.6771,
+            "actual_hit_rate": 0.7805,
+            "calibration_gap": -0.1034,
+            "class_distribution": {
+              "0.0": 46,
+              "1.0": 36
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 75,
+            "coverage_percent": 8.21,
+            "accuracy": 0.9467,
+            "balanced_accuracy": 0.9446,
+            "average_confidence": 0.729,
+            "actual_hit_rate": 0.9467,
+            "calibration_gap": -0.2176,
+            "class_distribution": {
+              "1.0": 40,
+              "0.0": 35
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 96,
+            "coverage_percent": 10.5,
+            "accuracy": 0.9688,
+            "balanced_accuracy": 0.968,
+            "average_confidence": 0.7739,
+            "actual_hit_rate": 0.9688,
+            "calibration_gap": -0.1949,
+            "class_distribution": {
+              "0.0": 51,
+              "1.0": 45
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 101,
+            "coverage_percent": 11.05,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.8273,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.1727,
+            "class_distribution": {
+              "0.0": 54,
+              "1.0": 47
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 170,
+            "coverage_percent": 18.6,
+            "accuracy": 0.9941,
+            "balanced_accuracy": 0.9933,
+            "average_confidence": 0.8743,
+            "actual_hit_rate": 0.9941,
+            "calibration_gap": -0.1199,
+            "class_distribution": {
+              "0.0": 95,
+              "1.0": 75
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 210,
+            "coverage_percent": 22.98,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.9407,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.0593,
+            "class_distribution": {
+              "1.0": 112,
+              "0.0": 98
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 854,
+            "coverage_percent": 93.44,
+            "accuracy": 0.9379,
+            "balanced_accuracy": 0.9382,
+            "average_confidence": 0.803,
+            "actual_hit_rate": 0.9379,
+            "calibration_gap": -0.135,
+            "class_distribution": {
+              "0.0": 449,
+              "1.0": 405
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 786,
+            "coverage_percent": 86.0,
+            "accuracy": 0.9567,
+            "balanced_accuracy": 0.9571,
+            "average_confidence": 0.8229,
+            "actual_hit_rate": 0.9567,
+            "calibration_gap": -0.1338,
+            "class_distribution": {
+              "0.0": 407,
+              "1.0": 379
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 734,
+            "coverage_percent": 80.31,
+            "accuracy": 0.9646,
+            "balanced_accuracy": 0.9648,
+            "average_confidence": 0.8368,
+            "actual_hit_rate": 0.9646,
+            "calibration_gap": -0.1278,
+            "class_distribution": {
+              "0.0": 379,
+              "1.0": 355
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 652,
+            "coverage_percent": 71.33,
+            "accuracy": 0.9877,
+            "balanced_accuracy": 0.9877,
+            "average_confidence": 0.8569,
+            "actual_hit_rate": 0.9877,
+            "calibration_gap": -0.1308,
+            "class_distribution": {
+              "0.0": 333,
+              "1.0": 319
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 577,
+            "coverage_percent": 63.13,
+            "accuracy": 0.9931,
+            "balanced_accuracy": 0.9929,
+            "average_confidence": 0.8735,
+            "actual_hit_rate": 0.9931,
+            "calibration_gap": -0.1196,
+            "class_distribution": {
+              "0.0": 298,
+              "1.0": 279
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 481,
+            "coverage_percent": 52.63,
+            "accuracy": 0.9979,
+            "balanced_accuracy": 0.9979,
+            "average_confidence": 0.8934,
+            "actual_hit_rate": 0.9979,
+            "calibration_gap": -0.1045,
+            "class_distribution": {
+              "0.0": 247,
+              "1.0": 234
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 481,
+          "coverage_percent": 52.63,
+          "accuracy": 0.9979,
+          "balanced_accuracy": 0.9979,
+          "average_confidence": 0.8934,
+          "actual_hit_rate": 0.9979,
+          "calibration_gap": -0.1045,
+          "class_distribution": {
+            "0.0": 247,
+            "1.0": 234
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 481,
+          "coverage_percent": 52.63,
+          "accuracy": 0.9979,
+          "balanced_accuracy": 0.9979,
+          "average_confidence": 0.8934,
+          "actual_hit_rate": 0.9979,
+          "calibration_gap": -0.1045,
+          "class_distribution": {
+            "0.0": 247,
+            "1.0": 234
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      },
+      "source": "ufc_1994_2025"
+    },
+    {
+      "variant": "holdout_ufc_1994_2026",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 10932,
+      "validation_rows": 2433,
+      "test_rows": 1164,
+      "metrics": {
+        "accuracy": 0.7981,
+        "balanced_accuracy": 0.7976,
+        "f1_macro": 0.7978,
+        "roc_auc": 0.8829,
+        "log_loss": 0.4443,
+        "brier_score": 0.1394,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 489,
+            "1.0": 109
+          },
+          "1.0": {
+            "0.0": 126,
+            "1.0": 440
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.5137,
+        "class_counts": {
+          "0.0": 598,
+          "1.0": 566
+        }
+      },
+      "relative_improvement": 0.2844,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 47,
+            "coverage_percent": 4.04,
+            "accuracy": 0.5106,
+            "balanced_accuracy": 0.5127,
+            "average_confidence": 0.5286,
+            "actual_hit_rate": 0.5106,
+            "calibration_gap": 0.018,
+            "class_distribution": {
+              "1.0": 24,
+              "0.0": 23
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 56,
+            "coverage_percent": 4.81,
+            "accuracy": 0.5714,
+            "balanced_accuracy": 0.5696,
+            "average_confidence": 0.5761,
+            "actual_hit_rate": 0.5714,
+            "calibration_gap": 0.0047,
+            "class_distribution": {
+              "1.0": 29,
+              "0.0": 27
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 60,
+            "coverage_percent": 5.15,
+            "accuracy": 0.5333,
+            "balanced_accuracy": 0.5354,
+            "average_confidence": 0.6278,
+            "actual_hit_rate": 0.5333,
+            "calibration_gap": 0.0945,
+            "class_distribution": {
+              "1.0": 33,
+              "0.0": 27
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 87,
+            "coverage_percent": 7.47,
+            "accuracy": 0.5172,
+            "balanced_accuracy": 0.5183,
+            "average_confidence": 0.6756,
+            "actual_hit_rate": 0.5172,
+            "calibration_gap": 0.1584,
+            "class_distribution": {
+              "0.0": 46,
+              "1.0": 41
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 63,
+            "coverage_percent": 5.41,
+            "accuracy": 0.7143,
+            "balanced_accuracy": 0.7152,
+            "average_confidence": 0.7249,
+            "actual_hit_rate": 0.7143,
+            "calibration_gap": 0.0106,
+            "class_distribution": {
+              "1.0": 33,
+              "0.0": 30
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 74,
+            "coverage_percent": 6.36,
+            "accuracy": 0.7027,
+            "balanced_accuracy": 0.7083,
+            "average_confidence": 0.7716,
+            "actual_hit_rate": 0.7027,
+            "calibration_gap": 0.0689,
+            "class_distribution": {
+              "1.0": 42,
+              "0.0": 32
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 89,
+            "coverage_percent": 7.65,
+            "accuracy": 0.764,
+            "balanced_accuracy": 0.7652,
+            "average_confidence": 0.8248,
+            "actual_hit_rate": 0.764,
+            "calibration_gap": 0.0608,
+            "class_distribution": {
+              "1.0": 47,
+              "0.0": 42
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 131,
+            "coverage_percent": 11.25,
+            "accuracy": 0.8779,
+            "balanced_accuracy": 0.8777,
+            "average_confidence": 0.8766,
+            "actual_hit_rate": 0.8779,
+            "calibration_gap": -0.0012,
+            "class_distribution": {
+              "1.0": 68,
+              "0.0": 63
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 557,
+            "coverage_percent": 47.85,
+            "accuracy": 0.9264,
+            "balanced_accuracy": 0.925,
+            "average_confidence": 0.961,
+            "actual_hit_rate": 0.9264,
+            "calibration_gap": 0.0346,
+            "class_distribution": {
+              "0.0": 308,
+              "1.0": 249
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 1117,
+            "coverage_percent": 95.96,
+            "accuracy": 0.8102,
+            "balanced_accuracy": 0.8097,
+            "average_confidence": 0.855,
+            "actual_hit_rate": 0.8102,
+            "calibration_gap": 0.0448,
+            "class_distribution": {
+              "0.0": 575,
+              "1.0": 542
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 1061,
+            "coverage_percent": 91.15,
+            "accuracy": 0.8228,
+            "balanced_accuracy": 0.8222,
+            "average_confidence": 0.8697,
+            "actual_hit_rate": 0.8228,
+            "calibration_gap": 0.0469,
+            "class_distribution": {
+              "0.0": 548,
+              "1.0": 513
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 1001,
+            "coverage_percent": 86.0,
+            "accuracy": 0.8402,
+            "balanced_accuracy": 0.8395,
+            "average_confidence": 0.8842,
+            "actual_hit_rate": 0.8402,
+            "calibration_gap": 0.044,
+            "class_distribution": {
+              "0.0": 521,
+              "1.0": 480
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 914,
+            "coverage_percent": 78.52,
+            "accuracy": 0.8709,
+            "balanced_accuracy": 0.8701,
+            "average_confidence": 0.904,
+            "actual_hit_rate": 0.8709,
+            "calibration_gap": 0.0331,
+            "class_distribution": {
+              "0.0": 475,
+              "1.0": 439
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 851,
+            "coverage_percent": 73.11,
+            "accuracy": 0.8825,
+            "balanced_accuracy": 0.8816,
+            "average_confidence": 0.9173,
+            "actual_hit_rate": 0.8825,
+            "calibration_gap": 0.0348,
+            "class_distribution": {
+              "0.0": 445,
+              "1.0": 406
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 777,
+            "coverage_percent": 66.75,
+            "accuracy": 0.8996,
+            "balanced_accuracy": 0.8987,
+            "average_confidence": 0.9312,
+            "actual_hit_rate": 0.8996,
+            "calibration_gap": 0.0316,
+            "class_distribution": {
+              "0.0": 413,
+              "1.0": 364
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 777,
+          "coverage_percent": 66.75,
+          "accuracy": 0.8996,
+          "balanced_accuracy": 0.8987,
+          "average_confidence": 0.9312,
+          "actual_hit_rate": 0.8996,
+          "calibration_gap": 0.0316,
+          "class_distribution": {
+            "0.0": 413,
+            "1.0": 364
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 777,
+          "coverage_percent": 66.75,
+          "accuracy": 0.8996,
+          "balanced_accuracy": 0.8987,
+          "average_confidence": 0.9312,
+          "actual_hit_rate": 0.8996,
+          "calibration_gap": 0.0316,
+          "class_distribution": {
+            "0.0": 413,
+            "1.0": 364
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": false
+      },
+      "source": "ufc_1994_2026"
+    },
+    {
+      "variant": "holdout_ufc_fight_forecast",
+      "algorithm": "hist_gradient_boosting",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 16987,
+      "validation_rows": 3656,
+      "test_rows": 954,
+      "metrics": {
+        "accuracy": 0.5723,
+        "balanced_accuracy": 0.5711,
+        "f1_macro": 0.5711,
+        "roc_auc": 0.5952,
+        "log_loss": 0.9074,
+        "brier_score": 0.2919,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 299,
+            "1.0": 204
+          },
+          "1.0": {
+            "0.0": 204,
+            "1.0": 247
+          }
+        }
+      },
+      "baseline": {
+        "label": "0.0",
+        "accuracy": 0.5273,
+        "class_counts": {
+          "0.0": 503,
+          "1.0": 451
+        }
+      },
+      "relative_improvement": 0.045,
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 98,
+            "coverage_percent": 10.27,
+            "accuracy": 0.4694,
+            "balanced_accuracy": 0.466,
+            "average_confidence": 0.5256,
+            "actual_hit_rate": 0.4694,
+            "calibration_gap": 0.0563,
+            "class_distribution": {
+              "1.0": 51,
+              "0.0": 47
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 87,
+            "coverage_percent": 9.12,
+            "accuracy": 0.5517,
+            "balanced_accuracy": 0.5523,
+            "average_confidence": 0.5733,
+            "actual_hit_rate": 0.5517,
+            "calibration_gap": 0.0216,
+            "class_distribution": {
+              "0.0": 51,
+              "1.0": 36
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 92,
+            "coverage_percent": 9.64,
+            "accuracy": 0.5326,
+            "balanced_accuracy": 0.5239,
+            "average_confidence": 0.6256,
+            "actual_hit_rate": 0.5326,
+            "calibration_gap": 0.093,
+            "class_distribution": {
+              "0.0": 54,
+              "1.0": 38
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 84,
+            "coverage_percent": 8.81,
+            "accuracy": 0.5714,
+            "balanced_accuracy": 0.5729,
+            "average_confidence": 0.6682,
+            "actual_hit_rate": 0.5714,
+            "calibration_gap": 0.0967,
+            "class_distribution": {
+              "1.0": 43,
+              "0.0": 41
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 79,
+            "coverage_percent": 8.28,
+            "accuracy": 0.5823,
+            "balanced_accuracy": 0.5691,
+            "average_confidence": 0.7208,
+            "actual_hit_rate": 0.5823,
+            "calibration_gap": 0.1385,
+            "class_distribution": {
+              "0.0": 47,
+              "1.0": 32
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 66,
+            "coverage_percent": 6.92,
+            "accuracy": 0.697,
+            "balanced_accuracy": 0.6859,
+            "average_confidence": 0.7742,
+            "actual_hit_rate": 0.697,
+            "calibration_gap": 0.0772,
+            "class_distribution": {
+              "0.0": 41,
+              "1.0": 25
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 81,
+            "coverage_percent": 8.49,
+            "accuracy": 0.4938,
+            "balanced_accuracy": 0.4945,
+            "average_confidence": 0.8257,
+            "actual_hit_rate": 0.4938,
+            "calibration_gap": 0.3318,
+            "class_distribution": {
+              "1.0": 41,
+              "0.0": 40
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 139,
+            "coverage_percent": 14.57,
+            "accuracy": 0.554,
+            "balanced_accuracy": 0.5463,
+            "average_confidence": 0.8781,
+            "actual_hit_rate": 0.554,
+            "calibration_gap": 0.3242,
+            "class_distribution": {
+              "0.0": 73,
+              "1.0": 66
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 228,
+            "coverage_percent": 23.9,
+            "accuracy": 0.6404,
+            "balanced_accuracy": 0.6377,
+            "average_confidence": 0.9519,
+            "actual_hit_rate": 0.6404,
+            "calibration_gap": 0.3115,
+            "class_distribution": {
+              "1.0": 119,
+              "0.0": 109
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 856,
+            "coverage_percent": 89.73,
+            "accuracy": 0.5841,
+            "balanced_accuracy": 0.5819,
+            "average_confidence": 0.7915,
+            "actual_hit_rate": 0.5841,
+            "calibration_gap": 0.2074,
+            "class_distribution": {
+              "0.0": 456,
+              "1.0": 400
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 769,
+            "coverage_percent": 80.61,
+            "accuracy": 0.5878,
+            "balanced_accuracy": 0.5857,
+            "average_confidence": 0.8162,
+            "actual_hit_rate": 0.5878,
+            "calibration_gap": 0.2284,
+            "class_distribution": {
+              "0.0": 405,
+              "1.0": 364
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 677,
+            "coverage_percent": 70.96,
+            "accuracy": 0.5953,
+            "balanced_accuracy": 0.5938,
+            "average_confidence": 0.8421,
+            "actual_hit_rate": 0.5953,
+            "calibration_gap": 0.2469,
+            "class_distribution": {
+              "0.0": 351,
+              "1.0": 326
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 593,
+            "coverage_percent": 62.16,
+            "accuracy": 0.5987,
+            "balanced_accuracy": 0.597,
+            "average_confidence": 0.8668,
+            "actual_hit_rate": 0.5987,
+            "calibration_gap": 0.2681,
+            "class_distribution": {
+              "0.0": 310,
+              "1.0": 283
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 514,
+            "coverage_percent": 53.88,
+            "accuracy": 0.6012,
+            "balanced_accuracy": 0.6004,
+            "average_confidence": 0.8892,
+            "actual_hit_rate": 0.6012,
+            "calibration_gap": 0.288,
+            "class_distribution": {
+              "0.0": 263,
+              "1.0": 251
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 448,
+            "coverage_percent": 46.96,
+            "accuracy": 0.5871,
+            "balanced_accuracy": 0.5873,
+            "average_confidence": 0.9062,
+            "actual_hit_rate": 0.5871,
+            "calibration_gap": 0.3191,
+            "class_distribution": {
+              "1.0": 226,
+              "0.0": 222
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=75%",
+          "sample_count": 514,
+          "coverage_percent": 53.88,
+          "accuracy": 0.6012,
+          "balanced_accuracy": 0.6004,
+          "average_confidence": 0.8892,
+          "actual_hit_rate": 0.6012,
+          "calibration_gap": 0.288,
+          "class_distribution": {
+            "0.0": 263,
+            "1.0": 251
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=75%",
+          "sample_count": 514,
+          "coverage_percent": 53.88,
+          "accuracy": 0.6012,
+          "balanced_accuracy": 0.6004,
+          "average_confidence": 0.8892,
+          "actual_hit_rate": 0.6012,
+          "calibration_gap": 0.288,
+          "class_distribution": {
+            "0.0": 263,
+            "1.0": 251
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": false,
+        "reaches_95_balanced_accuracy": false
+      },
+      "source": "ufc_fight_forecast"
+    },
+    {
+      "variant": "holdout_ufc_stats_complete",
+      "status": "insufficient_rows",
+      "feature_count": 40,
+      "features": [
+        "a_prior_fights",
+        "b_prior_fights",
+        "a_prior_wins",
+        "b_prior_wins",
+        "a_prior_finishes",
+        "b_prior_finishes",
+        "a_prior_decisions",
+        "b_prior_decisions",
+        "fighter_1_stance_known",
+        "fighter_2_stance_known",
+        "fighter_1_history_count",
+        "fighter_2_history_count",
+        "minimum_history_count",
+        "fighter_1_win_rate_before",
+        "fighter_2_win_rate_before",
+        "win_rate_diff",
+        "fighter_1_finish_win_rate_before",
+        "fighter_2_finish_win_rate_before",
+        "finish_rate_diff",
+        "fighter_1_decision_win_rate_before",
+        "fighter_2_decision_win_rate_before",
+        "decision_rate_diff",
+        "fighter_1_elo_fights_count_before",
+        "fighter_2_elo_fights_count_before",
+        "fighter_1_elo_available",
+        "fighter_2_elo_available",
+        "same_division",
+        "cross_division",
+        "catchweight",
+        "weight_class_gap",
+        "estimated_weight_gap_lbs",
+        "height_gap",
+        "reach_gap",
+        "unknown_size_context",
+        "pound_for_pound_mode",
+        "size_features_used",
+        "low_sample_warning",
+        "missing_profile_warning",
+        "missing_stats_warning",
+        "cross_division_warning"
+      ],
+      "train_rows": 17086,
+      "validation_rows": 3666,
+      "test_rows": 0,
+      "metrics": {},
+      "baseline": {},
+      "selective_prediction": {},
+      "source": "ufc_stats_complete"
+    }
+  ],
+  "stress_tests": {
+    "cold_start_any_fighter_zero_prior": {
+      "rows": 20,
+      "metrics": {
+        "accuracy": 0.55,
+        "balanced_accuracy": 0.5404,
+        "f1_macro": 0.5396,
+        "roc_auc": 0.6869,
+        "log_loss": 0.672,
+        "brier_score": 0.2438,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 7,
+            "1.0": 4
+          },
+          "1.0": {
+            "0.0": 5,
+            "1.0": 4
+          }
+        }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 7,
+            "coverage_percent": 35.0,
+            "accuracy": 0.5714,
+            "balanced_accuracy": 0.5,
+            "average_confidence": 0.5035,
+            "actual_hit_rate": 0.5714,
+            "calibration_gap": -0.068,
+            "class_distribution": {
+              "0.0": 4,
+              "1.0": 3
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 2,
+            "coverage_percent": 10.0,
+            "accuracy": 0.0,
+            "balanced_accuracy": 0.0,
+            "average_confidence": 0.5558,
+            "actual_hit_rate": 0.0,
+            "calibration_gap": 0.5558,
+            "class_distribution": {
+              "1.0": 1,
+              "0.0": 1
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 0,
+            "coverage_percent": 0.0,
+            "accuracy": null,
+            "balanced_accuracy": null,
+            "average_confidence": null,
+            "actual_hit_rate": null,
+            "calibration_gap": null,
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 2,
+            "coverage_percent": 10.0,
+            "accuracy": 0.5,
+            "balanced_accuracy": 0.5,
+            "average_confidence": 0.6772,
+            "actual_hit_rate": 0.5,
+            "calibration_gap": 0.1772,
+            "class_distribution": {
+              "0.0": 2
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 0,
+            "coverage_percent": 0.0,
+            "accuracy": null,
+            "balanced_accuracy": null,
+            "average_confidence": null,
+            "actual_hit_rate": null,
+            "calibration_gap": null,
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 5,
+            "coverage_percent": 25.0,
+            "accuracy": 0.4,
+            "balanced_accuracy": 0.4167,
+            "average_confidence": 0.7727,
+            "actual_hit_rate": 0.4,
+            "calibration_gap": 0.3727,
+            "class_distribution": {
+              "0.0": 3,
+              "1.0": 2
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 1,
+            "coverage_percent": 5.0,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.8373,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.1627,
+            "class_distribution": {
+              "1.0": 1
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 1,
+            "coverage_percent": 5.0,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.8816,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.1184,
+            "class_distribution": {
+              "0.0": 1
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 2,
+            "coverage_percent": 10.0,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.9277,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.0723,
+            "class_distribution": {
+              "1.0": 2
+            },
+            "small_sample_warning": true
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 13,
+            "coverage_percent": 65.0,
+            "accuracy": 0.5385,
+            "balanced_accuracy": 0.5476,
+            "average_confidence": 0.7618,
+            "actual_hit_rate": 0.5385,
+            "calibration_gap": 0.2234,
+            "class_distribution": {
+              "0.0": 7,
+              "1.0": 6
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 11,
+            "coverage_percent": 55.0,
+            "accuracy": 0.6364,
+            "balanced_accuracy": 0.65,
+            "average_confidence": 0.7993,
+            "actual_hit_rate": 0.6364,
+            "calibration_gap": 0.1629,
+            "class_distribution": {
+              "0.0": 6,
+              "1.0": 5
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 11,
+            "coverage_percent": 55.0,
+            "accuracy": 0.6364,
+            "balanced_accuracy": 0.65,
+            "average_confidence": 0.7993,
+            "actual_hit_rate": 0.6364,
+            "calibration_gap": 0.1629,
+            "class_distribution": {
+              "0.0": 6,
+              "1.0": 5
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 9,
+            "coverage_percent": 45.0,
+            "accuracy": 0.6667,
+            "balanced_accuracy": 0.65,
+            "average_confidence": 0.8264,
+            "actual_hit_rate": 0.6667,
+            "calibration_gap": 0.1598,
+            "class_distribution": {
+              "1.0": 5,
+              "0.0": 4
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 9,
+            "coverage_percent": 45.0,
+            "accuracy": 0.6667,
+            "balanced_accuracy": 0.65,
+            "average_confidence": 0.8264,
+            "actual_hit_rate": 0.6667,
+            "calibration_gap": 0.1598,
+            "class_distribution": {
+              "1.0": 5,
+              "0.0": 4
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 4,
+            "coverage_percent": 20.0,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.8936,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.1064,
+            "class_distribution": {
+              "1.0": 3,
+              "0.0": 1
+            },
+            "small_sample_warning": true
+          }
+        ],
+        "best_accuracy": null,
+        "best_balanced_accuracy": null,
+        "reaches_80_accuracy": false,
+        "reaches_95_balanced_accuracy": false
+      }
+    },
+    "low_history_any_fighter_under_3": {
+      "rows": 267,
+      "metrics": {
+        "accuracy": 0.8577,
+        "balanced_accuracy": 0.8583,
+        "f1_macro": 0.8577,
+        "roc_auc": 0.9632,
+        "log_loss": 0.2655,
+        "brier_score": 0.0894,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 113,
+            "1.0": 16
+          },
+          "1.0": {
+            "0.0": 22,
+            "1.0": 116
+          }
+        }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 8,
+            "coverage_percent": 3.0,
+            "accuracy": 0.625,
+            "balanced_accuracy": 0.625,
+            "average_confidence": 0.5031,
+            "actual_hit_rate": 0.625,
+            "calibration_gap": -0.1219,
+            "class_distribution": {
+              "0.0": 4,
+              "1.0": 4
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 3,
+            "coverage_percent": 1.12,
+            "accuracy": 0.0,
+            "balanced_accuracy": 0.0,
+            "average_confidence": 0.5621,
+            "actual_hit_rate": 0.0,
+            "calibration_gap": 0.5621,
+            "class_distribution": {
+              "1.0": 2,
+              "0.0": 1
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 8,
+            "coverage_percent": 3.0,
+            "accuracy": 0.25,
+            "balanced_accuracy": 0.5,
+            "average_confidence": 0.6236,
+            "actual_hit_rate": 0.25,
+            "calibration_gap": 0.3736,
+            "class_distribution": {
+              "1.0": 6,
+              "0.0": 2
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 7,
+            "coverage_percent": 2.62,
+            "accuracy": 0.2857,
+            "balanced_accuracy": 0.35,
+            "average_confidence": 0.6776,
+            "actual_hit_rate": 0.2857,
+            "calibration_gap": 0.3919,
+            "class_distribution": {
+              "0.0": 5,
+              "1.0": 2
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 8,
+            "coverage_percent": 3.0,
+            "accuracy": 0.625,
+            "balanced_accuracy": 0.625,
+            "average_confidence": 0.735,
+            "actual_hit_rate": 0.625,
+            "calibration_gap": 0.11,
+            "class_distribution": {
+              "1.0": 4,
+              "0.0": 4
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 12,
+            "coverage_percent": 4.49,
+            "accuracy": 0.4167,
+            "balanced_accuracy": 0.4167,
+            "average_confidence": 0.7697,
+            "actual_hit_rate": 0.4167,
+            "calibration_gap": 0.353,
+            "class_distribution": {
+              "0.0": 6,
+              "1.0": 6
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 5,
+            "coverage_percent": 1.87,
+            "accuracy": 1.0,
+            "balanced_accuracy": 1.0,
+            "average_confidence": 0.8325,
+            "actual_hit_rate": 1.0,
+            "calibration_gap": -0.1675,
+            "class_distribution": {
+              "0.0": 3,
+              "1.0": 2
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 10,
+            "coverage_percent": 3.75,
+            "accuracy": 0.6,
+            "balanced_accuracy": 0.5238,
+            "average_confidence": 0.8788,
+            "actual_hit_rate": 0.6,
+            "calibration_gap": 0.2788,
+            "class_distribution": {
+              "0.0": 7,
+              "1.0": 3
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 206,
+            "coverage_percent": 77.15,
+            "accuracy": 0.966,
+            "balanced_accuracy": 0.9673,
+            "average_confidence": 0.9819,
+            "actual_hit_rate": 0.966,
+            "calibration_gap": 0.0159,
+            "class_distribution": {
+              "1.0": 109,
+              "0.0": 97
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 259,
+            "coverage_percent": 97.0,
+            "accuracy": 0.8649,
+            "balanced_accuracy": 0.8651,
+            "average_confidence": 0.9334,
+            "actual_hit_rate": 0.8649,
+            "calibration_gap": 0.0686,
+            "class_distribution": {
+              "1.0": 134,
+              "0.0": 125
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 256,
+            "coverage_percent": 95.88,
+            "accuracy": 0.875,
+            "balanced_accuracy": 0.8751,
+            "average_confidence": 0.9378,
+            "actual_hit_rate": 0.875,
+            "calibration_gap": 0.0628,
+            "class_distribution": {
+              "1.0": 132,
+              "0.0": 124
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 248,
+            "coverage_percent": 92.88,
+            "accuracy": 0.8952,
+            "balanced_accuracy": 0.8949,
+            "average_confidence": 0.9479,
+            "actual_hit_rate": 0.8952,
+            "calibration_gap": 0.0528,
+            "class_distribution": {
+              "1.0": 126,
+              "0.0": 122
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 241,
+            "coverage_percent": 90.26,
+            "accuracy": 0.9129,
+            "balanced_accuracy": 0.9127,
+            "average_confidence": 0.9558,
+            "actual_hit_rate": 0.9129,
+            "calibration_gap": 0.0429,
+            "class_distribution": {
+              "1.0": 124,
+              "0.0": 117
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 233,
+            "coverage_percent": 87.27,
+            "accuracy": 0.9227,
+            "balanced_accuracy": 0.9229,
+            "average_confidence": 0.9634,
+            "actual_hit_rate": 0.9227,
+            "calibration_gap": 0.0406,
+            "class_distribution": {
+              "1.0": 120,
+              "0.0": 113
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 221,
+            "coverage_percent": 82.77,
+            "accuracy": 0.9502,
+            "balanced_accuracy": 0.9509,
+            "average_confidence": 0.9739,
+            "actual_hit_rate": 0.9502,
+            "calibration_gap": 0.0237,
+            "class_distribution": {
+              "1.0": 114,
+              "0.0": 107
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 221,
+          "coverage_percent": 82.77,
+          "accuracy": 0.9502,
+          "balanced_accuracy": 0.9509,
+          "average_confidence": 0.9739,
+          "actual_hit_rate": 0.9502,
+          "calibration_gap": 0.0237,
+          "class_distribution": {
+            "1.0": 114,
+            "0.0": 107
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 221,
+          "coverage_percent": 82.77,
+          "accuracy": 0.9502,
+          "balanced_accuracy": 0.9509,
+          "average_confidence": 0.9739,
+          "actual_hit_rate": 0.9502,
+          "calibration_gap": 0.0237,
+          "class_distribution": {
+            "1.0": 114,
+            "0.0": 107
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      }
+    },
+    "debutant_both_zero_prior": {
+      "rows": 7,
+      "status": "small_sample"
+    },
+    "recent_only_newest_half": {
+      "rows": 1663,
+      "metrics": {
+        "accuracy": 0.8677,
+        "balanced_accuracy": 0.8678,
+        "f1_macro": 0.8676,
+        "roc_auc": 0.9411,
+        "log_loss": 0.3136,
+        "brier_score": 0.0943,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 747,
+            "1.0": 117
+          },
+          "1.0": {
+            "0.0": 103,
+            "1.0": 696
+          }
+        }
+      },
+      "selective_prediction": {
+        "confidence_definition": "max predicted class probability",
+        "buckets": [
+          {
+            "bucket": "50-55%",
+            "sample_count": 46,
+            "coverage_percent": 2.77,
+            "accuracy": 0.6087,
+            "balanced_accuracy": 0.6087,
+            "average_confidence": 0.5261,
+            "actual_hit_rate": 0.6087,
+            "calibration_gap": -0.0826,
+            "class_distribution": {
+              "0.0": 23,
+              "1.0": 23
+            },
+            "small_sample_warning": true
+          },
+          {
+            "bucket": "55-60%",
+            "sample_count": 58,
+            "coverage_percent": 3.49,
+            "accuracy": 0.5345,
+            "balanced_accuracy": 0.5425,
+            "average_confidence": 0.5723,
+            "actual_hit_rate": 0.5345,
+            "calibration_gap": 0.0379,
+            "class_distribution": {
+              "0.0": 37,
+              "1.0": 21
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "60-65%",
+            "sample_count": 69,
+            "coverage_percent": 4.15,
+            "accuracy": 0.4928,
+            "balanced_accuracy": 0.4924,
+            "average_confidence": 0.6245,
+            "actual_hit_rate": 0.4928,
+            "calibration_gap": 0.1318,
+            "class_distribution": {
+              "1.0": 36,
+              "0.0": 33
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "65-70%",
+            "sample_count": 57,
+            "coverage_percent": 3.43,
+            "accuracy": 0.6667,
+            "balanced_accuracy": 0.6741,
+            "average_confidence": 0.6752,
+            "actual_hit_rate": 0.6667,
+            "calibration_gap": 0.0085,
+            "class_distribution": {
+              "0.0": 30,
+              "1.0": 27
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "70-75%",
+            "sample_count": 80,
+            "coverage_percent": 4.81,
+            "accuracy": 0.7,
+            "balanced_accuracy": 0.7,
+            "average_confidence": 0.7208,
+            "actual_hit_rate": 0.7,
+            "calibration_gap": 0.0208,
+            "class_distribution": {
+              "1.0": 40,
+              "0.0": 40
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "75-80%",
+            "sample_count": 126,
+            "coverage_percent": 7.58,
+            "accuracy": 0.7143,
+            "balanced_accuracy": 0.7114,
+            "average_confidence": 0.7764,
+            "actual_hit_rate": 0.7143,
+            "calibration_gap": 0.0621,
+            "class_distribution": {
+              "1.0": 66,
+              "0.0": 60
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "80-85%",
+            "sample_count": 102,
+            "coverage_percent": 6.13,
+            "accuracy": 0.8922,
+            "balanced_accuracy": 0.8922,
+            "average_confidence": 0.825,
+            "actual_hit_rate": 0.8922,
+            "calibration_gap": -0.0671,
+            "class_distribution": {
+              "0.0": 51,
+              "1.0": 51
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "85-90%",
+            "sample_count": 184,
+            "coverage_percent": 11.06,
+            "accuracy": 0.9076,
+            "balanced_accuracy": 0.9074,
+            "average_confidence": 0.878,
+            "actual_hit_rate": 0.9076,
+            "calibration_gap": -0.0296,
+            "class_distribution": {
+              "1.0": 94,
+              "0.0": 90
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": "90-100%",
+            "sample_count": 941,
+            "coverage_percent": 56.58,
+            "accuracy": 0.9649,
+            "balanced_accuracy": 0.9649,
+            "average_confidence": 0.966,
+            "actual_hit_rate": 0.9649,
+            "calibration_gap": 0.0011,
+            "class_distribution": {
+              "0.0": 500,
+              "1.0": 441
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "thresholds": [
+          {
+            "bucket": ">=55%",
+            "sample_count": 1617,
+            "coverage_percent": 97.23,
+            "accuracy": 0.8751,
+            "balanced_accuracy": 0.8753,
+            "average_confidence": 0.8812,
+            "actual_hit_rate": 0.8751,
+            "calibration_gap": 0.0062,
+            "class_distribution": {
+              "0.0": 841,
+              "1.0": 776
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=60%",
+            "sample_count": 1559,
+            "coverage_percent": 93.75,
+            "accuracy": 0.8877,
+            "balanced_accuracy": 0.8878,
+            "average_confidence": 0.8927,
+            "actual_hit_rate": 0.8877,
+            "calibration_gap": 0.005,
+            "class_distribution": {
+              "0.0": 804,
+              "1.0": 755
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=65%",
+            "sample_count": 1490,
+            "coverage_percent": 89.6,
+            "accuracy": 0.906,
+            "balanced_accuracy": 0.9062,
+            "average_confidence": 0.9052,
+            "actual_hit_rate": 0.906,
+            "calibration_gap": -0.0009,
+            "class_distribution": {
+              "0.0": 771,
+              "1.0": 719
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=70%",
+            "sample_count": 1433,
+            "coverage_percent": 86.17,
+            "accuracy": 0.9156,
+            "balanced_accuracy": 0.9155,
+            "average_confidence": 0.9143,
+            "actual_hit_rate": 0.9156,
+            "calibration_gap": -0.0013,
+            "class_distribution": {
+              "0.0": 741,
+              "1.0": 692
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=75%",
+            "sample_count": 1353,
+            "coverage_percent": 81.36,
+            "accuracy": 0.9283,
+            "balanced_accuracy": 0.9284,
+            "average_confidence": 0.9257,
+            "actual_hit_rate": 0.9283,
+            "calibration_gap": -0.0026,
+            "class_distribution": {
+              "0.0": 701,
+              "1.0": 652
+            },
+            "small_sample_warning": false
+          },
+          {
+            "bucket": ">=80%",
+            "sample_count": 1227,
+            "coverage_percent": 73.78,
+            "accuracy": 0.9503,
+            "balanced_accuracy": 0.9502,
+            "average_confidence": 0.9411,
+            "actual_hit_rate": 0.9503,
+            "calibration_gap": -0.0092,
+            "class_distribution": {
+              "0.0": 641,
+              "1.0": 586
+            },
+            "small_sample_warning": false
+          }
+        ],
+        "best_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 1227,
+          "coverage_percent": 73.78,
+          "accuracy": 0.9503,
+          "balanced_accuracy": 0.9502,
+          "average_confidence": 0.9411,
+          "actual_hit_rate": 0.9503,
+          "calibration_gap": -0.0092,
+          "class_distribution": {
+            "0.0": 641,
+            "1.0": 586
+          },
+          "small_sample_warning": false
+        },
+        "best_balanced_accuracy": {
+          "bucket": ">=80%",
+          "sample_count": 1227,
+          "coverage_percent": 73.78,
+          "accuracy": 0.9503,
+          "balanced_accuracy": 0.9502,
+          "average_confidence": 0.9411,
+          "actual_hit_rate": 0.9503,
+          "calibration_gap": -0.0092,
+          "class_distribution": {
+            "0.0": 641,
+            "1.0": 586
+          },
+          "small_sample_warning": false
+        },
+        "reaches_80_accuracy": true,
+        "reaches_95_balanced_accuracy": true
+      }
+    }
+  },
+  "confidence_audit": {
+    "best_threshold": {
+      "bucket": ">=80%",
+      "sample_count": 2517,
+      "coverage_percent": 75.65,
+      "accuracy": 0.9722,
+      "balanced_accuracy": 0.9722,
+      "average_confidence": 0.9441,
+      "actual_hit_rate": 0.9722,
+      "calibration_gap": -0.028,
+      "class_distribution": {
+        "0.0": 1313,
+        "1.0": 1204
+      },
+      "small_sample_warning": false
+    },
+    "top_correct_wrong_note": "Detailed fight lists are intentionally kept out of committed reports; regenerate locally if needed from backtest_predictions.json."
+  },
+  "final_status": {
+    "status": "high_confidence_only",
+    "runtime_parity_ok": true,
+    "leakage_scan_ok": false,
+    "source_holdout_ok": true,
+    "low_history_ok": true,
+    "reason": "Do not mark production_ready until runtime parity, source holdout, cold-start, and calibration are reviewed together."
+  }
+}
