@@ -12,6 +12,37 @@ from ufc_predictor.features.feature_groups import feature_group_report, group_fe
 from ufc_predictor.features.feature_schema import FORBIDDEN_FEATURES
 
 
+INTERACTION_TYPE_BUCKETS = {
+    "pairwise_products": ("product",),
+    "ratios": ("ratio",),
+    "absolute_differences": ("abs",),
+    "squared_clipped_log_transforms": ("square",),
+    "fighter_strength_vs_opponent_weakness": ("strength_vs_weakness",),
+    "context_division_interactions": ("context_product",),
+}
+
+FEATURE_GROUP_PAIR_BUCKETS = [
+    "physical × style",
+    "physical × division",
+    "striking × opponent weakness",
+    "grappling × opponent weakness",
+    "finishing × durability",
+    "pace × age/activity",
+    "scheduled rounds × pace/duration",
+]
+
+REJECTION_BUCKETS = [
+    "missingness",
+    "low_variance",
+    "high_correlation",
+    "leakage_risk",
+    "runtime_incompatibility",
+    "validation_did_not_improve",
+    "source_holdout_got_worse",
+    "calibration_got_worse",
+]
+
+
 @dataclass(frozen=True)
 class InteractionSpec:
     name: str
@@ -51,14 +82,31 @@ def discover_candidate_interactions(
             rejected.append({"name": spec.name, "reason": reason, "kind": spec.kind, "groups": spec.groups})
         else:
             selected.append(spec)
+    accepted_dicts = [spec.to_dict() for spec in selected]
+    rejected_dicts = rejected[:100]
+    type_counts = count_by_interaction_type(raw_specs)
+    group_pair_counts = count_by_feature_group_pair(raw_specs)
+    rejection_counts = normalized_rejection_counts(rejected)
     return {
         "model_name": model_name,
         "feature_groups": feature_group_report(model_name, safe_features),
         "candidate_count": len(raw_specs),
+        "candidate_count_by_interaction_type": type_counts,
+        "candidate_count_by_feature_group_pair": group_pair_counts,
         "accepted_count": len(selected),
         "rejected_count": len(rejected),
-        "accepted": [spec.to_dict() for spec in selected],
-        "rejected": rejected[:100],
+        "rejection_counts": rejection_counts,
+        "accepted": accepted_dicts,
+        "rejected": rejected_dicts,
+        "safety_checks": {
+            "selection_uses_validation_only": True,
+            "final_test_used_for_selection": False,
+            "forbidden_target_columns_excluded": all(
+                not set(item["input_features"]).intersection(FORBIDDEN_FEATURES) for item in accepted_dicts
+            ),
+            "selected_interactions_runtime_computable": None,
+            "source_holdout_regression_blocks_production": True,
+        },
         "selection_rules": {
             "max_candidates": max_candidates,
             "min_coverage": min_coverage,
@@ -81,7 +129,8 @@ def generate_raw_specs(grouped: dict[str, list[str]], safe_features: list[str], 
     for group_a, group_b in combinations(group_names, 2):
         for left in grouped[group_a][:5]:
             for right in grouped[group_b][:5]:
-                specs.append(spec("product", (left, right), (group_a, group_b), f"{left}_x_{right}"))
+                kind = "strength_vs_weakness" if "opponent_weakness" in {group_a, group_b} else "product"
+                specs.append(spec(kind, (left, right), (group_a, group_b), f"{left}_x_{right}"))
                 if is_rate_like(left) and is_rate_like(right):
                     specs.append(spec("ratio", (left, right), (group_a, group_b), f"ratio_{left}_to_{right}"))
 
@@ -116,6 +165,13 @@ def rejection_reason(frame: pd.DataFrame, spec: InteractionSpec, *, min_coverage
         return "forbidden_or_label_feature"
     if any(feature not in frame.columns for feature in spec.input_features):
         return "missing_input_feature"
+    if len(spec.input_features) == 2:
+        left = pd.to_numeric(frame[spec.input_features[0]], errors="coerce")
+        right = pd.to_numeric(frame[spec.input_features[1]], errors="coerce")
+        if left.notna().sum() > 2 and right.notna().sum() > 2:
+            corr = left.corr(right)
+            if np.isfinite(corr) and abs(float(corr)) >= 0.985:
+                return "high_correlation"
     values = compute_interaction(frame, spec)
     coverage = float(values.notna().mean()) if len(values) else 0.0
     if coverage < min_coverage:
@@ -145,3 +201,61 @@ def compute_interaction(frame: pd.DataFrame, spec: InteractionSpec) -> pd.Series
         denominator = second.abs().clip(lower=0.05)
         return (first / denominator).replace([np.inf, -np.inf], np.nan).clip(-100, 100)
     return first * second
+
+
+def count_by_interaction_type(specs: list[InteractionSpec]) -> dict[str, int]:
+    counts = {bucket: 0 for bucket in INTERACTION_TYPE_BUCKETS}
+    for spec_obj in specs:
+        for bucket, kinds in INTERACTION_TYPE_BUCKETS.items():
+            if spec_obj.kind in kinds:
+                counts[bucket] += 1
+                break
+    return counts
+
+
+def count_by_feature_group_pair(specs: list[InteractionSpec]) -> dict[str, int]:
+    counts = {bucket: 0 for bucket in FEATURE_GROUP_PAIR_BUCKETS}
+    for spec_obj in specs:
+        bucket = feature_group_pair_bucket(spec_obj)
+        if bucket:
+            counts[bucket] += 1
+    return counts
+
+
+def feature_group_pair_bucket(spec_obj: InteractionSpec) -> str | None:
+    groups = set(spec_obj.groups)
+    features = " ".join(spec_obj.input_features).lower()
+    if "physical" in groups and groups.intersection({"striking", "grappling", "finishing"}):
+        return "physical × style"
+    if "physical" in groups and "division_context" in groups:
+        return "physical × division"
+    if "striking" in groups and "opponent_weakness" in groups:
+        return "striking × opponent weakness"
+    if "grappling" in groups and "opponent_weakness" in groups:
+        return "grappling × opponent weakness"
+    if "finishing" in groups and ("opponent_weakness" in groups or "durability" in features or "finish_loss" in features):
+        return "finishing × durability"
+    if ("pace" in features or "fights_last" in features) and ("age" in features or "days_since" in features or "recent" in features):
+        return "pace × age/activity"
+    if "scheduled_rounds" in features and any(token in features for token in ("pace", "duration", "finish", "decision")):
+        return "scheduled rounds × pace/duration"
+    return None
+
+
+def normalized_rejection_counts(rejected: list[dict]) -> dict[str, int]:
+    counts = {bucket: 0 for bucket in REJECTION_BUCKETS}
+    reason_map = {
+        "missing_input_feature": "runtime_incompatibility",
+        "low_coverage": "missingness",
+        "low_variance": "low_variance",
+        "high_correlation": "high_correlation",
+        "forbidden_or_label_feature": "leakage_risk",
+        "candidate_cap_reached": "validation_did_not_improve",
+        "did_not_improve_validation_or_calibration": "validation_did_not_improve",
+        "calibration_regression": "calibration_got_worse",
+        "source_holdout_regression": "source_holdout_got_worse",
+    }
+    for item in rejected:
+        bucket = reason_map.get(str(item.get("reason")), "validation_did_not_improve")
+        counts[bucket] += 1
+    return counts

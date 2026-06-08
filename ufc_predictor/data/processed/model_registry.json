@@ -101,7 +101,12 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning"
+      "cross_division_warning",
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
     ],
     "class_distribution": {
       "1": 8705,
@@ -111,127 +116,127 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.621262+00:00",
-    "final_test_metric": 0.8287,
+    "final_test_metric": 0.8312,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.5141,
-    "relative_improvement": 0.3146,
+    "relative_improvement": 0.3171,
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.8287,
+    "backtest_main_metric": 0.8312,
     "backtest_baseline": 0.5141,
-    "backtest_relative_improvement": 0.3146,
+    "backtest_relative_improvement": 0.3171,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": "finish_binary",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 40,
-    "brier_score": 0.1288,
-    "log_loss": 0.4212,
-    "balanced_accuracy": 0.8297,
+    "feature_count": 45,
+    "brier_score": 0.1296,
+    "log_loss": 0.4234,
+    "balanced_accuracy": 0.8322,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 3422,
-        "coverage_percent": 92.59,
-        "accuracy": 0.8518,
-        "balanced_accuracy": 0.8527,
-        "average_confidence": 0.8179,
-        "actual_hit_rate": 0.8518,
-        "calibration_gap": -0.034,
+        "sample_count": 3450,
+        "coverage_percent": 93.34,
+        "accuracy": 0.851,
+        "balanced_accuracy": 0.8518,
+        "average_confidence": 0.8141,
+        "actual_hit_rate": 0.851,
+        "calibration_gap": -0.037,
         "class_distribution": {
-          "0": 1751,
-          "1": 1671
+          "0": 1762,
+          "1": 1688
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 3161,
-        "coverage_percent": 85.52,
-        "accuracy": 0.8722,
-        "balanced_accuracy": 0.8733,
-        "average_confidence": 0.8379,
-        "actual_hit_rate": 0.8722,
-        "calibration_gap": -0.0342,
+        "sample_count": 3169,
+        "coverage_percent": 85.74,
+        "accuracy": 0.8684,
+        "balanced_accuracy": 0.8695,
+        "average_confidence": 0.8351,
+        "actual_hit_rate": 0.8684,
+        "calibration_gap": -0.0333,
         "class_distribution": {
-          "0": 1622,
-          "1": 1539
+          "0": 1627,
+          "1": 1542
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 2851,
-        "coverage_percent": 77.14,
-        "accuracy": 0.8871,
-        "balanced_accuracy": 0.888,
-        "average_confidence": 0.861,
-        "actual_hit_rate": 0.8871,
-        "calibration_gap": -0.0261,
+        "sample_count": 2860,
+        "coverage_percent": 77.38,
+        "accuracy": 0.8864,
+        "balanced_accuracy": 0.8873,
+        "average_confidence": 0.8579,
+        "actual_hit_rate": 0.8864,
+        "calibration_gap": -0.0285,
         "class_distribution": {
-          "0": 1455,
-          "1": 1396
+          "0": 1456,
+          "1": 1404
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 2570,
-        "coverage_percent": 69.53,
-        "accuracy": 0.9004,
-        "balanced_accuracy": 0.9008,
-        "average_confidence": 0.8815,
-        "actual_hit_rate": 0.9004,
-        "calibration_gap": -0.0189,
+        "sample_count": 2573,
+        "coverage_percent": 69.62,
+        "accuracy": 0.8997,
+        "balanced_accuracy": 0.9001,
+        "average_confidence": 0.8781,
+        "actual_hit_rate": 0.8997,
+        "calibration_gap": -0.0216,
         "class_distribution": {
-          "0": 1295,
-          "1": 1275
+          "0": 1296,
+          "1": 1277
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 2264,
-        "coverage_percent": 61.26,
+        "sample_count": 2241,
+        "coverage_percent": 60.63,
         "accuracy": 0.9148,
-        "balanced_accuracy": 0.9145,
-        "average_confidence": 0.9025,
+        "balanced_accuracy": 0.9144,
+        "average_confidence": 0.9009,
         "actual_hit_rate": 0.9148,
-        "calibration_gap": -0.0122,
+        "calibration_gap": -0.0139,
         "class_distribution": {
-          "1": 1139,
-          "0": 1125
+          "1": 1130,
+          "0": 1111
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 1961,
-        "coverage_percent": 53.06,
-        "accuracy": 0.9301,
-        "balanced_accuracy": 0.9297,
-        "average_confidence": 0.9221,
-        "actual_hit_rate": 0.9301,
-        "calibration_gap": -0.008,
+        "sample_count": 1919,
+        "coverage_percent": 51.92,
+        "accuracy": 0.9276,
+        "balanced_accuracy": 0.927,
+        "average_confidence": 0.9218,
+        "actual_hit_rate": 0.9276,
+        "calibration_gap": -0.0058,
         "class_distribution": {
-          "1": 992,
-          "0": 969
+          "1": 975,
+          "0": 944
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.9301,
-    "best_high_conf_balanced_accuracy": 0.9297,
-    "best_high_conf_coverage": 53.06,
+    "best_high_conf_accuracy": 0.9276,
+    "best_high_conf_balanced_accuracy": 0.927,
+    "best_high_conf_coverage": 51.92,
     "production_status": "production_candidate",
     "production_status_reason": "source_holdout_not_run",
     "passed_gates": [
@@ -240,6 +245,9 @@
       "calibration_acceptable",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
+      "interaction_runtime_parity_passes",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -247,9 +255,138 @@
     ],
     "recommended_use": "candidate for limited internal validation",
     "public_warning_text": "Model is promising but still has failed production gates.",
-    "interaction_feature_count": 0,
-    "selected_interactions": [],
-    "interaction_selection_status": "base_features_kept"
+    "interaction_feature_count": 5,
+    "selected_interactions": [
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
+    ],
+    "interaction_selection_status": "selected",
+    "selected_interactions_detailed": [
+      {
+        "name": "int__win_rate_diff_x_finish_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__win_rate_diff_x_decision_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "decision_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__abs_win_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__sq_win_rate_diff",
+        "kind": "square",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "square",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__abs_finish_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      }
+    ],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": true,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "goes_distance_model": {
     "model_name": "goes_distance_model",
@@ -353,7 +490,12 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning"
+      "cross_division_warning",
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
     ],
     "class_distribution": {
       "0": 8705,
@@ -363,127 +505,127 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.702582+00:00",
-    "final_test_metric": 0.8287,
+    "final_test_metric": 0.8312,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.5141,
-    "relative_improvement": 0.3146,
+    "relative_improvement": 0.3171,
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.8287,
+    "backtest_main_metric": 0.8312,
     "backtest_baseline": 0.5141,
-    "backtest_relative_improvement": 0.3146,
+    "backtest_relative_improvement": 0.3171,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": "goes_distance_binary",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 40,
-    "brier_score": 0.1288,
-    "log_loss": 0.4212,
-    "balanced_accuracy": 0.8297,
+    "feature_count": 45,
+    "brier_score": 0.1296,
+    "log_loss": 0.4234,
+    "balanced_accuracy": 0.8322,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 3422,
-        "coverage_percent": 92.59,
-        "accuracy": 0.8518,
-        "balanced_accuracy": 0.8527,
-        "average_confidence": 0.8179,
-        "actual_hit_rate": 0.8518,
-        "calibration_gap": -0.034,
+        "sample_count": 3450,
+        "coverage_percent": 93.34,
+        "accuracy": 0.851,
+        "balanced_accuracy": 0.8518,
+        "average_confidence": 0.8141,
+        "actual_hit_rate": 0.851,
+        "calibration_gap": -0.037,
         "class_distribution": {
-          "0": 1751,
-          "1": 1671
+          "0": 1762,
+          "1": 1688
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 3161,
-        "coverage_percent": 85.52,
-        "accuracy": 0.8722,
-        "balanced_accuracy": 0.8733,
-        "average_confidence": 0.8379,
-        "actual_hit_rate": 0.8722,
-        "calibration_gap": -0.0342,
+        "sample_count": 3169,
+        "coverage_percent": 85.74,
+        "accuracy": 0.8684,
+        "balanced_accuracy": 0.8695,
+        "average_confidence": 0.8351,
+        "actual_hit_rate": 0.8684,
+        "calibration_gap": -0.0333,
         "class_distribution": {
-          "0": 1622,
-          "1": 1539
+          "0": 1627,
+          "1": 1542
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 2851,
-        "coverage_percent": 77.14,
-        "accuracy": 0.8871,
-        "balanced_accuracy": 0.888,
-        "average_confidence": 0.861,
-        "actual_hit_rate": 0.8871,
-        "calibration_gap": -0.0261,
+        "sample_count": 2860,
+        "coverage_percent": 77.38,
+        "accuracy": 0.8864,
+        "balanced_accuracy": 0.8873,
+        "average_confidence": 0.8579,
+        "actual_hit_rate": 0.8864,
+        "calibration_gap": -0.0285,
         "class_distribution": {
-          "0": 1455,
-          "1": 1396
+          "0": 1456,
+          "1": 1404
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 2570,
-        "coverage_percent": 69.53,
-        "accuracy": 0.9004,
-        "balanced_accuracy": 0.9008,
-        "average_confidence": 0.8815,
-        "actual_hit_rate": 0.9004,
-        "calibration_gap": -0.0189,
+        "sample_count": 2573,
+        "coverage_percent": 69.62,
+        "accuracy": 0.8997,
+        "balanced_accuracy": 0.9001,
+        "average_confidence": 0.8781,
+        "actual_hit_rate": 0.8997,
+        "calibration_gap": -0.0216,
         "class_distribution": {
-          "0": 1295,
-          "1": 1275
+          "0": 1296,
+          "1": 1277
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 2264,
-        "coverage_percent": 61.26,
+        "sample_count": 2241,
+        "coverage_percent": 60.63,
         "accuracy": 0.9148,
-        "balanced_accuracy": 0.9145,
-        "average_confidence": 0.9025,
+        "balanced_accuracy": 0.9144,
+        "average_confidence": 0.9009,
         "actual_hit_rate": 0.9148,
-        "calibration_gap": -0.0122,
+        "calibration_gap": -0.0139,
         "class_distribution": {
-          "1": 1139,
-          "0": 1125
+          "1": 1130,
+          "0": 1111
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 1961,
-        "coverage_percent": 53.06,
-        "accuracy": 0.9301,
-        "balanced_accuracy": 0.9297,
-        "average_confidence": 0.9221,
-        "actual_hit_rate": 0.9301,
-        "calibration_gap": -0.008,
+        "sample_count": 1919,
+        "coverage_percent": 51.92,
+        "accuracy": 0.9276,
+        "balanced_accuracy": 0.927,
+        "average_confidence": 0.9218,
+        "actual_hit_rate": 0.9276,
+        "calibration_gap": -0.0058,
         "class_distribution": {
-          "1": 992,
-          "0": 969
+          "1": 975,
+          "0": 944
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.9301,
-    "best_high_conf_balanced_accuracy": 0.9297,
-    "best_high_conf_coverage": 53.06,
+    "best_high_conf_accuracy": 0.9276,
+    "best_high_conf_balanced_accuracy": 0.927,
+    "best_high_conf_coverage": 51.92,
     "production_status": "production_candidate",
     "production_status_reason": "source_holdout_not_run",
     "passed_gates": [
@@ -492,6 +634,9 @@
       "calibration_acceptable",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
+      "interaction_runtime_parity_passes",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -499,9 +644,138 @@
     ],
     "recommended_use": "candidate for limited internal validation",
     "public_warning_text": "Model is promising but still has failed production gates.",
-    "interaction_feature_count": 0,
-    "selected_interactions": [],
-    "interaction_selection_status": "base_features_kept"
+    "interaction_feature_count": 5,
+    "selected_interactions": [
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
+    ],
+    "interaction_selection_status": "selected",
+    "selected_interactions_detailed": [
+      {
+        "name": "int__win_rate_diff_x_finish_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__win_rate_diff_x_decision_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "decision_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__abs_win_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__sq_win_rate_diff",
+        "kind": "square",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "square",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__abs_finish_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      }
+    ],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": true,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "method_model": {
     "model_name": "method_model",
@@ -647,7 +921,7 @@
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -659,7 +933,7 @@
     "backtest_relative_improvement": 0.1404,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": "method_class",
     "algorithm": "duration_x_conditional_finish_type",
     "feature_count": 40,
@@ -790,7 +1064,10 @@
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "not_run_composite_model"
+    "interaction_selection_status": "not_run_composite_model",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {},
+    "interaction_safety_checks": {}
   },
   "round_model": {
     "model_name": "round_model",
@@ -944,7 +1221,7 @@
     ],
     "recommended_use": "research only",
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "target": "round_binary_family",
     "algorithm": "binary_submodel_family",
     "feature_count": 40,
@@ -1064,10 +1341,13 @@
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "missing required columns: round_binary_family",
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "not_run_composite_summary"
+    "interaction_selection_status": "not_run_composite_summary",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {},
+    "interaction_safety_checks": {}
   },
   "strike_volume_model": {
     "model_name": "strike_volume_model",
@@ -1183,9 +1463,9 @@
       "cross_division_warning",
       "int__win_rate_diff_x_finish_rate_diff",
       "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
       "int__abs_win_rate_diff",
-      "int__sq_win_rate_diff"
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
     ],
     "class_distribution": {
       "low": 3440,
@@ -1198,138 +1478,141 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.921824+00:00",
-    "final_test_metric": 0.4357,
+    "final_test_metric": 0.447,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.3623,
-    "relative_improvement": 0.0734,
+    "relative_improvement": 0.0847,
     "beats_baseline": true,
     "test_rows": 1322,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 1322,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.4357,
+    "backtest_main_metric": 0.447,
     "backtest_baseline": 0.3623,
-    "backtest_relative_improvement": 0.0734,
+    "backtest_relative_improvement": 0.0847,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": "combined_strike_volume_bucket",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 45,
     "brier_score": null,
-    "log_loss": 1.1061,
-    "balanced_accuracy": 0.4343,
+    "log_loss": 1.1118,
+    "balanced_accuracy": 0.4458,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 601,
-        "coverage_percent": 45.46,
-        "accuracy": 0.4809,
-        "balanced_accuracy": 0.4443,
-        "average_confidence": 0.6757,
-        "actual_hit_rate": 0.4809,
-        "calibration_gap": 0.1948,
+        "sample_count": 580,
+        "coverage_percent": 43.87,
+        "accuracy": 0.4776,
+        "balanced_accuracy": 0.4407,
+        "average_confidence": 0.6804,
+        "actual_hit_rate": 0.4776,
+        "calibration_gap": 0.2028,
         "class_distribution": {
-          "low": 240,
-          "high": 183,
-          "medium": 178
+          "low": 232,
+          "high": 180,
+          "medium": 168
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 437,
-        "coverage_percent": 33.06,
-        "accuracy": 0.5103,
-        "balanced_accuracy": 0.4524,
-        "average_confidence": 0.7132,
-        "actual_hit_rate": 0.5103,
-        "calibration_gap": 0.2029,
+        "sample_count": 441,
+        "coverage_percent": 33.36,
+        "accuracy": 0.5011,
+        "balanced_accuracy": 0.4429,
+        "average_confidence": 0.7137,
+        "actual_hit_rate": 0.5011,
+        "calibration_gap": 0.2126,
         "class_distribution": {
-          "low": 184,
-          "medium": 129,
-          "high": 124
+          "low": 186,
+          "high": 131,
+          "medium": 124
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 336,
-        "coverage_percent": 25.42,
-        "accuracy": 0.5298,
-        "balanced_accuracy": 0.4448,
-        "average_confidence": 0.7406,
-        "actual_hit_rate": 0.5298,
-        "calibration_gap": 0.2108,
+        "sample_count": 327,
+        "coverage_percent": 24.74,
+        "accuracy": 0.5413,
+        "balanced_accuracy": 0.4568,
+        "average_confidence": 0.7444,
+        "actual_hit_rate": 0.5413,
+        "calibration_gap": 0.2031,
         "class_distribution": {
-          "low": 154,
-          "medium": 97,
-          "high": 85
+          "low": 148,
+          "medium": 91,
+          "high": 88
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 227,
-        "coverage_percent": 17.17,
-        "accuracy": 0.5683,
-        "balanced_accuracy": 0.432,
-        "average_confidence": 0.7726,
-        "actual_hit_rate": 0.5683,
-        "calibration_gap": 0.2043,
+        "sample_count": 224,
+        "coverage_percent": 16.94,
+        "accuracy": 0.567,
+        "balanced_accuracy": 0.4473,
+        "average_confidence": 0.7758,
+        "actual_hit_rate": 0.567,
+        "calibration_gap": 0.2088,
         "class_distribution": {
-          "low": 115,
+          "low": 108,
           "medium": 60,
-          "high": 52
+          "high": 56
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 135,
-        "coverage_percent": 10.21,
-        "accuracy": 0.6519,
-        "balanced_accuracy": 0.4222,
-        "average_confidence": 0.8045,
-        "actual_hit_rate": 0.6519,
-        "calibration_gap": 0.1527,
+        "sample_count": 142,
+        "coverage_percent": 10.74,
+        "accuracy": 0.6127,
+        "balanced_accuracy": 0.4271,
+        "average_confidence": 0.804,
+        "actual_hit_rate": 0.6127,
+        "calibration_gap": 0.1913,
         "class_distribution": {
-          "low": 80,
-          "high": 30,
-          "medium": 25
+          "low": 78,
+          "high": 32,
+          "medium": 32
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 60,
-        "coverage_percent": 4.54,
-        "accuracy": 0.6833,
-        "balanced_accuracy": 0.4103,
-        "average_confidence": 0.8418,
-        "actual_hit_rate": 0.6833,
-        "calibration_gap": 0.1585,
+        "sample_count": 55,
+        "coverage_percent": 4.16,
+        "accuracy": 0.6545,
+        "balanced_accuracy": 0.4444,
+        "average_confidence": 0.849,
+        "actual_hit_rate": 0.6545,
+        "calibration_gap": 0.1945,
         "class_distribution": {
-          "low": 38,
-          "high": 13,
-          "medium": 9
+          "low": 32,
+          "high": 12,
+          "medium": 11
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.6833,
-    "best_high_conf_balanced_accuracy": 0.4103,
-    "best_high_conf_coverage": 4.54,
+    "best_high_conf_accuracy": 0.6545,
+    "best_high_conf_balanced_accuracy": 0.4444,
+    "best_high_conf_coverage": 4.16,
     "production_status": "experimental",
     "production_status_reason": "balanced_accuracy_not_dangerously_low; calibration_acceptable; high_confidence_not_tiny_sample_noise; source_holdout_not_run",
     "passed_gates": [
       "beats_chronological_baseline",
       "duplicate_mirrored_fight_leakage_prevented",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
+      "interaction_runtime_parity_passes",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -1344,11 +1627,136 @@
     "selected_interactions": [
       "int__win_rate_diff_x_finish_rate_diff",
       "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
       "int__abs_win_rate_diff",
-      "int__sq_win_rate_diff"
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
     ],
-    "interaction_selection_status": "selected"
+    "interaction_selection_status": "selected",
+    "selected_interactions_detailed": [
+      {
+        "name": "int__win_rate_diff_x_finish_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "strike_volume_model",
+        "validation_improvement": 0.0094,
+        "final_test_impact": 0.0102,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0094,
+        "calibration_impact": 0.0026
+      },
+      {
+        "name": "int__win_rate_diff_x_decision_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "decision_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "strike_volume_model",
+        "validation_improvement": 0.0094,
+        "final_test_impact": 0.0102,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0094,
+        "calibration_impact": 0.0026
+      },
+      {
+        "name": "int__abs_win_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "strike_volume_model",
+        "validation_improvement": 0.0094,
+        "final_test_impact": 0.0102,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0094,
+        "calibration_impact": 0.0026
+      },
+      {
+        "name": "int__sq_win_rate_diff",
+        "kind": "square",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "square",
+        "model_using_it": "strike_volume_model",
+        "validation_improvement": 0.0094,
+        "final_test_impact": 0.0102,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0094,
+        "calibration_impact": 0.0026
+      },
+      {
+        "name": "int__abs_finish_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "strike_volume_model",
+        "validation_improvement": 0.0094,
+        "final_test_impact": 0.0102,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0094,
+        "calibration_impact": 0.0026
+      }
+    ],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "ratios",
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": true,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "ratios",
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "takedown_control_model": {
     "model_name": "takedown_control_model",
@@ -1471,7 +1879,7 @@
     "beats_baseline": true,
     "test_rows": 2486,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 2486,
     "backtest_date_range": {
@@ -1483,7 +1891,7 @@
     "backtest_relative_improvement": 0.0076,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": "grappling_heavy_binary",
     "algorithm": "random_forest_balanced",
     "feature_count": 40,
@@ -1592,6 +2000,8 @@
       "beats_chronological_baseline",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -1602,7 +2012,37 @@
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "base_features_kept"
+    "interaction_selection_status": "base_features_kept",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "ratios",
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": false,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "ratios",
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "winner_model": {
     "model_name": "winner_model",
@@ -1687,139 +2127,134 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning",
-      "int__win_rate_diff_x_finish_rate_diff",
-      "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
-      "int__abs_win_rate_diff",
-      "int__sq_win_rate_diff"
+      "cross_division_warning"
     ],
     "class_distribution": {},
     "limitations": [
       "Winner prediction already uses the existing sklearn/Elo pipeline; this pass does not retrain it."
     ],
     "trained_at": null,
-    "final_test_metric": 0.9095,
+    "final_test_metric": 0.9092,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.52,
-    "relative_improvement": 0.3895,
+    "relative_improvement": 0.3892,
     "beats_baseline": true,
     "test_rows": 3327,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3327,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.9095,
+    "backtest_main_metric": 0.9092,
     "backtest_baseline": 0.52,
-    "backtest_relative_improvement": 0.3895,
+    "backtest_relative_improvement": 0.3892,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": "f1_wins_safe",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 45,
-    "brier_score": 0.0683,
-    "log_loss": 0.2374,
-    "balanced_accuracy": 0.9096,
+    "feature_count": 40,
+    "brier_score": 0.0701,
+    "log_loss": 0.2421,
+    "balanced_accuracy": 0.9093,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 3217,
-        "coverage_percent": 96.69,
-        "accuracy": 0.922,
-        "balanced_accuracy": 0.9219,
-        "average_confidence": 0.8905,
-        "actual_hit_rate": 0.922,
-        "calibration_gap": -0.0315,
+        "sample_count": 3229,
+        "coverage_percent": 97.05,
+        "accuracy": 0.9158,
+        "balanced_accuracy": 0.9159,
+        "average_confidence": 0.8886,
+        "actual_hit_rate": 0.9158,
+        "calibration_gap": -0.0272,
         "class_distribution": {
-          "0.0": 1660,
-          "1.0": 1557
+          "0.0": 1674,
+          "1.0": 1555
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 3127,
-        "coverage_percent": 93.99,
-        "accuracy": 0.9296,
-        "balanced_accuracy": 0.9297,
-        "average_confidence": 0.8995,
-        "actual_hit_rate": 0.9296,
-        "calibration_gap": -0.0301,
+        "sample_count": 3132,
+        "coverage_percent": 94.14,
+        "accuracy": 0.9266,
+        "balanced_accuracy": 0.9267,
+        "average_confidence": 0.8983,
+        "actual_hit_rate": 0.9266,
+        "calibration_gap": -0.0282,
         "class_distribution": {
-          "0.0": 1615,
-          "1.0": 1512
+          "0.0": 1618,
+          "1.0": 1514
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 3007,
-        "coverage_percent": 90.38,
-        "accuracy": 0.9451,
-        "balanced_accuracy": 0.9451,
-        "average_confidence": 0.9105,
-        "actual_hit_rate": 0.9451,
-        "calibration_gap": -0.0346,
+        "sample_count": 3001,
+        "coverage_percent": 90.2,
+        "accuracy": 0.9427,
+        "balanced_accuracy": 0.9428,
+        "average_confidence": 0.9103,
+        "actual_hit_rate": 0.9427,
+        "calibration_gap": -0.0324,
         "class_distribution": {
-          "0.0": 1552,
-          "1.0": 1455
+          "0.0": 1549,
+          "1.0": 1452
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 2876,
-        "coverage_percent": 86.44,
-        "accuracy": 0.9545,
-        "balanced_accuracy": 0.9544,
-        "average_confidence": 0.9211,
-        "actual_hit_rate": 0.9545,
-        "calibration_gap": -0.0333,
+        "sample_count": 2888,
+        "coverage_percent": 86.8,
+        "accuracy": 0.9498,
+        "balanced_accuracy": 0.9498,
+        "average_confidence": 0.9196,
+        "actual_hit_rate": 0.9498,
+        "calibration_gap": -0.0302,
         "class_distribution": {
-          "0.0": 1487,
-          "1.0": 1389
+          "0.0": 1490,
+          "1.0": 1398
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 2719,
-        "coverage_percent": 81.73,
-        "accuracy": 0.9636,
-        "balanced_accuracy": 0.9636,
-        "average_confidence": 0.9324,
-        "actual_hit_rate": 0.9636,
-        "calibration_gap": -0.0312,
+        "sample_count": 2723,
+        "coverage_percent": 81.85,
+        "accuracy": 0.9592,
+        "balanced_accuracy": 0.9593,
+        "average_confidence": 0.9314,
+        "actual_hit_rate": 0.9592,
+        "calibration_gap": -0.0278,
         "class_distribution": {
-          "0.0": 1411,
-          "1.0": 1308
+          "0.0": 1407,
+          "1.0": 1316
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 2536,
-        "coverage_percent": 76.22,
-        "accuracy": 0.9716,
-        "balanced_accuracy": 0.9716,
-        "average_confidence": 0.9436,
-        "actual_hit_rate": 0.9716,
+        "sample_count": 2517,
+        "coverage_percent": 75.65,
+        "accuracy": 0.9722,
+        "balanced_accuracy": 0.9722,
+        "average_confidence": 0.9441,
+        "actual_hit_rate": 0.9722,
         "calibration_gap": -0.028,
         "class_distribution": {
-          "0.0": 1317,
-          "1.0": 1219
+          "0.0": 1313,
+          "1.0": 1204
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.9716,
-    "best_high_conf_balanced_accuracy": 0.9716,
-    "best_high_conf_coverage": 76.22,
+    "best_high_conf_accuracy": 0.9722,
+    "best_high_conf_balanced_accuracy": 0.9722,
+    "best_high_conf_coverage": 75.65,
     "production_status": "high_confidence_only",
     "production_status_reason": "winner_leakage_audit_passes; source_holdout_stable",
     "leakage_audit_report": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\winner_model_leakage_audit.json",
@@ -1835,6 +2270,8 @@
       "cold_start_low_history_not_dangerously_poor",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
       "runtime_feature_schema_exists",
       "runtime_parity_passes"
     ],
@@ -1844,15 +2281,39 @@
     ],
     "recommended_use": "research/high-confidence selective predictions only",
     "public_warning_text": "Use only as selective model evidence; winner audit gates are not strong enough for production-ready status.",
-    "interaction_feature_count": 5,
-    "selected_interactions": [
-      "int__win_rate_diff_x_finish_rate_diff",
-      "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
-      "int__abs_win_rate_diff",
-      "int__sq_win_rate_diff"
-    ],
-    "interaction_selection_status": "selected"
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "context_division_interactions",
+        "physical \u00d7 style",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": false,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "context_division_interactions",
+        "physical \u00d7 style",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "odds_calibration_model": {
     "model_name": "odds_calibration_model",
@@ -1910,7 +2371,7 @@
     "beats_baseline": false,
     "test_rows": 0,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": false,
     "backtest_fights": 0,
     "backtest_date_range": {
@@ -1922,7 +2383,7 @@
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "Trusted pre-fight odds snapshots are not available.",
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": null,
     "algorithm": null,
     "feature_count": 0,
@@ -1943,7 +2404,10 @@
     "public_warning_text": "This model is blocked until required data quality gates pass.",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": null
+    "interaction_selection_status": null,
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {},
+    "interaction_safety_checks": {}
   },
   "round_phase_model": {
     "model_name": "round_phase_model",
@@ -1956,7 +2420,7 @@
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": false,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": false,
     "backtest_fights": 0,
     "backtest_date_range": {
@@ -1968,7 +2432,7 @@
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "missing required columns: round_binary_family",
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "target": "round_binary_family",
     "algorithm": "binary_submodel_family",
     "feature_count": 40,
@@ -2131,7 +2595,10 @@
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "not_run_composite_summary"
+    "interaction_selection_status": "not_run_composite_summary",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {},
+    "interaction_safety_checks": {}
   },
   "strike_volume_regression": {
     "model_name": "strike_volume_regression",
@@ -2144,7 +2611,7 @@
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": false,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "target": "combined_sig_strikes",
     "algorithm": null,
     "feature_count": 8,
@@ -2184,13 +2651,16 @@
     "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence.",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": null
+    "interaction_selection_status": null,
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {},
+    "interaction_safety_checks": {}
   },
   "fight_duration_model": {
     "model_name": "fight_duration_model",
     "target": "finish_binary",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 40,
+    "feature_count": 45,
     "feature_names": [
       "a_prior_fights",
       "b_prior_fights",
@@ -2231,113 +2701,118 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning"
+      "cross_division_warning",
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
     ],
-    "final_test_metric": 0.8287,
+    "final_test_metric": 0.8312,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.5141,
-    "relative_improvement": 0.3146,
+    "relative_improvement": 0.3171,
     "beats_baseline": true,
     "test_rows": 3696,
     "split_type": "chronological",
-    "brier_score": 0.1288,
-    "log_loss": 0.4212,
-    "balanced_accuracy": 0.8297,
+    "brier_score": 0.1296,
+    "log_loss": 0.4234,
+    "balanced_accuracy": 0.8322,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 3422,
-        "coverage_percent": 92.59,
-        "accuracy": 0.8518,
-        "balanced_accuracy": 0.8527,
-        "average_confidence": 0.8179,
-        "actual_hit_rate": 0.8518,
-        "calibration_gap": -0.034,
+        "sample_count": 3450,
+        "coverage_percent": 93.34,
+        "accuracy": 0.851,
+        "balanced_accuracy": 0.8518,
+        "average_confidence": 0.8141,
+        "actual_hit_rate": 0.851,
+        "calibration_gap": -0.037,
         "class_distribution": {
-          "0": 1751,
-          "1": 1671
+          "0": 1762,
+          "1": 1688
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 3161,
-        "coverage_percent": 85.52,
-        "accuracy": 0.8722,
-        "balanced_accuracy": 0.8733,
-        "average_confidence": 0.8379,
-        "actual_hit_rate": 0.8722,
-        "calibration_gap": -0.0342,
+        "sample_count": 3169,
+        "coverage_percent": 85.74,
+        "accuracy": 0.8684,
+        "balanced_accuracy": 0.8695,
+        "average_confidence": 0.8351,
+        "actual_hit_rate": 0.8684,
+        "calibration_gap": -0.0333,
         "class_distribution": {
-          "0": 1622,
-          "1": 1539
+          "0": 1627,
+          "1": 1542
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 2851,
-        "coverage_percent": 77.14,
-        "accuracy": 0.8871,
-        "balanced_accuracy": 0.888,
-        "average_confidence": 0.861,
-        "actual_hit_rate": 0.8871,
-        "calibration_gap": -0.0261,
+        "sample_count": 2860,
+        "coverage_percent": 77.38,
+        "accuracy": 0.8864,
+        "balanced_accuracy": 0.8873,
+        "average_confidence": 0.8579,
+        "actual_hit_rate": 0.8864,
+        "calibration_gap": -0.0285,
         "class_distribution": {
-          "0": 1455,
-          "1": 1396
+          "0": 1456,
+          "1": 1404
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 2570,
-        "coverage_percent": 69.53,
-        "accuracy": 0.9004,
-        "balanced_accuracy": 0.9008,
-        "average_confidence": 0.8815,
-        "actual_hit_rate": 0.9004,
-        "calibration_gap": -0.0189,
+        "sample_count": 2573,
+        "coverage_percent": 69.62,
+        "accuracy": 0.8997,
+        "balanced_accuracy": 0.9001,
+        "average_confidence": 0.8781,
+        "actual_hit_rate": 0.8997,
+        "calibration_gap": -0.0216,
         "class_distribution": {
-          "0": 1295,
-          "1": 1275
+          "0": 1296,
+          "1": 1277
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 2264,
-        "coverage_percent": 61.26,
+        "sample_count": 2241,
+        "coverage_percent": 60.63,
         "accuracy": 0.9148,
-        "balanced_accuracy": 0.9145,
-        "average_confidence": 0.9025,
+        "balanced_accuracy": 0.9144,
+        "average_confidence": 0.9009,
         "actual_hit_rate": 0.9148,
-        "calibration_gap": -0.0122,
+        "calibration_gap": -0.0139,
         "class_distribution": {
-          "1": 1139,
-          "0": 1125
+          "1": 1130,
+          "0": 1111
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 1961,
-        "coverage_percent": 53.06,
-        "accuracy": 0.9301,
-        "balanced_accuracy": 0.9297,
-        "average_confidence": 0.9221,
-        "actual_hit_rate": 0.9301,
-        "calibration_gap": -0.008,
+        "sample_count": 1919,
+        "coverage_percent": 51.92,
+        "accuracy": 0.9276,
+        "balanced_accuracy": 0.927,
+        "average_confidence": 0.9218,
+        "actual_hit_rate": 0.9276,
+        "calibration_gap": -0.0058,
         "class_distribution": {
-          "1": 992,
-          "0": 969
+          "1": 975,
+          "0": 944
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.9301,
-    "best_high_conf_balanced_accuracy": 0.9297,
-    "best_high_conf_coverage": 53.06,
+    "best_high_conf_accuracy": 0.9276,
+    "best_high_conf_balanced_accuracy": 0.927,
+    "best_high_conf_coverage": 51.92,
     "leakage_risk": "low",
     "runtime_compatible": true,
     "production_status": "production_candidate",
@@ -2348,6 +2823,9 @@
       "calibration_acceptable",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
+      "interaction_runtime_parity_passes",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -2357,22 +2835,151 @@
     "public_warning_text": "Model is promising but still has failed production gates.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.8287,
+    "backtest_main_metric": 0.8312,
     "backtest_baseline": 0.5141,
-    "backtest_relative_improvement": 0.3146,
+    "backtest_relative_improvement": 0.3171,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
-    "interaction_feature_count": 0,
-    "selected_interactions": [],
-    "interaction_selection_status": "base_features_kept"
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
+    "interaction_feature_count": 5,
+    "selected_interactions": [
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
+    ],
+    "interaction_selection_status": "selected",
+    "selected_interactions_detailed": [
+      {
+        "name": "int__win_rate_diff_x_finish_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__win_rate_diff_x_decision_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "decision_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__abs_win_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__sq_win_rate_diff",
+        "kind": "square",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "square",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      },
+      {
+        "name": "int__abs_finish_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "fight_duration_model",
+        "validation_improvement": 0.0039,
+        "final_test_impact": 0.0025,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0039,
+        "calibration_impact": 0.0053
+      }
+    ],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": true,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "over_1_5_model": {
     "model_name": "over_1_5_model",
@@ -2536,6 +3143,8 @@
       "calibration_acceptable",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -2545,7 +3154,7 @@
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
@@ -2557,10 +3166,40 @@
     "backtest_relative_improvement": 0.0421,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "base_features_kept"
+    "interaction_selection_status": "base_features_kept",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": false,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "over_2_5_model": {
     "model_name": "over_2_5_model",
@@ -2724,6 +3363,8 @@
       "calibration_acceptable",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -2733,7 +3374,7 @@
     "public_warning_text": "Model is promising but still has failed production gates.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
@@ -2745,10 +3386,40 @@
     "backtest_relative_improvement": 0.2343,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "base_features_kept"
+    "interaction_selection_status": "base_features_kept",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": false,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "ends_before_round_3_model": {
     "model_name": "ends_before_round_3_model",
@@ -2912,6 +3583,8 @@
       "calibration_acceptable",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -2921,7 +3594,7 @@
     "public_warning_text": "Model is promising but still has failed production gates.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
@@ -2933,10 +3606,40 @@
     "backtest_relative_improvement": 0.1653,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "base_features_kept"
+    "interaction_selection_status": "base_features_kept",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": false,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "finish_in_round_1_model": {
     "model_name": "finish_in_round_1_model",
@@ -2986,115 +3689,115 @@
       "cross_division_warning",
       "int__win_rate_diff_x_finish_rate_diff",
       "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
       "int__abs_win_rate_diff",
-      "int__sq_win_rate_diff"
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
     ],
-    "final_test_metric": 0.6554,
+    "final_test_metric": 0.6565,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.7613,
-    "relative_improvement": -0.1059,
+    "relative_improvement": -0.1048,
     "beats_baseline": false,
     "test_rows": 3683,
     "split_type": "chronological",
-    "brier_score": 0.2176,
+    "brier_score": 0.2177,
     "log_loss": 0.6251,
-    "balanced_accuracy": 0.6242,
+    "balanced_accuracy": 0.626,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 2955,
-        "coverage_percent": 80.23,
-        "accuracy": 0.686,
-        "balanced_accuracy": 0.6538,
-        "average_confidence": 0.6788,
-        "actual_hit_rate": 0.686,
-        "calibration_gap": -0.0072,
+        "sample_count": 2973,
+        "coverage_percent": 80.72,
+        "accuracy": 0.6818,
+        "balanced_accuracy": 0.6501,
+        "average_confidence": 0.6792,
+        "actual_hit_rate": 0.6818,
+        "calibration_gap": -0.0026,
         "class_distribution": {
-          "0.0": 2277,
-          "1.0": 678
+          "0.0": 2288,
+          "1.0": 685
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 2294,
-        "coverage_percent": 62.29,
-        "accuracy": 0.7175,
-        "balanced_accuracy": 0.7019,
-        "average_confidence": 0.7089,
-        "actual_hit_rate": 0.7175,
-        "calibration_gap": -0.0086,
+        "sample_count": 2328,
+        "coverage_percent": 63.21,
+        "accuracy": 0.7143,
+        "balanced_accuracy": 0.6977,
+        "average_confidence": 0.7082,
+        "actual_hit_rate": 0.7143,
+        "calibration_gap": -0.0061,
         "class_distribution": {
-          "0.0": 1791,
-          "1.0": 503
+          "0.0": 1813,
+          "1.0": 515
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 1656,
-        "coverage_percent": 44.96,
-        "accuracy": 0.7258,
-        "balanced_accuracy": 0.7239,
-        "average_confidence": 0.741,
-        "actual_hit_rate": 0.7258,
-        "calibration_gap": 0.0152,
+        "sample_count": 1676,
+        "coverage_percent": 45.51,
+        "accuracy": 0.7261,
+        "balanced_accuracy": 0.7273,
+        "average_confidence": 0.7403,
+        "actual_hit_rate": 0.7261,
+        "calibration_gap": 0.0141,
         "class_distribution": {
-          "0.0": 1284,
-          "1.0": 372
+          "0.0": 1299,
+          "1.0": 377
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 1053,
-        "coverage_percent": 28.59,
-        "accuracy": 0.7768,
-        "balanced_accuracy": 0.7407,
-        "average_confidence": 0.7792,
-        "actual_hit_rate": 0.7768,
-        "calibration_gap": 0.0024,
+        "sample_count": 1070,
+        "coverage_percent": 29.05,
+        "accuracy": 0.7748,
+        "balanced_accuracy": 0.7441,
+        "average_confidence": 0.7776,
+        "actual_hit_rate": 0.7748,
+        "calibration_gap": 0.0028,
         "class_distribution": {
-          "0.0": 863,
-          "1.0": 190
+          "0.0": 870,
+          "1.0": 200
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 656,
-        "coverage_percent": 17.81,
-        "accuracy": 0.7988,
-        "balanced_accuracy": 0.7453,
-        "average_confidence": 0.8118,
-        "actual_hit_rate": 0.7988,
-        "calibration_gap": 0.013,
+        "sample_count": 657,
+        "coverage_percent": 17.84,
+        "accuracy": 0.8143,
+        "balanced_accuracy": 0.762,
+        "average_confidence": 0.8106,
+        "actual_hit_rate": 0.8143,
+        "calibration_gap": -0.0037,
         "class_distribution": {
-          "0.0": 543,
-          "1.0": 113
+          "0.0": 541,
+          "1.0": 116
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 325,
-        "coverage_percent": 8.82,
-        "accuracy": 0.8277,
-        "balanced_accuracy": 0.7775,
-        "average_confidence": 0.8489,
-        "actual_hit_rate": 0.8277,
-        "calibration_gap": 0.0212,
+        "sample_count": 302,
+        "coverage_percent": 8.2,
+        "accuracy": 0.851,
+        "balanced_accuracy": 0.7806,
+        "average_confidence": 0.8519,
+        "actual_hit_rate": 0.851,
+        "calibration_gap": 0.0009,
         "class_distribution": {
-          "0.0": 257,
-          "1.0": 68
+          "0.0": 240,
+          "1.0": 62
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.8277,
-    "best_high_conf_balanced_accuracy": 0.7775,
-    "best_high_conf_coverage": 8.82,
+    "best_high_conf_accuracy": 0.851,
+    "best_high_conf_balanced_accuracy": 0.7806,
+    "best_high_conf_coverage": 8.2,
     "leakage_risk": "review_needed",
     "runtime_compatible": true,
     "production_status": "weak_or_failed_baseline",
@@ -3103,6 +3806,9 @@
       "balanced_accuracy_not_dangerously_low",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
+      "interaction_runtime_parity_passes",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -3114,34 +3820,159 @@
     "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.6554,
+    "backtest_main_metric": 0.6565,
     "backtest_baseline": 0.7613,
-    "backtest_relative_improvement": -0.1059,
+    "backtest_relative_improvement": -0.1048,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "interaction_feature_count": 5,
     "selected_interactions": [
       "int__win_rate_diff_x_finish_rate_diff",
       "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
       "int__abs_win_rate_diff",
-      "int__sq_win_rate_diff"
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff"
     ],
-    "interaction_selection_status": "selected"
+    "interaction_selection_status": "selected",
+    "selected_interactions_detailed": [
+      {
+        "name": "int__win_rate_diff_x_finish_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "finish_in_round_1_model",
+        "validation_improvement": 0.0111,
+        "final_test_impact": 0.0133,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0111,
+        "calibration_impact": -0.0049
+      },
+      {
+        "name": "int__win_rate_diff_x_decision_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "decision_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "finish_in_round_1_model",
+        "validation_improvement": 0.0111,
+        "final_test_impact": 0.0133,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0111,
+        "calibration_impact": -0.0049
+      },
+      {
+        "name": "int__abs_win_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "finish_in_round_1_model",
+        "validation_improvement": 0.0111,
+        "final_test_impact": 0.0133,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0111,
+        "calibration_impact": -0.0049
+      },
+      {
+        "name": "int__sq_win_rate_diff",
+        "kind": "square",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "square",
+        "model_using_it": "finish_in_round_1_model",
+        "validation_improvement": 0.0111,
+        "final_test_impact": 0.0133,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0111,
+        "calibration_impact": -0.0049
+      },
+      {
+        "name": "int__abs_finish_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "finish_in_round_1_model",
+        "validation_improvement": 0.0111,
+        "final_test_impact": 0.0133,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0111,
+        "calibration_impact": -0.0049
+      }
+    ],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": true,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 style",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "finish_type_model": {
     "model_name": "finish_type_model",
     "target": "finish_type_class",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 50,
+    "feature_count": 45,
     "feature_names": [
       "a_prior_fights",
       "b_prior_fights",
@@ -3185,126 +4016,121 @@
       "cross_division_warning",
       "int__win_rate_diff_x_finish_rate_diff",
       "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
       "int__abs_win_rate_diff",
       "int__sq_win_rate_diff",
-      "int__abs_finish_rate_diff",
-      "int__sq_finish_rate_diff",
-      "int__abs_decision_rate_diff",
-      "int__sq_decision_rate_diff",
-      "int__a_prior_decisions_x_cross_division_warning"
+      "int__abs_finish_rate_diff"
     ],
-    "final_test_metric": 0.5651,
+    "final_test_metric": 0.5607,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.632,
-    "relative_improvement": -0.0669,
+    "relative_improvement": -0.0713,
     "beats_baseline": false,
     "test_rows": 1796,
     "split_type": "chronological",
     "brier_score": null,
-    "log_loss": 0.8975,
-    "balanced_accuracy": 0.4422,
+    "log_loss": 0.8927,
+    "balanced_accuracy": 0.4307,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 1377,
-        "coverage_percent": 76.67,
-        "accuracy": 0.5606,
-        "balanced_accuracy": 0.4476,
-        "average_confidence": 0.7299,
-        "actual_hit_rate": 0.5606,
-        "calibration_gap": 0.1693,
+        "sample_count": 1389,
+        "coverage_percent": 77.34,
+        "accuracy": 0.563,
+        "balanced_accuracy": 0.4351,
+        "average_confidence": 0.7278,
+        "actual_hit_rate": 0.563,
+        "calibration_gap": 0.1648,
         "class_distribution": {
-          "KO/TKO": 850,
-          "Submission": 490,
+          "KO/TKO": 873,
+          "Submission": 479,
           "Other": 37
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 1114,
-        "coverage_percent": 62.03,
-        "accuracy": 0.5575,
-        "balanced_accuracy": 0.4662,
-        "average_confidence": 0.7667,
-        "actual_hit_rate": 0.5575,
-        "calibration_gap": 0.2092,
+        "sample_count": 1133,
+        "coverage_percent": 63.08,
+        "accuracy": 0.5622,
+        "balanced_accuracy": 0.4511,
+        "average_confidence": 0.7629,
+        "actual_hit_rate": 0.5622,
+        "calibration_gap": 0.2007,
         "class_distribution": {
-          "KO/TKO": 667,
-          "Submission": 416,
-          "Other": 31
+          "KO/TKO": 705,
+          "Submission": 396,
+          "Other": 32
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 911,
-        "coverage_percent": 50.72,
-        "accuracy": 0.5631,
-        "balanced_accuracy": 0.4954,
-        "average_confidence": 0.7986,
-        "actual_hit_rate": 0.5631,
-        "calibration_gap": 0.2355,
+        "sample_count": 921,
+        "coverage_percent": 51.28,
+        "accuracy": 0.5722,
+        "balanced_accuracy": 0.483,
+        "average_confidence": 0.7947,
+        "actual_hit_rate": 0.5722,
+        "calibration_gap": 0.2225,
         "class_distribution": {
-          "KO/TKO": 545,
-          "Submission": 340,
-          "Other": 26
+          "KO/TKO": 569,
+          "Submission": 325,
+          "Other": 27
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 749,
-        "coverage_percent": 41.7,
-        "accuracy": 0.5541,
-        "balanced_accuracy": 0.5012,
-        "average_confidence": 0.8252,
-        "actual_hit_rate": 0.5541,
-        "calibration_gap": 0.2712,
+        "sample_count": 741,
+        "coverage_percent": 41.26,
+        "accuracy": 0.5816,
+        "balanced_accuracy": 0.5142,
+        "average_confidence": 0.8237,
+        "actual_hit_rate": 0.5816,
+        "calibration_gap": 0.242,
         "class_distribution": {
-          "KO/TKO": 447,
-          "Submission": 278,
-          "Other": 24
+          "KO/TKO": 458,
+          "Submission": 260,
+          "Other": 23
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 565,
-        "coverage_percent": 31.46,
-        "accuracy": 0.5735,
-        "balanced_accuracy": 0.5263,
-        "average_confidence": 0.8578,
-        "actual_hit_rate": 0.5735,
-        "calibration_gap": 0.2843,
+        "sample_count": 568,
+        "coverage_percent": 31.63,
+        "accuracy": 0.5951,
+        "balanced_accuracy": 0.5183,
+        "average_confidence": 0.8544,
+        "actual_hit_rate": 0.5951,
+        "calibration_gap": 0.2593,
         "class_distribution": {
-          "KO/TKO": 337,
-          "Submission": 206,
-          "Other": 22
+          "KO/TKO": 353,
+          "Submission": 192,
+          "Other": 23
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 425,
-        "coverage_percent": 23.66,
-        "accuracy": 0.5906,
-        "balanced_accuracy": 0.5333,
-        "average_confidence": 0.8852,
-        "actual_hit_rate": 0.5906,
-        "calibration_gap": 0.2946,
+        "sample_count": 422,
+        "coverage_percent": 23.5,
+        "accuracy": 0.5877,
+        "balanced_accuracy": 0.534,
+        "average_confidence": 0.8822,
+        "actual_hit_rate": 0.5877,
+        "calibration_gap": 0.2945,
         "class_distribution": {
-          "KO/TKO": 261,
-          "Submission": 143,
+          "KO/TKO": 259,
+          "Submission": 142,
           "Other": 21
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.5906,
-    "best_high_conf_balanced_accuracy": 0.5333,
-    "best_high_conf_coverage": 23.66,
+    "best_high_conf_accuracy": 0.5951,
+    "best_high_conf_balanced_accuracy": 0.5183,
+    "best_high_conf_coverage": 31.63,
     "leakage_risk": "review_needed",
     "runtime_compatible": true,
     "production_status": "weak_or_failed_baseline",
@@ -3313,6 +4139,9 @@
       "calibration_acceptable",
       "duplicate_mirrored_fight_leakage_prevented",
       "high_confidence_not_tiny_sample_noise",
+      "interaction_final_test_not_used_for_selection",
+      "interaction_leakage_columns_excluded",
+      "interaction_runtime_parity_passes",
       "runtime_feature_schema_exists"
     ],
     "failed_gates": [
@@ -3324,33 +4153,153 @@
     "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 1796,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.5651,
+    "backtest_main_metric": 0.5607,
     "backtest_baseline": 0.632,
-    "backtest_relative_improvement": -0.0669,
+    "backtest_relative_improvement": -0.0713,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
-    "interaction_feature_count": 10,
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
+    "interaction_feature_count": 5,
     "selected_interactions": [
       "int__win_rate_diff_x_finish_rate_diff",
       "int__win_rate_diff_x_decision_rate_diff",
-      "int__finish_rate_diff_x_decision_rate_diff",
       "int__abs_win_rate_diff",
       "int__sq_win_rate_diff",
-      "int__abs_finish_rate_diff",
-      "int__sq_finish_rate_diff",
-      "int__abs_decision_rate_diff",
-      "int__sq_decision_rate_diff",
-      "int__a_prior_decisions_x_cross_division_warning"
+      "int__abs_finish_rate_diff"
     ],
-    "interaction_selection_status": "selected"
+    "interaction_selection_status": "selected",
+    "selected_interactions_detailed": [
+      {
+        "name": "int__win_rate_diff_x_finish_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "finish_type_model",
+        "validation_improvement": 0.0092,
+        "final_test_impact": -0.0093,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0092,
+        "calibration_impact": -0.0037
+      },
+      {
+        "name": "int__win_rate_diff_x_decision_rate_diff",
+        "kind": "product",
+        "input_features": [
+          "win_rate_diff",
+          "decision_rate_diff"
+        ],
+        "groups": [
+          "difference",
+          "difference"
+        ],
+        "expression": "product",
+        "model_using_it": "finish_type_model",
+        "validation_improvement": 0.0092,
+        "final_test_impact": -0.0093,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0092,
+        "calibration_impact": -0.0037
+      },
+      {
+        "name": "int__abs_win_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "finish_type_model",
+        "validation_improvement": 0.0092,
+        "final_test_impact": -0.0093,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0092,
+        "calibration_impact": -0.0037
+      },
+      {
+        "name": "int__sq_win_rate_diff",
+        "kind": "square",
+        "input_features": [
+          "win_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "square",
+        "model_using_it": "finish_type_model",
+        "validation_improvement": 0.0092,
+        "final_test_impact": -0.0093,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0092,
+        "calibration_impact": -0.0037
+      },
+      {
+        "name": "int__abs_finish_rate_diff",
+        "kind": "abs",
+        "input_features": [
+          "finish_rate_diff"
+        ],
+        "groups": [
+          "nonlinear"
+        ],
+        "expression": "abs",
+        "model_using_it": "finish_type_model",
+        "validation_improvement": 0.0092,
+        "final_test_impact": -0.0093,
+        "source_holdout_impact": "not_run",
+        "runtime_availability": "training_schema_computable",
+        "importance_score": 0.0092,
+        "calibration_impact": -0.0037
+      }
+    ],
+    "interaction_audit_summary": {
+      "enough_interactions_tested": true,
+      "interaction_coverage_gaps": [
+        "ratios",
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness",
+        "finishing \u00d7 durability",
+        "pace \u00d7 age/activity",
+        "scheduled rounds \u00d7 pace/duration"
+      ],
+      "model_improved": true,
+      "model_worsened": false,
+      "next_interaction_groups_to_try": [
+        "ratios",
+        "fighter_strength_vs_opponent_weakness",
+        "physical \u00d7 division",
+        "striking \u00d7 opponent weakness",
+        "grappling \u00d7 opponent weakness"
+      ]
+    },
+    "interaction_safety_checks": {
+      "selection_uses_validation_only": true,
+      "final_test_used_for_selection": false,
+      "forbidden_target_columns_excluded": true,
+      "selected_interactions_runtime_computable": true,
+      "source_holdout_regression_blocks_production": true
+    }
   },
   "method_umbrella_model": {
     "model_name": "method_umbrella_model",
@@ -3535,7 +4484,7 @@
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
+    "evaluated_at": "2026-06-08T13:44:01.815016+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -3547,9 +4496,12 @@
     "backtest_relative_improvement": 0.1404,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "backtested_at": "2026-06-08T13:48:35.068636+00:00",
     "interaction_feature_count": 0,
     "selected_interactions": [],
-    "interaction_selection_status": "not_run_composite_model"
+    "interaction_selection_status": "not_run_composite_model",
+    "selected_interactions_detailed": [],
+    "interaction_audit_summary": {},
+    "interaction_safety_checks": {}
   }
 }

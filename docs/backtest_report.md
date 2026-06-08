@@ -6,12 +6,12 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 ## Hierarchical Outcome Backtest
 | Model | Fights | Accuracy | Balanced Accuracy | Baseline | Improvement | Status |
 |---|---:|---:|---:|---:|---:|---|
-| fight_duration_model | 3696 | 0.8287 | 0.8297 | 0.5141 | 0.3146 | backtested |
+| fight_duration_model | 3696 | 0.8312 | 0.8322 | 0.5141 | 0.3171 | backtested |
 | over_1_5_model | 3683 | 0.7385 | 0.6758 | 0.6964 | 0.0421 | backtested |
 | over_2_5_model | 3683 | 0.7942 | 0.79 | 0.5599 | 0.2343 | backtested |
 | ends_before_round_3_model | 3683 | 0.7719 | 0.7611 | 0.6066 | 0.1653 | backtested |
-| finish_in_round_1_model | 3683 | 0.6554 | 0.6242 | 0.7613 | -0.1059 | weak_or_failed_baseline |
-| finish_type_model | 1796 | 0.5651 | 0.4422 | 0.632 | -0.0669 | weak_or_failed_baseline |
+| finish_in_round_1_model | 3683 | 0.6565 | 0.626 | 0.7613 | -0.1048 | weak_or_failed_baseline |
+| finish_type_model | 1796 | 0.5607 | 0.4307 | 0.632 | -0.0713 | weak_or_failed_baseline |
 | method_umbrella_model | 3696 | 0.6545 | 0.4621 | 0.5141 | 0.1404 | backtested |
 
 ## Combined Method Logic
@@ -29,19 +29,19 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 ## Overall Ranking
 | Model | Fights Tested | Main Metric | Baseline | Improvement | Beats Baseline | Status |
 |---|---:|---:|---:|---:|---|---|
-| winner_model | 3327 | 0.9095 | 0.52 | 0.3895 | True | backtested |
-| fight_duration_model | 3696 | 0.8287 | 0.5141 | 0.3146 | True | backtested |
-| finish_model | 3696 | 0.8287 | 0.5141 | 0.3146 | True | backtested |
-| goes_distance_model | 3696 | 0.8287 | 0.5141 | 0.3146 | True | backtested |
+| winner_model | 3327 | 0.9092 | 0.52 | 0.3892 | True | backtested |
+| fight_duration_model | 3696 | 0.8312 | 0.5141 | 0.3171 | True | backtested |
+| finish_model | 3696 | 0.8312 | 0.5141 | 0.3171 | True | backtested |
+| goes_distance_model | 3696 | 0.8312 | 0.5141 | 0.3171 | True | backtested |
 | over_2_5_model | 3683 | 0.7942 | 0.5599 | 0.2343 | True | backtested |
 | ends_before_round_3_model | 3683 | 0.7719 | 0.6066 | 0.1653 | True | backtested |
 | method_umbrella_model | 3696 | 0.6545 | 0.5141 | 0.1404 | True | backtested |
 | method_model | 3696 | 0.6545 | 0.5141 | 0.1404 | True | backtested |
-| strike_volume_model | 1322 | 0.4357 | 0.3623 | 0.0734 | True | backtested |
+| strike_volume_model | 1322 | 0.447 | 0.3623 | 0.0847 | True | backtested |
 | over_1_5_model | 3683 | 0.7385 | 0.6964 | 0.0421 | True | backtested |
 | takedown_control_model | 2486 | 0.5973 | 0.5897 | 0.0076 | True | backtested |
-| finish_type_model | 1796 | 0.5651 | 0.632 | -0.0669 | False | weak_or_failed_baseline |
-| finish_in_round_1_model | 3683 | 0.6554 | 0.7613 | -0.1059 | False | weak_or_failed_baseline |
+| finish_type_model | 1796 | 0.5607 | 0.632 | -0.0713 | False | weak_or_failed_baseline |
+| finish_in_round_1_model | 3683 | 0.6565 | 0.7613 | -0.1048 | False | weak_or_failed_baseline |
 | odds_calibration_model | 0 |  |  |  | False | skipped |
 | round_phase_model | 0 |  |  |  | False | skipped |
 | round_model | 0 |  |  |  | False | skipped |
@@ -70,18 +70,18 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 | Model | Interaction Features | Selection Status |
 |---|---:|---|
 | odds_calibration_model | 0 | not_run |
-| winner_model | 5 | selected |
-| fight_duration_model | 0 | base_features_kept |
+| winner_model | 0 | base_features_kept |
+| fight_duration_model | 5 | selected |
 | over_1_5_model | 0 | base_features_kept |
 | over_2_5_model | 0 | base_features_kept |
 | ends_before_round_3_model | 0 | base_features_kept |
 | finish_in_round_1_model | 5 | selected |
-| finish_type_model | 10 | selected |
+| finish_type_model | 5 | selected |
 | strike_volume_model | 5 | selected |
 | takedown_control_model | 0 | base_features_kept |
 | method_umbrella_model | 0 | not_run |
-| finish_model | 0 | base_features_kept |
-| goes_distance_model | 0 | base_features_kept |
+| finish_model | 5 | selected |
+| goes_distance_model | 5 | selected |
 | method_model | 0 | not_run |
 | round_phase_model | 0 | not_run |
 | round_model | 0 | not_run |
@@ -90,18 +90,18 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 - `odds_calibration_model`: Trusted pre-fight odds snapshots are not available.
 
 ## Best Predictions
-- Danny Barlow vs Josh Quinlan (fight_duration_model): predicted `1` with confidence 0.9954.
-- Danny Barlow vs Josh Quinlan (finish_model): predicted `1` with confidence 0.9954.
-- Danny Barlow vs Josh Quinlan (goes_distance_model): predicted `0` with confidence 0.9954.
-- Danny Barlow vs Josh Quinlan (fight_duration_model): predicted `1` with confidence 0.9954.
-- Danny Barlow vs Josh Quinlan (finish_model): predicted `1` with confidence 0.9954.
+- Danny Barlow vs Josh Quinlan (fight_duration_model): predicted `1` with confidence 0.9948.
+- Danny Barlow vs Josh Quinlan (finish_model): predicted `1` with confidence 0.9948.
+- Danny Barlow vs Josh Quinlan (goes_distance_model): predicted `0` with confidence 0.9948.
+- Danny Barlow vs Josh Quinlan (fight_duration_model): predicted `1` with confidence 0.9948.
+- Danny Barlow vs Josh Quinlan (finish_model): predicted `1` with confidence 0.9948.
 
 ## Worst Misses
-- Luke Riley vs Michael Aswell Jr. (fight_duration_model): predicted `1` with confidence 0.9951.
-- Luke Riley vs Michael Aswell Jr. (finish_model): predicted `1` with confidence 0.9951.
-- Luke Riley vs Michael Aswell Jr. (goes_distance_model): predicted `0` with confidence 0.9951.
-- Luke Riley vs Michael Aswell Jr. (fight_duration_model): predicted `1` with confidence 0.9951.
-- Luke Riley vs Michael Aswell Jr. (finish_model): predicted `1` with confidence 0.9951.
+- Daria Zhelezniakova vs Montse Rendon (over_2_5_model): predicted `1.0` with confidence 0.994.
+- Luke Riley vs Michael Aswell Jr. (fight_duration_model): predicted `1` with confidence 0.9938.
+- Luke Riley vs Michael Aswell Jr. (finish_model): predicted `1` with confidence 0.9938.
+- Luke Riley vs Michael Aswell Jr. (goes_distance_model): predicted `0` with confidence 0.9938.
+- Bolaji Oki vs Michael Aswell Jr. (over_2_5_model): predicted `1.0` with confidence 0.9936.
 
 ## Prop Examples
 - Chad Anheliger vs Jose Johnson: fighter 1 over 50 sig strikes=False, fighter 2 1+ takedown=True.
@@ -113,66 +113,66 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 ## Segment Performance
 ### winner_model
 - weight_class:Bantamweight: {'rows': 146, 'accuracy': 0.9041, 'unstable_sample_warning': False}
-- weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.8931, 'unstable_sample_warning': False}
-- weight_class:Featherweight: {'rows': 147, 'accuracy': 0.9184, 'unstable_sample_warning': False}
+- weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.8702, 'unstable_sample_warning': False}
+- weight_class:Featherweight: {'rows': 147, 'accuracy': 0.9116, 'unstable_sample_warning': False}
 - weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.8527, 'unstable_sample_warning': False}
-- weight_class:Flyweight: {'rows': 102, 'accuracy': 0.9608, 'unstable_sample_warning': False}
+- weight_class:Flyweight: {'rows': 102, 'accuracy': 0.9314, 'unstable_sample_warning': False}
 - weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.8352, 'unstable_sample_warning': True}
-- weight_class:Heavyweight: {'rows': 88, 'accuracy': 0.8864, 'unstable_sample_warning': True}
+- weight_class:Heavyweight: {'rows': 88, 'accuracy': 0.875, 'unstable_sample_warning': True}
 - weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.8493, 'unstable_sample_warning': True}
-- weight_class:Light Heavyweight: {'rows': 85, 'accuracy': 0.9294, 'unstable_sample_warning': True}
+- weight_class:Light Heavyweight: {'rows': 85, 'accuracy': 0.9176, 'unstable_sample_warning': True}
 - weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.8684, 'unstable_sample_warning': True}
-- weight_class:Lightweight: {'rows': 163, 'accuracy': 0.8896, 'unstable_sample_warning': False}
-- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.8919, 'unstable_sample_warning': False}
-- weight_class:Middleweight: {'rows': 161, 'accuracy': 0.9317, 'unstable_sample_warning': False}
-- weight_class:Middleweight Bout: {'rows': 145, 'accuracy': 0.8621, 'unstable_sample_warning': False}
-- weight_class:Welterweight: {'rows': 143, 'accuracy': 0.9371, 'unstable_sample_warning': False}
-- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.8712, 'unstable_sample_warning': False}
-- weight_class:Women's Bantamweight: {'rows': 53, 'accuracy': 0.9245, 'unstable_sample_warning': True}
-- weight_class:Women's Bantamweight Bout: {'rows': 45, 'accuracy': 0.8222, 'unstable_sample_warning': True}
+- weight_class:Lightweight: {'rows': 163, 'accuracy': 0.9018, 'unstable_sample_warning': False}
+- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.9122, 'unstable_sample_warning': False}
+- weight_class:Middleweight: {'rows': 161, 'accuracy': 0.9379, 'unstable_sample_warning': False}
+- weight_class:Middleweight Bout: {'rows': 145, 'accuracy': 0.8552, 'unstable_sample_warning': False}
+- weight_class:Welterweight: {'rows': 143, 'accuracy': 0.9091, 'unstable_sample_warning': False}
+- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.8788, 'unstable_sample_warning': False}
+- weight_class:Women's Bantamweight: {'rows': 53, 'accuracy': 0.9057, 'unstable_sample_warning': True}
+- weight_class:Women's Bantamweight Bout: {'rows': 45, 'accuracy': 0.8444, 'unstable_sample_warning': True}
 - weight_class:Women's Flyweight: {'rows': 60, 'accuracy': 0.9333, 'unstable_sample_warning': True}
 - weight_class:Women's Flyweight Bout: {'rows': 54, 'accuracy': 0.9444, 'unstable_sample_warning': True}
 - weight_class:Women's Strawweight: {'rows': 81, 'accuracy': 0.963, 'unstable_sample_warning': True}
-- weight_class:Women's Strawweight Bout: {'rows': 71, 'accuracy': 0.8451, 'unstable_sample_warning': True}
-- weight_class:bantamweight: {'rows': 106, 'accuracy': 0.9245, 'unstable_sample_warning': False}
-- weight_class:featherweight: {'rows': 108, 'accuracy': 0.963, 'unstable_sample_warning': False}
+- weight_class:Women's Strawweight Bout: {'rows': 71, 'accuracy': 0.8592, 'unstable_sample_warning': True}
+- weight_class:bantamweight: {'rows': 106, 'accuracy': 0.934, 'unstable_sample_warning': False}
+- weight_class:featherweight: {'rows': 108, 'accuracy': 0.9537, 'unstable_sample_warning': False}
 - weight_class:flyweight: {'rows': 73, 'accuracy': 0.9726, 'unstable_sample_warning': True}
 - weight_class:heavyweight: {'rows': 55, 'accuracy': 0.9455, 'unstable_sample_warning': True}
 - weight_class:light heavyweight: {'rows': 63, 'accuracy': 0.9524, 'unstable_sample_warning': True}
-- weight_class:lightweight: {'rows': 125, 'accuracy': 0.952, 'unstable_sample_warning': False}
+- weight_class:lightweight: {'rows': 125, 'accuracy': 0.976, 'unstable_sample_warning': False}
 - weight_class:middleweight: {'rows': 113, 'accuracy': 0.9558, 'unstable_sample_warning': False}
 - weight_class:welterweight: {'rows': 108, 'accuracy': 0.9537, 'unstable_sample_warning': False}
 - weight_class:women's bantamweight: {'rows': 37, 'accuracy': 0.973, 'unstable_sample_warning': True}
 - weight_class:women's flyweight: {'rows': 49, 'accuracy': 0.9796, 'unstable_sample_warning': True}
 - weight_class:women's strawweight: {'rows': 61, 'accuracy': 0.9508, 'unstable_sample_warning': True}
-- low_fighter_history: {'rows': 267, 'accuracy': 0.8539, 'unstable_sample_warning': False}
-- enough_fighter_history: {'rows': 3060, 'accuracy': 0.9144, 'unstable_sample_warning': False}
+- low_fighter_history: {'rows': 267, 'accuracy': 0.8577, 'unstable_sample_warning': False}
+- enough_fighter_history: {'rows': 3060, 'accuracy': 0.9137, 'unstable_sample_warning': False}
 ### fight_duration_model
-- weight_class:Bantamweight: {'rows': 292, 'accuracy': 0.839, 'unstable_sample_warning': False}
+- weight_class:Bantamweight: {'rows': 292, 'accuracy': 0.8562, 'unstable_sample_warning': False}
 - weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.8702, 'unstable_sample_warning': False}
 - weight_class:Catch Weight: {'rows': 30, 'accuracy': 0.8, 'unstable_sample_warning': True}
-- weight_class:Featherweight: {'rows': 297, 'accuracy': 0.8451, 'unstable_sample_warning': False}
-- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.8527, 'unstable_sample_warning': False}
-- weight_class:Flyweight: {'rows': 202, 'accuracy': 0.8515, 'unstable_sample_warning': False}
-- weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.8132, 'unstable_sample_warning': True}
-- weight_class:Heavyweight: {'rows': 175, 'accuracy': 0.7371, 'unstable_sample_warning': False}
-- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.7534, 'unstable_sample_warning': True}
-- weight_class:Light Heavyweight: {'rows': 175, 'accuracy': 0.84, 'unstable_sample_warning': False}
-- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.8684, 'unstable_sample_warning': True}
-- weight_class:Lightweight: {'rows': 335, 'accuracy': 0.8179, 'unstable_sample_warning': False}
-- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.8446, 'unstable_sample_warning': False}
-- weight_class:Middleweight: {'rows': 323, 'accuracy': 0.8204, 'unstable_sample_warning': False}
+- weight_class:Featherweight: {'rows': 297, 'accuracy': 0.8519, 'unstable_sample_warning': False}
+- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.8605, 'unstable_sample_warning': False}
+- weight_class:Flyweight: {'rows': 202, 'accuracy': 0.8366, 'unstable_sample_warning': False}
+- weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.8242, 'unstable_sample_warning': True}
+- weight_class:Heavyweight: {'rows': 175, 'accuracy': 0.7486, 'unstable_sample_warning': False}
+- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.7397, 'unstable_sample_warning': True}
+- weight_class:Light Heavyweight: {'rows': 175, 'accuracy': 0.8457, 'unstable_sample_warning': False}
+- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.8816, 'unstable_sample_warning': True}
+- weight_class:Lightweight: {'rows': 335, 'accuracy': 0.8149, 'unstable_sample_warning': False}
+- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.8581, 'unstable_sample_warning': False}
+- weight_class:Middleweight: {'rows': 323, 'accuracy': 0.805, 'unstable_sample_warning': False}
 - weight_class:Middleweight Bout: {'rows': 145, 'accuracy': 0.8759, 'unstable_sample_warning': False}
-- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.784, 'unstable_sample_warning': False}
-- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.7955, 'unstable_sample_warning': False}
-- weight_class:Women's Bantamweight: {'rows': 105, 'accuracy': 0.9143, 'unstable_sample_warning': False}
+- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.8084, 'unstable_sample_warning': False}
+- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.803, 'unstable_sample_warning': False}
+- weight_class:Women's Bantamweight: {'rows': 105, 'accuracy': 0.8952, 'unstable_sample_warning': False}
 - weight_class:Women's Bantamweight Bout: {'rows': 45, 'accuracy': 0.9556, 'unstable_sample_warning': True}
-- weight_class:Women's Flyweight: {'rows': 122, 'accuracy': 0.8443, 'unstable_sample_warning': False}
+- weight_class:Women's Flyweight: {'rows': 122, 'accuracy': 0.8361, 'unstable_sample_warning': False}
 - weight_class:Women's Flyweight Bout: {'rows': 54, 'accuracy': 0.8519, 'unstable_sample_warning': True}
-- weight_class:Women's Strawweight: {'rows': 162, 'accuracy': 0.7901, 'unstable_sample_warning': False}
+- weight_class:Women's Strawweight: {'rows': 162, 'accuracy': 0.784, 'unstable_sample_warning': False}
 - weight_class:Women's Strawweight Bout: {'rows': 71, 'accuracy': 0.8451, 'unstable_sample_warning': True}
-- low_fighter_history: {'rows': 477, 'accuracy': 0.8721, 'unstable_sample_warning': False}
-- enough_fighter_history: {'rows': 3219, 'accuracy': 0.8223, 'unstable_sample_warning': False}
+- low_fighter_history: {'rows': 477, 'accuracy': 0.8763, 'unstable_sample_warning': False}
+- enough_fighter_history: {'rows': 3219, 'accuracy': 0.8245, 'unstable_sample_warning': False}
 ### over_1_5_model
 - weight_class:Bantamweight: {'rows': 291, 'accuracy': 0.811, 'unstable_sample_warning': False}
 - weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.8092, 'unstable_sample_warning': False}
@@ -252,67 +252,67 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 - low_fighter_history: {'rows': 474, 'accuracy': 0.808, 'unstable_sample_warning': False}
 - enough_fighter_history: {'rows': 3209, 'accuracy': 0.7666, 'unstable_sample_warning': False}
 ### finish_in_round_1_model
-- weight_class:Bantamweight: {'rows': 291, 'accuracy': 0.756, 'unstable_sample_warning': False}
+- weight_class:Bantamweight: {'rows': 291, 'accuracy': 0.7526, 'unstable_sample_warning': False}
 - weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.7252, 'unstable_sample_warning': False}
 - weight_class:Catch Weight: {'rows': 30, 'accuracy': 0.7333, 'unstable_sample_warning': True}
-- weight_class:Featherweight: {'rows': 295, 'accuracy': 0.5898, 'unstable_sample_warning': False}
-- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.5271, 'unstable_sample_warning': False}
-- weight_class:Flyweight: {'rows': 201, 'accuracy': 0.6816, 'unstable_sample_warning': False}
+- weight_class:Featherweight: {'rows': 295, 'accuracy': 0.5864, 'unstable_sample_warning': False}
+- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.5194, 'unstable_sample_warning': False}
+- weight_class:Flyweight: {'rows': 201, 'accuracy': 0.6866, 'unstable_sample_warning': False}
 - weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.6374, 'unstable_sample_warning': True}
 - weight_class:Heavyweight: {'rows': 174, 'accuracy': 0.6264, 'unstable_sample_warning': False}
-- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.6301, 'unstable_sample_warning': True}
-- weight_class:Light Heavyweight: {'rows': 174, 'accuracy': 0.592, 'unstable_sample_warning': False}
-- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.5526, 'unstable_sample_warning': True}
-- weight_class:Lightweight: {'rows': 332, 'accuracy': 0.6747, 'unstable_sample_warning': False}
-- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.6216, 'unstable_sample_warning': False}
-- weight_class:Middleweight: {'rows': 322, 'accuracy': 0.5466, 'unstable_sample_warning': False}
-- weight_class:Middleweight Bout: {'rows': 145, 'accuracy': 0.5448, 'unstable_sample_warning': False}
-- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.6272, 'unstable_sample_warning': False}
-- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.5985, 'unstable_sample_warning': False}
+- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.6164, 'unstable_sample_warning': True}
+- weight_class:Light Heavyweight: {'rows': 174, 'accuracy': 0.6034, 'unstable_sample_warning': False}
+- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.5658, 'unstable_sample_warning': True}
+- weight_class:Lightweight: {'rows': 332, 'accuracy': 0.6777, 'unstable_sample_warning': False}
+- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.6284, 'unstable_sample_warning': False}
+- weight_class:Middleweight: {'rows': 322, 'accuracy': 0.5435, 'unstable_sample_warning': False}
+- weight_class:Middleweight Bout: {'rows': 145, 'accuracy': 0.5379, 'unstable_sample_warning': False}
+- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.6341, 'unstable_sample_warning': False}
+- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.6061, 'unstable_sample_warning': False}
 - weight_class:Women's Bantamweight: {'rows': 104, 'accuracy': 0.7404, 'unstable_sample_warning': False}
 - weight_class:Women's Bantamweight Bout: {'rows': 45, 'accuracy': 0.7333, 'unstable_sample_warning': True}
-- weight_class:Women's Flyweight: {'rows': 121, 'accuracy': 0.7521, 'unstable_sample_warning': False}
+- weight_class:Women's Flyweight: {'rows': 121, 'accuracy': 0.7603, 'unstable_sample_warning': False}
 - weight_class:Women's Flyweight Bout: {'rows': 54, 'accuracy': 0.7593, 'unstable_sample_warning': True}
 - weight_class:Women's Strawweight: {'rows': 161, 'accuracy': 0.8634, 'unstable_sample_warning': False}
 - weight_class:Women's Strawweight Bout: {'rows': 71, 'accuracy': 0.8592, 'unstable_sample_warning': True}
-- low_fighter_history: {'rows': 474, 'accuracy': 0.6561, 'unstable_sample_warning': False}
-- enough_fighter_history: {'rows': 3209, 'accuracy': 0.6553, 'unstable_sample_warning': False}
+- low_fighter_history: {'rows': 474, 'accuracy': 0.6582, 'unstable_sample_warning': False}
+- enough_fighter_history: {'rows': 3209, 'accuracy': 0.6563, 'unstable_sample_warning': False}
 ### finish_type_model
-- weight_class:Bantamweight: {'rows': 91, 'accuracy': 0.4066, 'unstable_sample_warning': True}
+- weight_class:Bantamweight: {'rows': 91, 'accuracy': 0.3407, 'unstable_sample_warning': True}
 - weight_class:Bantamweight Bout: {'rows': 42, 'accuracy': 0.4762, 'unstable_sample_warning': True}
-- weight_class:Featherweight: {'rows': 164, 'accuracy': 0.5549, 'unstable_sample_warning': False}
-- weight_class:Featherweight Bout: {'rows': 71, 'accuracy': 0.5915, 'unstable_sample_warning': True}
-- weight_class:Flyweight: {'rows': 97, 'accuracy': 0.5464, 'unstable_sample_warning': True}
-- weight_class:Flyweight Bout: {'rows': 42, 'accuracy': 0.6667, 'unstable_sample_warning': True}
-- weight_class:Heavyweight: {'rows': 90, 'accuracy': 0.6, 'unstable_sample_warning': True}
-- weight_class:Heavyweight Bout: {'rows': 37, 'accuracy': 0.4865, 'unstable_sample_warning': True}
-- weight_class:Light Heavyweight: {'rows': 117, 'accuracy': 0.6923, 'unstable_sample_warning': False}
+- weight_class:Featherweight: {'rows': 164, 'accuracy': 0.5122, 'unstable_sample_warning': False}
+- weight_class:Featherweight Bout: {'rows': 71, 'accuracy': 0.5211, 'unstable_sample_warning': True}
+- weight_class:Flyweight: {'rows': 97, 'accuracy': 0.567, 'unstable_sample_warning': True}
+- weight_class:Flyweight Bout: {'rows': 42, 'accuracy': 0.6429, 'unstable_sample_warning': True}
+- weight_class:Heavyweight: {'rows': 90, 'accuracy': 0.5889, 'unstable_sample_warning': True}
+- weight_class:Heavyweight Bout: {'rows': 37, 'accuracy': 0.5135, 'unstable_sample_warning': True}
+- weight_class:Light Heavyweight: {'rows': 117, 'accuracy': 0.6752, 'unstable_sample_warning': False}
 - weight_class:Light Heavyweight Bout: {'rows': 49, 'accuracy': 0.6939, 'unstable_sample_warning': True}
 - weight_class:Lightweight: {'rows': 174, 'accuracy': 0.5517, 'unstable_sample_warning': False}
-- weight_class:Lightweight Bout: {'rows': 75, 'accuracy': 0.6, 'unstable_sample_warning': True}
-- weight_class:Middleweight: {'rows': 189, 'accuracy': 0.5397, 'unstable_sample_warning': False}
+- weight_class:Lightweight Bout: {'rows': 75, 'accuracy': 0.6267, 'unstable_sample_warning': True}
+- weight_class:Middleweight: {'rows': 189, 'accuracy': 0.5608, 'unstable_sample_warning': False}
 - weight_class:Middleweight Bout: {'rows': 87, 'accuracy': 0.6092, 'unstable_sample_warning': True}
-- weight_class:Welterweight: {'rows': 159, 'accuracy': 0.6415, 'unstable_sample_warning': False}
-- weight_class:Welterweight Bout: {'rows': 76, 'accuracy': 0.6053, 'unstable_sample_warning': True}
-- weight_class:Women's Bantamweight: {'rows': 42, 'accuracy': 0.4286, 'unstable_sample_warning': True}
-- weight_class:Women's Flyweight: {'rows': 33, 'accuracy': 0.4545, 'unstable_sample_warning': True}
+- weight_class:Welterweight: {'rows': 159, 'accuracy': 0.673, 'unstable_sample_warning': False}
+- weight_class:Welterweight Bout: {'rows': 76, 'accuracy': 0.6316, 'unstable_sample_warning': True}
+- weight_class:Women's Bantamweight: {'rows': 42, 'accuracy': 0.4524, 'unstable_sample_warning': True}
+- weight_class:Women's Flyweight: {'rows': 33, 'accuracy': 0.4242, 'unstable_sample_warning': True}
 - weight_class:Women's Strawweight: {'rows': 51, 'accuracy': 0.3725, 'unstable_sample_warning': True}
-- low_fighter_history: {'rows': 272, 'accuracy': 0.5221, 'unstable_sample_warning': False}
-- enough_fighter_history: {'rows': 1524, 'accuracy': 0.5728, 'unstable_sample_warning': False}
+- low_fighter_history: {'rows': 272, 'accuracy': 0.511, 'unstable_sample_warning': False}
+- enough_fighter_history: {'rows': 1524, 'accuracy': 0.5696, 'unstable_sample_warning': False}
 ### strike_volume_model
-- weight_class:Bantamweight: {'rows': 150, 'accuracy': 0.48, 'unstable_sample_warning': False}
-- weight_class:Featherweight: {'rows': 152, 'accuracy': 0.4934, 'unstable_sample_warning': False}
-- weight_class:Flyweight: {'rows': 103, 'accuracy': 0.4078, 'unstable_sample_warning': False}
-- weight_class:Heavyweight: {'rows': 94, 'accuracy': 0.3723, 'unstable_sample_warning': True}
-- weight_class:Light Heavyweight: {'rows': 90, 'accuracy': 0.4778, 'unstable_sample_warning': True}
-- weight_class:Lightweight: {'rows': 174, 'accuracy': 0.4023, 'unstable_sample_warning': False}
-- weight_class:Middleweight: {'rows': 169, 'accuracy': 0.4142, 'unstable_sample_warning': False}
-- weight_class:Welterweight: {'rows': 148, 'accuracy': 0.4392, 'unstable_sample_warning': False}
-- weight_class:Women's Bantamweight: {'rows': 55, 'accuracy': 0.4182, 'unstable_sample_warning': True}
-- weight_class:Women's Flyweight: {'rows': 62, 'accuracy': 0.4839, 'unstable_sample_warning': True}
-- weight_class:Women's Strawweight: {'rows': 83, 'accuracy': 0.4458, 'unstable_sample_warning': True}
-- low_fighter_history: {'rows': 231, 'accuracy': 0.4892, 'unstable_sample_warning': False}
-- enough_fighter_history: {'rows': 1091, 'accuracy': 0.4244, 'unstable_sample_warning': False}
+- weight_class:Bantamweight: {'rows': 150, 'accuracy': 0.4867, 'unstable_sample_warning': False}
+- weight_class:Featherweight: {'rows': 152, 'accuracy': 0.5, 'unstable_sample_warning': False}
+- weight_class:Flyweight: {'rows': 103, 'accuracy': 0.4272, 'unstable_sample_warning': False}
+- weight_class:Heavyweight: {'rows': 94, 'accuracy': 0.3936, 'unstable_sample_warning': True}
+- weight_class:Light Heavyweight: {'rows': 90, 'accuracy': 0.4889, 'unstable_sample_warning': True}
+- weight_class:Lightweight: {'rows': 174, 'accuracy': 0.3966, 'unstable_sample_warning': False}
+- weight_class:Middleweight: {'rows': 169, 'accuracy': 0.4556, 'unstable_sample_warning': False}
+- weight_class:Welterweight: {'rows': 148, 'accuracy': 0.4257, 'unstable_sample_warning': False}
+- weight_class:Women's Bantamweight: {'rows': 55, 'accuracy': 0.4364, 'unstable_sample_warning': True}
+- weight_class:Women's Flyweight: {'rows': 62, 'accuracy': 0.4677, 'unstable_sample_warning': True}
+- weight_class:Women's Strawweight: {'rows': 83, 'accuracy': 0.4699, 'unstable_sample_warning': True}
+- low_fighter_history: {'rows': 231, 'accuracy': 0.4935, 'unstable_sample_warning': False}
+- enough_fighter_history: {'rows': 1091, 'accuracy': 0.4372, 'unstable_sample_warning': False}
 ### takedown_control_model
 - weight_class:Bantamweight: {'rows': 150, 'accuracy': 0.56, 'unstable_sample_warning': False}
 - weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.5649, 'unstable_sample_warning': False}
@@ -365,57 +365,57 @@ This backtest simulated 5537 historical fights by hiding outcome labels until af
 - low_fighter_history: {'rows': 477, 'accuracy': 0.6373, 'unstable_sample_warning': False}
 - enough_fighter_history: {'rows': 3219, 'accuracy': 0.657, 'unstable_sample_warning': False}
 ### finish_model
-- weight_class:Bantamweight: {'rows': 292, 'accuracy': 0.839, 'unstable_sample_warning': False}
+- weight_class:Bantamweight: {'rows': 292, 'accuracy': 0.8562, 'unstable_sample_warning': False}
 - weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.8702, 'unstable_sample_warning': False}
 - weight_class:Catch Weight: {'rows': 30, 'accuracy': 0.8, 'unstable_sample_warning': True}
-- weight_class:Featherweight: {'rows': 297, 'accuracy': 0.8451, 'unstable_sample_warning': False}
-- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.8527, 'unstable_sample_warning': False}
-- weight_class:Flyweight: {'rows': 202, 'accuracy': 0.8515, 'unstable_sample_warning': False}
-- weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.8132, 'unstable_sample_warning': True}
-- weight_class:Heavyweight: {'rows': 175, 'accuracy': 0.7371, 'unstable_sample_warning': False}
-- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.7534, 'unstable_sample_warning': True}
-- weight_class:Light Heavyweight: {'rows': 175, 'accuracy': 0.84, 'unstable_sample_warning': False}
-- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.8684, 'unstable_sample_warning': True}
-- weight_class:Lightweight: {'rows': 335, 'accuracy': 0.8179, 'unstable_sample_warning': False}
-- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.8446, 'unstable_sample_warning': False}
-- weight_class:Middleweight: {'rows': 323, 'accuracy': 0.8204, 'unstable_sample_warning': False}
+- weight_class:Featherweight: {'rows': 297, 'accuracy': 0.8519, 'unstable_sample_warning': False}
+- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.8605, 'unstable_sample_warning': False}
+- weight_class:Flyweight: {'rows': 202, 'accuracy': 0.8366, 'unstable_sample_warning': False}
+- weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.8242, 'unstable_sample_warning': True}
+- weight_class:Heavyweight: {'rows': 175, 'accuracy': 0.7486, 'unstable_sample_warning': False}
+- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.7397, 'unstable_sample_warning': True}
+- weight_class:Light Heavyweight: {'rows': 175, 'accuracy': 0.8457, 'unstable_sample_warning': False}
+- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.8816, 'unstable_sample_warning': True}
+- weight_class:Lightweight: {'rows': 335, 'accuracy': 0.8149, 'unstable_sample_warning': False}
+- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.8581, 'unstable_sample_warning': False}
+- weight_class:Middleweight: {'rows': 323, 'accuracy': 0.805, 'unstable_sample_warning': False}
 - weight_class:Middleweight Bout: {'rows': 145, 'accuracy': 0.8759, 'unstable_sample_warning': False}
-- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.784, 'unstable_sample_warning': False}
-- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.7955, 'unstable_sample_warning': False}
-- weight_class:Women's Bantamweight: {'rows': 105, 'accuracy': 0.9143, 'unstable_sample_warning': False}
+- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.8084, 'unstable_sample_warning': False}
+- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.803, 'unstable_sample_warning': False}
+- weight_class:Women's Bantamweight: {'rows': 105, 'accuracy': 0.8952, 'unstable_sample_warning': False}
 - weight_class:Women's Bantamweight Bout: {'rows': 45, 'accuracy': 0.9556, 'unstable_sample_warning': True}
-- weight_class:Women's Flyweight: {'rows': 122, 'accuracy': 0.8443, 'unstable_sample_warning': False}
+- weight_class:Women's Flyweight: {'rows': 122, 'accuracy': 0.8361, 'unstable_sample_warning': False}
 - weight_class:Women's Flyweight Bout: {'rows': 54, 'accuracy': 0.8519, 'unstable_sample_warning': True}
-- weight_class:Women's Strawweight: {'rows': 162, 'accuracy': 0.7901, 'unstable_sample_warning': False}
+- weight_class:Women's Strawweight: {'rows': 162, 'accuracy': 0.784, 'unstable_sample_warning': False}
 - weight_class:Women's Strawweight Bout: {'rows': 71, 'accuracy': 0.8451, 'unstable_sample_warning': True}
-- low_fighter_history: {'rows': 477, 'accuracy': 0.8721, 'unstable_sample_warning': False}
-- enough_fighter_history: {'rows': 3219, 'accuracy': 0.8223, 'unstable_sample_warning': False}
+- low_fighter_history: {'rows': 477, 'accuracy': 0.8763, 'unstable_sample_warning': False}
+- enough_fighter_history: {'rows': 3219, 'accuracy': 0.8245, 'unstable_sample_warning': False}
 ### goes_distance_model
-- weight_class:Bantamweight: {'rows': 292, 'accuracy': 0.839, 'unstable_sample_warning': False}
+- weight_class:Bantamweight: {'rows': 292, 'accuracy': 0.8562, 'unstable_sample_warning': False}
 - weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.8702, 'unstable_sample_warning': False}
 - weight_class:Catch Weight: {'rows': 30, 'accuracy': 0.8, 'unstable_sample_warning': True}
-- weight_class:Featherweight: {'rows': 297, 'accuracy': 0.8451, 'unstable_sample_warning': False}
-- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.8527, 'unstable_sample_warning': False}
-- weight_class:Flyweight: {'rows': 202, 'accuracy': 0.8515, 'unstable_sample_warning': False}
-- weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.8132, 'unstable_sample_warning': True}
-- weight_class:Heavyweight: {'rows': 175, 'accuracy': 0.7371, 'unstable_sample_warning': False}
-- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.7534, 'unstable_sample_warning': True}
-- weight_class:Light Heavyweight: {'rows': 175, 'accuracy': 0.84, 'unstable_sample_warning': False}
-- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.8684, 'unstable_sample_warning': True}
-- weight_class:Lightweight: {'rows': 335, 'accuracy': 0.8179, 'unstable_sample_warning': False}
-- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.8446, 'unstable_sample_warning': False}
-- weight_class:Middleweight: {'rows': 323, 'accuracy': 0.8204, 'unstable_sample_warning': False}
+- weight_class:Featherweight: {'rows': 297, 'accuracy': 0.8519, 'unstable_sample_warning': False}
+- weight_class:Featherweight Bout: {'rows': 129, 'accuracy': 0.8605, 'unstable_sample_warning': False}
+- weight_class:Flyweight: {'rows': 202, 'accuracy': 0.8366, 'unstable_sample_warning': False}
+- weight_class:Flyweight Bout: {'rows': 91, 'accuracy': 0.8242, 'unstable_sample_warning': True}
+- weight_class:Heavyweight: {'rows': 175, 'accuracy': 0.7486, 'unstable_sample_warning': False}
+- weight_class:Heavyweight Bout: {'rows': 73, 'accuracy': 0.7397, 'unstable_sample_warning': True}
+- weight_class:Light Heavyweight: {'rows': 175, 'accuracy': 0.8457, 'unstable_sample_warning': False}
+- weight_class:Light Heavyweight Bout: {'rows': 76, 'accuracy': 0.8816, 'unstable_sample_warning': True}
+- weight_class:Lightweight: {'rows': 335, 'accuracy': 0.8149, 'unstable_sample_warning': False}
+- weight_class:Lightweight Bout: {'rows': 148, 'accuracy': 0.8581, 'unstable_sample_warning': False}
+- weight_class:Middleweight: {'rows': 323, 'accuracy': 0.805, 'unstable_sample_warning': False}
 - weight_class:Middleweight Bout: {'rows': 145, 'accuracy': 0.8759, 'unstable_sample_warning': False}
-- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.784, 'unstable_sample_warning': False}
-- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.7955, 'unstable_sample_warning': False}
-- weight_class:Women's Bantamweight: {'rows': 105, 'accuracy': 0.9143, 'unstable_sample_warning': False}
+- weight_class:Welterweight: {'rows': 287, 'accuracy': 0.8084, 'unstable_sample_warning': False}
+- weight_class:Welterweight Bout: {'rows': 132, 'accuracy': 0.803, 'unstable_sample_warning': False}
+- weight_class:Women's Bantamweight: {'rows': 105, 'accuracy': 0.8952, 'unstable_sample_warning': False}
 - weight_class:Women's Bantamweight Bout: {'rows': 45, 'accuracy': 0.9556, 'unstable_sample_warning': True}
-- weight_class:Women's Flyweight: {'rows': 122, 'accuracy': 0.8443, 'unstable_sample_warning': False}
+- weight_class:Women's Flyweight: {'rows': 122, 'accuracy': 0.8361, 'unstable_sample_warning': False}
 - weight_class:Women's Flyweight Bout: {'rows': 54, 'accuracy': 0.8519, 'unstable_sample_warning': True}
-- weight_class:Women's Strawweight: {'rows': 162, 'accuracy': 0.7901, 'unstable_sample_warning': False}
+- weight_class:Women's Strawweight: {'rows': 162, 'accuracy': 0.784, 'unstable_sample_warning': False}
 - weight_class:Women's Strawweight Bout: {'rows': 71, 'accuracy': 0.8451, 'unstable_sample_warning': True}
-- low_fighter_history: {'rows': 477, 'accuracy': 0.8721, 'unstable_sample_warning': False}
-- enough_fighter_history: {'rows': 3219, 'accuracy': 0.8223, 'unstable_sample_warning': False}
+- low_fighter_history: {'rows': 477, 'accuracy': 0.8763, 'unstable_sample_warning': False}
+- enough_fighter_history: {'rows': 3219, 'accuracy': 0.8245, 'unstable_sample_warning': False}
 ### method_model
 - weight_class:Bantamweight: {'rows': 292, 'accuracy': 0.7021, 'unstable_sample_warning': False}
 - weight_class:Bantamweight Bout: {'rows': 131, 'accuracy': 0.7405, 'unstable_sample_warning': False}

@@ -20,7 +20,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ufc_predictor.config import settings
-from ufc_predictor.features.interaction_discovery import add_interaction_features, discover_candidate_interactions
+from ufc_predictor.features.interaction_discovery import add_interaction_features, discover_candidate_interactions, normalized_rejection_counts
 from ufc_predictor.features.feature_schema import get_feature_schema
 from ufc_predictor.training.dataset_builder import build_training_rows, load_fights_csv
 from ufc_predictor.training.deduping import stable_fight_key
@@ -240,6 +240,8 @@ def evaluate_classification_model(
     if len(rows_train) < 500 or len(rows_test) < 100 or rows_train[target].nunique() < 2:
         return insufficient(model_name, target, len(rows_train), len(rows_test), rows_train, rows_test)
     classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
+    base_feature_names = list(feature_names)
+    rows_test_base = rows_test.copy()
     selected_bundle = select_classifier_with_interactions(model_name, rows_train, rows_validation, target, feature_names, classes)
     selected = selected_bundle["selected"]
     feature_names = selected_bundle["feature_names"]
@@ -252,6 +254,12 @@ def evaluate_classification_model(
     y_true = rows_test[target].astype(str).tolist()
     majority = majority_baseline(y_true)
     metrics = classification_metrics(y_true, preds, probs, classes)
+    base_final_metrics = (
+        validation_metrics(selected_bundle["base_selected"]["model"], rows_test_base, target, base_feature_names, classes)
+        if not rows_test_base.empty
+        else None
+    )
+    annotate_interaction_final_results(selected_bundle["interaction_report"], metrics, base_final_metrics)
     main = metrics["accuracy"]
     baseline = majority["accuracy"]
     improvement = round(main - baseline, 4) if baseline is not None else None
@@ -270,8 +278,18 @@ def evaluate_classification_model(
         "interaction_discovery": selected_bundle["interaction_report"],
         "interaction_feature_count": len(selected_bundle["selected_interactions"]),
         "selected_interactions": [item["name"] for item in selected_bundle["selected_interactions"]],
+        "selected_interactions_detailed": selected_bundle["interaction_report"].get("selected_interactions", []),
         "base_validation_metrics": selected_bundle.get("base_validation_metrics"),
         "interaction_validation_metrics": selected_bundle.get("interaction_validation_metrics"),
+        "base_final_test_metrics": base_final_metrics,
+        "interaction_final_test_metrics": metrics if selected_bundle["selected_interactions"] else None,
+        "base_vs_interaction_comparison": base_vs_interaction_comparison(
+            base_final_metrics,
+            metrics if selected_bundle["selected_interactions"] else None,
+            selected_bundle.get("base_validation_metrics"),
+            selected_bundle.get("interaction_validation_metrics"),
+            None,
+        ),
         "source_contribution": source_contribution_report(pd.concat([rows_train, rows_test], ignore_index=True), rows_train, validation.dropna(subset=[target]).copy(), rows_test.iloc[0:0].copy(), rows_test),
         "feature_coverage": feature_coverage(pd.concat([rows_train, rows_test], ignore_index=True), feature_names + [target]),
         "final_test_metric_name": "accuracy",
@@ -542,6 +560,7 @@ def select_classifier_with_interactions(
     accepted = discovery.get("accepted", [])
     if base_metrics is None or not accepted:
         discovery["selection_status"] = "skipped_no_validation_or_candidates"
+        discovery["summary_judgment"] = interaction_summary_judgment(discovery, set())
         return {
             "selected": base_selected,
             "feature_names": base_features,
@@ -549,6 +568,7 @@ def select_classifier_with_interactions(
             "rows_validation": rows_validation,
             "selected_interactions": [],
             "interaction_report": discovery,
+            "base_selected": base_selected,
             "base_validation_metrics": base_metrics,
             "interaction_validation_metrics": None,
         }
@@ -586,12 +606,30 @@ def select_classifier_with_interactions(
     selected_names = {item["name"] for item in best["interactions"]}
     discovery["selection_status"] = "selected" if selected_names else "base_features_kept"
     discovery["validation_trials"] = tried
-    discovery["selected_interactions"] = [item for item in accepted if item["name"] in selected_names]
+    validation_improvement = metric_delta(best["metrics"], base_metrics, "balanced_accuracy") if selected_names else None
+    log_loss_delta = metric_delta(best["metrics"], base_metrics, "log_loss") if selected_names else None
+    discovery["selected_interactions"] = [
+        selected_interaction_detail(item, model_name, validation_improvement, log_loss_delta)
+        for item in accepted
+        if item["name"] in selected_names
+    ]
     discovery["rejected_after_validation"] = [
-        {"name": item["name"], "reason": "did_not_improve_validation_or_calibration"}
+        {
+            "name": item["name"],
+            "reason": "did_not_improve_validation_or_calibration",
+            "kind": item.get("kind"),
+            "groups": item.get("groups"),
+        }
         for item in accepted
         if item["name"] not in selected_names
     ][:100]
+    discovery["rejection_counts"] = merge_counts(
+        discovery.get("rejection_counts", {}),
+        normalized_rejection_counts(discovery["rejected_after_validation"]),
+    )
+    discovery["summary_judgment"] = interaction_summary_judgment(discovery, selected_names)
+    if discovery.get("safety_checks") is not None:
+        discovery["safety_checks"]["selected_interactions_runtime_computable"] = selected_interactions_runtime_computable(best["interactions"], base_features)
     return {
         "selected": best["selected"],
         "feature_names": best["features"],
@@ -599,8 +637,105 @@ def select_classifier_with_interactions(
         "rows_validation": best["rows_validation"],
         "selected_interactions": best["interactions"],
         "interaction_report": discovery,
+        "base_selected": base_selected,
         "base_validation_metrics": base_metrics,
         "interaction_validation_metrics": best["metrics"] if selected_names else None,
+    }
+
+
+def metric_delta(current: dict | None, base: dict | None, key: str) -> float | None:
+    if not current or not base or current.get(key) is None or base.get(key) is None:
+        return None
+    return round(float(current[key]) - float(base[key]), 4)
+
+
+def selected_interaction_detail(item: dict, model_name: str, validation_improvement: float | None, log_loss_delta: float | None) -> dict:
+    detail = dict(item)
+    detail.update(
+        {
+            "model_using_it": model_name,
+            "validation_improvement": validation_improvement,
+            "final_test_impact": None,
+            "source_holdout_impact": "not_run",
+            "runtime_availability": "training_schema_computable",
+            "importance_score": validation_improvement,
+            "calibration_impact": log_loss_delta,
+        }
+    )
+    return detail
+
+
+def selected_interactions_runtime_computable(specs: list[dict], base_features: list[str]) -> bool:
+    base = set(base_features)
+    return all(set(item.get("input_features", [])).issubset(base) for item in specs)
+
+
+def merge_counts(left: dict, right: dict) -> dict:
+    keys = set(left) | set(right)
+    return {key: int(left.get(key, 0) or 0) + int(right.get(key, 0) or 0) for key in sorted(keys)}
+
+
+def interaction_summary_judgment(discovery: dict, selected_names: set[str]) -> dict:
+    type_counts = discovery.get("candidate_count_by_interaction_type") or {}
+    group_counts = discovery.get("candidate_count_by_feature_group_pair") or {}
+    tested = int(discovery.get("candidate_count") or 0)
+    accepted = int(discovery.get("accepted_count") or 0)
+    coverage_gaps = [
+        name
+        for name, count in {**type_counts, **group_counts}.items()
+        if int(count or 0) == 0
+    ]
+    return {
+        "enough_interactions_tested": bool(tested >= 120 and accepted >= 20),
+        "interaction_coverage_gaps": coverage_gaps,
+        "model_improved": bool(selected_names),
+        "model_worsened": False,
+        "next_interaction_groups_to_try": coverage_gaps[:5],
+    }
+
+
+def annotate_interaction_final_results(discovery: dict, final_metrics: dict, base_final_metrics: dict | None) -> None:
+    selected = discovery.get("selected_interactions") or []
+    if not selected:
+        return
+    impact = metric_delta(final_metrics, base_final_metrics, "balanced_accuracy")
+    for item in selected:
+        item["final_test_impact"] = impact
+        if item.get("importance_score") is None:
+            item["importance_score"] = impact
+    discovery["final_test_impact_summary"] = {
+        "balanced_accuracy_delta_vs_base_final_test": impact,
+        "final_test_used_for_selection": False,
+    }
+
+
+def base_vs_interaction_comparison(
+    base_final: dict | None,
+    interaction_final: dict | None,
+    base_validation: dict | None,
+    interaction_validation: dict | None,
+    source_holdout: dict | None,
+) -> dict:
+    return {
+        "selection_basis": "validation_only",
+        "base_final_test": metric_subset(base_final),
+        "interaction_final_test": metric_subset(interaction_final),
+        "base_validation": metric_subset(base_validation),
+        "interaction_validation": metric_subset(interaction_validation),
+        "source_holdout": source_holdout or {"status": "not_run"},
+        "cold_start_low_history_segment": {"status": "reported_in_segment_metrics_when_available"},
+    }
+
+
+def metric_subset(metrics: dict | None) -> dict | None:
+    if not metrics:
+        return None
+    return {
+        "accuracy": metrics.get("accuracy"),
+        "balanced_accuracy": metrics.get("balanced_accuracy"),
+        "roc_auc": metrics.get("roc_auc"),
+        "brier_score": metrics.get("brier_score"),
+        "log_loss": metrics.get("log_loss"),
     }
 
 
@@ -953,7 +1088,10 @@ def update_registry_with_evaluation(models, split_report: dict | None = None):
                 "feature_names": result.get("feature_names", []),
                 "interaction_feature_count": result.get("interaction_feature_count", 0),
                 "selected_interactions": result.get("selected_interactions", []),
+                "selected_interactions_detailed": result.get("selected_interactions_detailed", []),
                 "interaction_selection_status": (result.get("interaction_discovery") or {}).get("selection_status"),
+                "interaction_audit_summary": (result.get("interaction_discovery") or {}).get("summary_judgment", {}),
+                "interaction_safety_checks": (result.get("interaction_discovery") or {}).get("safety_checks", {}),
                 "final_test_metric": result.get("final_test_metric"),
                 "final_test_metric_name": result.get("final_test_metric_name"),
                 "baseline_metric": result.get("baseline_metric"),
@@ -1059,6 +1197,15 @@ def production_gate_result(model_name: str, result: dict, split_report: dict | N
     _gate(bool(result.get("feature_names")), "runtime_feature_schema_exists", passed, failed)
     _gate(calibration_is_acceptable(result), "calibration_acceptable", passed, failed)
     _gate(high_confidence_not_tiny(result), "high_confidence_not_tiny_sample_noise", passed, failed)
+    interaction_report = result.get("interaction_discovery") or {}
+    safety = interaction_report.get("safety_checks") or {}
+    if safety:
+        _gate(bool(safety.get("final_test_used_for_selection") is False), "interaction_final_test_not_used_for_selection", passed, failed)
+        _gate(bool(safety.get("forbidden_target_columns_excluded")), "interaction_leakage_columns_excluded", passed, failed)
+        if result.get("interaction_feature_count", 0):
+            _gate(bool(safety.get("selected_interactions_runtime_computable")), "interaction_runtime_parity_passes", passed, failed)
+    if interaction_report.get("source_holdout_regression_detected"):
+        failed.append("interaction_source_holdout_regression")
 
     if model_name == "winner_model":
         audit_status = winner_audit.get("final_status", {})
@@ -1162,20 +1309,32 @@ def interaction_discovery_payload(payload: dict) -> dict:
         discovery = result.get("interaction_discovery") or {}
         models[name] = {
             "candidate_count": discovery.get("candidate_count", 0),
+            "candidate_count_by_interaction_type": discovery.get("candidate_count_by_interaction_type", {}),
+            "candidate_count_by_feature_group_pair": discovery.get("candidate_count_by_feature_group_pair", {}),
             "accepted_count": discovery.get("accepted_count", 0),
             "selected_count": len(result.get("selected_interactions") or []),
             "selection_status": discovery.get("selection_status", "not_run"),
             "feature_groups": discovery.get("feature_groups", {}),
+            "rejection_counts": discovery.get("rejection_counts", {}),
             "selected_interactions": discovery.get("selected_interactions", []),
             "rejected_interactions": discovery.get("rejected", [])[:25],
             "rejected_after_validation": discovery.get("rejected_after_validation", [])[:25],
             "base_validation_metrics": result.get("base_validation_metrics"),
             "interaction_validation_metrics": result.get("interaction_validation_metrics"),
+            "base_final_test_metrics": result.get("base_final_test_metrics"),
+            "interaction_final_test_metrics": result.get("interaction_final_test_metrics"),
+            "base_vs_interaction_comparison": result.get("base_vs_interaction_comparison", {}),
             "final_test_metric": result.get("final_test_metric"),
             "baseline_metric": result.get("baseline_metric"),
             "relative_improvement": result.get("relative_improvement"),
+            "high_confidence_accuracy": ((result.get("selective_prediction") or {}).get("best_accuracy") or {}).get("accuracy"),
+            "high_confidence_coverage": ((result.get("selective_prediction") or {}).get("best_accuracy") or {}).get("coverage_percent"),
+            "source_holdout": {"status": "not_run"},
+            "cold_start_low_history_segment": (result.get("segment_metrics") or {}).get("minimum_history_count"),
             "runtime_parity": "passed" if not result.get("selected_interactions") else "passed_training_schema_generated",
             "leakage_check": "passed_forbidden_feature_filter",
+            "safety_checks": discovery.get("safety_checks", {}),
+            "summary_judgment": discovery.get("summary_judgment", {}),
             "final_test_used_for_selection": False,
         }
     return {
@@ -1186,6 +1345,7 @@ def interaction_discovery_payload(payload: dict) -> dict:
             "minimum_validation_improvement": 0.003,
             "maximum_log_loss_regression_allowed": 0.05,
             "candidate_cap_per_model": 80,
+            "source_holdout_regression_blocks_production_ready": True,
         },
         "models": models,
     }
@@ -1206,15 +1366,40 @@ def interaction_markdown_report(payload: dict) -> str:
         "- Selected interactions are included only when validation balanced performance improves without a large log-loss regression.",
         "",
         "## Model Summary",
-        "| Model | Candidates | Accepted | Selected | Selection Status | Base Validation | Interaction Validation |",
-        "|---|---:|---:|---:|---|---|---|",
+        "| Model | Candidates | Accepted | Selected | Enough Tested | Selection Status | Base Validation | Interaction Validation |",
+        "|---|---:|---:|---:|---|---|---|---|",
     ]
     for name, result in payload["models"].items():
         base = result.get("base_validation_metrics") or {}
         interaction = result.get("interaction_validation_metrics") or {}
+        judgment = result.get("summary_judgment") or {}
         lines.append(
-            f"| {name} | {result.get('candidate_count', 0)} | {result.get('accepted_count', 0)} | {result.get('selected_count', 0)} | {result.get('selection_status')} | {base.get('balanced_accuracy')} | {interaction.get('balanced_accuracy')} |"
+            f"| {name} | {result.get('candidate_count', 0)} | {result.get('accepted_count', 0)} | {result.get('selected_count', 0)} | {judgment.get('enough_interactions_tested')} | {result.get('selection_status')} | {base.get('balanced_accuracy')} | {interaction.get('balanced_accuracy')} |"
         )
+    lines.extend(["", "## Candidate Counts By Type"])
+    for name, result in payload["models"].items():
+        lines.append(f"### {name}")
+        counts = result.get("candidate_count_by_interaction_type") or {}
+        if not counts:
+            lines.append("- No interaction candidates were generated.")
+        for key, value in counts.items():
+            lines.append(f"- {key}: {value}")
+    lines.extend(["", "## Candidate Counts By Feature-Group Pair"])
+    for name, result in payload["models"].items():
+        lines.append(f"### {name}")
+        counts = result.get("candidate_count_by_feature_group_pair") or {}
+        if not counts:
+            lines.append("- No feature-group pair candidates were generated.")
+        for key, value in counts.items():
+            lines.append(f"- {key}: {value}")
+    lines.extend(["", "## Rejection Counts"])
+    for name, result in payload["models"].items():
+        lines.append(f"### {name}")
+        counts = result.get("rejection_counts") or {}
+        if not counts:
+            lines.append("- No rejection counts were recorded.")
+        for key, value in counts.items():
+            lines.append(f"- {key}: {value}")
     lines.extend(["", "## Selected Interactions"])
     for name, result in payload["models"].items():
         selected = result.get("selected_interactions") or []
@@ -1222,7 +1407,43 @@ def interaction_markdown_report(payload: dict) -> str:
         if not selected:
             lines.append("- None selected; base features remained stronger or validation support was insufficient.")
         for item in selected[:25]:
-            lines.append(f"- `{item.get('name')}` ({item.get('kind')}, groups={item.get('groups')})")
+            lines.append(
+                f"- `{item.get('name')}` ({item.get('kind')}, groups={item.get('groups')}, validation improvement={item.get('validation_improvement')}, final-test impact={item.get('final_test_impact')}, source-holdout impact={item.get('source_holdout_impact')}, runtime={item.get('runtime_availability')}, importance={item.get('importance_score')})"
+            )
+    lines.extend(["", "## Base Vs Interaction Comparison"])
+    lines.append("| Model | Base Final Balanced | Interaction Final Balanced | Final Impact | Base Validation Balanced | Interaction Validation Balanced | High-Confidence Accuracy | High-Confidence Coverage | Source Holdout |")
+    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---|")
+    for name, result in payload["models"].items():
+        base_final = result.get("base_final_test_metrics") or {}
+        interaction_final = result.get("interaction_final_test_metrics") or {}
+        base_val = result.get("base_validation_metrics") or {}
+        interaction_val = result.get("interaction_validation_metrics") or {}
+        final_impact = None
+        if base_final.get("balanced_accuracy") is not None and interaction_final.get("balanced_accuracy") is not None:
+            final_impact = round(float(interaction_final["balanced_accuracy"]) - float(base_final["balanced_accuracy"]), 4)
+        lines.append(
+            f"| {name} | {base_final.get('balanced_accuracy')} | {interaction_final.get('balanced_accuracy')} | {final_impact} | {base_val.get('balanced_accuracy')} | {interaction_val.get('balanced_accuracy')} | {result.get('high_confidence_accuracy')} | {result.get('high_confidence_coverage')} | {(result.get('source_holdout') or {}).get('status')} |"
+        )
+    lines.extend(["", "## Safety Checks"])
+    for name, result in payload["models"].items():
+        checks = result.get("safety_checks") or {}
+        lines.append(f"### {name}")
+        if not checks:
+            lines.append("- No interaction safety checks were recorded.")
+        for key, value in checks.items():
+            lines.append(f"- {key}: {value}")
+    lines.extend(["", "## Summary Judgment"])
+    for name, result in payload["models"].items():
+        judgment = result.get("summary_judgment") or {}
+        lines.append(f"### {name}")
+        if not judgment:
+            lines.append("- No summary judgment was recorded.")
+        else:
+            lines.append(f"- Enough interactions tested: {judgment.get('enough_interactions_tested')}")
+            lines.append(f"- Coverage gaps: {judgment.get('interaction_coverage_gaps')}")
+            lines.append(f"- Model improved: {judgment.get('model_improved')}")
+            lines.append(f"- Model worsened: {judgment.get('model_worsened')}")
+            lines.append(f"- Next groups to try: {judgment.get('next_interaction_groups_to_try')}")
     lines.extend(["", "## Rejection Summary"])
     for name, result in payload["models"].items():
         rejected = result.get("rejected_interactions") or []
