@@ -189,6 +189,7 @@ def build_features_from_snapshots(
             "fighter_2_elo_fights_count_before": snapshot_2.get("elo_fights_count_before"),
             "fighter_1_elo_available": bool(snapshot_1.get("elo_available")),
             "fighter_2_elo_available": bool(snapshot_2.get("elo_available")),
+            "scheduled_rounds": scheduled_rounds,
             "low_sample_warning": min(_number(snapshot_1.get("total_fights_before"), 0), _number(snapshot_2.get("total_fights_before"), 0)) < 3,
             "missing_profile_warning": _profile_missing(snapshot_1) or _profile_missing(snapshot_2),
             "missing_stats_warning": _stats_missing(snapshot_1) or _stats_missing(snapshot_2),
@@ -196,6 +197,7 @@ def build_features_from_snapshots(
         }
     )
     _add_optional_stat_features(features, snapshot_1, snapshot_2)
+    _add_style_weakness_features(features, snapshot_1, snapshot_2)
     features.update(
         {
             "same_division": size_context["same_division"],
@@ -280,6 +282,33 @@ def _add_optional_stat_features(features: dict[str, Any], s1: dict[str, Any], s2
     ]:
         _set_if_declared(features, f"fighter_1_{key}", s1.get(key))
         _set_if_declared(features, f"fighter_2_{key}", s2.get(key))
+
+
+def _add_style_weakness_features(features: dict[str, Any], s1: dict[str, Any], s2: dict[str, Any]) -> None:
+    keys = [
+        "striker_score",
+        "high_volume_striker_score",
+        "power_finisher_score",
+        "wrestler_score",
+        "grappler_score",
+        "submission_threat_score",
+        "control_fighter_score",
+        "high_pace_score",
+        "durability_score",
+        "decision_tendency_score",
+        "early_finish_threat_score",
+        "strike_absorption_weakness",
+        "takedown_defense_weakness_proxy",
+        "submission_defense_weakness_proxy",
+        "control_vulnerability_proxy",
+        "durability_weakness",
+        "low_activity_weakness",
+        "poor_recent_form_weakness",
+    ]
+    for key in keys:
+        _set_if_declared(features, f"fighter_1_{key}", s1.get(key))
+        _set_if_declared(features, f"fighter_2_{key}", s2.get(key))
+        _set_if_declared(features, f"{key}_diff", _diff(s1.get(key), s2.get(key)))
 
 
 def _set_if_declared(features: dict[str, Any], key: str, value) -> None:

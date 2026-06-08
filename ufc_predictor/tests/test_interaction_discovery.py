@@ -25,6 +25,15 @@ def _frame() -> pd.DataFrame:
             "win_rate_diff": [value / 100 for value in range(120)],
             "finish_rate_diff": [(value % 17) / 20 for value in range(120)],
             "reach_gap": [(-1) ** value * (value % 8) for value in range(120)],
+            "scheduled_rounds": [3 for _ in range(120)],
+            "fighter_1_striker_score": [(value % 20) / 20 for value in range(120)],
+            "fighter_2_strike_absorption_weakness": [(value % 13) / 13 for value in range(120)],
+            "fighter_1_wrestler_score": [(value % 11) / 11 for value in range(120)],
+            "fighter_2_takedown_defense_weakness_proxy": [(value % 9) / 9 for value in range(120)],
+            "fighter_1_power_finisher_score": [(value % 7) / 7 for value in range(120)],
+            "fighter_2_durability_weakness": [(value % 5) / 5 for value in range(120)],
+            "fighter_1_high_pace_score": [(value % 17) / 17 for value in range(120)],
+            "fighter_2_poor_recent_form_weakness": [(value % 6) / 6 for value in range(120)],
             "same_division": [1 for _ in range(120)],
             "low_sample_warning": [1 if value < 20 else 0 for value in range(120)],
             "finish_binary": [value % 2 for value in range(120)],
@@ -65,12 +74,20 @@ def test_interaction_discovery_documents_final_test_is_not_used():
 
 
 def test_interaction_audit_counts_types_groups_and_rejections():
-    report = discover_candidate_interactions(_frame(), "fight_duration_model", list(_frame().columns), max_candidates=12)
+    report = discover_candidate_interactions(_frame(), "fight_duration_model", list(_frame().columns), max_candidates=80)
 
     assert "candidate_count_by_interaction_type" in report
     assert "pairwise_products" in report["candidate_count_by_interaction_type"]
+    assert report["candidate_count_by_interaction_type"]["fighter_strength_vs_opponent_weakness"] > 0
     assert "candidate_count_by_feature_group_pair" in report
-    assert "physical × style" in report["candidate_count_by_feature_group_pair"]
+    for family in [
+        "striking x opponent weakness",
+        "grappling x opponent weakness",
+        "finishing x durability",
+        "pace x age/activity",
+        "scheduled rounds x pace/duration",
+    ]:
+        assert report["candidate_count_by_feature_group_pair"][family] > 0
     assert "rejection_counts" in report
     assert "missingness" in report["rejection_counts"]
     assert "validation_did_not_improve" in report["rejection_counts"]

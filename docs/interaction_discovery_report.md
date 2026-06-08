@@ -13,18 +13,18 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ## Model Summary
 | Model | Candidates | Accepted | Selected | Enough Tested | Selection Status | Base Validation | Interaction Validation |
 |---|---:|---:|---:|---|---|---|---|
-| winner_model | 240 | 80 | 0 | True | base_features_kept | 0.9288 | None |
-| fight_duration_model | 240 | 80 | 5 | True | selected | 0.8706 | 0.8745 |
-| over_1_5_model | 240 | 80 | 0 | True | base_features_kept | 0.7245 | None |
-| over_2_5_model | 240 | 80 | 0 | True | base_features_kept | 0.8346 | None |
-| ends_before_round_3_model | 240 | 80 | 0 | True | base_features_kept | 0.7967 | None |
-| finish_in_round_1_model | 240 | 80 | 5 | True | selected | 0.6453 | 0.6564 |
-| finish_type_model | 208 | 80 | 5 | True | selected | 0.4783 | 0.4875 |
+| winner_model | 240 | 80 | 0 | True | base_features_kept | 0.9986 | None |
+| fight_duration_model | 240 | 80 | 0 | True | base_features_kept | 0.8938 | None |
+| over_1_5_model | 240 | 80 | 0 | True | base_features_kept | 0.7908 | None |
+| over_2_5_model | 240 | 80 | 0 | True | base_features_kept | 0.8395 | None |
+| ends_before_round_3_model | 240 | 80 | 0 | True | base_features_kept | 0.8117 | None |
+| finish_in_round_1_model | 240 | 80 | 0 | True | base_features_kept | 0.8134 | None |
+| finish_type_model | 240 | 80 | 10 | True | selected | 0.7225 | 0.74 |
 | method_umbrella_model | 0 | 0 | 0 | None | not_run_composite_model | None | None |
-| strike_volume_model | 240 | 80 | 5 | True | selected | 0.4704 | 0.4798 |
-| takedown_control_model | 240 | 80 | 0 | True | base_features_kept | 0.6089 | None |
-| finish_model | 240 | 80 | 5 | True | selected | 0.8706 | 0.8745 |
-| goes_distance_model | 240 | 80 | 5 | True | selected | 0.8706 | 0.8745 |
+| strike_volume_model | 240 | 80 | 20 | True | selected | 0.6542 | 0.6708 |
+| takedown_control_model | 240 | 80 | 0 | True | base_features_kept | 0.7356 | None |
+| finish_model | 240 | 80 | 0 | True | base_features_kept | 0.8938 | None |
+| goes_distance_model | 240 | 80 | 0 | True | base_features_kept | 0.8938 | None |
 | method_model | 0 | 0 | 0 | None | not_run_composite_model | None | None |
 | round_phase_model | 0 | 0 | 0 | None | not_run_composite_summary | None | None |
 | round_model | 0 | 0 | 0 | None | not_run_composite_summary | None | None |
@@ -33,84 +33,84 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 
 ## Candidate Counts By Type
 ### winner_model
-- pairwise_products: 225
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 0
-### fight_duration_model
-- pairwise_products: 171
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 54
-### over_1_5_model
-- pairwise_products: 96
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 129
-### over_2_5_model
-- pairwise_products: 96
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 129
-### ends_before_round_3_model
-- pairwise_products: 96
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 129
-### finish_in_round_1_model
-- pairwise_products: 96
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 129
-### finish_type_model
-- pairwise_products: 46
+- pairwise_products: 90
 - ratios: 0
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 148
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
+### fight_duration_model
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
+### over_1_5_model
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
+### over_2_5_model
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
+### ends_before_round_3_model
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
+### finish_in_round_1_model
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
+### finish_type_model
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
 ### method_umbrella_model
 - No interaction candidates were generated.
 ### strike_volume_model
-- pairwise_products: 96
+- pairwise_products: 90
 - ratios: 0
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 130
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
 ### takedown_control_model
-- pairwise_products: 96
+- pairwise_products: 90
 - ratios: 0
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 130
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
 ### finish_model
-- pairwise_products: 171
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 54
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
 ### goes_distance_model
-- pairwise_products: 171
-- ratios: 1
-- absolute_differences: 7
-- squared_clipped_log_transforms: 7
-- fighter_strength_vs_opponent_weakness: 0
-- context_division_interactions: 54
+- pairwise_products: 90
+- ratios: 0
+- absolute_differences: 3
+- squared_clipped_log_transforms: 3
+- fighter_strength_vs_opponent_weakness: 108
+- context_division_interactions: 36
 ### method_model
 - No interaction candidates were generated.
 ### round_phase_model
@@ -124,95 +124,95 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 
 ## Candidate Counts By Feature-Group Pair
 ### winner_model
-- physical × style: 0
-- physical × division: 25
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### fight_duration_model
-- physical × style: 25
-- physical × division: 25
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### over_1_5_model
-- physical × style: 0
-- physical × division: 0
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### over_2_5_model
-- physical × style: 0
-- physical × division: 0
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### ends_before_round_3_model
-- physical × style: 0
-- physical × division: 0
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### finish_in_round_1_model
-- physical × style: 0
-- physical × division: 0
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### finish_type_model
-- physical × style: 25
-- physical × division: 0
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### method_umbrella_model
 - No feature-group pair candidates were generated.
 ### strike_volume_model
-- physical × style: 0
-- physical × division: 25
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### takedown_control_model
-- physical × style: 0
-- physical × division: 25
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### finish_model
-- physical × style: 25
-- physical × division: 25
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### goes_distance_model
-- physical × style: 25
-- physical × division: 25
-- striking × opponent weakness: 0
-- grappling × opponent weakness: 0
-- finishing × durability: 0
-- pace × age/activity: 0
-- scheduled rounds × pace/duration: 0
+- physical x style: 0
+- physical x division: 36
+- striking x opponent weakness: 36
+- grappling x opponent weakness: 36
+- finishing x durability: 36
+- pace x age/activity: 18
+- scheduled rounds x pace/duration: 6
 ### method_model
 - No feature-group pair candidates were generated.
 ### round_phase_model
@@ -227,105 +227,105 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ## Rejection Counts
 ### winner_model
 - calibration_got_worse: 0
-- high_correlation: 6
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 103
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 106
+- validation_did_not_improve: 238
 ### fight_duration_model
 - calibration_got_worse: 0
-- high_correlation: 4
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 79
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 152
+- validation_did_not_improve: 238
 ### over_1_5_model
 - calibration_got_worse: 0
-- high_correlation: 1
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 64
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 175
+- validation_did_not_improve: 238
 ### over_2_5_model
 - calibration_got_worse: 0
-- high_correlation: 1
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 64
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 175
+- validation_did_not_improve: 238
 ### ends_before_round_3_model
 - calibration_got_worse: 0
-- high_correlation: 1
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 64
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 175
+- validation_did_not_improve: 238
 ### finish_in_round_1_model
 - calibration_got_worse: 0
-- high_correlation: 1
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 64
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 170
+- validation_did_not_improve: 238
 ### finish_type_model
 - calibration_got_worse: 0
-- high_correlation: 1
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 86
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 103
+- validation_did_not_improve: 228
 ### method_umbrella_model
 - No rejection counts were recorded.
 ### strike_volume_model
 - calibration_got_worse: 0
-- high_correlation: 4
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 110
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 109
+- validation_did_not_improve: 218
 ### takedown_control_model
 - calibration_got_worse: 0
-- high_correlation: 4
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 110
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 114
+- validation_did_not_improve: 238
 ### finish_model
 - calibration_got_worse: 0
-- high_correlation: 4
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 79
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 152
+- validation_did_not_improve: 238
 ### goes_distance_model
 - calibration_got_worse: 0
-- high_correlation: 4
+- high_correlation: 0
 - leakage_risk: 0
-- low_variance: 79
-- missingness: 0
+- low_variance: 0
+- missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 152
+- validation_did_not_improve: 238
 ### method_model
 - No rejection counts were recorded.
 ### round_phase_model
@@ -341,11 +341,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ### winner_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### fight_duration_model
-- `int__win_rate_diff_x_finish_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__win_rate_diff_x_decision_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__abs_win_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__sq_win_rate_diff` (square, groups=('nonlinear',), validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__abs_finish_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
+- None selected; base features remained stronger or validation support was insufficient.
 ### over_1_5_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### over_2_5_model
@@ -353,39 +349,47 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ### ends_before_round_3_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### finish_in_round_1_model
-- `int__win_rate_diff_x_finish_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0111, final-test impact=0.0133, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0111)
-- `int__win_rate_diff_x_decision_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0111, final-test impact=0.0133, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0111)
-- `int__abs_win_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0111, final-test impact=0.0133, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0111)
-- `int__sq_win_rate_diff` (square, groups=('nonlinear',), validation improvement=0.0111, final-test impact=0.0133, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0111)
-- `int__abs_finish_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0111, final-test impact=0.0133, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0111)
+- None selected; base features remained stronger or validation support was insufficient.
 ### finish_type_model
-- `int__win_rate_diff_x_finish_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0092, final-test impact=-0.0093, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0092)
-- `int__win_rate_diff_x_decision_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0092, final-test impact=-0.0093, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0092)
-- `int__abs_win_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0092, final-test impact=-0.0093, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0092)
-- `int__sq_win_rate_diff` (square, groups=('nonlinear',), validation improvement=0.0092, final-test impact=-0.0093, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0092)
-- `int__abs_finish_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0092, final-test impact=-0.0093, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0092)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
+- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0175, final-test impact=-0.0004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0175)
 ### method_umbrella_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### strike_volume_model
-- `int__win_rate_diff_x_finish_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0094, final-test impact=0.0102, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0094)
-- `int__win_rate_diff_x_decision_rate_diff` (product, groups=('difference', 'difference'), validation improvement=0.0094, final-test impact=0.0102, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0094)
-- `int__abs_win_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0094, final-test impact=0.0102, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0094)
-- `int__sq_win_rate_diff` (square, groups=('nonlinear',), validation improvement=0.0094, final-test impact=0.0102, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0094)
-- `int__abs_finish_rate_diff` (abs, groups=('nonlinear',), validation improvement=0.0094, final-test impact=0.0102, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0094)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_2_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_2_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__striker_score_diff_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__striker_score_diff_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__striker_score_diff_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__striker_score_diff_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__striker_score_diff_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__striker_score_diff_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_1_high_volume_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
+- `int__fighter_1_high_volume_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0166, final-test impact=0.004, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0166)
 ### takedown_control_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### finish_model
-- `int__win_rate_diff_x_finish_rate_diff` (product, groups=['difference', 'difference'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__win_rate_diff_x_decision_rate_diff` (product, groups=['difference', 'difference'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__abs_win_rate_diff` (abs, groups=['nonlinear'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__sq_win_rate_diff` (square, groups=['nonlinear'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__abs_finish_rate_diff` (abs, groups=['nonlinear'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
+- None selected; base features remained stronger or validation support was insufficient.
 ### goes_distance_model
-- `int__win_rate_diff_x_finish_rate_diff` (product, groups=['difference', 'difference'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__win_rate_diff_x_decision_rate_diff` (product, groups=['difference', 'difference'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__abs_win_rate_diff` (abs, groups=['nonlinear'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__sq_win_rate_diff` (square, groups=['nonlinear'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
-- `int__abs_finish_rate_diff` (abs, groups=['nonlinear'], validation improvement=0.0039, final-test impact=0.0025, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0039)
+- None selected; base features remained stronger or validation support was insufficient.
 ### method_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### round_phase_model
@@ -400,21 +404,21 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ## Base Vs Interaction Comparison
 | Model | Base Final Balanced | Interaction Final Balanced | Final Impact | Base Validation Balanced | Interaction Validation Balanced | High-Confidence Accuracy | High-Confidence Coverage | Source Holdout |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| winner_model | 0.9093 | None | None | 0.9288 | None | 0.9722 | 75.65 | not_run |
-| fight_duration_model | 0.8297 | 0.8322 | 0.0025 | 0.8706 | 0.8745 | 0.9276 | 51.92 | not_run |
-| over_1_5_model | 0.6758 | None | None | 0.7245 | None | 0.9246 | 36.71 | not_run |
-| over_2_5_model | 0.79 | None | None | 0.8346 | None | 0.9225 | 43.77 | not_run |
-| ends_before_round_3_model | 0.7611 | None | None | 0.7967 | None | 0.9087 | 42.52 | not_run |
-| finish_in_round_1_model | 0.6127 | 0.626 | 0.0133 | 0.6453 | 0.6564 | 0.851 | 8.2 | not_run |
-| finish_type_model | 0.44 | 0.4307 | -0.0093 | 0.4783 | 0.4875 | 0.5951 | 31.63 | not_run |
-| method_umbrella_model | None | None | None | None | None | 0.9137 | 26.95 | not_run |
-| strike_volume_model | 0.4356 | 0.4458 | 0.0102 | 0.4704 | 0.4798 | 0.6545 | 4.16 | not_run |
-| takedown_control_model | 0.5485 | None | None | 0.6089 | None | 0.7742 | 8.73 | not_run |
-| finish_model | 0.8297 | 0.8322 | 0.0025 | 0.8706 | 0.8745 | 0.9276 | 51.92 | not_run |
-| goes_distance_model | 0.8297 | 0.8322 | 0.0025 | 0.8706 | 0.8745 | 0.9276 | 51.92 | not_run |
-| method_model | None | None | None | None | None | 0.9137 | 26.95 | not_run |
-| round_phase_model | None | None | None | None | None | 0.9225 | 43.77 | not_run |
-| round_model | None | None | None | None | None | 0.9225 | 43.77 | not_run |
+| winner_model | 0.9587 | None | None | 0.9986 | None | 0.9894 | 93.6 | not_run |
+| fight_duration_model | 0.8278 | None | None | 0.8938 | None | 0.9251 | 65.75 | not_run |
+| over_1_5_model | 0.7183 | None | None | 0.7908 | None | 0.9093 | 60.49 | not_run |
+| over_2_5_model | 0.8008 | None | None | 0.8395 | None | 0.9184 | 58.92 | not_run |
+| ends_before_round_3_model | 0.7769 | None | None | 0.8117 | None | 0.9178 | 58.1 | not_run |
+| finish_in_round_1_model | 0.7086 | None | None | 0.8134 | None | 0.9172 | 71.79 | not_run |
+| finish_type_model | 0.6458 | 0.6454 | -0.0004 | 0.7225 | 0.74 | 0.8867 | 71.27 | not_run |
+| method_umbrella_model | None | None | None | None | None | 0.9126 | 56.06 | not_run |
+| strike_volume_model | 0.565 | 0.569 | 0.004 | 0.6542 | 0.6708 | 0.75 | 37.22 | not_run |
+| takedown_control_model | 0.7043 | None | None | 0.7356 | None | 0.8662 | 45.09 | not_run |
+| finish_model | 0.8278 | None | None | 0.8938 | None | 0.9251 | 65.75 | not_run |
+| goes_distance_model | 0.8278 | None | None | 0.8938 | None | 0.9251 | 65.75 | not_run |
+| method_model | None | None | None | None | None | 0.9126 | 56.06 | not_run |
+| round_phase_model | None | None | None | None | None | 0.9184 | 58.92 | not_run |
+| round_model | None | None | None | None | None | 0.9184 | 58.92 | not_run |
 | strike_volume_regression | None | None | None | None | None | None | None | not_run |
 | odds_calibration_model | None | None | None | None | None | None | None | not_run |
 
@@ -501,72 +505,72 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ## Summary Judgment
 ### winner_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'context_division_interactions', 'physical × style', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
+- Coverage gaps: ['ratios', 'physical x style']
 - Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'context_division_interactions', 'physical × style', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### fight_duration_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
-- Model improved: True
+- Coverage gaps: ['ratios', 'physical x style']
+- Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity']
+- Next groups to try: ['ratios', 'physical x style']
 ### over_1_5_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
+- Coverage gaps: ['ratios', 'physical x style']
 - Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### over_2_5_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
+- Coverage gaps: ['ratios', 'physical x style']
 - Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### ends_before_round_3_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
+- Coverage gaps: ['ratios', 'physical x style']
 - Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### finish_in_round_1_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
-- Model improved: True
+- Coverage gaps: ['ratios', 'physical x style']
+- Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'physical × style', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### finish_type_model
 - Enough interactions tested: True
-- Coverage gaps: ['ratios', 'fighter_strength_vs_opponent_weakness', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
+- Coverage gaps: ['ratios', 'physical x style']
 - Model improved: True
 - Model worsened: False
-- Next groups to try: ['ratios', 'fighter_strength_vs_opponent_weakness', 'physical × division', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### method_umbrella_model
 - No summary judgment was recorded.
 ### strike_volume_model
 - Enough interactions tested: True
-- Coverage gaps: ['ratios', 'fighter_strength_vs_opponent_weakness', 'physical × style', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
+- Coverage gaps: ['ratios', 'physical x style']
 - Model improved: True
 - Model worsened: False
-- Next groups to try: ['ratios', 'fighter_strength_vs_opponent_weakness', 'physical × style', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### takedown_control_model
 - Enough interactions tested: True
-- Coverage gaps: ['ratios', 'fighter_strength_vs_opponent_weakness', 'physical × style', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
+- Coverage gaps: ['ratios', 'physical x style']
 - Model improved: False
 - Model worsened: False
-- Next groups to try: ['ratios', 'fighter_strength_vs_opponent_weakness', 'physical × style', 'striking × opponent weakness', 'grappling × opponent weakness']
+- Next groups to try: ['ratios', 'physical x style']
 ### finish_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
-- Model improved: True
+- Coverage gaps: ['ratios', 'physical x style']
+- Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity']
+- Next groups to try: ['ratios', 'physical x style']
 ### goes_distance_model
 - Enough interactions tested: True
-- Coverage gaps: ['fighter_strength_vs_opponent_weakness', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity', 'scheduled rounds × pace/duration']
-- Model improved: True
+- Coverage gaps: ['ratios', 'physical x style']
+- Model improved: False
 - Model worsened: False
-- Next groups to try: ['fighter_strength_vs_opponent_weakness', 'striking × opponent weakness', 'grappling × opponent weakness', 'finishing × durability', 'pace × age/activity']
+- Next groups to try: ['ratios', 'physical x style']
 ### method_model
 - No summary judgment was recorded.
 ### round_phase_model

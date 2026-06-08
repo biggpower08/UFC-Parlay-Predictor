@@ -126,12 +126,73 @@ GRAPPLING_FEATURES = [
     "fighter_2_recent_5_takedowns_avg",
 ]
 
+STYLE_SCORE_FEATURES = [
+    "fighter_1_striker_score",
+    "fighter_2_striker_score",
+    "striker_score_diff",
+    "fighter_1_high_volume_striker_score",
+    "fighter_2_high_volume_striker_score",
+    "high_volume_striker_score_diff",
+    "fighter_1_power_finisher_score",
+    "fighter_2_power_finisher_score",
+    "power_finisher_score_diff",
+    "fighter_1_wrestler_score",
+    "fighter_2_wrestler_score",
+    "wrestler_score_diff",
+    "fighter_1_grappler_score",
+    "fighter_2_grappler_score",
+    "grappler_score_diff",
+    "fighter_1_submission_threat_score",
+    "fighter_2_submission_threat_score",
+    "submission_threat_score_diff",
+    "fighter_1_control_fighter_score",
+    "fighter_2_control_fighter_score",
+    "control_fighter_score_diff",
+    "fighter_1_high_pace_score",
+    "fighter_2_high_pace_score",
+    "high_pace_score_diff",
+    "fighter_1_durability_score",
+    "fighter_2_durability_score",
+    "durability_score_diff",
+    "fighter_1_decision_tendency_score",
+    "fighter_2_decision_tendency_score",
+    "decision_tendency_score_diff",
+    "fighter_1_early_finish_threat_score",
+    "fighter_2_early_finish_threat_score",
+    "early_finish_threat_score_diff",
+]
+
+OPPONENT_WEAKNESS_FEATURES = [
+    "fighter_1_strike_absorption_weakness",
+    "fighter_2_strike_absorption_weakness",
+    "strike_absorption_weakness_diff",
+    "fighter_1_takedown_defense_weakness_proxy",
+    "fighter_2_takedown_defense_weakness_proxy",
+    "takedown_defense_weakness_proxy_diff",
+    "fighter_1_submission_defense_weakness_proxy",
+    "fighter_2_submission_defense_weakness_proxy",
+    "submission_defense_weakness_proxy_diff",
+    "fighter_1_control_vulnerability_proxy",
+    "fighter_2_control_vulnerability_proxy",
+    "control_vulnerability_proxy_diff",
+    "fighter_1_durability_weakness",
+    "fighter_2_durability_weakness",
+    "durability_weakness_diff",
+    "fighter_1_low_activity_weakness",
+    "fighter_2_low_activity_weakness",
+    "low_activity_weakness_diff",
+    "fighter_1_poor_recent_form_weakness",
+    "fighter_2_poor_recent_form_weakness",
+    "poor_recent_form_weakness_diff",
+]
+
 SIZE_CONTEXT_FEATURES = [
     "same_division",
     "cross_division",
     "catchweight",
     "weight_class_gap",
     "estimated_weight_gap_lbs",
+    "scheduled_rounds",
     "height_gap",
     "reach_gap",
     "unknown_size_context",
@@ -205,6 +266,8 @@ def get_feature_schema(model_family: str = "winner") -> FeatureSchema:
             + RECORD_FEATURES
             + RECENT_FORM_FEATURES
             + ELO_FEATURES
+            + STYLE_SCORE_FEATURES
+            + OPPONENT_WEAKNESS_FEATURES
             + SIZE_CONTEXT_FEATURES
             + DATA_QUALITY_FEATURES
         )

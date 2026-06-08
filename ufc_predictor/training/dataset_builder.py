@@ -169,13 +169,26 @@ def build_training_rows(
             }
         )
 
-        if winner_name:
-            loser_for_update = loser_name or (source_fighter_2 if normalize_name(winner_name) == normalize_name(source_fighter_1) else source_fighter_1)
-            _update_history(history[winner_name], won=True, method=method)
-            _update_history(history[loser_for_update], won=False, method=None)
-        else:
-            _update_history(history[fighter_a], won=None, method=None)
-            _update_history(history[fighter_b], won=None, method=None)
+        a_won = f1_wins_safe is True or f1_wins_safe == 1
+        b_won = f1_wins_safe is False or f1_wins_safe == 0
+        _update_history(
+            history[fighter_a],
+            won=a_won if winner_name else None,
+            method=method,
+            fight=fight,
+            orientation=orientation,
+            side="a",
+            finish_round=finish_round,
+        )
+        _update_history(
+            history[fighter_b],
+            won=b_won if winner_name else None,
+            method=method,
+            fight=fight,
+            orientation=orientation,
+            side="b",
+            finish_round=finish_round,
+        )
 
     dataset = pd.DataFrame(rows)
     audit = audit_training_dataset(dataset, fights, source, warnings)
@@ -386,8 +399,29 @@ def parse_round_time_seconds(value) -> int | None:
     return _safe_int(text)
 
 
-def _empty_history() -> dict[str, int]:
-    return {"fights": 0, "wins": 0, "finishes": 0, "decisions": 0}
+def _empty_history() -> dict[str, Any]:
+    return {
+        "fights": 0,
+        "wins": 0,
+        "losses": 0,
+        "finishes": 0,
+        "decisions": 0,
+        "ko_tko_wins": 0,
+        "submission_wins": 0,
+        "finish_losses": 0,
+        "decision_losses": 0,
+        "early_finishes": 0,
+        "sig_landed_for": 0.0,
+        "sig_landed_against": 0.0,
+        "sig_attempted_for": 0.0,
+        "takedowns_for": 0.0,
+        "takedowns_against": 0.0,
+        "takedowns_attempted_for": 0.0,
+        "takedowns_attempted_against": 0.0,
+        "control_for_seconds": 0.0,
+        "control_against_seconds": 0.0,
+        "recent_results": [],
+    }
 
 
 def _snapshot_from_running_history(fighter_name: str, history: dict[str, int]) -> dict[str, Any]:
@@ -395,26 +429,32 @@ def _snapshot_from_running_history(fighter_name: str, history: dict[str, int]) -
     wins = int(history.get("wins", 0) or 0)
     finishes = int(history.get("finishes", 0) or 0)
     decisions = int(history.get("decisions", 0) or 0)
-    return {
+    losses = int(history.get("losses", 0) or 0)
+    recent = list(history.get("recent_results", []))
+    snapshot = {
         "fighter_name": fighter_name,
         "normalized_name": str(fighter_name).lower(),
         "wins_before": wins,
-        "losses_before": max(0, fights - wins),
+        "losses_before": losses,
         "draws_before": 0,
         "no_contests_before": 0,
         "total_fights_before": fights,
         "win_rate_before": _rate(wins, fights),
         "finish_win_rate_before": _rate(finishes, wins),
         "decision_win_rate_before": _rate(decisions, wins),
-        "ko_tko_win_rate_before": None,
-        "submission_win_rate_before": None,
-        "finish_loss_rate_before": None,
-        "decision_loss_rate_before": None,
+        "ko_tko_win_rate_before": _rate(int(history.get("ko_tko_wins", 0) or 0), wins),
+        "submission_win_rate_before": _rate(int(history.get("submission_wins", 0) or 0), wins),
+        "finish_loss_rate_before": _rate(int(history.get("finish_losses", 0) or 0), losses),
+        "decision_loss_rate_before": _rate(int(history.get("decision_losses", 0) or 0), losses),
+        "recent_3_win_rate": _recent_rate(recent, 3),
+        "recent_5_win_rate": _recent_rate(recent, 5),
         "elo_before_fight": None,
         "elo_fights_count_before": 0,
         "elo_source": "baseline",
         "elo_available": False,
     }
+    snapshot.update(_style_weakness_scores(history))
+    return snapshot
 
 
 def feature_availability_report(dataset: pd.DataFrame, model_family: str = "finish") -> dict[str, Any]:
@@ -449,7 +489,15 @@ def feature_availability_report(dataset: pd.DataFrame, model_family: str = "fini
     }
 
 
-def _update_history(history: dict[str, int], won: bool | None, method: str | None) -> None:
+def _update_history(
+    history: dict[str, Any],
+    won: bool | None,
+    method: str | None,
+    fight: pd.Series,
+    orientation: str,
+    side: str,
+    finish_round: int | None,
+) -> None:
     history["fights"] += 1
     if won is True:
         history["wins"] += 1
@@ -457,6 +505,101 @@ def _update_history(history: dict[str, int], won: bool | None, method: str | Non
             history["decisions"] += 1
         elif method:
             history["finishes"] += 1
+            if method == "KO/TKO":
+                history["ko_tko_wins"] += 1
+            if method == "Submission":
+                history["submission_wins"] += 1
+            if finish_round == 1:
+                history["early_finishes"] += 1
+        history["recent_results"].append(1)
+    elif won is False:
+        history["losses"] += 1
+        if method == "Decision":
+            history["decision_losses"] += 1
+        elif method:
+            history["finish_losses"] += 1
+        history["recent_results"].append(0)
+    else:
+        history["recent_results"].append(None)
+    history["recent_results"] = history["recent_results"][-5:]
+    _update_style_stats(history, fight, orientation, side)
+
+
+def _update_style_stats(history: dict[str, Any], fight: pd.Series, orientation: str, side: str) -> None:
+    own_prefix = "fighter_a" if side == "a" else "fighter_b"
+    opp_prefix = "fighter_b" if side == "a" else "fighter_a"
+    own_sig = _oriented_value(fight, f"{own_prefix}_sig_strikes", f"{opp_prefix}_sig_strikes", orientation)
+    opp_sig = _oriented_value(fight, f"{opp_prefix}_sig_strikes", f"{own_prefix}_sig_strikes", orientation)
+    own_sig_attempted = _oriented_value(fight, f"{own_prefix}_sig_strikes_attempted", f"{opp_prefix}_sig_strikes_attempted", orientation)
+    own_td = _oriented_value(fight, f"{own_prefix}_takedowns", f"{opp_prefix}_takedowns", orientation)
+    opp_td = _oriented_value(fight, f"{opp_prefix}_takedowns", f"{own_prefix}_takedowns", orientation)
+    own_td_attempted = _oriented_value(fight, f"{own_prefix}_takedowns_attempted", f"{opp_prefix}_takedowns_attempted", orientation)
+    opp_td_attempted = _oriented_value(fight, f"{opp_prefix}_takedowns_attempted", f"{own_prefix}_takedowns_attempted", orientation)
+    own_control = _oriented_value(fight, f"{own_prefix}_control_time_seconds", f"{opp_prefix}_control_time_seconds", orientation)
+    opp_control = _oriented_value(fight, f"{opp_prefix}_control_time_seconds", f"{own_prefix}_control_time_seconds", orientation)
+    _add_number(history, "sig_landed_for", own_sig)
+    _add_number(history, "sig_landed_against", opp_sig)
+    _add_number(history, "sig_attempted_for", own_sig_attempted)
+    _add_number(history, "takedowns_for", own_td)
+    _add_number(history, "takedowns_against", opp_td)
+    _add_number(history, "takedowns_attempted_for", own_td_attempted)
+    _add_number(history, "takedowns_attempted_against", opp_td_attempted)
+    _add_number(history, "control_for_seconds", own_control)
+    _add_number(history, "control_against_seconds", opp_control)
+
+
+def _style_weakness_scores(history: dict[str, Any]) -> dict[str, float | None]:
+    fights = int(history.get("fights", 0) or 0)
+    wins = int(history.get("wins", 0) or 0)
+    losses = int(history.get("losses", 0) or 0)
+    if fights <= 0:
+        return {}
+    avg_sig_for = float(history.get("sig_landed_for", 0.0) or 0.0) / fights
+    avg_sig_against = float(history.get("sig_landed_against", 0.0) or 0.0) / fights
+    avg_attempts = float(history.get("sig_attempted_for", 0.0) or 0.0) / fights
+    avg_td_for = float(history.get("takedowns_for", 0.0) or 0.0) / fights
+    avg_td_against = float(history.get("takedowns_against", 0.0) or 0.0) / fights
+    avg_td_attempts_against = float(history.get("takedowns_attempted_against", 0.0) or 0.0) / fights
+    avg_control_for = float(history.get("control_for_seconds", 0.0) or 0.0) / fights
+    avg_control_against = float(history.get("control_against_seconds", 0.0) or 0.0) / fights
+    finish_rate = _rate(int(history.get("finishes", 0) or 0), wins) or 0.0
+    ko_rate = _rate(int(history.get("ko_tko_wins", 0) or 0), wins) or 0.0
+    sub_rate = _rate(int(history.get("submission_wins", 0) or 0), wins) or 0.0
+    finish_loss_rate = _rate(int(history.get("finish_losses", 0) or 0), losses) or 0.0
+    recent_win_rate = _recent_rate(list(history.get("recent_results", [])), 5)
+    recent_loss_weakness = 1.0 - recent_win_rate if recent_win_rate is not None else None
+    return {
+        "avg_sig_strikes_landed_before": round(avg_sig_for, 4),
+        "avg_sig_strikes_absorbed_before": round(avg_sig_against, 4),
+        "avg_sig_strike_attempts_before": round(avg_attempts, 4),
+        "avg_takedowns_landed_before": round(avg_td_for, 4),
+        "avg_takedowns_attempted_before": round(float(history.get("takedowns_attempted_for", 0.0) or 0.0) / fights, 4),
+        "avg_control_time_before": round(avg_control_for, 4),
+        "striker_score": _clip01(avg_sig_for / 50.0),
+        "high_volume_striker_score": _clip01(avg_attempts / 90.0),
+        "power_finisher_score": _clip01((finish_rate + ko_rate) / 2.0),
+        "wrestler_score": _clip01(avg_td_for / 3.0),
+        "grappler_score": _clip01((avg_td_for / 3.0 + avg_control_for / 300.0 + sub_rate) / 3.0),
+        "submission_threat_score": _clip01(sub_rate),
+        "control_fighter_score": _clip01(avg_control_for / 300.0),
+        "high_pace_score": _clip01((avg_attempts / 90.0 + avg_td_for / 3.0) / 2.0),
+        "durability_score": _clip01(1.0 - finish_loss_rate),
+        "decision_tendency_score": _clip01(_rate(int(history.get("decisions", 0) or 0), wins) or 0.0),
+        "early_finish_threat_score": _clip01(_rate(int(history.get("early_finishes", 0) or 0), wins) or 0.0),
+        "strike_absorption_weakness": _clip01(avg_sig_against / 50.0),
+        "takedown_defense_weakness_proxy": _clip01(avg_td_against / max(1.0, avg_td_attempts_against)),
+        "submission_defense_weakness_proxy": _clip01(finish_loss_rate),
+        "control_vulnerability_proxy": _clip01(avg_control_against / 300.0),
+        "durability_weakness": _clip01(finish_loss_rate),
+        "low_activity_weakness": _clip01(1.0 - min(1.0, fights / 8.0)),
+        "poor_recent_form_weakness": _clip01(recent_loss_weakness) if recent_loss_weakness is not None else None,
+    }
+
+
+def _add_number(history: dict[str, Any], key: str, value) -> None:
+    number = _safe_float(value)
+    if number is not None:
+        history[key] = float(history.get(key, 0.0) or 0.0) + number
 
 
 def _oriented_value(row: pd.Series, source_key: str, swapped_key: str, orientation: str):
@@ -479,6 +622,16 @@ def _safe_int(value) -> int | None:
         return None
 
 
+def _safe_float(value) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if pd.isna(number):
+        return None
+    return number
+
+
 def _date_string(value) -> str | None:
     if pd.isna(value):
         return None
@@ -489,3 +642,17 @@ def _rate(numerator: int, denominator: int) -> float | None:
     if denominator <= 0:
         return None
     return round(float(numerator) / float(denominator), 4)
+
+
+def _recent_rate(values: list[Any], limit: int) -> float | None:
+    recent = [value for value in values[-limit:] if value is not None]
+    if not recent:
+        return None
+    return round(float(sum(recent)) / len(recent), 4)
+
+
+def _clip01(value) -> float | None:
+    number = _safe_float(value)
+    if number is None:
+        return None
+    return round(max(0.0, min(1.0, number)), 4)
