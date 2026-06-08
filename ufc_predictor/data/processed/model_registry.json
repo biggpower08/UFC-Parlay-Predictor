@@ -118,7 +118,7 @@
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -130,7 +130,7 @@
     "backtest_relative_improvement": 0.3146,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": "finish_binary",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 40,
@@ -246,7 +246,10 @@
       "source_holdout_not_run"
     ],
     "recommended_use": "candidate for limited internal validation",
-    "public_warning_text": "Model is promising but still has failed production gates."
+    "public_warning_text": "Model is promising but still has failed production gates.",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept"
   },
   "goes_distance_model": {
     "model_name": "goes_distance_model",
@@ -367,7 +370,7 @@
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -379,7 +382,7 @@
     "backtest_relative_improvement": 0.3146,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": "goes_distance_binary",
     "algorithm": "hist_gradient_boosting",
     "feature_count": 40,
@@ -495,7 +498,10 @@
       "source_holdout_not_run"
     ],
     "recommended_use": "candidate for limited internal validation",
-    "public_warning_text": "Model is promising but still has failed production gates."
+    "public_warning_text": "Model is promising but still has failed production gates.",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept"
   },
   "method_model": {
     "model_name": "method_model",
@@ -641,7 +647,7 @@
     "beats_baseline": true,
     "test_rows": 3696,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -653,7 +659,7 @@
     "backtest_relative_improvement": 0.1404,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": "method_class",
     "algorithm": "duration_x_conditional_finish_type",
     "feature_count": 40,
@@ -781,7 +787,10 @@
       "source_holdout_not_run"
     ],
     "recommended_use": "research only",
-    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims."
+    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "not_run_composite_model"
   },
   "round_model": {
     "model_name": "round_model",
@@ -935,7 +944,7 @@
     ],
     "recommended_use": "research only",
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "target": "round_binary_family",
     "algorithm": "binary_submodel_family",
     "feature_count": 40,
@@ -1055,7 +1064,10 @@
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "missing required columns: round_binary_family",
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "not_run_composite_summary"
   },
   "strike_volume_model": {
     "model_name": "strike_volume_model",
@@ -1168,7 +1180,12 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning"
+      "cross_division_warning",
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff"
     ],
     "class_distribution": {
       "low": 3440,
@@ -1181,133 +1198,133 @@
       "Features are limited to pre-fight rolling win/finish/decision history from the available source order."
     ],
     "trained_at": "2026-06-07T03:55:42.921824+00:00",
-    "final_test_metric": 0.438,
+    "final_test_metric": 0.4357,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.3623,
-    "relative_improvement": 0.0757,
+    "relative_improvement": 0.0734,
     "beats_baseline": true,
     "test_rows": 1322,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 1322,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.438,
+    "backtest_main_metric": 0.4357,
     "backtest_baseline": 0.3623,
-    "backtest_relative_improvement": 0.0757,
+    "backtest_relative_improvement": 0.0734,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": "combined_strike_volume_bucket",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 40,
+    "feature_count": 45,
     "brier_score": null,
-    "log_loss": 1.1014,
-    "balanced_accuracy": 0.4356,
+    "log_loss": 1.1061,
+    "balanced_accuracy": 0.4343,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 619,
-        "coverage_percent": 46.82,
-        "accuracy": 0.4911,
-        "balanced_accuracy": 0.4629,
-        "average_confidence": 0.6747,
-        "actual_hit_rate": 0.4911,
-        "calibration_gap": 0.1835,
+        "sample_count": 601,
+        "coverage_percent": 45.46,
+        "accuracy": 0.4809,
+        "balanced_accuracy": 0.4443,
+        "average_confidence": 0.6757,
+        "actual_hit_rate": 0.4809,
+        "calibration_gap": 0.1948,
         "class_distribution": {
           "low": 240,
-          "high": 190,
-          "medium": 189
+          "high": 183,
+          "medium": 178
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 466,
-        "coverage_percent": 35.25,
-        "accuracy": 0.4957,
-        "balanced_accuracy": 0.4446,
-        "average_confidence": 0.7079,
-        "actual_hit_rate": 0.4957,
-        "calibration_gap": 0.2122,
+        "sample_count": 437,
+        "coverage_percent": 33.06,
+        "accuracy": 0.5103,
+        "balanced_accuracy": 0.4524,
+        "average_confidence": 0.7132,
+        "actual_hit_rate": 0.5103,
+        "calibration_gap": 0.2029,
         "class_distribution": {
-          "low": 195,
-          "medium": 136,
-          "high": 135
+          "low": 184,
+          "medium": 129,
+          "high": 124
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 335,
-        "coverage_percent": 25.34,
-        "accuracy": 0.5224,
-        "balanced_accuracy": 0.4364,
-        "average_confidence": 0.7402,
-        "actual_hit_rate": 0.5224,
-        "calibration_gap": 0.2178,
+        "sample_count": 336,
+        "coverage_percent": 25.42,
+        "accuracy": 0.5298,
+        "balanced_accuracy": 0.4448,
+        "average_confidence": 0.7406,
+        "actual_hit_rate": 0.5298,
+        "calibration_gap": 0.2108,
         "class_distribution": {
-          "low": 153,
-          "high": 93,
-          "medium": 89
+          "low": 154,
+          "medium": 97,
+          "high": 85
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 228,
-        "coverage_percent": 17.25,
-        "accuracy": 0.5746,
-        "balanced_accuracy": 0.4508,
-        "average_confidence": 0.7724,
-        "actual_hit_rate": 0.5746,
-        "calibration_gap": 0.1978,
+        "sample_count": 227,
+        "coverage_percent": 17.17,
+        "accuracy": 0.5683,
+        "balanced_accuracy": 0.432,
+        "average_confidence": 0.7726,
+        "actual_hit_rate": 0.5683,
+        "calibration_gap": 0.2043,
         "class_distribution": {
-          "low": 112,
-          "high": 60,
-          "medium": 56
+          "low": 115,
+          "medium": 60,
+          "high": 52
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 138,
-        "coverage_percent": 10.44,
-        "accuracy": 0.6377,
-        "balanced_accuracy": 0.4636,
-        "average_confidence": 0.8049,
-        "actual_hit_rate": 0.6377,
-        "calibration_gap": 0.1672,
+        "sample_count": 135,
+        "coverage_percent": 10.21,
+        "accuracy": 0.6519,
+        "balanced_accuracy": 0.4222,
+        "average_confidence": 0.8045,
+        "actual_hit_rate": 0.6519,
+        "calibration_gap": 0.1527,
         "class_distribution": {
-          "low": 77,
-          "high": 33,
-          "medium": 28
+          "low": 80,
+          "high": 30,
+          "medium": 25
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 55,
-        "coverage_percent": 4.16,
-        "accuracy": 0.6727,
-        "balanced_accuracy": 0.4167,
-        "average_confidence": 0.8465,
-        "actual_hit_rate": 0.6727,
-        "calibration_gap": 0.1738,
+        "sample_count": 60,
+        "coverage_percent": 4.54,
+        "accuracy": 0.6833,
+        "balanced_accuracy": 0.4103,
+        "average_confidence": 0.8418,
+        "actual_hit_rate": 0.6833,
+        "calibration_gap": 0.1585,
         "class_distribution": {
-          "low": 34,
-          "high": 12,
+          "low": 38,
+          "high": 13,
           "medium": 9
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.6727,
-    "best_high_conf_balanced_accuracy": 0.4167,
-    "best_high_conf_coverage": 4.16,
+    "best_high_conf_accuracy": 0.6833,
+    "best_high_conf_balanced_accuracy": 0.4103,
+    "best_high_conf_coverage": 4.54,
     "production_status": "experimental",
     "production_status_reason": "balanced_accuracy_not_dangerously_low; calibration_acceptable; high_confidence_not_tiny_sample_noise; source_holdout_not_run",
     "passed_gates": [
@@ -1322,7 +1339,16 @@
       "source_holdout_not_run"
     ],
     "recommended_use": "research only",
-    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims."
+    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
+    "interaction_feature_count": 5,
+    "selected_interactions": [
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff"
+    ],
+    "interaction_selection_status": "selected"
   },
   "takedown_control_model": {
     "model_name": "takedown_control_model",
@@ -1445,7 +1471,7 @@
     "beats_baseline": true,
     "test_rows": 2486,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 2486,
     "backtest_date_range": {
@@ -1457,7 +1483,7 @@
     "backtest_relative_improvement": 0.0076,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": "grappling_heavy_binary",
     "algorithm": "random_forest_balanced",
     "feature_count": 40,
@@ -1573,7 +1599,10 @@
       "source_holdout_not_run"
     ],
     "recommended_use": "research only",
-    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims."
+    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept"
   },
   "winner_model": {
     "model_name": "winner_model",
@@ -1658,134 +1687,139 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning"
+      "cross_division_warning",
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff"
     ],
     "class_distribution": {},
     "limitations": [
       "Winner prediction already uses the existing sklearn/Elo pipeline; this pass does not retrain it."
     ],
     "trained_at": null,
-    "final_test_metric": 0.9092,
+    "final_test_metric": 0.9095,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.52,
-    "relative_improvement": 0.3892,
+    "relative_improvement": 0.3895,
     "beats_baseline": true,
     "test_rows": 3327,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3327,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.9092,
+    "backtest_main_metric": 0.9095,
     "backtest_baseline": 0.52,
-    "backtest_relative_improvement": 0.3892,
+    "backtest_relative_improvement": 0.3895,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": "f1_wins_safe",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 40,
-    "brier_score": 0.0701,
-    "log_loss": 0.2421,
-    "balanced_accuracy": 0.9093,
+    "feature_count": 45,
+    "brier_score": 0.0683,
+    "log_loss": 0.2374,
+    "balanced_accuracy": 0.9096,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 3229,
-        "coverage_percent": 97.05,
-        "accuracy": 0.9158,
-        "balanced_accuracy": 0.9159,
-        "average_confidence": 0.8886,
-        "actual_hit_rate": 0.9158,
-        "calibration_gap": -0.0272,
+        "sample_count": 3217,
+        "coverage_percent": 96.69,
+        "accuracy": 0.922,
+        "balanced_accuracy": 0.9219,
+        "average_confidence": 0.8905,
+        "actual_hit_rate": 0.922,
+        "calibration_gap": -0.0315,
         "class_distribution": {
-          "0.0": 1674,
-          "1.0": 1555
+          "0.0": 1660,
+          "1.0": 1557
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 3132,
-        "coverage_percent": 94.14,
-        "accuracy": 0.9266,
-        "balanced_accuracy": 0.9267,
-        "average_confidence": 0.8983,
-        "actual_hit_rate": 0.9266,
-        "calibration_gap": -0.0282,
+        "sample_count": 3127,
+        "coverage_percent": 93.99,
+        "accuracy": 0.9296,
+        "balanced_accuracy": 0.9297,
+        "average_confidence": 0.8995,
+        "actual_hit_rate": 0.9296,
+        "calibration_gap": -0.0301,
         "class_distribution": {
-          "0.0": 1618,
-          "1.0": 1514
+          "0.0": 1615,
+          "1.0": 1512
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 3001,
-        "coverage_percent": 90.2,
-        "accuracy": 0.9427,
-        "balanced_accuracy": 0.9428,
-        "average_confidence": 0.9103,
-        "actual_hit_rate": 0.9427,
-        "calibration_gap": -0.0324,
+        "sample_count": 3007,
+        "coverage_percent": 90.38,
+        "accuracy": 0.9451,
+        "balanced_accuracy": 0.9451,
+        "average_confidence": 0.9105,
+        "actual_hit_rate": 0.9451,
+        "calibration_gap": -0.0346,
         "class_distribution": {
-          "0.0": 1549,
-          "1.0": 1452
+          "0.0": 1552,
+          "1.0": 1455
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 2888,
-        "coverage_percent": 86.8,
-        "accuracy": 0.9498,
-        "balanced_accuracy": 0.9498,
-        "average_confidence": 0.9196,
-        "actual_hit_rate": 0.9498,
-        "calibration_gap": -0.0302,
+        "sample_count": 2876,
+        "coverage_percent": 86.44,
+        "accuracy": 0.9545,
+        "balanced_accuracy": 0.9544,
+        "average_confidence": 0.9211,
+        "actual_hit_rate": 0.9545,
+        "calibration_gap": -0.0333,
         "class_distribution": {
-          "0.0": 1490,
-          "1.0": 1398
+          "0.0": 1487,
+          "1.0": 1389
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 2723,
-        "coverage_percent": 81.85,
-        "accuracy": 0.9592,
-        "balanced_accuracy": 0.9593,
-        "average_confidence": 0.9314,
-        "actual_hit_rate": 0.9592,
-        "calibration_gap": -0.0278,
+        "sample_count": 2719,
+        "coverage_percent": 81.73,
+        "accuracy": 0.9636,
+        "balanced_accuracy": 0.9636,
+        "average_confidence": 0.9324,
+        "actual_hit_rate": 0.9636,
+        "calibration_gap": -0.0312,
         "class_distribution": {
-          "0.0": 1407,
-          "1.0": 1316
+          "0.0": 1411,
+          "1.0": 1308
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 2517,
-        "coverage_percent": 75.65,
-        "accuracy": 0.9722,
-        "balanced_accuracy": 0.9722,
-        "average_confidence": 0.9441,
-        "actual_hit_rate": 0.9722,
+        "sample_count": 2536,
+        "coverage_percent": 76.22,
+        "accuracy": 0.9716,
+        "balanced_accuracy": 0.9716,
+        "average_confidence": 0.9436,
+        "actual_hit_rate": 0.9716,
         "calibration_gap": -0.028,
         "class_distribution": {
-          "0.0": 1313,
-          "1.0": 1204
+          "0.0": 1317,
+          "1.0": 1219
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.9722,
-    "best_high_conf_balanced_accuracy": 0.9722,
-    "best_high_conf_coverage": 75.65,
+    "best_high_conf_accuracy": 0.9716,
+    "best_high_conf_balanced_accuracy": 0.9716,
+    "best_high_conf_coverage": 76.22,
     "production_status": "high_confidence_only",
     "production_status_reason": "winner_leakage_audit_passes; source_holdout_stable",
     "leakage_audit_report": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\winner_model_leakage_audit.json",
@@ -1809,7 +1843,16 @@
       "winner_leakage_audit_passes"
     ],
     "recommended_use": "research/high-confidence selective predictions only",
-    "public_warning_text": "Use only as selective model evidence; winner audit gates are not strong enough for production-ready status."
+    "public_warning_text": "Use only as selective model evidence; winner audit gates are not strong enough for production-ready status.",
+    "interaction_feature_count": 5,
+    "selected_interactions": [
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff"
+    ],
+    "interaction_selection_status": "selected"
   },
   "odds_calibration_model": {
     "model_name": "odds_calibration_model",
@@ -1867,7 +1910,7 @@
     "beats_baseline": false,
     "test_rows": 0,
     "calibration_status": "basic_probability_scores_only",
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": false,
     "backtest_fights": 0,
     "backtest_date_range": {
@@ -1879,7 +1922,7 @@
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "Trusted pre-fight odds snapshots are not available.",
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": null,
     "algorithm": null,
     "feature_count": 0,
@@ -1897,7 +1940,10 @@
       "model_blocked"
     ],
     "recommended_use": "not available",
-    "public_warning_text": "This model is blocked until required data quality gates pass."
+    "public_warning_text": "This model is blocked until required data quality gates pass.",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": null
   },
   "round_phase_model": {
     "model_name": "round_phase_model",
@@ -1910,7 +1956,7 @@
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": false,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": false,
     "backtest_fights": 0,
     "backtest_date_range": {
@@ -1922,7 +1968,7 @@
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
     "biggest_limitations": "missing required columns: round_binary_family",
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00",
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
     "target": "round_binary_family",
     "algorithm": "binary_submodel_family",
     "feature_count": 40,
@@ -2082,7 +2128,10 @@
       "source_holdout_not_run"
     ],
     "recommended_use": "research only",
-    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims."
+    "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "not_run_composite_summary"
   },
   "strike_volume_regression": {
     "model_name": "strike_volume_regression",
@@ -2095,7 +2144,7 @@
     "split_type": "chronological",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": false,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "target": "combined_sig_strikes",
     "algorithm": null,
     "feature_count": 8,
@@ -2132,7 +2181,10 @@
       "source_holdout_not_run"
     ],
     "recommended_use": "research only",
-    "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence."
+    "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence.",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": null
   },
   "fight_duration_model": {
     "model_name": "fight_duration_model",
@@ -2305,7 +2357,7 @@
     "public_warning_text": "Model is promising but still has failed production gates.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -2317,7 +2369,10 @@
     "backtest_relative_improvement": 0.3146,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept"
   },
   "over_1_5_model": {
     "model_name": "over_1_5_model",
@@ -2490,7 +2545,7 @@
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
@@ -2502,7 +2557,10 @@
     "backtest_relative_improvement": 0.0421,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept"
   },
   "over_2_5_model": {
     "model_name": "over_2_5_model",
@@ -2675,7 +2733,7 @@
     "public_warning_text": "Model is promising but still has failed production gates.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
@@ -2687,7 +2745,10 @@
     "backtest_relative_improvement": 0.2343,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept"
   },
   "ends_before_round_3_model": {
     "model_name": "ends_before_round_3_model",
@@ -2860,7 +2921,7 @@
     "public_warning_text": "Model is promising but still has failed production gates.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
@@ -2872,13 +2933,16 @@
     "backtest_relative_improvement": 0.1653,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "base_features_kept"
   },
   "finish_in_round_1_model": {
     "model_name": "finish_in_round_1_model",
     "target": "finish_in_round_1_binary",
     "algorithm": "logistic_regression_balanced",
-    "feature_count": 40,
+    "feature_count": 45,
     "feature_names": [
       "a_prior_fights",
       "b_prior_fights",
@@ -2919,113 +2983,118 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning"
+      "cross_division_warning",
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff"
     ],
-    "final_test_metric": 0.6516,
+    "final_test_metric": 0.6554,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.7613,
-    "relative_improvement": -0.1097,
+    "relative_improvement": -0.1059,
     "beats_baseline": false,
     "test_rows": 3683,
     "split_type": "chronological",
-    "brier_score": 0.2189,
-    "log_loss": 0.6286,
-    "balanced_accuracy": 0.6127,
+    "brier_score": 0.2176,
+    "log_loss": 0.6251,
+    "balanced_accuracy": 0.6242,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 2950,
-        "coverage_percent": 80.1,
-        "accuracy": 0.6888,
-        "balanced_accuracy": 0.6441,
-        "average_confidence": 0.6707,
-        "actual_hit_rate": 0.6888,
-        "calibration_gap": -0.0181,
+        "sample_count": 2955,
+        "coverage_percent": 80.23,
+        "accuracy": 0.686,
+        "balanced_accuracy": 0.6538,
+        "average_confidence": 0.6788,
+        "actual_hit_rate": 0.686,
+        "calibration_gap": -0.0072,
         "class_distribution": {
-          "0.0": 2271,
-          "1.0": 679
+          "0.0": 2277,
+          "1.0": 678
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 2281,
-        "coverage_percent": 61.93,
-        "accuracy": 0.7234,
-        "balanced_accuracy": 0.7039,
-        "average_confidence": 0.6989,
-        "actual_hit_rate": 0.7234,
-        "calibration_gap": -0.0244,
+        "sample_count": 2294,
+        "coverage_percent": 62.29,
+        "accuracy": 0.7175,
+        "balanced_accuracy": 0.7019,
+        "average_confidence": 0.7089,
+        "actual_hit_rate": 0.7175,
+        "calibration_gap": -0.0086,
         "class_distribution": {
-          "0.0": 1782,
-          "1.0": 499
+          "0.0": 1791,
+          "1.0": 503
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 1548,
-        "coverage_percent": 42.03,
-        "accuracy": 0.7358,
-        "balanced_accuracy": 0.7198,
-        "average_confidence": 0.7345,
-        "actual_hit_rate": 0.7358,
-        "calibration_gap": -0.0013,
+        "sample_count": 1656,
+        "coverage_percent": 44.96,
+        "accuracy": 0.7258,
+        "balanced_accuracy": 0.7239,
+        "average_confidence": 0.741,
+        "actual_hit_rate": 0.7258,
+        "calibration_gap": 0.0152,
         "class_distribution": {
-          "0.0": 1226,
-          "1.0": 322
+          "0.0": 1284,
+          "1.0": 372
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 954,
-        "coverage_percent": 25.9,
-        "accuracy": 0.761,
-        "balanced_accuracy": 0.6919,
-        "average_confidence": 0.7719,
-        "actual_hit_rate": 0.761,
-        "calibration_gap": 0.0109,
+        "sample_count": 1053,
+        "coverage_percent": 28.59,
+        "accuracy": 0.7768,
+        "balanced_accuracy": 0.7407,
+        "average_confidence": 0.7792,
+        "actual_hit_rate": 0.7768,
+        "calibration_gap": 0.0024,
         "class_distribution": {
-          "0.0": 779,
-          "1.0": 175
+          "0.0": 863,
+          "1.0": 190
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 592,
-        "coverage_percent": 16.07,
-        "accuracy": 0.772,
-        "balanced_accuracy": 0.6916,
-        "average_confidence": 0.8022,
-        "actual_hit_rate": 0.772,
-        "calibration_gap": 0.0302,
+        "sample_count": 656,
+        "coverage_percent": 17.81,
+        "accuracy": 0.7988,
+        "balanced_accuracy": 0.7453,
+        "average_confidence": 0.8118,
+        "actual_hit_rate": 0.7988,
+        "calibration_gap": 0.013,
         "class_distribution": {
-          "0.0": 494,
-          "1.0": 98
+          "0.0": 543,
+          "1.0": 113
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 253,
-        "coverage_percent": 6.87,
-        "accuracy": 0.7747,
-        "balanced_accuracy": 0.7145,
-        "average_confidence": 0.8423,
-        "actual_hit_rate": 0.7747,
-        "calibration_gap": 0.0676,
+        "sample_count": 325,
+        "coverage_percent": 8.82,
+        "accuracy": 0.8277,
+        "balanced_accuracy": 0.7775,
+        "average_confidence": 0.8489,
+        "actual_hit_rate": 0.8277,
+        "calibration_gap": 0.0212,
         "class_distribution": {
-          "0.0": 193,
-          "1.0": 60
+          "0.0": 257,
+          "1.0": 68
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.7747,
-    "best_high_conf_balanced_accuracy": 0.7145,
-    "best_high_conf_coverage": 6.87,
+    "best_high_conf_accuracy": 0.8277,
+    "best_high_conf_balanced_accuracy": 0.7775,
+    "best_high_conf_coverage": 8.82,
     "leakage_risk": "review_needed",
     "runtime_compatible": true,
     "production_status": "weak_or_failed_baseline",
@@ -3045,25 +3114,34 @@
     "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3683,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.6516,
+    "backtest_main_metric": 0.6554,
     "backtest_baseline": 0.7613,
-    "backtest_relative_improvement": -0.1097,
+    "backtest_relative_improvement": -0.1059,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 5,
+    "selected_interactions": [
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff"
+    ],
+    "interaction_selection_status": "selected"
   },
   "finish_type_model": {
     "model_name": "finish_type_model",
     "target": "finish_type_class",
     "algorithm": "hist_gradient_boosting",
-    "feature_count": 40,
+    "feature_count": 50,
     "feature_names": [
       "a_prior_fights",
       "b_prior_fights",
@@ -3104,119 +3182,129 @@
       "low_sample_warning",
       "missing_profile_warning",
       "missing_stats_warning",
-      "cross_division_warning"
+      "cross_division_warning",
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff",
+      "int__sq_finish_rate_diff",
+      "int__abs_decision_rate_diff",
+      "int__sq_decision_rate_diff",
+      "int__a_prior_decisions_x_cross_division_warning"
     ],
-    "final_test_metric": 0.559,
+    "final_test_metric": 0.5651,
     "final_test_metric_name": "accuracy",
     "baseline_metric": 0.632,
-    "relative_improvement": -0.073,
+    "relative_improvement": -0.0669,
     "beats_baseline": false,
     "test_rows": 1796,
     "split_type": "chronological",
     "brier_score": null,
-    "log_loss": 0.9071,
-    "balanced_accuracy": 0.44,
+    "log_loss": 0.8975,
+    "balanced_accuracy": 0.4422,
     "high_confidence_thresholds": [
       {
         "bucket": ">=55%",
-        "sample_count": 1407,
-        "coverage_percent": 78.34,
-        "accuracy": 0.5601,
-        "balanced_accuracy": 0.459,
-        "average_confidence": 0.7247,
-        "actual_hit_rate": 0.5601,
-        "calibration_gap": 0.1647,
+        "sample_count": 1377,
+        "coverage_percent": 76.67,
+        "accuracy": 0.5606,
+        "balanced_accuracy": 0.4476,
+        "average_confidence": 0.7299,
+        "actual_hit_rate": 0.5606,
+        "calibration_gap": 0.1693,
         "class_distribution": {
-          "KO/TKO": 873,
-          "Submission": 500,
-          "Other": 34
+          "KO/TKO": 850,
+          "Submission": 490,
+          "Other": 37
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=60%",
-        "sample_count": 1120,
-        "coverage_percent": 62.36,
-        "accuracy": 0.5598,
-        "balanced_accuracy": 0.4936,
-        "average_confidence": 0.7635,
-        "actual_hit_rate": 0.5598,
-        "calibration_gap": 0.2037,
+        "sample_count": 1114,
+        "coverage_percent": 62.03,
+        "accuracy": 0.5575,
+        "balanced_accuracy": 0.4662,
+        "average_confidence": 0.7667,
+        "actual_hit_rate": 0.5575,
+        "calibration_gap": 0.2092,
         "class_distribution": {
-          "KO/TKO": 678,
+          "KO/TKO": 667,
           "Submission": 416,
-          "Other": 26
+          "Other": 31
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=65%",
-        "sample_count": 897,
-        "coverage_percent": 49.94,
-        "accuracy": 0.5674,
-        "balanced_accuracy": 0.5055,
-        "average_confidence": 0.798,
-        "actual_hit_rate": 0.5674,
-        "calibration_gap": 0.2305,
+        "sample_count": 911,
+        "coverage_percent": 50.72,
+        "accuracy": 0.5631,
+        "balanced_accuracy": 0.4954,
+        "average_confidence": 0.7986,
+        "actual_hit_rate": 0.5631,
+        "calibration_gap": 0.2355,
         "class_distribution": {
-          "KO/TKO": 558,
-          "Submission": 317,
-          "Other": 22
+          "KO/TKO": 545,
+          "Submission": 340,
+          "Other": 26
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=70%",
-        "sample_count": 715,
-        "coverage_percent": 39.81,
-        "accuracy": 0.5664,
-        "balanced_accuracy": 0.5337,
-        "average_confidence": 0.8295,
-        "actual_hit_rate": 0.5664,
-        "calibration_gap": 0.2631,
+        "sample_count": 749,
+        "coverage_percent": 41.7,
+        "accuracy": 0.5541,
+        "balanced_accuracy": 0.5012,
+        "average_confidence": 0.8252,
+        "actual_hit_rate": 0.5541,
+        "calibration_gap": 0.2712,
         "class_distribution": {
-          "KO/TKO": 442,
-          "Submission": 254,
-          "Other": 19
+          "KO/TKO": 447,
+          "Submission": 278,
+          "Other": 24
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=75%",
-        "sample_count": 557,
-        "coverage_percent": 31.01,
-        "accuracy": 0.5655,
-        "balanced_accuracy": 0.5444,
-        "average_confidence": 0.8596,
-        "actual_hit_rate": 0.5655,
-        "calibration_gap": 0.2941,
+        "sample_count": 565,
+        "coverage_percent": 31.46,
+        "accuracy": 0.5735,
+        "balanced_accuracy": 0.5263,
+        "average_confidence": 0.8578,
+        "actual_hit_rate": 0.5735,
+        "calibration_gap": 0.2843,
         "class_distribution": {
-          "KO/TKO": 342,
-          "Submission": 197,
-          "Other": 18
+          "KO/TKO": 337,
+          "Submission": 206,
+          "Other": 22
         },
         "small_sample_warning": false
       },
       {
         "bucket": ">=80%",
-        "sample_count": 418,
-        "coverage_percent": 23.27,
-        "accuracy": 0.61,
-        "balanced_accuracy": 0.557,
-        "average_confidence": 0.8876,
-        "actual_hit_rate": 0.61,
-        "calibration_gap": 0.2776,
+        "sample_count": 425,
+        "coverage_percent": 23.66,
+        "accuracy": 0.5906,
+        "balanced_accuracy": 0.5333,
+        "average_confidence": 0.8852,
+        "actual_hit_rate": 0.5906,
+        "calibration_gap": 0.2946,
         "class_distribution": {
-          "KO/TKO": 264,
-          "Submission": 136,
-          "Other": 18
+          "KO/TKO": 261,
+          "Submission": 143,
+          "Other": 21
         },
         "small_sample_warning": false
       }
     ],
-    "best_high_conf_accuracy": 0.61,
-    "best_high_conf_balanced_accuracy": 0.557,
-    "best_high_conf_coverage": 23.27,
+    "best_high_conf_accuracy": 0.5906,
+    "best_high_conf_balanced_accuracy": 0.5333,
+    "best_high_conf_coverage": 23.66,
     "leakage_risk": "review_needed",
     "runtime_compatible": true,
     "production_status": "weak_or_failed_baseline",
@@ -3236,19 +3324,33 @@
     "public_warning_text": "This model did not beat the chronological baseline and should not be used for user-facing confidence.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 1796,
     "backtest_date_range": {
       "min": "2023-11-18",
       "max": "2026-05-16"
     },
-    "backtest_main_metric": 0.559,
+    "backtest_main_metric": 0.5651,
     "backtest_baseline": 0.632,
-    "backtest_relative_improvement": -0.073,
+    "backtest_relative_improvement": -0.0669,
     "backtest_beats_baseline": false,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 10,
+    "selected_interactions": [
+      "int__win_rate_diff_x_finish_rate_diff",
+      "int__win_rate_diff_x_decision_rate_diff",
+      "int__finish_rate_diff_x_decision_rate_diff",
+      "int__abs_win_rate_diff",
+      "int__sq_win_rate_diff",
+      "int__abs_finish_rate_diff",
+      "int__sq_finish_rate_diff",
+      "int__abs_decision_rate_diff",
+      "int__sq_decision_rate_diff",
+      "int__a_prior_decisions_x_cross_division_warning"
+    ],
+    "interaction_selection_status": "selected"
   },
   "method_umbrella_model": {
     "model_name": "method_umbrella_model",
@@ -3433,7 +3535,7 @@
     "public_warning_text": "Model has not passed enough production-readiness gates for public confidence claims.",
     "calibration_status": "basic_probability_scores_only",
     "segment_metrics_available": true,
-    "evaluated_at": "2026-06-08T04:43:37.481961+00:00",
+    "evaluated_at": "2026-06-08T05:32:49.705840+00:00",
     "backtested": true,
     "backtest_fights": 3696,
     "backtest_date_range": {
@@ -3445,6 +3547,9 @@
     "backtest_relative_improvement": 0.1404,
     "backtest_beats_baseline": true,
     "biggest_limitations": [],
-    "backtested_at": "2026-06-08T04:46:38.664891+00:00"
+    "backtested_at": "2026-06-08T05:43:13.621093+00:00",
+    "interaction_feature_count": 0,
+    "selected_interactions": [],
+    "interaction_selection_status": "not_run_composite_model"
   }
 }

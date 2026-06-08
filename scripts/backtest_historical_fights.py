@@ -28,10 +28,12 @@ from scripts.evaluate_model_accuracy import (
     finish_rows,
     majority_baseline,
     select_classifier,
+    select_classifier_with_interactions,
     selective_prediction_report,
     source_contribution_report,
 )
 from ufc_predictor.config import settings
+from ufc_predictor.features.interaction_discovery import add_interaction_features
 from ufc_predictor.training.dataset_builder import build_training_rows, load_fights_csv
 from ufc_predictor.training.leakage import scan_dataframe
 
@@ -190,7 +192,11 @@ def build_backtest_models(train: pd.DataFrame, validation: pd.DataFrame, test: p
             continue
         classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
         rows_validation = dedupe_model_rows(source_validation.dropna(subset=[target]).copy(), target, feature_names)
-        selected = select_classifier(rows_train, rows_validation, target, feature_names, classes)
+        selected_bundle = select_classifier_with_interactions(model_name, rows_train, rows_validation, target, feature_names, classes)
+        selected = selected_bundle["selected"]
+        feature_names = selected_bundle["feature_names"]
+        rows_train = selected_bundle["rows_train"]
+        rows_test = add_backtest_interactions(rows_test, selected_bundle["selected_interactions"])
         models[model_name] = {
             "available": True,
             "target": target,
@@ -198,6 +204,9 @@ def build_backtest_models(train: pd.DataFrame, validation: pd.DataFrame, test: p
             "feature_names": feature_names,
             "algorithm": selected["algorithm"],
             "model": selected["model"],
+            "interaction_feature_count": len(selected_bundle["selected_interactions"]),
+            "selected_interactions": selected_bundle["selected_interactions"],
+            "interaction_selection_status": selected_bundle["interaction_report"].get("selection_status"),
             "train_rows": int(len(rows_train)),
             "test_rows": int(len(rows_test)),
         }
@@ -223,6 +232,10 @@ def compatibility_backtest_model(source: dict[str, Any], model_name: str) -> dic
     elif model_name == "method_model":
         result["target"] = "method_class"
     return result
+
+
+def add_backtest_interactions(rows: pd.DataFrame, interactions: list[dict[str, Any]]) -> pd.DataFrame:
+    return add_interaction_features(rows, interactions) if interactions else rows
 
 
 def round_family_backtest_model(models: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -329,15 +342,16 @@ def precompute_model_predictions(test: pd.DataFrame, models: dict[str, dict[str,
         if not info.get("available"):
             continue
         feature_names = info.get("feature_names", FEATURE_NAMES)
+        model_rows = add_backtest_interactions(test, info.get("selected_interactions", []))
         if info.get("algorithm") == "duration_x_conditional_finish_type":
-            probabilities = method_umbrella_probabilities(info, test[feature_names])
+            probabilities = method_umbrella_probabilities(info, model_rows[feature_names])
             classes = info["classes"]
             precomputed[model_name] = {
                 "probabilities": probabilities,
                 "predicted_classes": [classes[int(np.argmax(row))] for row in probabilities],
             }
             continue
-        probabilities = align_probabilities(np.asarray(info["model"].predict_proba(test[feature_names])), list(info["model"].classes_), info["classes"])
+        probabilities = align_probabilities(np.asarray(info["model"].predict_proba(model_rows[feature_names])), list(info["model"].classes_), info["classes"])
         classes = info["classes"]
         precomputed[model_name] = {
             "probabilities": probabilities,
@@ -453,11 +467,13 @@ def score_models(predictions: list[dict[str, Any]], models: dict[str, dict[str, 
             continue
         target = info["target"]
         feature_names = info.get("feature_names", FEATURE_NAMES)
-        missing = [column for column in feature_names + [target] if column not in test.columns]
+        raw_required_features = [feature for feature in feature_names if not str(feature).startswith("int__")]
+        missing = [column for column in raw_required_features + [target] if column not in test.columns]
         if missing:
             results[model_name] = {"status": "skipped", "available": False, "reason": f"missing required columns: {', '.join(missing)}", "beats_baseline": False}
             continue
-        rows = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, feature_names)
+        rows = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, [feature for feature in feature_names if feature in test.columns])
+        rows = add_backtest_interactions(rows, info.get("selected_interactions", []))
         y_true = rows[target].astype(str).tolist()
         if info.get("algorithm") == "duration_x_conditional_finish_type":
             probs = method_umbrella_probabilities(info, rows[feature_names])
@@ -488,6 +504,9 @@ def score_models(predictions: list[dict[str, Any]], models: dict[str, dict[str, 
             "baseline": baseline,
             "selective_prediction": selective_prediction_report(y_true, preds, np.asarray(probs), classes),
             "segment_metrics": backtest_segments(rows.assign(_pred=preds), target) if by_segment else {},
+            "interaction_feature_count": int(info.get("interaction_feature_count") or 0),
+            "selected_interactions": info.get("selected_interactions", []),
+            "interaction_selection_status": info.get("interaction_selection_status", "not_run"),
         }
     return results
 
@@ -627,6 +646,11 @@ def markdown_report(payload: dict[str, Any], predictions: list[dict[str, Any]]) 
     for name in payload["models"]:
         entry = registry.get(name, {})
         lines.append(f"| {name} | {entry.get('production_status', 'not_evaluated')} | {', '.join(entry.get('failed_gates', []))} | {entry.get('public_warning_text', '')} |")
+    lines.extend(["", "## Interaction Features Used In Backtest"])
+    lines.append("| Model | Interaction Features | Selection Status |")
+    lines.append("|---|---:|---|")
+    for name, result in payload["models"].items():
+        lines.append(f"| {name} | {result.get('interaction_feature_count', 0)} | {result.get('interaction_selection_status', 'not_run')} |")
     lines.extend(["", "## Models Not Run"])
     for name, reason in payload["summary"]["models_skipped"].items():
         lines.append(f"- `{name}`: {reason}")

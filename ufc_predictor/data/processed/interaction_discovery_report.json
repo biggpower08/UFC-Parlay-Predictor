@@ -1,0 +1,4877 @@
+{
+  "generated_at": "2026-06-08T05:32:49.134658+00:00",
+  "plain_english_summary": "Candidate interactions are generated from safe pre-fight feature groups, selected on validation only, and then evaluated on the final chronological holdout.",
+  "selection_policy": {
+    "final_test_used_for_selection": false,
+    "minimum_validation_improvement": 0.003,
+    "maximum_log_loss_regression_allowed": 0.05,
+    "candidate_cap_per_model": 80
+  },
+  "models": {
+    "winner_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 5,
+      "selection_status": "selected",
+      "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "data_quality": [
+          "cross_division_warning",
+          "fighter_1_elo_available",
+          "fighter_2_elo_available",
+          "low_sample_warning",
+          "missing_profile_warning",
+          "missing_stats_warning"
+        ],
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "finish_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "finish_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "kind": "abs",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "abs"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "kind": "square",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "square"
+        }
+      ],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_unknown_size_context",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_unknown_size_context",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__missing_profile_warning_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__missing_profile_warning_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__missing_profile_warning_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__missing_profile_warning_x_unknown_size_context",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__low_sample_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__missing_profile_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.9288,
+        "balanced_accuracy": 0.9288,
+        "f1_macro": 0.9288,
+        "roc_auc": 0.9833,
+        "log_loss": 0.1836,
+        "brier_score": 0.0525,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1704,
+            "1.0": 134
+          },
+          "1.0": {
+            "0.0": 127,
+            "1.0": 1701
+          }
+        }
+      },
+      "interaction_validation_metrics": {
+        "accuracy": 0.9351,
+        "balanced_accuracy": 0.9351,
+        "f1_macro": 0.9351,
+        "roc_auc": 0.984,
+        "log_loss": 0.1817,
+        "brier_score": 0.0517,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1715,
+            "1.0": 123
+          },
+          "1.0": {
+            "0.0": 115,
+            "1.0": 1713
+          }
+        }
+      },
+      "final_test_metric": 0.9095,
+      "baseline_metric": 0.52,
+      "relative_improvement": 0.3895,
+      "runtime_parity": "passed_training_schema_generated",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "fight_duration_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 0,
+      "selection_status": "base_features_kept",
+      "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.8712,
+        "balanced_accuracy": 0.8706,
+        "f1_macro": 0.8708,
+        "roc_auc": 0.948,
+        "log_loss": 0.313,
+        "brier_score": 0.0943,
+        "confusion_matrix": {
+          "0": {
+            "0": 1504,
+            "1": 249
+          },
+          "1": {
+            "0": 227,
+            "1": 1716
+          }
+        }
+      },
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.8287,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.3146,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "over_1_5_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 0,
+      "selection_status": "base_features_kept",
+      "feature_groups": {
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.77,
+        "balanced_accuracy": 0.7245,
+        "f1_macro": 0.7312,
+        "roc_auc": 0.841,
+        "log_loss": 0.4586,
+        "brier_score": 0.1523,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 721,
+            "1.0": 501
+          },
+          "1.0": {
+            "0.0": 349,
+            "1.0": 2125
+          }
+        }
+      },
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.7385,
+      "baseline_metric": 0.6964,
+      "relative_improvement": 0.0421,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "over_2_5_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 0,
+      "selection_status": "base_features_kept",
+      "feature_groups": {
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.8355,
+        "balanced_accuracy": 0.8346,
+        "f1_macro": 0.8348,
+        "roc_auc": 0.908,
+        "log_loss": 0.3926,
+        "brier_score": 0.1232,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1424,
+            "1.0": 313
+          },
+          "1.0": {
+            "0.0": 295,
+            "1.0": 1664
+          }
+        }
+      },
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.7942,
+      "baseline_metric": 0.5599,
+      "relative_improvement": 0.2343,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "ends_before_round_3_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 0,
+      "selection_status": "base_features_kept",
+      "feature_groups": {
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.8014,
+        "balanced_accuracy": 0.7967,
+        "f1_macro": 0.7973,
+        "roc_auc": 0.8793,
+        "log_loss": 0.4339,
+        "brier_score": 0.1405,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1743,
+            "1.0": 352
+          },
+          "1.0": {
+            "0.0": 382,
+            "1.0": 1219
+          }
+        }
+      },
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.7719,
+      "baseline_metric": 0.6066,
+      "relative_improvement": 0.1653,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "finish_in_round_1_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 5,
+      "selection_status": "selected",
+      "feature_groups": {
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "finish_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "finish_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "kind": "abs",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "abs"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "kind": "square",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "square"
+        }
+      ],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_decisions",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.6778,
+        "balanced_accuracy": 0.6453,
+        "f1_macro": 0.6228,
+        "roc_auc": 0.7035,
+        "log_loss": 0.6046,
+        "brier_score": 0.2087,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1958,
+            "1.0": 793
+          },
+          "1.0": {
+            "0.0": 398,
+            "1.0": 547
+          }
+        }
+      },
+      "interaction_validation_metrics": {
+        "accuracy": 0.6861,
+        "balanced_accuracy": 0.6586,
+        "f1_macro": 0.6337,
+        "roc_auc": 0.7149,
+        "log_loss": 0.6001,
+        "brier_score": 0.2071,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1967,
+            "1.0": 784
+          },
+          "1.0": {
+            "0.0": 376,
+            "1.0": 569
+          }
+        }
+      },
+      "final_test_metric": 0.6554,
+      "baseline_metric": 0.7613,
+      "relative_improvement": -0.1059,
+      "runtime_parity": "passed_training_schema_generated",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "finish_type_model": {
+      "candidate_count": 208,
+      "accepted_count": 80,
+      "selected_count": 10,
+      "selection_status": "selected",
+      "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "finish_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "finish_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "kind": "abs",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "abs"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "kind": "square",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "square"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "kind": "abs",
+          "input_features": [
+            "finish_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "abs"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "kind": "square",
+          "input_features": [
+            "finish_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "square"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "kind": "abs",
+          "input_features": [
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "abs"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "kind": "square",
+          "input_features": [
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "square"
+        },
+        {
+          "name": "int__a_prior_decisions_x_cross_division_warning",
+          "kind": "product",
+          "input_features": [
+            "a_prior_decisions",
+            "cross_division_warning"
+          ],
+          "groups": [
+            "finishing",
+            "physical"
+          ],
+          "expression": "product"
+        }
+      ],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__a_prior_finishes_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_decisions_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_finishes_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__decision_rate_diff_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_fights_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_fights_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_wins_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_wins_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_finishes_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_finishes_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_decisions_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_decisions_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__fighter_1_history_count_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__fighter_2_history_count_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__minimum_history_count_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__fighter_1_win_rate_before_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__fighter_2_win_rate_before_x_same_division",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_fights_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_fights_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_wins_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_wins_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_finishes_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_finishes_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__a_prior_decisions_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__b_prior_decisions_x_catchweight",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.595,
+        "balanced_accuracy": 0.4783,
+        "f1_macro": 0.4693,
+        "roc_auc": null,
+        "log_loss": 0.7875,
+        "brier_score": null,
+        "confusion_matrix": {
+          "KO/TKO": {
+            "KO/TKO": 1038,
+            "Other": 10,
+            "Submission": 180
+          },
+          "Other": {
+            "KO/TKO": 14,
+            "Other": 14,
+            "Submission": 4
+          },
+          "Submission": {
+            "KO/TKO": 575,
+            "Other": 4,
+            "Submission": 104
+          }
+        }
+      },
+      "interaction_validation_metrics": {
+        "accuracy": 0.6078,
+        "balanced_accuracy": 0.4867,
+        "f1_macro": 0.4951,
+        "roc_auc": null,
+        "log_loss": 0.7795,
+        "brier_score": null,
+        "confusion_matrix": {
+          "KO/TKO": {
+            "KO/TKO": 1056,
+            "Other": 5,
+            "Submission": 167
+          },
+          "Other": {
+            "KO/TKO": 14,
+            "Other": 14,
+            "Submission": 4
+          },
+          "Submission": {
+            "KO/TKO": 569,
+            "Other": 3,
+            "Submission": 111
+          }
+        }
+      },
+      "final_test_metric": 0.5651,
+      "baseline_metric": 0.632,
+      "relative_improvement": -0.0669,
+      "runtime_parity": "passed_training_schema_generated",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "method_umbrella_model": {
+      "candidate_count": 0,
+      "accepted_count": 0,
+      "selected_count": 0,
+      "selection_status": "not_run_composite_model",
+      "feature_groups": {},
+      "selected_interactions": [],
+      "rejected_interactions": [],
+      "rejected_after_validation": [],
+      "base_validation_metrics": null,
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.6545,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.1404,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "strike_volume_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 5,
+      "selection_status": "selected",
+      "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ]
+      },
+      "selected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "finish_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "win_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "kind": "product",
+          "input_features": [
+            "finish_rate_diff",
+            "decision_rate_diff"
+          ],
+          "groups": [
+            "difference",
+            "difference"
+          ],
+          "expression": "product"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "kind": "abs",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "abs"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "kind": "square",
+          "input_features": [
+            "win_rate_diff"
+          ],
+          "groups": [
+            "nonlinear"
+          ],
+          "expression": "square"
+        }
+      ],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_cross_division_warning",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.4697,
+        "balanced_accuracy": 0.4704,
+        "f1_macro": 0.4558,
+        "roc_auc": null,
+        "log_loss": 1.0719,
+        "brier_score": null,
+        "confusion_matrix": {
+          "high": {
+            "high": 184,
+            "low": 120,
+            "medium": 181
+          },
+          "low": {
+            "high": 42,
+            "low": 291,
+            "medium": 72
+          },
+          "medium": {
+            "high": 75,
+            "low": 175,
+            "medium": 114
+          }
+        }
+      },
+      "interaction_validation_metrics": {
+        "accuracy": 0.4769,
+        "balanced_accuracy": 0.4788,
+        "f1_macro": 0.4649,
+        "roc_auc": null,
+        "log_loss": 1.0714,
+        "brier_score": null,
+        "confusion_matrix": {
+          "high": {
+            "high": 184,
+            "low": 118,
+            "medium": 183
+          },
+          "low": {
+            "high": 48,
+            "low": 289,
+            "medium": 68
+          },
+          "medium": {
+            "high": 69,
+            "low": 170,
+            "medium": 125
+          }
+        }
+      },
+      "final_test_metric": 0.4357,
+      "baseline_metric": 0.3623,
+      "relative_improvement": 0.0734,
+      "runtime_parity": "passed_training_schema_generated",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "takedown_control_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 0,
+      "selection_status": "base_features_kept",
+      "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ]
+      },
+      "selected_interactions": [],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.6715,
+        "balanced_accuracy": 0.6089,
+        "f1_macro": 0.6108,
+        "roc_auc": 0.6453,
+        "log_loss": 0.6293,
+        "brier_score": 0.2188,
+        "confusion_matrix": {
+          "0.0": {
+            "0.0": 1326,
+            "1.0": 260
+          },
+          "1.0": {
+            "0.0": 557,
+            "1.0": 344
+          }
+        }
+      },
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.5973,
+      "baseline_metric": 0.5897,
+      "relative_improvement": 0.0076,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "finish_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 0,
+      "selection_status": "base_features_kept",
+      "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.8712,
+        "balanced_accuracy": 0.8706,
+        "f1_macro": 0.8708,
+        "roc_auc": 0.948,
+        "log_loss": 0.313,
+        "brier_score": 0.0943,
+        "confusion_matrix": {
+          "0": {
+            "0": 1504,
+            "1": 249
+          },
+          "1": {
+            "0": 227,
+            "1": 1716
+          }
+        }
+      },
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.8287,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.3146,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "goes_distance_model": {
+      "candidate_count": 240,
+      "accepted_count": 80,
+      "selected_count": 0,
+      "selection_status": "base_features_kept",
+      "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "experience": [
+          "a_prior_fights",
+          "a_prior_wins",
+          "b_prior_fights",
+          "b_prior_wins",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_1_history_count",
+          "fighter_1_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "fighter_2_history_count",
+          "fighter_2_win_rate_before",
+          "minimum_history_count",
+          "win_rate_diff"
+        ],
+        "division_context": [
+          "catchweight",
+          "cross_division",
+          "cross_division_warning",
+          "same_division",
+          "unknown_size_context",
+          "weight_class_gap"
+        ],
+        "finishing": [
+          "a_prior_decisions",
+          "a_prior_finishes",
+          "b_prior_decisions",
+          "b_prior_finishes",
+          "decision_rate_diff",
+          "fighter_1_decision_win_rate_before",
+          "fighter_1_finish_win_rate_before",
+          "fighter_2_decision_win_rate_before",
+          "fighter_2_finish_win_rate_before",
+          "finish_rate_diff"
+        ]
+      },
+      "selected_interactions": [],
+      "rejected_interactions": [
+        {
+          "name": "int__win_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__win_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__finish_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__decision_rate_diff_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__weight_class_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_height_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__estimated_weight_gap_lbs_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__height_gap_x_reach_gap",
+          "reason": "low_variance",
+          "kind": "product",
+          "groups": [
+            "difference",
+            "difference"
+          ]
+        },
+        {
+          "name": "int__abs_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_weight_class_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_estimated_weight_gap_lbs",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_height_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__sq_height_gap",
+          "reason": "low_variance",
+          "kind": "square",
+          "groups": [
+            "nonlinear"
+          ]
+        },
+        {
+          "name": "int__abs_reach_gap",
+          "reason": "low_variance",
+          "kind": "abs",
+          "groups": [
+            "nonlinear"
+          ]
+        }
+      ],
+      "rejected_after_validation": [
+        {
+          "name": "int__win_rate_diff_x_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__win_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__finish_rate_diff_x_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_win_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_finish_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__abs_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__sq_decision_rate_diff",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__catchweight_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__cross_division_warning_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_a_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_b_prior_wins",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__same_division_x_fighter_1_decision_win_rate_before",
+          "reason": "did_not_improve_validation_or_calibration"
+        },
+        {
+          "name": "int__unknown_size_context_x_a_prior_fights",
+          "reason": "did_not_improve_validation_or_calibration"
+        }
+      ],
+      "base_validation_metrics": {
+        "accuracy": 0.8712,
+        "balanced_accuracy": 0.8706,
+        "f1_macro": 0.8708,
+        "roc_auc": 0.948,
+        "log_loss": 0.313,
+        "brier_score": 0.0943,
+        "confusion_matrix": {
+          "0": {
+            "0": 1504,
+            "1": 249
+          },
+          "1": {
+            "0": 227,
+            "1": 1716
+          }
+        }
+      },
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.8287,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.3146,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "method_model": {
+      "candidate_count": 0,
+      "accepted_count": 0,
+      "selected_count": 0,
+      "selection_status": "not_run_composite_model",
+      "feature_groups": {},
+      "selected_interactions": [],
+      "rejected_interactions": [],
+      "rejected_after_validation": [],
+      "base_validation_metrics": null,
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.6545,
+      "baseline_metric": 0.5141,
+      "relative_improvement": 0.1404,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "round_phase_model": {
+      "candidate_count": 0,
+      "accepted_count": 0,
+      "selected_count": 0,
+      "selection_status": "not_run_composite_summary",
+      "feature_groups": {},
+      "selected_interactions": [],
+      "rejected_interactions": [],
+      "rejected_after_validation": [],
+      "base_validation_metrics": null,
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.7942,
+      "baseline_metric": 0.5599,
+      "relative_improvement": 0.2343,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "round_model": {
+      "candidate_count": 0,
+      "accepted_count": 0,
+      "selected_count": 0,
+      "selection_status": "not_run_composite_summary",
+      "feature_groups": {},
+      "selected_interactions": [],
+      "rejected_interactions": [],
+      "rejected_after_validation": [],
+      "base_validation_metrics": null,
+      "interaction_validation_metrics": null,
+      "final_test_metric": 0.7942,
+      "baseline_metric": 0.5599,
+      "relative_improvement": 0.2343,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "strike_volume_regression": {
+      "candidate_count": 0,
+      "accepted_count": 0,
+      "selected_count": 0,
+      "selection_status": "not_run",
+      "feature_groups": {},
+      "selected_interactions": [],
+      "rejected_interactions": [],
+      "rejected_after_validation": [],
+      "base_validation_metrics": null,
+      "interaction_validation_metrics": null,
+      "final_test_metric": 52.6679,
+      "baseline_metric": 50.6327,
+      "relative_improvement": -0.0402,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    },
+    "odds_calibration_model": {
+      "candidate_count": 0,
+      "accepted_count": 0,
+      "selected_count": 0,
+      "selection_status": "not_run",
+      "feature_groups": {},
+      "selected_interactions": [],
+      "rejected_interactions": [],
+      "rejected_after_validation": [],
+      "base_validation_metrics": null,
+      "interaction_validation_metrics": null,
+      "final_test_metric": null,
+      "baseline_metric": null,
+      "relative_improvement": null,
+      "runtime_parity": "passed",
+      "leakage_check": "passed_forbidden_feature_filter",
+      "final_test_used_for_selection": false
+    }
+  }
+}

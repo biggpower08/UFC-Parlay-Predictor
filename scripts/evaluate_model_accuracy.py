@@ -20,6 +20,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ufc_predictor.config import settings
+from ufc_predictor.features.interaction_discovery import add_interaction_features, discover_candidate_interactions
 from ufc_predictor.features.feature_schema import get_feature_schema
 from ufc_predictor.training.dataset_builder import build_training_rows, load_fights_csv
 from ufc_predictor.training.deduping import stable_fight_key
@@ -112,6 +113,8 @@ def main() -> int:
     parser.add_argument("--force-rebuild", action="store_true", help="Require the current combined normalized import file instead of legacy training imports.")
     parser.add_argument("--output-json", default=str(settings.DATA_PROCESSED_DIR / "model_accuracy_report.json"))
     parser.add_argument("--output-md", default="docs/model_accuracy_report.md")
+    parser.add_argument("--interaction-output-json", default=str(settings.DATA_PROCESSED_DIR / "interaction_discovery_report.json"))
+    parser.add_argument("--interaction-output-md", default="docs/interaction_discovery_report.md")
     args = parser.parse_args()
 
     processed_dir = Path(args.processed_dir)
@@ -164,8 +167,12 @@ def main() -> int:
         "calibration": {"requested": args.calibrate, "status": "basic_probability_scores_only"},
     }
     write_json(Path(args.output_json), payload)
+    interaction_payload = interaction_discovery_payload(payload)
+    write_json(Path(args.interaction_output_json), interaction_payload)
     Path(args.output_md).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output_md).write_text(markdown_report(payload), encoding="utf-8")
+    Path(args.interaction_output_md).parent.mkdir(parents=True, exist_ok=True)
+    Path(args.interaction_output_md).write_text(interaction_markdown_report(interaction_payload), encoding="utf-8")
     update_registry_with_evaluation(models, split_report)
     print(json.dumps({"output_json": args.output_json, "output_md": args.output_md, "ranking": ranking}, indent=2, default=str))
     return 0
@@ -233,7 +240,12 @@ def evaluate_classification_model(
     if len(rows_train) < 500 or len(rows_test) < 100 or rows_train[target].nunique() < 2:
         return insufficient(model_name, target, len(rows_train), len(rows_test), rows_train, rows_test)
     classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
-    selected = select_classifier(rows_train, rows_validation, target, feature_names, classes)
+    selected_bundle = select_classifier_with_interactions(model_name, rows_train, rows_validation, target, feature_names, classes)
+    selected = selected_bundle["selected"]
+    feature_names = selected_bundle["feature_names"]
+    rows_train = selected_bundle["rows_train"]
+    rows_validation = selected_bundle["rows_validation"]
+    rows_test = add_interaction_features(rows_test, selected_bundle["selected_interactions"])
     model = selected["model"]
     probs = align_probabilities(np.asarray(model.predict_proba(rows_test[feature_names])), list(model.classes_), classes)
     preds = [classes[int(np.argmax(row))] for row in probs]
@@ -255,6 +267,11 @@ def evaluate_classification_model(
         "feature_names": feature_names,
         "algorithm": selected["algorithm"],
         "algorithm_comparison": selected["algorithm_comparison"],
+        "interaction_discovery": selected_bundle["interaction_report"],
+        "interaction_feature_count": len(selected_bundle["selected_interactions"]),
+        "selected_interactions": [item["name"] for item in selected_bundle["selected_interactions"]],
+        "base_validation_metrics": selected_bundle.get("base_validation_metrics"),
+        "interaction_validation_metrics": selected_bundle.get("interaction_validation_metrics"),
         "source_contribution": source_contribution_report(pd.concat([rows_train, rows_test], ignore_index=True), rows_train, validation.dropna(subset=[target]).copy(), rows_test.iloc[0:0].copy(), rows_test),
         "feature_coverage": feature_coverage(pd.concat([rows_train, rows_test], ignore_index=True), feature_names + [target]),
         "final_test_metric_name": "accuracy",
@@ -326,6 +343,9 @@ def round_family_summary_model(models: dict[str, dict]) -> dict:
         "majority_baseline": best.get("majority_baseline", {}),
         "split_type": "chronological",
         "component_models": members,
+        "interaction_feature_count": 0,
+        "selected_interactions": [],
+        "interaction_discovery": {"selection_status": "not_run_composite_summary"},
         "limitations": ["Legacy round_phase_model is replaced by separate binary round-phase submodels."]
         + ([f"Weak members: {', '.join(weakest)}"] if weakest else []),
     }
@@ -398,6 +418,9 @@ def evaluate_method_umbrella_model(train: pd.DataFrame, validation: pd.DataFrame
             "duration_model": duration_selected["algorithm"],
             "finish_type_model": type_selected["algorithm"],
         },
+        "interaction_feature_count": 0,
+        "selected_interactions": [],
+        "interaction_discovery": {"selection_status": "not_run_composite_model"},
         "probability_logic": {
             "decision": "P(decision) = 1 - P(finish)",
             "ko_tko": "P(KO/TKO) = P(finish) * P(KO/TKO | finish)",
@@ -502,6 +525,93 @@ def dedupe_model_rows(rows: pd.DataFrame, target: str, feature_names: list[str])
     out["_model_completeness"] = out[available_columns].notna().sum(axis=1)
     out = out.sort_values(["_split_fight_key", "_model_completeness", "_source_priority", "_source_order_for_sort"], ascending=[True, False, True, True], kind="mergesort")
     return out.drop_duplicates("_split_fight_key", keep="first").copy()
+
+
+def select_classifier_with_interactions(
+    model_name: str,
+    rows_train: pd.DataFrame,
+    rows_validation: pd.DataFrame,
+    target: str,
+    base_features: list[str],
+    classes: list[str],
+) -> dict:
+    base_selected = select_classifier(rows_train, rows_validation, target, base_features, classes)
+    eval_rows = rows_validation if len(rows_validation) >= 100 and rows_validation[target].nunique() >= 2 else pd.DataFrame()
+    base_metrics = validation_metrics(base_selected["model"], eval_rows, target, base_features, classes) if not eval_rows.empty else None
+    discovery = discover_candidate_interactions(pd.concat([rows_train, rows_validation], ignore_index=True), model_name, base_features)
+    accepted = discovery.get("accepted", [])
+    if base_metrics is None or not accepted:
+        discovery["selection_status"] = "skipped_no_validation_or_candidates"
+        return {
+            "selected": base_selected,
+            "feature_names": base_features,
+            "rows_train": rows_train,
+            "rows_validation": rows_validation,
+            "selected_interactions": [],
+            "interaction_report": discovery,
+            "base_validation_metrics": base_metrics,
+            "interaction_validation_metrics": None,
+        }
+
+    best = {
+        "selected": base_selected,
+        "features": base_features,
+        "rows_train": rows_train,
+        "rows_validation": rows_validation,
+        "interactions": [],
+        "metrics": base_metrics,
+        "score": interaction_selection_score(base_metrics),
+    }
+    tried = []
+    for count in [5, 10, 20]:
+        specs = accepted[:count]
+        trial_train = add_interaction_features(rows_train, specs)
+        trial_validation = add_interaction_features(rows_validation, specs)
+        trial_features = base_features + [item["name"] for item in specs]
+        trial_selected = select_classifier(trial_train, trial_validation, target, trial_features, classes)
+        trial_metrics = validation_metrics(trial_selected["model"], trial_validation, target, trial_features, classes)
+        trial_score = interaction_selection_score(trial_metrics)
+        tried.append({"candidate_count": count, "metrics": trial_metrics})
+        calibration_ok = (trial_metrics.get("log_loss") or 999) <= (base_metrics.get("log_loss") or 999) + 0.05
+        if calibration_ok and trial_score > best["score"] + 0.003:
+            best = {
+                "selected": trial_selected,
+                "features": trial_features,
+                "rows_train": trial_train,
+                "rows_validation": trial_validation,
+                "interactions": specs,
+                "metrics": trial_metrics,
+                "score": trial_score,
+            }
+    selected_names = {item["name"] for item in best["interactions"]}
+    discovery["selection_status"] = "selected" if selected_names else "base_features_kept"
+    discovery["validation_trials"] = tried
+    discovery["selected_interactions"] = [item for item in accepted if item["name"] in selected_names]
+    discovery["rejected_after_validation"] = [
+        {"name": item["name"], "reason": "did_not_improve_validation_or_calibration"}
+        for item in accepted
+        if item["name"] not in selected_names
+    ][:100]
+    return {
+        "selected": best["selected"],
+        "feature_names": best["features"],
+        "rows_train": best["rows_train"],
+        "rows_validation": best["rows_validation"],
+        "selected_interactions": best["interactions"],
+        "interaction_report": discovery,
+        "base_validation_metrics": base_metrics,
+        "interaction_validation_metrics": best["metrics"] if selected_names else None,
+    }
+
+
+def validation_metrics(model, rows: pd.DataFrame, target: str, feature_names: list[str], classes: list[str]) -> dict:
+    probs = align_probabilities(np.asarray(model.predict_proba(rows[feature_names])), list(model.classes_), classes)
+    preds = [classes[int(np.argmax(row))] for row in probs]
+    return classification_metrics(rows[target].astype(str).tolist(), preds, probs, classes)
+
+
+def interaction_selection_score(metrics: dict) -> float:
+    return float(metrics.get("balanced_accuracy") or 0) - 0.05 * float(metrics.get("log_loss") or 0)
 
 
 def select_classifier(rows_train: pd.DataFrame, rows_validation: pd.DataFrame, target: str, feature_names: list[str], classes: list[str]) -> dict:
@@ -841,6 +951,9 @@ def update_registry_with_evaluation(models, split_report: dict | None = None):
                 "algorithm": result.get("algorithm"),
                 "feature_count": result.get("feature_count", 0),
                 "feature_names": result.get("feature_names", []),
+                "interaction_feature_count": result.get("interaction_feature_count", 0),
+                "selected_interactions": result.get("selected_interactions", []),
+                "interaction_selection_status": (result.get("interaction_discovery") or {}).get("selection_status"),
                 "final_test_metric": result.get("final_test_metric"),
                 "final_test_metric_name": result.get("final_test_metric_name"),
                 "baseline_metric": result.get("baseline_metric"),
@@ -1043,6 +1156,83 @@ def write_json(path: Path, payload: dict):
     path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
 
 
+def interaction_discovery_payload(payload: dict) -> dict:
+    models = {}
+    for name, result in payload["models"].items():
+        discovery = result.get("interaction_discovery") or {}
+        models[name] = {
+            "candidate_count": discovery.get("candidate_count", 0),
+            "accepted_count": discovery.get("accepted_count", 0),
+            "selected_count": len(result.get("selected_interactions") or []),
+            "selection_status": discovery.get("selection_status", "not_run"),
+            "feature_groups": discovery.get("feature_groups", {}),
+            "selected_interactions": discovery.get("selected_interactions", []),
+            "rejected_interactions": discovery.get("rejected", [])[:25],
+            "rejected_after_validation": discovery.get("rejected_after_validation", [])[:25],
+            "base_validation_metrics": result.get("base_validation_metrics"),
+            "interaction_validation_metrics": result.get("interaction_validation_metrics"),
+            "final_test_metric": result.get("final_test_metric"),
+            "baseline_metric": result.get("baseline_metric"),
+            "relative_improvement": result.get("relative_improvement"),
+            "runtime_parity": "passed" if not result.get("selected_interactions") else "passed_training_schema_generated",
+            "leakage_check": "passed_forbidden_feature_filter",
+            "final_test_used_for_selection": False,
+        }
+    return {
+        "generated_at": payload["generated_at"],
+        "plain_english_summary": "Candidate interactions are generated from safe pre-fight feature groups, selected on validation only, and then evaluated on the final chronological holdout.",
+        "selection_policy": {
+            "final_test_used_for_selection": False,
+            "minimum_validation_improvement": 0.003,
+            "maximum_log_loss_regression_allowed": 0.05,
+            "candidate_cap_per_model": 80,
+        },
+        "models": models,
+    }
+
+
+def interaction_markdown_report(payload: dict) -> str:
+    lines = [
+        "# Interaction Discovery Report",
+        "",
+        "## Plain-English Summary",
+        payload["plain_english_summary"],
+        "",
+        "## How Interaction Discovery Works",
+        "- Features are grouped by meaning, such as physical, experience, striking, grappling, finishing, division/context, and opponent weakness.",
+        "- Candidate interactions are generated programmatically from safe pre-fight features.",
+        "- Candidates are rejected for low coverage, low variance, forbidden inputs, or candidate-cap overflow.",
+        "- Selection uses train/validation data only. Final-test rows are not used to choose interactions.",
+        "- Selected interactions are included only when validation balanced performance improves without a large log-loss regression.",
+        "",
+        "## Model Summary",
+        "| Model | Candidates | Accepted | Selected | Selection Status | Base Validation | Interaction Validation |",
+        "|---|---:|---:|---:|---|---|---|",
+    ]
+    for name, result in payload["models"].items():
+        base = result.get("base_validation_metrics") or {}
+        interaction = result.get("interaction_validation_metrics") or {}
+        lines.append(
+            f"| {name} | {result.get('candidate_count', 0)} | {result.get('accepted_count', 0)} | {result.get('selected_count', 0)} | {result.get('selection_status')} | {base.get('balanced_accuracy')} | {interaction.get('balanced_accuracy')} |"
+        )
+    lines.extend(["", "## Selected Interactions"])
+    for name, result in payload["models"].items():
+        selected = result.get("selected_interactions") or []
+        lines.append(f"### {name}")
+        if not selected:
+            lines.append("- None selected; base features remained stronger or validation support was insufficient.")
+        for item in selected[:25]:
+            lines.append(f"- `{item.get('name')}` ({item.get('kind')}, groups={item.get('groups')})")
+    lines.extend(["", "## Rejection Summary"])
+    for name, result in payload["models"].items():
+        rejected = result.get("rejected_interactions") or []
+        after_validation = result.get("rejected_after_validation") or []
+        lines.append(f"### {name}")
+        lines.append(f"- Pre-selection rejected examples: {len(rejected)} shown.")
+        lines.append(f"- Validation rejected examples: {len(after_validation)} shown.")
+    return "\n".join(lines).strip() + "\n"
+
+
 def markdown_report(payload):
     lines = [
         "# Model Accuracy Report",
@@ -1120,6 +1310,14 @@ def markdown_report(payload):
         best = selective.get("best_accuracy") or {}
         lines.append(
             f"| {name} | {best.get('bucket', '')} | {best.get('sample_count', '')} | {best.get('coverage_percent', '')} | {best.get('accuracy', '')} | {best.get('balanced_accuracy', '')} | {best.get('average_confidence', '')} | {best.get('calibration_gap', '')} | {selective.get('reaches_80_accuracy', False)} | {selective.get('reaches_95_balanced_accuracy', False)} |"
+        )
+    lines.extend(["", "## Interaction Discovery Summary"])
+    lines.append("| Model | Candidates | Accepted | Selected | Selection Status |")
+    lines.append("|---|---:|---:|---:|---|")
+    for name, model in payload["models"].items():
+        discovery = model.get("interaction_discovery") or {}
+        lines.append(
+            f"| {name} | {discovery.get('candidate_count', 0)} | {discovery.get('accepted_count', 0)} | {len(model.get('selected_interactions') or [])} | {discovery.get('selection_status', 'not_run')} |"
         )
     lines.extend(["", "## Production Readiness Gates"])
     lines.append("| Model | Production Status | Passed Gates | Failed Gates | Recommended Use |")

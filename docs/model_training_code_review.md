@@ -94,6 +94,14 @@ Round-phase modeling is now decomposed into binary targets:
 
 This avoids treating all round outcomes as one multiclass problem before the data proves that approach works.
 
+## Automatic Interaction Discovery
+Interaction discovery now groups safe pre-fight features by meaning and generates candidate products, ratios, context interactions, and nonlinear transforms. Candidate interactions are filtered for forbidden inputs, low coverage, low variance, and candidate caps. Selection uses training/validation only; final-test rows are not used to choose interactions.
+
+Current interaction audit results:
+- Winner model selected a small interaction set and improved validation balance slightly, but remains `high_confidence_only` because source-holdout and leakage-review gates still fail.
+- Fight duration, goes-distance, over 1.5, over 2.5, ends-before-round-3, and takedown/control kept base features because generated interactions did not clear validation/calibration selection gates.
+- Finish-in-round-1, finish-type, and strike-volume selected interactions on validation, but final-test status remains weak or experimental where baseline/calibration gates fail.
+
 ## Evaluation Notes
 - Final-test reports are fight-level after source-priority deduping.
 - Feature schema selection is based on train/validation data only; final-test rows are held back for scoring.
