@@ -38,12 +38,23 @@ FEATURE_NAMES = [
 
 CLASSIFICATION_MODELS = {
     "winner_model": "f1_wins_safe",
-    "finish_model": "finish_binary",
-    "goes_distance_model": "goes_distance_binary",
-    "method_model": "method_class",
-    "round_phase_model": "round_phase_class",
+    "fight_duration_model": "finish_binary",
+    "over_1_5_model": "over_1_5_binary",
+    "over_2_5_model": "over_2_5_binary",
+    "ends_before_round_3_model": "ends_before_round_3_binary",
+    "finish_in_round_1_model": "finish_in_round_1_binary",
+    "finish_type_model": "finish_type_class",
+    "method_umbrella_model": "method_class",
     "strike_volume_model": "combined_strike_volume_bucket",
     "takedown_control_model": "grappling_heavy_binary",
+}
+
+LEGACY_COMPATIBILITY_MODELS = {
+    "finish_model": "fight_duration_model",
+    "goes_distance_model": "fight_duration_model",
+    "method_model": "method_umbrella_model",
+    "round_phase_model": "round_binary_family",
+    "round_model": "round_binary_family",
 }
 
 TARGET_COLUMNS = {
@@ -52,8 +63,13 @@ TARGET_COLUMNS = {
     "finish_binary",
     "goes_distance_binary",
     "method_class",
+    "finish_type_class",
     "round_number",
     "round_phase_class",
+    "over_1_5_binary",
+    "over_2_5_binary",
+    "ends_before_round_3_binary",
+    "finish_in_round_1_binary",
     "fighter_a_sig_strikes",
     "fighter_b_sig_strikes",
     "combined_sig_strikes",
@@ -111,7 +127,26 @@ def main() -> int:
     train, validation, test, split_report = chronological_train_validation_test_split(dataset, args.validation_size, args.final_test_size)
     models = {}
     for model_name, target in CLASSIFICATION_MODELS.items():
-        models[model_name] = evaluate_classification_model(model_name, target, train, validation, test, by_segment=args.by_segment)
+        if model_name == "finish_type_model":
+            models[model_name] = evaluate_classification_model(
+                model_name,
+                target,
+                train,
+                validation,
+                test,
+                by_segment=args.by_segment,
+                row_filter=lambda frame: frame[frame.get("finish_binary").astype(str).isin({"1", "1.0"})].copy(),
+                limitations_extra=["Conditional model: trained and scored only on fights that actually finished."],
+            )
+        elif model_name == "method_umbrella_model":
+            models[model_name] = evaluate_method_umbrella_model(train, validation, test, by_segment=args.by_segment)
+        else:
+            models[model_name] = evaluate_classification_model(model_name, target, train, validation, test, by_segment=args.by_segment)
+    models["finish_model"] = compatibility_duration_model(models["fight_duration_model"], "finish_model")
+    models["goes_distance_model"] = compatibility_duration_model(models["fight_duration_model"], "goes_distance_model")
+    models["method_model"] = compatibility_alias_model(models["method_umbrella_model"], "method_model")
+    models["round_phase_model"] = round_family_summary_model(models)
+    models["round_model"] = compatibility_alias_model(models["round_phase_model"], "round_model")
     for model_name, target in REGRESSION_MODELS.items():
         models[model_name] = evaluate_regression_model(model_name, target, train, validation, test, by_segment=args.by_segment)
     models["odds_calibration_model"] = blocked_model("odds_calibration_model", "Pre-fight odds snapshots are not yet safely matched to outcomes and timestamps.")
@@ -178,11 +213,23 @@ def chronological_train_validation_test_split(dataset: pd.DataFrame, validation_
     }
 
 
-def evaluate_classification_model(model_name: str, target: str, train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame, by_segment: bool):
+def evaluate_classification_model(
+    model_name: str,
+    target: str,
+    train: pd.DataFrame,
+    validation: pd.DataFrame,
+    test: pd.DataFrame,
+    by_segment: bool,
+    row_filter=None,
+    limitations_extra: list[str] | None = None,
+):
     feature_names = feature_names_for_model(train, validation, test, model_name)
-    rows_train = dedupe_model_rows(train.dropna(subset=[target]).copy(), target, feature_names)
-    rows_validation = dedupe_model_rows(validation.dropna(subset=[target]).copy(), target, feature_names)
-    rows_test = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, feature_names)
+    source_train = row_filter(train.copy()) if row_filter else train.copy()
+    source_validation = row_filter(validation.copy()) if row_filter else validation.copy()
+    source_test = row_filter(test.copy()) if row_filter else test.copy()
+    rows_train = dedupe_model_rows(source_train.dropna(subset=[target]).copy(), target, feature_names)
+    rows_validation = dedupe_model_rows(source_validation.dropna(subset=[target]).copy(), target, feature_names)
+    rows_test = dedupe_model_rows(source_test.dropna(subset=[target]).copy(), target, feature_names)
     if len(rows_train) < 500 or len(rows_test) < 100 or rows_train[target].nunique() < 2:
         return insufficient(model_name, target, len(rows_train), len(rows_test), rows_train, rows_test)
     classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
@@ -220,7 +267,154 @@ def evaluate_classification_model(model_name: str, target: str, train: pd.DataFr
         "majority_baseline": majority,
         "split_type": "chronological",
         "segment_metrics": segment_metrics(rows_test.assign(_pred=preds), target) if by_segment else {},
-        "limitations": limitations(beats, metrics),
+        "limitations": limitations(beats, metrics) + list(limitations_extra or []),
+    }
+
+
+def finish_rows(frame: pd.DataFrame) -> pd.DataFrame:
+    if "finish_binary" not in frame.columns:
+        return frame.iloc[0:0].copy()
+    return frame[frame["finish_binary"].astype(str).isin({"1", "1.0"})].copy()
+
+
+def compatibility_duration_model(duration_result: dict, model_name: str) -> dict:
+    result = json.loads(json.dumps(duration_result, default=str))
+    result["model_name"] = model_name
+    result["derived_from"] = "fight_duration_model"
+    if model_name == "finish_model":
+        result["target"] = "finish_binary"
+        result["output_name"] = "finish_probability"
+        result["limitations"] = list(dict.fromkeys(result.get("limitations", []) + ["Compatibility output: internally backed by fight_duration_model."]))
+    else:
+        result["target"] = "goes_distance_binary"
+        result["output_name"] = "goes_distance_probability"
+        result["probability_transform"] = "1 - finish_probability"
+        result["limitations"] = list(dict.fromkeys(result.get("limitations", []) + ["Compatibility output: goes_distance_probability is derived as 1 - finish_probability."]))
+    return result
+
+
+def compatibility_alias_model(source_result: dict, model_name: str) -> dict:
+    result = json.loads(json.dumps(source_result, default=str))
+    result["model_name"] = model_name
+    result["derived_from"] = source_result.get("model_name")
+    result["limitations"] = list(dict.fromkeys(result.get("limitations", []) + [f"Compatibility alias backed by {source_result.get('model_name')}."]))
+    return result
+
+
+def round_family_summary_model(models: dict[str, dict]) -> dict:
+    members = ["over_1_5_model", "over_2_5_model", "ends_before_round_3_model", "finish_in_round_1_model"]
+    available = [models[name] for name in members if name in models]
+    beats = [item for item in available if item.get("beats_baseline")]
+    weakest = [item.get("model_name") for item in available if not item.get("beats_baseline")]
+    best = max(available, key=lambda item: item.get("relative_improvement") or -999, default={})
+    return {
+        "model_name": "round_phase_model",
+        "target": "round_binary_family",
+        "status": "evaluated" if beats else "weak_or_failed_baseline",
+        "train_rows": max((item.get("train_rows", 0) for item in available), default=0),
+        "test_rows": max((item.get("test_rows", 0) for item in available), default=0),
+        "feature_count": best.get("feature_count", 0),
+        "feature_names": best.get("feature_names", []),
+        "algorithm": "binary_submodel_family",
+        "final_test_metric_name": "best_binary_submodel_accuracy",
+        "final_test_metric": best.get("final_test_metric"),
+        "baseline_metric": best.get("baseline_metric"),
+        "relative_improvement": best.get("relative_improvement"),
+        "beats_baseline": bool(beats),
+        "metrics": {"member_models": {name: models[name].get("metrics") for name in members if name in models}},
+        "selective_prediction": best.get("selective_prediction", {}),
+        "majority_baseline": best.get("majority_baseline", {}),
+        "split_type": "chronological",
+        "component_models": members,
+        "limitations": ["Legacy round_phase_model is replaced by separate binary round-phase submodels."]
+        + ([f"Weak members: {', '.join(weakest)}"] if weakest else []),
+    }
+
+
+def evaluate_method_umbrella_model(train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame, by_segment: bool):
+    feature_names = feature_names_for_model(train, validation, test, "method_umbrella_model")
+    duration_train = dedupe_model_rows(train.dropna(subset=["finish_binary"]).copy(), "finish_binary", feature_names)
+    duration_validation = dedupe_model_rows(validation.dropna(subset=["finish_binary"]).copy(), "finish_binary", feature_names)
+    duration_test = dedupe_model_rows(test.dropna(subset=["method_class", "finish_binary"]).copy(), "method_class", feature_names)
+    type_train = dedupe_model_rows(finish_rows(train).dropna(subset=["finish_type_class"]).copy(), "finish_type_class", feature_names)
+    type_validation = dedupe_model_rows(finish_rows(validation).dropna(subset=["finish_type_class"]).copy(), "finish_type_class", feature_names)
+    if len(duration_train) < 500 or len(duration_test) < 100 or len(type_train) < 300 or type_train["finish_type_class"].nunique() < 2:
+        return insufficient("method_umbrella_model", "method_class", min(len(duration_train), len(type_train)), len(duration_test), duration_train, duration_test)
+
+    duration_classes = sorted(str(value) for value in set(duration_train["finish_binary"].astype(str)) | {"0", "1"})
+    duration_selected = select_classifier(duration_train, duration_validation, "finish_binary", feature_names, duration_classes)
+    type_classes = sorted(str(value) for value in set(type_train["finish_type_class"].astype(str)) | set(type_validation.get("finish_type_class", pd.Series(dtype=str)).dropna().astype(str)))
+    type_selected = select_classifier(type_train, type_validation, "finish_type_class", feature_names, type_classes)
+
+    duration_probs = align_probabilities(
+        np.asarray(duration_selected["model"].predict_proba(duration_test[feature_names])),
+        list(duration_selected["model"].classes_),
+        duration_classes,
+    )
+    finish_index = duration_classes.index("1") if "1" in duration_classes else len(duration_classes) - 1
+    finish_probability = duration_probs[:, finish_index]
+    type_probs = align_probabilities(
+        np.asarray(type_selected["model"].predict_proba(duration_test[feature_names])),
+        list(type_selected["model"].classes_),
+        type_classes,
+    )
+    method_classes = sorted(set(duration_test["method_class"].dropna().astype(str)) | {"Decision"} | set(type_classes))
+    combined_probs = np.zeros((len(duration_test), len(method_classes)))
+    method_index = {label: index for index, label in enumerate(method_classes)}
+    combined_probs[:, method_index["Decision"]] = 1 - finish_probability
+    for class_index, label in enumerate(type_classes):
+        if label in method_index:
+            combined_probs[:, method_index[label]] = finish_probability * type_probs[:, class_index]
+    row_sums = combined_probs.sum(axis=1)
+    leftover = np.maximum(0, 1 - row_sums)
+    if "Other" not in method_index:
+        method_classes.append("Other")
+        combined_probs = np.column_stack([combined_probs, leftover])
+    else:
+        combined_probs[:, method_index["Other"]] += leftover
+    row_sums = combined_probs.sum(axis=1)
+    row_sums[row_sums == 0] = 1
+    combined_probs = combined_probs / row_sums[:, None]
+
+    preds = [method_classes[int(np.argmax(row))] for row in combined_probs]
+    y_true = duration_test["method_class"].astype(str).tolist()
+    majority = majority_baseline(y_true)
+    metrics = classification_metrics(y_true, preds, combined_probs, method_classes)
+    main = metrics["accuracy"]
+    baseline = majority["accuracy"]
+    improvement = round(main - baseline, 4) if baseline is not None else None
+    beats = bool(improvement is not None and improvement > 0)
+    return {
+        "model_name": "method_umbrella_model",
+        "target": "method_class",
+        "status": "evaluated" if beats else "weak_or_failed_baseline",
+        "test_rows": int(len(duration_test)),
+        "train_rows": int(min(len(duration_train), len(type_train))),
+        "validation_rows": int(min(len(duration_validation), len(type_validation))),
+        "feature_count": len(feature_names),
+        "feature_names": feature_names,
+        "algorithm": "duration_x_conditional_finish_type",
+        "algorithm_comparison": {
+            "duration_model": duration_selected["algorithm"],
+            "finish_type_model": type_selected["algorithm"],
+        },
+        "probability_logic": {
+            "decision": "P(decision) = 1 - P(finish)",
+            "ko_tko": "P(KO/TKO) = P(finish) * P(KO/TKO | finish)",
+            "submission": "P(submission) = P(finish) * P(submission | finish)",
+            "other_finish": "P(other_finish) = P(finish) * P(other_finish | finish)",
+        },
+        "final_test_metric_name": "accuracy",
+        "final_test_metric": main,
+        "baseline_metric": baseline,
+        "relative_improvement": improvement,
+        "beats_baseline": beats,
+        "metrics": metrics,
+        "selective_prediction": selective_prediction_report(y_true, preds, combined_probs, method_classes),
+        "majority_baseline": majority,
+        "split_type": "chronological",
+        "segment_metrics": segment_metrics(duration_test.assign(_pred=preds), "method_class") if by_segment else {},
+        "limitations": limitations(beats, metrics) + ["Umbrella method output combines duration probability with conditional finish type probabilities."],
     }
 
 
@@ -852,7 +1046,40 @@ def markdown_report(payload):
         "# Model Accuracy Report",
         "",
         "## Plain-English Summary",
-        "Models were evaluated on the newest chronological holdout from normalized historical fight data. Metrics are approximate final-test results, not guarantees.",
+        "Models were evaluated on the newest chronological holdout from normalized historical fight data. Finish and goes-distance are now one fight-duration model with inverse outputs, while method is estimated from duration plus conditional finish type. Metrics are approximate final-test results, not guarantees.",
+        "",
+        "## Hierarchical Fight Outcome Model",
+        "- `fight_duration_model` predicts finish probability; `goes_distance_probability` is `1 - finish_probability`.",
+        "- `finish_model` and `goes_distance_model` remain as compatibility report entries backed by the same duration model.",
+        "- Round reads are separate binary submodels instead of one broad multiclass round-phase model.",
+        "- `finish_type_model` is trained only on fights that actually finished.",
+        "- `method_umbrella_model` combines `P(decision) = P(goes_distance)` with `P(KO/TKO or submission) = P(finish) * P(type | finish)`.",
+        "",
+        "## Hierarchy Metrics",
+        "| Model | Status | Rows | Accuracy | Balanced Accuracy | ROC AUC | Brier | Baseline | Improvement |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+    ]
+    for name in [
+        "fight_duration_model",
+        "over_1_5_model",
+        "over_2_5_model",
+        "ends_before_round_3_model",
+        "finish_in_round_1_model",
+        "finish_type_model",
+        "method_umbrella_model",
+    ]:
+        model = payload["models"].get(name, {})
+        metrics = model.get("metrics") or {}
+        lines.append(
+            f"| {name} | {model.get('status')} | {model.get('test_rows', 0)} | {metrics.get('accuracy')} | {metrics.get('balanced_accuracy')} | {metrics.get('roc_auc')} | {metrics.get('brier_score')} | {model.get('baseline_metric')} | {model.get('relative_improvement')} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Method Probability Logic",
+            "- Decision probability comes from the duration model's goes-distance output.",
+            "- KO/TKO and submission probabilities are conditional on the fight first being projected to finish.",
+            "- The combined method output improved over majority baseline on accuracy, but balanced method metrics remain modest, so it is not production-ready.",
         "",
         "## Split",
         f"- Train: {payload['split']['train_rows']} rows, {payload['split']['date_range_train']}",
@@ -869,7 +1096,8 @@ def markdown_report(payload):
         "## Model Ranking",
         "| Model | Status | Test Rows | Main Metric | Baseline | Improvement | Beats Baseline | Notes |",
         "|---|---|---:|---:|---:|---:|---|---|",
-    ]
+        ]
+    )
     for item in payload["relative_ranking"]:
         model = payload["models"][item["model"]]
         lines.append(

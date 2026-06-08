@@ -1,6 +1,10 @@
 import pandas as pd
 from pathlib import Path
 
+import numpy as np
+
+from scripts.evaluate_model_accuracy import feature_names_for_model, finish_rows
+from scripts.backtest_historical_fights import method_umbrella_probabilities, model_prediction_payload
 from scripts.train_prop_models import registry_entry_from_artifact
 from ufc_predictor.features.feature_schema import get_feature_schema
 from ufc_predictor.features.matchup_features import (
@@ -84,6 +88,11 @@ def test_target_columns_cannot_become_features():
         "f1_wins",
         "went_distance",
         "over_2_5",
+        "over_1_5_binary",
+        "over_2_5_binary",
+        "ends_before_round_3_binary",
+        "finish_in_round_1_binary",
+        "finish_type_class",
         "method_class",
         "fighter_a_sig_strikes",
         "fighter_b_takedowns",
@@ -91,7 +100,86 @@ def test_target_columns_cannot_become_features():
     }
 
     assert not target_columns.intersection(schema.all_features())
-    assert {"f1_wins", "method_class", "grappling_heavy_binary"} <= set(schema.forbidden_features)
+    assert {"f1_wins", "method_class", "finish_type_class", "over_2_5_binary", "grappling_heavy_binary"} <= set(schema.forbidden_features)
+
+
+def test_duration_model_features_exclude_outcome_labels():
+    frame = pd.DataFrame(
+        [
+            {
+                "a_prior_fights": 1,
+                "b_prior_fights": 1,
+                "a_prior_wins": 1,
+                "b_prior_wins": 0,
+                "a_prior_finishes": 1,
+                "b_prior_finishes": 0,
+                "a_prior_decisions": 0,
+                "b_prior_decisions": 0,
+                "finish_binary": 1,
+                "goes_distance_binary": 0,
+                "result": "win",
+                "method_class": "KO/TKO",
+                "round_number": 1,
+            }
+        ]
+    )
+
+    features = feature_names_for_model(frame, frame, frame, "fight_duration_model")
+
+    assert "finish_binary" not in features
+    assert "goes_distance_binary" not in features
+    assert "method_class" not in features
+    assert "round_number" not in features
+    assert "result" not in features
+
+
+def test_finish_type_rows_keep_only_finished_fights():
+    rows = pd.DataFrame(
+        [
+            {"finish_binary": 1, "finish_type_class": "KO/TKO"},
+            {"finish_binary": 0, "finish_type_class": None},
+            {"finish_binary": 1.0, "finish_type_class": "Submission"},
+        ]
+    )
+
+    filtered = finish_rows(rows)
+
+    assert filtered["finish_type_class"].tolist() == ["KO/TKO", "Submission"]
+
+
+def test_goes_distance_probability_is_inverse_of_finish_probability():
+    payload = model_prediction_payload("goes_distance_model", "1", ["0", "1"], np.asarray([0.35, 0.65]))
+
+    assert payload["finish_probability"] == 0.65
+    assert payload["goes_distance_probability"] == 0.35
+    assert payload["predicted_class"] == "0"
+
+
+class _FixedProbabilityModel:
+    def __init__(self, classes, probabilities):
+        self.classes_ = np.asarray(classes)
+        self._probabilities = np.asarray(probabilities)
+
+    def predict_proba(self, rows):
+        return np.tile(self._probabilities, (len(rows), 1))
+
+
+def test_method_umbrella_probabilities_are_conditional_and_sum_to_one():
+    info = {
+        "classes": ["Decision", "KO/TKO", "Submission"],
+        "duration_classes": ["0", "1"],
+        "duration_model": _FixedProbabilityModel(["0", "1"], [0.4, 0.6]),
+        "finish_type_classes": ["KO/TKO", "Submission"],
+        "finish_type_model": _FixedProbabilityModel(["KO/TKO", "Submission"], [0.25, 0.75]),
+    }
+
+    probs = method_umbrella_probabilities(info, pd.DataFrame({"a_prior_fights": [1]}))
+
+    assert probs.shape == (1, 3)
+    assert abs(float(probs.sum()) - 1.0) < 0.0001
+    assert round(float(probs[0][0]), 4) == 0.4
+    assert round(float(probs[0][1]), 4) == 0.15
+    assert round(float(probs[0][2]), 4) == 0.45
 
 
 def test_chronological_and_event_grouped_splits_are_safe():

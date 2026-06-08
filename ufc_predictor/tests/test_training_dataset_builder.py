@@ -1,6 +1,14 @@
 import pandas as pd
 
-from ufc_predictor.training.dataset_builder import build_training_rows, normalize_method, round_phase_label
+from ufc_predictor.training.dataset_builder import (
+    build_training_rows,
+    ends_before_round_3_label,
+    finish_in_round_1_label,
+    normalize_method,
+    over_round_half_label,
+    parse_round_time_seconds,
+    round_phase_label,
+)
 from ufc_predictor.training.split import chronological_split
 
 
@@ -13,6 +21,15 @@ def test_label_normalization_for_prop_models():
     assert round_phase_label(2, False) == "middle"
     assert round_phase_label(5, False) == "late"
     assert round_phase_label(3, True) == "decision"
+    assert parse_round_time_seconds("2:31") == 151
+    assert over_round_half_label(2, 151, False, threshold_round=1) == 1
+    assert over_round_half_label(2, 149, False, threshold_round=1) == 0
+    assert over_round_half_label(2, None, False, threshold_round=1) is None
+    assert over_round_half_label(3, 151, False, threshold_round=2) == 1
+    assert ends_before_round_3_label(2, False) == 1
+    assert ends_before_round_3_label(3, False) == 0
+    assert finish_in_round_1_label(1, False) == 1
+    assert finish_in_round_1_label(2, False) == 0
 
 
 def test_dataset_builder_uses_prior_history_only():
@@ -49,6 +66,14 @@ def test_dataset_builder_uses_prior_history_only():
     assert dataset.iloc[1]["a_prior_finishes"] == 1
     assert dataset.iloc[1]["finish_binary"] == 0
     assert dataset.iloc[1]["goes_distance_binary"] == 1
+    assert dataset.iloc[0]["finish_type_class"] == "KO/TKO"
+    assert pd.isna(dataset.iloc[1]["finish_type_class"])
+    assert dataset.iloc[0]["over_1_5_binary"] == 0
+    assert dataset.iloc[1]["over_1_5_binary"] == 1
+    assert dataset.iloc[0]["ends_before_round_3_binary"] == 1
+    assert dataset.iloc[1]["ends_before_round_3_binary"] == 0
+    assert dataset.iloc[0]["finish_in_round_1_binary"] == 1
+    assert dataset.iloc[1]["finish_in_round_1_binary"] == 0
     assert audit.label_availability["finish_binary"] == 2
     assert audit.label_availability["fighter_a_sig_strikes"] == 0
 

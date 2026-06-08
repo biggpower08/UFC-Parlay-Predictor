@@ -68,6 +68,32 @@ If source holdout fails while other metrics are strong, status must be `high_con
 - Extra trees.
 - Histogram gradient boosting.
 
+## Hierarchical Fight Outcome Refactor
+The previous reports trained `finish_model` and `goes_distance_model` as separate flat classifiers even though their labels are direct inverses. They now share the same umbrella duration signal:
+
+- `fight_duration_model`: predicts finish probability.
+- `finish_model`: compatibility output backed by `fight_duration_model`.
+- `goes_distance_model`: compatibility output where `goes_distance_probability = 1 - finish_probability`.
+
+The old flat `method_model` tried to classify decision, KO/TKO, submission, and other outcomes in one step. The safer structure is now:
+
+- `finish_type_model`: conditional model trained only on fights that finished.
+- `method_umbrella_model`: combines duration probability with conditional finish-type probability.
+
+Combined method logic:
+- `P(decision) = P(goes_distance)`
+- `P(KO/TKO) = P(finish) * P(KO/TKO | finish)`
+- `P(submission) = P(finish) * P(submission | finish)`
+- `P(other_finish) = P(finish) * P(other_finish | finish)`
+
+Round-phase modeling is now decomposed into binary targets:
+- `over_1_5_model`
+- `over_2_5_model`
+- `ends_before_round_3_model`
+- `finish_in_round_1_model`
+
+This avoids treating all round outcomes as one multiclass problem before the data proves that approach works.
+
 ## Evaluation Notes
 - Final-test reports are fight-level after source-priority deduping.
 - High-confidence metrics report coverage and calibration gap.
@@ -76,6 +102,6 @@ If source holdout fails while other metrics are strong, status must be `high_con
 ## Remaining Risks
 - Source duplicate quality still needs periodic auditing.
 - Odds rows are not production-training-ready without trusted pre-fight timestamps.
-- Method and round-phase labels need better target decomposition before public confidence claims.
+- Method and round labels are now decomposed, but finish-type and round-1 finish remain weak until they beat baseline with acceptable balanced metrics.
 - Winner model source-transfer is not uniformly strong; the red-team audit found `ufc_fight_forecast` holdout weakness.
 - High-confidence winner performance should be used as selective evidence only until source-holdout stability is improved.

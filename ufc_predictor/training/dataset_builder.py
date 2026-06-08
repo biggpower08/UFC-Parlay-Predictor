@@ -106,6 +106,8 @@ def build_training_rows(
 
         method = normalize_method(fight.get("method_group") or fight.get("method"))
         is_decision = method == "Decision"
+        finish_round = _safe_int(fight.get("round"))
+        finish_time_seconds = parse_round_time_seconds(fight.get("time") or fight.get("finish_time"))
         round_phase = round_phase_label(fight.get("round"), is_decision)
         a_hist = history[fighter_a]
         b_hist = history[fighter_b]
@@ -142,8 +144,13 @@ def build_training_rows(
                 "finish_binary": 0 if is_decision else 1,
                 "goes_distance_binary": 1 if is_decision else 0,
                 "method_class": method,
-                "round_number": _safe_int(fight.get("round")),
+                "finish_type_class": None if is_decision else method,
+                "round_number": finish_round,
                 "round_phase_class": round_phase,
+                "over_1_5_binary": over_round_half_label(finish_round, finish_time_seconds, is_decision, threshold_round=1),
+                "over_2_5_binary": over_round_half_label(finish_round, finish_time_seconds, is_decision, threshold_round=2),
+                "ends_before_round_3_binary": ends_before_round_3_label(finish_round, is_decision),
+                "finish_in_round_1_binary": finish_in_round_1_label(finish_round, is_decision),
                 "fighter_a_sig_strikes": _oriented_value(fight, "fighter_a_sig_strikes", "fighter_b_sig_strikes", orientation),
                 "fighter_b_sig_strikes": _oriented_value(fight, "fighter_b_sig_strikes", "fighter_a_sig_strikes", orientation),
                 "combined_sig_strikes": fight.get("combined_sig_strikes"),
@@ -183,8 +190,13 @@ def audit_training_dataset(dataset: pd.DataFrame, raw_fights: pd.DataFrame, sour
         "finish_binary",
         "goes_distance_binary",
         "method_class",
+        "finish_type_class",
         "round_number",
         "round_phase_class",
+        "over_1_5_binary",
+        "over_2_5_binary",
+        "ends_before_round_3_binary",
+        "finish_in_round_1_binary",
         "fighter_a_sig_strikes",
         "fighter_b_sig_strikes",
         "combined_sig_strikes",
@@ -207,7 +219,19 @@ def audit_training_dataset(dataset: pd.DataFrame, raw_fights: pd.DataFrame, sour
     }
     distributions = {
         column: {str(key): int(value) for key, value in Counter(dataset[column].dropna()).items()}
-        for column in ("finish_binary", "goes_distance_binary", "method_class", "round_phase_class", "combined_strike_volume_bucket", "grappling_heavy_binary")
+        for column in (
+            "finish_binary",
+            "goes_distance_binary",
+            "method_class",
+            "finish_type_class",
+            "round_phase_class",
+            "over_1_5_binary",
+            "over_2_5_binary",
+            "ends_before_round_3_binary",
+            "finish_in_round_1_binary",
+            "combined_strike_volume_bucket",
+            "grappling_heavy_binary",
+        )
         if column in dataset.columns
     }
     feature_columns = schema.all_features()
@@ -311,6 +335,55 @@ def round_phase_label(round_value, is_decision: bool) -> str:
     if round_number <= 3:
         return "middle"
     return "late"
+
+
+def over_round_half_label(round_number: int | None, round_time_seconds: int | None, is_decision: bool, threshold_round: int) -> int | None:
+    """Return whether a fight passed X.5 rounds without guessing missing midpoint times."""
+    if is_decision:
+        return 1
+    if round_number is None:
+        return None
+    if round_number <= threshold_round:
+        return 0
+    if round_number >= threshold_round + 2:
+        return 1
+    if round_number == threshold_round + 1:
+        if round_time_seconds is None:
+            return None
+        return 1 if round_time_seconds > 150 else 0
+    return None
+
+
+def ends_before_round_3_label(round_number: int | None, is_decision: bool) -> int | None:
+    if is_decision:
+        return 0
+    if round_number is None:
+        return None
+    return 1 if round_number < 3 else 0
+
+
+def finish_in_round_1_label(round_number: int | None, is_decision: bool) -> int | None:
+    if is_decision:
+        return 0
+    if round_number is None:
+        return None
+    return 1 if round_number == 1 else 0
+
+
+def parse_round_time_seconds(value) -> int | None:
+    if value is None or pd.isna(value):
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    if ":" in text:
+        left, right = text.split(":", 1)
+        minutes = _safe_int(left)
+        seconds = _safe_int(right)
+        if minutes is None or seconds is None:
+            return None
+        return minutes * 60 + seconds
+    return _safe_int(text)
 
 
 def _empty_history() -> dict[str, int]:
