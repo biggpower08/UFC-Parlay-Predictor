@@ -3,9 +3,11 @@ __pycache__/
 .pytest_cache/
 .pytest_tmp/
 pytest_tmp_codex/
+pytest_tmp_codex_fresh/
 pytest_tmp_*/
 UFC-Elo-Engine/
 .next/
+.venv/
 .venv*/
 docs/.venv/
 venv/
@@ -21,6 +23,9 @@ build/python_deps/
 ufc_predictor/data/processed/scrape_cache/
 ufc_predictor/data/processed/scrape_debug/
 ufc_predictor/data/processed/*.db
+ufc_predictor/data/processed/fighters.db
+ufc_predictor/data/processed/imports/normalized_fights_combined.csv
+ufc_predictor/data/processed/backtest_predictions.json
 data/imports/
 data/mentor_silver_run/
 audit.jsonl
@@ -39,5 +44,8 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 .env
+.env.*
 .env.local
+!.env.example
+!app/frontend/.env.example
 .npm-cache/

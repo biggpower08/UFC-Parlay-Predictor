@@ -477,7 +477,9 @@ def predict_probabilities(model, X):
 
 def feature_names_for_model(train: pd.DataFrame, validation: pd.DataFrame, test: pd.DataFrame, model_name: str) -> list[str]:
     schema = get_feature_schema(model_name)
-    combined = pd.concat([train, validation, test], ignore_index=True)
+    # Feature schema selection is based on train/validation only. Final-test
+    # rows stay untouched until scoring so they cannot influence model shape.
+    combined = pd.concat([train, validation], ignore_index=True)
     forbidden = set(schema.forbidden_features) | TARGET_COLUMNS
     features = []
     for name in schema.all_features():

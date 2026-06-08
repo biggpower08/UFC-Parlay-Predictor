@@ -96,6 +96,8 @@ This avoids treating all round outcomes as one multiclass problem before the dat
 
 ## Evaluation Notes
 - Final-test reports are fight-level after source-priority deduping.
+- Feature schema selection is based on train/validation data only; final-test rows are held back for scoring.
+- The `--calibrate` flag is currently reported as basic probability scoring only, not a final-test calibration step.
 - High-confidence metrics report coverage and calibration gap.
 - Models that only perform well on narrow high-confidence slices should be treated as selective, not globally reliable.
 

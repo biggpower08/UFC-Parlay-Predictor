@@ -1,7 +1,0 @@
-build/python_deps/
-app/frontend/node_modules/
-ufc_predictor/ui/node_modules/
-ufc_predictor/ui/release/
-ufc_predictor/ui/.next/
-__pycache__/
-*.pyc
