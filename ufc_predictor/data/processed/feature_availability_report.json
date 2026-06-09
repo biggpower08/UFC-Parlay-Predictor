@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-09T03:55:18.081361+00:00",
+  "generated_at": "2026-06-09T14:02:39.864060+00:00",
   "plain_english_summary": "Feature availability is reported from evaluated model feature sets; raw imports remain local-only.",
   "models": {
     "winner_model": {

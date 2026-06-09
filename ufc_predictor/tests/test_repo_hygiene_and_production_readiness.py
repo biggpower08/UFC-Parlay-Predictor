@@ -129,3 +129,39 @@ def test_registry_keeps_odds_blocked_without_trusted_prefight_timestamps():
 
     assert odds.get("production_status") == "blocked"
     assert "model_blocked" in odds.get("failed_gates", [])
+
+
+def test_source_holdout_not_run_blocks_production_ready_for_non_winner():
+    gates = production_gate_result(
+        "fight_duration_model",
+        {
+            "status": "evaluated",
+            "beats_baseline": True,
+            "feature_names": ["a_prior_fights"],
+            "metrics": {"balanced_accuracy": 0.9, "brier_score": 0.1},
+            "selective_prediction": {"best_accuracy": {"sample_count": 200, "coverage_percent": 10}},
+        },
+        {"no_cross_split_fight_leakage": True},
+        {},
+    )
+
+    assert gates["production_status"] != "production_ready"
+    assert "source_holdout_not_run" in gates["failed_gates"]
+
+
+def test_calibration_gate_distinguishes_probability_scoring_from_true_calibration():
+    gates = production_gate_result(
+        "strike_volume_model",
+        {
+            "status": "evaluated",
+            "beats_baseline": True,
+            "feature_names": ["a_prior_fights"],
+            "metrics": {"balanced_accuracy": 0.9, "brier_score": 0.35},
+            "selective_prediction": {"best_accuracy": {"sample_count": 200, "coverage_percent": 10}},
+        },
+        {"no_cross_split_fight_leakage": True},
+        {},
+    )
+
+    assert gates["production_status"] != "production_ready"
+    assert "calibration_acceptable" in gates["failed_gates"]

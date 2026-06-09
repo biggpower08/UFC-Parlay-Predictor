@@ -70,10 +70,21 @@ Current automated gates still enforce:
 - Calibration status must be explicit.
 - Final-test rows must not decide model feature schema.
 
+## Metric Jump Audit
+The current metric-jump audit is documented in `docs/metric_jump_audit.md`.
+
+Key result:
+- Fight rows stayed stable at 49,355.
+- Feature count increased from 136 to 157.
+- The final date range did not change.
+- Several gains are plausible feature/interaction improvements, but they are not production-safe until source-holdout validation runs.
+- `--calibrate` still means `basic_probability_scores_only`, not true validation-only calibration.
+
 ## Remaining Production Blockers
 - Untrack `ufc_predictor/data/processed/fighters.db`.
 - Keep raw Kaggle/import datasets out of Git.
 - Keep `normalized_fights_combined.csv` and `backtest_predictions.json` out of Git.
 - Resolve winner-model source-holdout instability before production-ready claims.
+- Run source-holdout validation for all non-winner production candidates before packaging artifacts.
 - Improve weak method/finish-type and round-1 finish models before public confidence claims.
 - Add trusted pre-fight odds timestamps before odds calibration or betting-edge modeling.

@@ -9,13 +9,13 @@ The winner model is no longer blocked by winner-oriented rows. Historical fights
 - `finish_model`: compatibility output backed by `fight_duration_model`.
 - `goes_distance_model`: compatibility output where probability is derived as `1 - finish_probability`.
 - `over_2_5_model` and `ends_before_round_3_model`: useful binary round targets that beat baseline.
-- `over_1_5_model`: beats baseline, but weaker and should remain experimental.
-- `finish_in_round_1_model`: weak or failed baseline.
-- `finish_type_model`: weak or failed baseline when trained only on finished fights.
+- `over_1_5_model`: currently a production candidate, but still blocked from production-ready status until source-holdout runs.
+- `finish_in_round_1_model`: currently a production candidate on the latest report, but should stay cautious because the metric lift is modest and source-holdout has not run.
+- `finish_type_model`: experimental when trained only on finished fights; it improved versus baseline but balanced method separation remains modest.
 - `method_umbrella_model`: improves accuracy versus baseline, but balanced method metrics remain modest because finish-type separation is weak.
 - `round_phase_model`: legacy compatibility summary backed by binary round submodels, not a preferred flat multiclass model.
 - `strike_volume_model`: improved but still experimental.
-- `takedown_control_model`: barely beats baseline and should remain experimental.
+- `takedown_control_model`: currently a production candidate, but should stay cautious because it previously hovered near baseline and still lacks source-holdout.
 - `odds_calibration_model`: blocked until pre-fight odds timestamps are trusted.
 
 ## Safety Rules
@@ -29,7 +29,7 @@ The winner model is no longer blocked by winner-oriented rows. Historical fights
 1. Investigate source-transfer weakness, especially the `ufc_fight_forecast` source holdout result.
 2. Save versioned artifacts only after the red-team audit remains stable across source holdouts and runtime parity.
 3. Add artifact-level metadata for selected algorithm, feature schema, source datasets, and high-confidence thresholds.
-4. Improve weak hierarchy members, especially `finish_type_model` and `finish_in_round_1_model`, before public confidence claims.
+4. Improve weak or fragile hierarchy members, especially `finish_type_model` and `finish_in_round_1_model`, before public confidence claims.
 5. Add trusted pre-fight odds snapshots before training odds calibration.
 6. Keep production status conservative until backtest, calibration, and live-runtime feature generation agree.
 
@@ -73,3 +73,6 @@ Prediction output should be gated by both model status and matchup data quality:
 - Weak, blocked, or not-trained models must stay hidden or context-only.
 
 See `docs/prediction_output_policy.md` for the detailed public-output policy and `docs/model_artifact_packaging_plan.md` for packaging rules.
+
+## Metric Jump Audit
+The latest metric-jump audit compares current results against commit `a955ca9`. It found that fight rows, date range, and held-out row counts stayed stable, while feature count increased from 136 to 157. This makes the jumps more likely to come from feature/schema and interaction changes than from split churn, but the audit still marks improvements as `needs_review` until source-holdout validation runs for all production candidates.

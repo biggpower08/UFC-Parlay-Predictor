@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-09T04:03:53.727017+00:00",
+  "generated_at": "2026-06-09T22:12:56.519345+00:00",
   "summary": {
     "fights_simulated": 5537,
     "date_range": {
@@ -122,25 +122,25 @@
     "leakage_scan_blocked_columns": [
       "a_prior_finishes",
       "b_prior_finishes",
-      "finish_time",
-      "fighter_a_takedowns",
-      "fighter_a_sig_strikes",
-      "combined_sig_strikes",
-      "goes_distance_binary",
-      "takedown_control_bucket",
-      "result",
-      "finish_type_class",
-      "finish_in_round_1_binary",
-      "method",
-      "winner",
       "round_phase_class",
-      "method_class",
-      "loser",
+      "goes_distance_binary",
       "finish_round",
-      "fighter_b_sig_strikes",
-      "fighter_b_takedowns",
+      "finish_time",
       "method_group",
-      "finish_binary"
+      "loser",
+      "finish_type_class",
+      "winner",
+      "finish_in_round_1_binary",
+      "fighter_a_takedowns",
+      "fighter_b_takedowns",
+      "combined_sig_strikes",
+      "fighter_a_sig_strikes",
+      "result",
+      "takedown_control_bucket",
+      "finish_binary",
+      "method",
+      "method_class",
+      "fighter_b_sig_strikes"
     ]
   },
   "models": {

@@ -110,6 +110,9 @@ Current interaction audit results:
 - High-confidence metrics report coverage and calibration gap.
 - Models that only perform well on narrow high-confidence slices should be treated as selective, not globally reliable.
 
+## Metric Jump Review
+The metric-jump audit compares the current report against commit `a955ca9`. It found stable fight rows, stable date range, and stable held-out row counts, while feature count increased from 136 to 157. That points toward the style/weakness feature expansion and validation-selected interactions as the likely cause of metric movement, not obvious row filtering or split churn. The audit still marks the improvements as needing review because source-holdout has not run for most non-winner candidates.
+
 ## Remaining Risks
 - Source duplicate quality still needs periodic auditing.
 - Odds rows are not production-training-ready without trusted pre-fight timestamps.
