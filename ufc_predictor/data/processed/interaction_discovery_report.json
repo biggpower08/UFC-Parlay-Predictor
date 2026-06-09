@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-09T03:01:19.645503+00:00",
+  "generated_at": "2026-06-09T03:55:18.081361+00:00",
   "plain_english_summary": "Candidate interactions are generated from safe pre-fight feature groups, selected on validation only, and then evaluated on the final chronological holdout.",
   "selection_policy": {
     "final_test_used_for_selection": false,
@@ -44,36 +44,19 @@
           "size_features_used",
           "unknown_size_context"
         ],
-        "data_quality": [
-          "cross_division_warning",
-          "fighter_1_elo_available",
-          "fighter_2_elo_available",
-          "low_sample_warning",
-          "missing_profile_warning",
-          "missing_stats_warning"
-        ],
-        "grappling": [
-          "control_fighter_score_diff",
-          "control_vulnerability_proxy_diff",
-          "fighter_1_control_fighter_score",
-          "fighter_1_control_vulnerability_proxy",
-          "fighter_1_grappler_score",
-          "fighter_1_grappling_exposure_weakness",
-          "fighter_1_submission_threat_score",
-          "fighter_1_takedown_defense_weakness_proxy",
-          "fighter_1_wrestler_score",
-          "fighter_2_control_fighter_score",
-          "fighter_2_control_vulnerability_proxy",
-          "fighter_2_grappler_score",
-          "fighter_2_grappling_exposure_weakness",
-          "fighter_2_submission_threat_score",
-          "fighter_2_takedown_defense_weakness_proxy",
-          "fighter_2_wrestler_score",
-          "grappler_score_diff",
-          "grappling_exposure_weakness_diff",
-          "submission_threat_score_diff",
-          "takedown_defense_weakness_proxy_diff",
-          "wrestler_score_diff"
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
         ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
@@ -202,19 +185,36 @@
           "submission_threat_score_diff",
           "volatility_score_diff"
         ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
+        "data_quality": [
+          "cross_division_warning",
+          "fighter_1_elo_available",
+          "fighter_2_elo_available",
+          "low_sample_warning",
+          "missing_profile_warning",
+          "missing_stats_warning"
+        ],
+        "grappling": [
+          "control_fighter_score_diff",
+          "control_vulnerability_proxy_diff",
+          "fighter_1_control_fighter_score",
+          "fighter_1_control_vulnerability_proxy",
+          "fighter_1_grappler_score",
+          "fighter_1_grappling_exposure_weakness",
+          "fighter_1_submission_threat_score",
+          "fighter_1_takedown_defense_weakness_proxy",
+          "fighter_1_wrestler_score",
+          "fighter_2_control_fighter_score",
+          "fighter_2_control_vulnerability_proxy",
+          "fighter_2_grappler_score",
+          "fighter_2_grappling_exposure_weakness",
+          "fighter_2_submission_threat_score",
+          "fighter_2_takedown_defense_weakness_proxy",
+          "fighter_2_wrestler_score",
+          "grappler_score_diff",
+          "grappling_exposure_weakness_diff",
+          "submission_threat_score_diff",
+          "takedown_defense_weakness_proxy_diff",
+          "wrestler_score_diff"
         ]
       },
       "rejection_counts": {
@@ -690,6 +690,32 @@
       "selected_count": 10,
       "selection_status": "selected",
       "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -816,32 +842,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
-        ],
-        "physical": [
-          "cross_division",
-          "cross_division_warning",
-          "estimated_weight_gap_lbs",
-          "fighter_1_stance_known",
-          "fighter_2_stance_known",
-          "height_gap",
-          "reach_gap",
-          "same_division",
-          "size_features_used",
-          "unknown_size_context"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -1587,6 +1587,20 @@
       "selected_count": 5,
       "selection_status": "selected",
       "feature_groups": {
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -1713,20 +1727,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -2372,6 +2372,20 @@
       "selected_count": 0,
       "selection_status": "base_features_kept",
       "feature_groups": {
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -2498,20 +2512,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -3010,6 +3010,20 @@
       "selected_count": 5,
       "selection_status": "selected",
       "feature_groups": {
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -3136,20 +3150,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -3795,6 +3795,20 @@
       "selected_count": 0,
       "selection_status": "base_features_kept",
       "feature_groups": {
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -3921,20 +3935,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -4433,6 +4433,18 @@
       "selected_count": 5,
       "selection_status": "selected",
       "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -4472,6 +4484,20 @@
           "strike_absorption_weakness_diff",
           "submission_defense_weakness_proxy_diff",
           "takedown_defense_weakness_proxy_diff"
+        ],
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
         ],
         "finishing": [
           "a_prior_decisions",
@@ -4521,32 +4547,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
-        ],
-        "physical": [
-          "cross_division",
-          "cross_division_warning",
-          "estimated_weight_gap_lbs",
-          "fighter_1_stance_known",
-          "fighter_2_stance_known",
-          "height_gap",
-          "reach_gap",
-          "same_division",
-          "size_features_used",
-          "unknown_size_context"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -5252,6 +5252,32 @@
       "selected_count": 20,
       "selection_status": "selected",
       "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -5329,32 +5355,6 @@
           "recent_3_win_rate_diff",
           "recent_5_win_rate_diff",
           "win_rate_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
-        ],
-        "physical": [
-          "cross_division",
-          "cross_division_warning",
-          "estimated_weight_gap_lbs",
-          "fighter_1_stance_known",
-          "fighter_2_stance_known",
-          "height_gap",
-          "reach_gap",
-          "same_division",
-          "size_features_used",
-          "unknown_size_context"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -6328,6 +6328,18 @@
       "selected_count": 0,
       "selection_status": "base_features_kept",
       "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -6405,18 +6417,6 @@
           "recent_3_win_rate_diff",
           "recent_5_win_rate_diff",
           "win_rate_diff"
-        ],
-        "physical": [
-          "cross_division",
-          "cross_division_warning",
-          "estimated_weight_gap_lbs",
-          "fighter_1_stance_known",
-          "fighter_2_stance_known",
-          "height_gap",
-          "reach_gap",
-          "same_division",
-          "size_features_used",
-          "unknown_size_context"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -6915,6 +6915,32 @@
       "selected_count": 10,
       "selection_status": "selected",
       "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -7041,32 +7067,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
-        ],
-        "physical": [
-          "cross_division",
-          "cross_division_warning",
-          "estimated_weight_gap_lbs",
-          "fighter_1_stance_known",
-          "fighter_2_stance_known",
-          "height_gap",
-          "reach_gap",
-          "same_division",
-          "size_features_used",
-          "unknown_size_context"
         ],
         "grappling": [
           "control_fighter_score_diff",
@@ -7812,6 +7812,32 @@
       "selected_count": 10,
       "selection_status": "selected",
       "feature_groups": {
+        "physical": [
+          "cross_division",
+          "cross_division_warning",
+          "estimated_weight_gap_lbs",
+          "fighter_1_stance_known",
+          "fighter_2_stance_known",
+          "height_gap",
+          "reach_gap",
+          "same_division",
+          "size_features_used",
+          "unknown_size_context"
+        ],
+        "striking": [
+          "fighter_1_high_pace_score",
+          "fighter_1_high_volume_striker_score",
+          "fighter_1_pace_breakdown_risk",
+          "fighter_1_striker_score",
+          "fighter_2_high_pace_score",
+          "fighter_2_high_volume_striker_score",
+          "fighter_2_pace_breakdown_risk",
+          "fighter_2_striker_score",
+          "high_pace_score_diff",
+          "high_volume_striker_score_diff",
+          "pace_breakdown_risk_diff",
+          "striker_score_diff"
+        ],
         "opponent_weakness": [
           "cardio_late_fight_risk_proxy_diff",
           "control_vulnerability_proxy_diff",
@@ -7938,32 +7964,6 @@
           "submission_rate_diff",
           "submission_threat_score_diff",
           "volatility_score_diff"
-        ],
-        "striking": [
-          "fighter_1_high_pace_score",
-          "fighter_1_high_volume_striker_score",
-          "fighter_1_pace_breakdown_risk",
-          "fighter_1_striker_score",
-          "fighter_2_high_pace_score",
-          "fighter_2_high_volume_striker_score",
-          "fighter_2_pace_breakdown_risk",
-          "fighter_2_striker_score",
-          "high_pace_score_diff",
-          "high_volume_striker_score_diff",
-          "pace_breakdown_risk_diff",
-          "striker_score_diff"
-        ],
-        "physical": [
-          "cross_division",
-          "cross_division_warning",
-          "estimated_weight_gap_lbs",
-          "fighter_1_stance_known",
-          "fighter_2_stance_known",
-          "height_gap",
-          "reach_gap",
-          "same_division",
-          "size_features_used",
-          "unknown_size_context"
         ],
         "grappling": [
           "control_fighter_score_diff",

@@ -98,9 +98,10 @@ This avoids treating all round outcomes as one multiclass problem before the dat
 Interaction discovery now groups safe pre-fight features by meaning and generates candidate products, ratios, context interactions, and nonlinear transforms. Candidate interactions are filtered for forbidden inputs, low coverage, low variance, and candidate caps. Selection uses training/validation only; final-test rows are not used to choose interactions.
 
 Current interaction audit results:
-- Winner model selected a small interaction set and improved validation balance slightly, but remains `high_confidence_only` because source-holdout and leakage-review gates still fail.
-- Fight duration, goes-distance, over 1.5, over 2.5, ends-before-round-3, and takedown/control kept base features because generated interactions did not clear validation/calibration selection gates.
-- Finish-in-round-1, finish-type, and strike-volume selected interactions on validation, but final-test status remains weak or experimental where baseline/calibration gates fail.
+- Winner model tested the expanded MMA interaction families but kept base features in the latest report; it remains `high_confidence_only` because source-holdout and leakage-review gates still fail.
+- Fight duration, over 1.5, ends-before-round-3, finish-type, and strike-volume selected limited interaction sets on validation.
+- Over 2.5, finish-in-round-1, and takedown/control kept base features in the latest report where interactions did not clear validation/calibration selection gates.
+- Method and round compatibility outputs inherit their underlying family status and should not be treated as independent interaction wins.
 
 ## Evaluation Notes
 - Final-test reports are fight-level after source-priority deduping.

@@ -3,6 +3,7 @@ import pandas as pd
 from scripts.backtest_historical_fights import (
     FORBIDDEN_BACKTEST_INPUTS,
     backtest_segments,
+    examples,
     round_family_backtest_model,
     run_backtest,
 )
@@ -158,14 +159,44 @@ def test_round_family_carries_selected_interactions_for_runtime_columns():
 def test_backtest_segment_keys_normalize_weight_class_case():
     rows = pd.DataFrame(
         {
-            "weight_class": ["Bantamweight"] * 30 + ["bantamweight"] * 30,
-            "minimum_history_count": [5] * 60,
-            "finish_binary": ["1"] * 60,
-            "_pred": ["1"] * 60,
+            "weight_class": ["Bantamweight"] * 30 + ["bantamweight"] * 30 + ["Bantamweight Bout"] * 30,
+            "minimum_history_count": [5] * 90,
+            "finish_binary": ["1"] * 90,
+            "_pred": ["1"] * 90,
         }
     )
 
     segments = backtest_segments(rows, "finish_binary")
 
     assert list(key for key in segments if key.startswith("weight_class:")) == ["weight_class:bantamweight"]
-    assert segments["weight_class:bantamweight"]["rows"] == 60
+    assert segments["weight_class:bantamweight"]["rows"] == 90
+
+
+def test_backtest_examples_skip_compatibility_aliases():
+    prediction = {
+        "fight_id": "fight-1",
+        "event_date": "2025-01-01",
+        "fighter_1": "Alpha",
+        "fighter_2": "Beta",
+        "models_run": {
+            "fight_duration_model": {"available": True, "predicted_class": "1", "probabilities": {"1": 0.8}},
+            "finish_model": {"available": True, "predicted_class": "1", "probabilities": {"1": 0.8}},
+            "goes_distance_model": {"available": True, "predicted_class": "0", "probabilities": {"0": 0.8}},
+            "method_model": {"available": True, "predicted_class": "Decision", "probabilities": {"Decision": 0.8}},
+        },
+        "actual_result": {},
+        "scoring": {
+            "fight_duration_model_correct": True,
+            "finish_model_correct": True,
+            "goes_distance_correct": True,
+            "method_model_correct": True,
+        },
+    }
+
+    result = examples([prediction])
+    models = {row["model"] for row in result["best_predictions"]}
+
+    assert "fight_duration_model" in models
+    assert "finish_model" not in models
+    assert "goes_distance_model" not in models
+    assert "method_model" not in models

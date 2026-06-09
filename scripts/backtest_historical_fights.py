@@ -529,8 +529,11 @@ def backtest_segments(rows: pd.DataFrame, target: str) -> dict[str, Any]:
 
 def normalize_segment_key(value) -> str:
     text = str(value or "unknown").strip().lower()
+    for suffix in (" bout", "_bout", "-bout"):
+        if text.endswith(suffix):
+            text = text[: -len(suffix)]
     text = " ".join(text.split())
-    return text.replace(" ", "_")
+    return text.replace(" ", "_").replace("-", "_")
 
 
 def segment_result(group: pd.DataFrame, target: str) -> dict[str, Any]:
@@ -549,9 +552,12 @@ def rank_models(results: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def examples(predictions: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    duplicate_example_aliases = {"finish_model", "goes_distance_model", "method_model", "round_model"}
     scored = []
     for record in predictions:
         for model_name, prediction in record["models_run"].items():
+            if model_name in duplicate_example_aliases:
+                continue
             if not prediction.get("available") or "predicted_class" not in prediction:
                 continue
             confidence = max(prediction.get("probabilities", {}).values() or [0])

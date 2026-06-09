@@ -962,8 +962,11 @@ def segment_metrics(rows: pd.DataFrame, target: str):
 
 def normalize_segment_key(value) -> str:
     text = str(value or "unknown").strip().lower()
+    for suffix in (" bout", "_bout", "-bout"):
+        if text.endswith(suffix):
+            text = text[: -len(suffix)]
     text = " ".join(text.split())
-    return text.replace(" ", "_")
+    return text.replace(" ", "_").replace("-", "_")
 
 
 def segment_accuracy(group, target):
