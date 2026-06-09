@@ -167,6 +167,8 @@ def main() -> int:
         "calibration": {"requested": args.calibrate, "status": "basic_probability_scores_only"},
     }
     write_json(Path(args.output_json), payload)
+    write_json(settings.DATA_PROCESSED_DIR / "feature_availability_report.json", feature_availability_payload(payload))
+    write_json(settings.DATA_PROCESSED_DIR / "training_dataset_summary.json", training_dataset_summary_payload(payload))
     interaction_payload = interaction_discovery_payload(payload)
     write_json(Path(args.interaction_output_json), interaction_payload)
     Path(args.output_md).parent.mkdir(parents=True, exist_ok=True)
@@ -945,7 +947,7 @@ def binary_auc(y_true, probs, classes):
 def segment_metrics(rows: pd.DataFrame, target: str):
     segments = {}
     if "weight_class" in rows.columns:
-        for weight_class, group in rows.groupby("weight_class"):
+        for weight_class, group in rows.groupby(rows["weight_class"].map(normalize_segment_key)):
             if len(group) >= 50:
                 segments[f"weight_class:{weight_class}"] = segment_accuracy(group, target)
     if "minimum_history_count" in rows.columns:
@@ -956,6 +958,12 @@ def segment_metrics(rows: pd.DataFrame, target: str):
         if len(low) >= 50:
             segments["low_fighter_history"] = segment_accuracy(low, target)
     return segments
+
+
+def normalize_segment_key(value) -> str:
+    text = str(value or "unknown").strip().lower()
+    text = " ".join(text.split())
+    return text.replace(" ", "_")
 
 
 def segment_accuracy(group, target):
@@ -1115,6 +1123,8 @@ def update_registry_with_evaluation(models, split_report: dict | None = None):
                 "recommended_use": gates["recommended_use"],
                 "public_warning_text": gates["public_warning_text"],
                 "calibration_status": "basic_probability_scores_only",
+                "data_quality_requirements": data_quality_requirements_for_model(name, gates["production_status"]),
+                "selective_prediction_policy": selective_policy_for_model(name, gates["production_status"]),
                 "segment_metrics_available": bool(result.get("segment_metrics")),
                 "evaluated_at": now,
             }
@@ -1135,6 +1145,8 @@ def backfill_registry_gate_fields(registry: dict, models: dict, split_report: di
         "passed_gates",
         "recommended_use",
         "public_warning_text",
+        "data_quality_requirements",
+        "selective_prediction_policy",
     }
     for name, entry in registry.items():
         if required_fields.issubset(entry):
@@ -1160,6 +1172,10 @@ def backfill_registry_gate_fields(registry: dict, models: dict, split_report: di
                 "failed_gates": gates["failed_gates"],
                 "recommended_use": gates["recommended_use"],
                 "public_warning_text": gates["public_warning_text"],
+                "data_quality_requirements": entry.get("data_quality_requirements")
+                or data_quality_requirements_for_model(name, gates["production_status"]),
+                "selective_prediction_policy": entry.get("selective_prediction_policy")
+                or selective_policy_for_model(name, gates["production_status"]),
                 "evaluated_at": entry.get("evaluated_at", evaluated_at),
             }
         )
@@ -1296,6 +1312,74 @@ def production_status_for_result(result: dict) -> tuple[str, str]:
     if test_rows >= 1000 and balanced >= 0.7:
         return "high_confidence_only", "Beats baseline with useful held-out performance; use selectively until artifact/runtime validation is complete."
     return "experimental", "Beats baseline but balanced accuracy or sample support is still limited."
+
+
+def data_quality_requirements_for_model(model_name: str, production_status: str) -> dict:
+    minimum = "medium"
+    if production_status in {"production_candidate", "production_ready", "high_confidence_only"}:
+        minimum = "strong_or_medium"
+    if production_status in {"experimental", "weak_or_failed_baseline", "blocked"}:
+        minimum = "context_only"
+    return {
+        "minimum_data_quality_for_full_probability": minimum,
+        "hide_when_data_quality": ["dangerous"],
+        "warn_when_data_quality": ["limited"],
+        "cold_start_handling": "lean_or_hide_probability_when_minimum_history_is_under_3",
+    }
+
+
+def selective_policy_for_model(model_name: str, production_status: str) -> dict:
+    if model_name == "winner_model":
+        return {
+            "full_probability": "show only when high-confidence threshold and data-quality gates pass",
+            "lean": "show when model is available but confidence is below high-confidence threshold",
+            "hide": "hide when data quality is dangerous or model status is blocked",
+        }
+    if production_status in {"experimental", "weak_or_failed_baseline"}:
+        return {
+            "full_probability": "do_not_show_as_reliable",
+            "lean": "scenario_context_only",
+            "hide": "hide if data quality is limited or dangerous",
+        }
+    return {
+        "full_probability": "show when model gates and data-quality gates pass",
+        "lean": "show when confidence or data quality is moderate",
+        "hide": "hide when data quality is dangerous",
+    }
+
+
+def feature_availability_payload(payload: dict) -> dict:
+    models = {}
+    for name, model in payload.get("models", {}).items():
+        coverage = model.get("feature_coverage") or {}
+        missing = [feature for feature, value in coverage.items() if value == 0]
+        models[name] = {
+            "feature_count": model.get("feature_count", 0),
+            "runtime_compatible": bool(model.get("feature_names")),
+            "missing_or_zero_coverage_features": missing[:50],
+            "style_features_present": [feature for feature in model.get("feature_names", []) if "score" in feature or "weakness" in feature or "vulnerability" in feature],
+        }
+    return {
+        "generated_at": payload.get("generated_at"),
+        "plain_english_summary": "Feature availability is reported from evaluated model feature sets; raw imports remain local-only.",
+        "models": models,
+    }
+
+
+def training_dataset_summary_payload(payload: dict) -> dict:
+    audit = payload.get("audit", {})
+    return {
+        "generated_at": payload.get("generated_at"),
+        "input_data": payload.get("input_data"),
+        "fight_rows": audit.get("fight_rows"),
+        "fighter_count": audit.get("fighter_count"),
+        "date_range": audit.get("date_range"),
+        "label_availability": audit.get("label_availability"),
+        "class_distributions": audit.get("class_distributions"),
+        "source_contribution": payload.get("source_contribution"),
+        "split": payload.get("split"),
+        "warnings": audit.get("warnings", []),
+    }
 
 
 def write_json(path: Path, payload: dict):

@@ -9,10 +9,10 @@ FEATURE_GROUP_KEYWORDS: dict[str, tuple[str, ...]] = {
     "physical": ("age", "height", "reach", "stance", "weight_gap", "size", "same_division", "cross_division"),
     "experience": ("prior_fights", "history_count", "prior_wins", "win_rate", "days_since", "recent", "fights_last"),
     "striking": ("sig_strike", "strikes", "knockdown", "striking", "striker_score", "high_volume_striker", "pace"),
-    "grappling": ("takedown", "wrestler", "control_fighter", "submission_attempt", "submission_threat", "grappler", "grappling"),
-    "finishing": ("finish", "ko_tko", "submission", "decision", "durability", "power_finisher", "early_finish"),
+    "grappling": ("takedown", "wrestler", "control_fighter", "control_vulnerability", "submission_attempt", "submission_threat", "grappler", "grappling"),
+    "finishing": ("finish", "ko_tko", "submission", "decision", "durability", "power_finisher", "early_finish", "volatility"),
     "division_context": ("division", "weight_class", "scheduled_rounds", "catchweight", "size_context"),
-    "opponent_weakness": ("absorbed", "absorption_weakness", "defense_weakness", "vulnerability", "finish_loss", "durability_weakness", "low_activity_weakness", "poor_recent_form_weakness"),
+    "opponent_weakness": ("absorbed", "absorption_weakness", "defense_weakness", "defensive_volume_weakness", "vulnerability", "exposure_weakness", "finish_loss", "durability_weakness", "low_activity_weakness", "poor_recent_form_weakness", "breakdown_risk", "cardio_late"),
     "model_probability": ("duration_probability", "expected_fight_length", "finish_probability"),
     "data_quality": ("warning", "quality", "available", "missing", "low_sample"),
 }

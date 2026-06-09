@@ -16,6 +16,8 @@ import pandas as pd
 
 from ufc_predictor.features.feature_schema import get_feature_schema
 from ufc_predictor.features.matchup_features import build_features_from_snapshots
+from ufc_predictor.features.opponent_weakness_features import compute_opponent_weakness_scores
+from ufc_predictor.features.style_features import compute_style_scores
 from ufc_predictor.utils.helpers import normalize_name
 
 
@@ -409,6 +411,7 @@ def _empty_history() -> dict[str, Any]:
         "ko_tko_wins": 0,
         "submission_wins": 0,
         "finish_losses": 0,
+        "early_finish_losses": 0,
         "decision_losses": 0,
         "early_finishes": 0,
         "sig_landed_for": 0.0,
@@ -518,6 +521,8 @@ def _update_history(
             history["decision_losses"] += 1
         elif method:
             history["finish_losses"] += 1
+            if finish_round == 1:
+                history["early_finish_losses"] += 1
         history["recent_results"].append(0)
     else:
         history["recent_results"].append(None)
@@ -549,51 +554,7 @@ def _update_style_stats(history: dict[str, Any], fight: pd.Series, orientation: 
 
 
 def _style_weakness_scores(history: dict[str, Any]) -> dict[str, float | None]:
-    fights = int(history.get("fights", 0) or 0)
-    wins = int(history.get("wins", 0) or 0)
-    losses = int(history.get("losses", 0) or 0)
-    if fights <= 0:
-        return {}
-    avg_sig_for = float(history.get("sig_landed_for", 0.0) or 0.0) / fights
-    avg_sig_against = float(history.get("sig_landed_against", 0.0) or 0.0) / fights
-    avg_attempts = float(history.get("sig_attempted_for", 0.0) or 0.0) / fights
-    avg_td_for = float(history.get("takedowns_for", 0.0) or 0.0) / fights
-    avg_td_against = float(history.get("takedowns_against", 0.0) or 0.0) / fights
-    avg_td_attempts_against = float(history.get("takedowns_attempted_against", 0.0) or 0.0) / fights
-    avg_control_for = float(history.get("control_for_seconds", 0.0) or 0.0) / fights
-    avg_control_against = float(history.get("control_against_seconds", 0.0) or 0.0) / fights
-    finish_rate = _rate(int(history.get("finishes", 0) or 0), wins) or 0.0
-    ko_rate = _rate(int(history.get("ko_tko_wins", 0) or 0), wins) or 0.0
-    sub_rate = _rate(int(history.get("submission_wins", 0) or 0), wins) or 0.0
-    finish_loss_rate = _rate(int(history.get("finish_losses", 0) or 0), losses) or 0.0
-    recent_win_rate = _recent_rate(list(history.get("recent_results", [])), 5)
-    recent_loss_weakness = 1.0 - recent_win_rate if recent_win_rate is not None else None
-    return {
-        "avg_sig_strikes_landed_before": round(avg_sig_for, 4),
-        "avg_sig_strikes_absorbed_before": round(avg_sig_against, 4),
-        "avg_sig_strike_attempts_before": round(avg_attempts, 4),
-        "avg_takedowns_landed_before": round(avg_td_for, 4),
-        "avg_takedowns_attempted_before": round(float(history.get("takedowns_attempted_for", 0.0) or 0.0) / fights, 4),
-        "avg_control_time_before": round(avg_control_for, 4),
-        "striker_score": _clip01(avg_sig_for / 50.0),
-        "high_volume_striker_score": _clip01(avg_attempts / 90.0),
-        "power_finisher_score": _clip01((finish_rate + ko_rate) / 2.0),
-        "wrestler_score": _clip01(avg_td_for / 3.0),
-        "grappler_score": _clip01((avg_td_for / 3.0 + avg_control_for / 300.0 + sub_rate) / 3.0),
-        "submission_threat_score": _clip01(sub_rate),
-        "control_fighter_score": _clip01(avg_control_for / 300.0),
-        "high_pace_score": _clip01((avg_attempts / 90.0 + avg_td_for / 3.0) / 2.0),
-        "durability_score": _clip01(1.0 - finish_loss_rate),
-        "decision_tendency_score": _clip01(_rate(int(history.get("decisions", 0) or 0), wins) or 0.0),
-        "early_finish_threat_score": _clip01(_rate(int(history.get("early_finishes", 0) or 0), wins) or 0.0),
-        "strike_absorption_weakness": _clip01(avg_sig_against / 50.0),
-        "takedown_defense_weakness_proxy": _clip01(avg_td_against / max(1.0, avg_td_attempts_against)),
-        "submission_defense_weakness_proxy": _clip01(finish_loss_rate),
-        "control_vulnerability_proxy": _clip01(avg_control_against / 300.0),
-        "durability_weakness": _clip01(finish_loss_rate),
-        "low_activity_weakness": _clip01(1.0 - min(1.0, fights / 8.0)),
-        "poor_recent_form_weakness": _clip01(recent_loss_weakness) if recent_loss_weakness is not None else None,
-    }
+    return {**compute_style_scores(history), **compute_opponent_weakness_scores(history)}
 
 
 def _add_number(history: dict[str, Any], key: str, value) -> None:

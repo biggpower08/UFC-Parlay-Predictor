@@ -251,6 +251,9 @@ def round_family_backtest_model(models: dict[str, dict[str, Any]]) -> dict[str, 
         "feature_names": best.get("feature_names", FEATURE_NAMES),
         "algorithm": "binary_submodel_family",
         "model": best.get("model"),
+        "interaction_feature_count": int(best.get("interaction_feature_count") or 0),
+        "selected_interactions": best.get("selected_interactions", []),
+        "interaction_selection_status": best.get("interaction_selection_status", "not_run"),
         "train_rows": max(item.get("train_rows", 0) for item in available),
         "test_rows": max(item.get("test_rows", 0) for item in available),
         "component_models": members,
@@ -514,7 +517,7 @@ def score_models(predictions: list[dict[str, Any]], models: dict[str, dict[str, 
 def backtest_segments(rows: pd.DataFrame, target: str) -> dict[str, Any]:
     segments = {}
     if "weight_class" in rows.columns:
-        for weight_class, group in rows.groupby("weight_class"):
+        for weight_class, group in rows.groupby(rows["weight_class"].map(normalize_segment_key)):
             if len(group) >= 30:
                 segments[f"weight_class:{weight_class}"] = segment_result(group, target)
     if "minimum_history_count" in rows.columns:
@@ -522,6 +525,12 @@ def backtest_segments(rows: pd.DataFrame, target: str) -> dict[str, Any]:
             if len(group) >= 30:
                 segments[label] = segment_result(group, target)
     return segments
+
+
+def normalize_segment_key(value) -> str:
+    text = str(value or "unknown").strip().lower()
+    text = " ".join(text.split())
+    return text.replace(" ", "_")
 
 
 def segment_result(group: pd.DataFrame, target: str) -> dict[str, Any]:

@@ -150,13 +150,13 @@ def generate_mma_style_specs(safe_features: list[str]) -> list[InteractionSpec]:
     striking_strength = pick_features(safe_features, ("striker_score", "high_volume_striker_score", "reach_diff", "reach_gap"))
     striking_weakness = pick_features(safe_features, ("strike_absorption_weakness", "low_activity_weakness"))
     grappling_strength = pick_features(safe_features, ("wrestler_score", "control_fighter_score", "submission_threat_score", "grappler_score"))
-    grappling_weakness = pick_features(safe_features, ("takedown_defense_weakness_proxy", "control_vulnerability_proxy", "submission_defense_weakness_proxy"))
-    finishing_strength = pick_features(safe_features, ("power_finisher_score", "submission_threat_score", "early_finish_threat_score", "finish_rate_diff"))
-    durability_weakness = pick_features(safe_features, ("durability_weakness", "durability_score_diff", "finish_loss_rate"))
-    pace_features = pick_features(safe_features, ("high_pace_score", "high_pace_score_diff"))
-    age_activity = pick_features(safe_features, ("age", "days_since_last_fight", "recent_5_win_rate", "recent_3_win_rate", "poor_recent_form_weakness"))
+    grappling_weakness = pick_features(safe_features, ("takedown_defense_weakness_proxy", "control_vulnerability_proxy", "submission_defense_weakness_proxy", "grappling_exposure_weakness"))
+    finishing_strength = pick_features(safe_features, ("power_finisher_score", "submission_threat_score", "early_finish_threat_score", "finish_rate_diff", "volatility_score"))
+    durability_weakness = pick_features(safe_features, ("durability_weakness", "early_finish_vulnerability", "durability_score_diff", "finish_loss_rate"))
+    pace_features = pick_features(safe_features, ("high_pace_score", "high_pace_score_diff", "volatility_score"))
+    age_activity = pick_features(safe_features, ("age", "days_since_last_fight", "recent_5_win_rate", "recent_3_win_rate", "poor_recent_form_weakness", "low_activity_weakness", "cardio_late_fight_risk_proxy"))
     scheduled_rounds = pick_features(safe_features, ("scheduled_rounds",))
-    duration_features = pick_features(safe_features, ("high_pace_score", "durability_score", "early_finish_threat_score", "decision_tendency_score"))
+    duration_features = pick_features(safe_features, ("high_pace_score", "durability_score", "early_finish_threat_score", "decision_tendency_score", "cardio_late_fight_risk_proxy"))
     division_context = pick_features(safe_features, ("same_division", "cross_division", "catchweight", "weight_class_gap", "estimated_weight_gap_lbs"))
     style_features = pick_features(safe_features, ("power_finisher_score", "wrestler_score", "high_pace_score", "reach_diff", "reach_gap"))
 
@@ -289,9 +289,9 @@ def feature_group_pair_bucket(spec_obj: InteractionSpec) -> str | None:
 def missing_prerequisite_features_by_family(safe_features: list[str]) -> dict[str, list[str]]:
     requirements = {
         "striking x opponent weakness": (("striker_score", "high_volume_striker_score"), ("strike_absorption_weakness",)),
-        "grappling x opponent weakness": (("wrestler_score", "control_fighter_score", "submission_threat_score"), ("takedown_defense_weakness_proxy", "control_vulnerability_proxy")),
-        "finishing x durability": (("power_finisher_score", "early_finish_threat_score"), ("durability_weakness",)),
-        "pace x age/activity": (("high_pace_score",), ("age", "days_since_last_fight", "recent_5_win_rate", "poor_recent_form_weakness")),
+        "grappling x opponent weakness": (("wrestler_score", "control_fighter_score", "submission_threat_score"), ("takedown_defense_weakness_proxy", "control_vulnerability_proxy", "grappling_exposure_weakness")),
+        "finishing x durability": (("power_finisher_score", "early_finish_threat_score"), ("durability_weakness", "early_finish_vulnerability")),
+        "pace x age/activity": (("high_pace_score", "volatility_score"), ("age", "days_since_last_fight", "recent_5_win_rate", "poor_recent_form_weakness", "cardio_late_fight_risk_proxy")),
         "scheduled rounds x pace/duration": (("scheduled_rounds",), ("high_pace_score", "durability_score", "decision_tendency_score")),
         "fighter_strength_vs_opponent_weakness": (("striker_score", "wrestler_score", "power_finisher_score"), ("weakness", "vulnerability")),
     }

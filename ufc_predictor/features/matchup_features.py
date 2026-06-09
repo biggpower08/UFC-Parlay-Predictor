@@ -297,13 +297,20 @@ def _add_style_weakness_features(features: dict[str, Any], s1: dict[str, Any], s
         "durability_score",
         "decision_tendency_score",
         "early_finish_threat_score",
+        "low_volume_control_score",
+        "volatility_score",
         "strike_absorption_weakness",
+        "low_defensive_volume_weakness",
         "takedown_defense_weakness_proxy",
         "submission_defense_weakness_proxy",
+        "grappling_exposure_weakness",
         "control_vulnerability_proxy",
         "durability_weakness",
+        "early_finish_vulnerability",
         "low_activity_weakness",
         "poor_recent_form_weakness",
+        "pace_breakdown_risk",
+        "cardio_late_fight_risk_proxy",
     ]
     for key in keys:
         _set_if_declared(features, f"fighter_1_{key}", s1.get(key))

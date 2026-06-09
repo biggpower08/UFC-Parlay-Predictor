@@ -2,6 +2,8 @@ import pandas as pd
 
 from scripts.backtest_historical_fights import (
     FORBIDDEN_BACKTEST_INPUTS,
+    backtest_segments,
+    round_family_backtest_model,
     run_backtest,
 )
 
@@ -122,3 +124,48 @@ def test_backtest_skips_unavailable_models_honestly():
     assert payload["models"]["winner_model"]["status"] == "skipped"
     assert payload["models"]["odds_calibration_model"]["status"] == "skipped"
     assert payload["summary"]["models_skipped"]
+
+
+def test_round_family_carries_selected_interactions_for_runtime_columns():
+    interaction = {
+        "name": "int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness",
+        "kind": "strength_vs_weakness",
+        "input_features": ("fighter_1_striker_score", "fighter_2_strike_absorption_weakness"),
+        "groups": ("striking", "opponent_weakness"),
+        "expression": "strength_vs_weakness",
+    }
+    models = {
+        "over_2_5_model": {
+            "available": True,
+            "feature_names": ["fighter_1_striker_score", interaction["name"]],
+            "classes": ["0", "1"],
+            "model": object(),
+            "interaction_feature_count": 1,
+            "selected_interactions": [interaction],
+            "interaction_selection_status": "selected",
+            "train_rows": 100,
+            "test_rows": 25,
+        }
+    }
+
+    family = round_family_backtest_model(models)
+
+    assert family["selected_interactions"] == [interaction]
+    assert family["interaction_feature_count"] == 1
+    assert family["interaction_selection_status"] == "selected"
+
+
+def test_backtest_segment_keys_normalize_weight_class_case():
+    rows = pd.DataFrame(
+        {
+            "weight_class": ["Bantamweight"] * 30 + ["bantamweight"] * 30,
+            "minimum_history_count": [5] * 60,
+            "finish_binary": ["1"] * 60,
+            "_pred": ["1"] * 60,
+        }
+    )
+
+    segments = backtest_segments(rows, "finish_binary")
+
+    assert list(key for key in segments if key.startswith("weight_class:")) == ["weight_class:bantamweight"]
+    assert segments["weight_class:bantamweight"]["rows"] == 60

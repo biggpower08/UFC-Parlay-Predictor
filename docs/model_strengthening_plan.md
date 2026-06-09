@@ -58,3 +58,18 @@ The finish/goes-distance pair is now represented by one `fight_duration_model`, 
 
 ## Automatic Interaction Discovery
 The evaluator now discovers feature interactions automatically from semantic feature groups instead of relying on manually listed examples. Interactions are selected only on validation performance and are rejected when they have low coverage, low variance, leakage risk, poor calibration impact, or no validation lift. Current findings are conservative: winner selected a small interaction set, while duration and the stronger round binary models kept base features.
+
+## MMA-Specific Style and Weakness Expansion
+The next strengthening layer adds explicit MMA style and opponent-weakness scores derived from prior fight history only. These include striker, high-volume striker, power finisher, wrestler, grappler, submission threat, control fighter, high pace, durability, decision tendency, early finish threat, low-volume control, volatility, strike-absorption weakness, takedown-defense weakness, control vulnerability, grappling exposure, early-finish vulnerability, pace-breakdown risk, and late-fight/cardio risk proxies.
+
+The goal is not to force more features into production. The goal is to let the audit system test richer fight-style combinations and reject them automatically when they do not improve validation, calibration, runtime compatibility, or source-holdout behavior.
+
+## Data-Quality and Selective Output Policy
+Prediction output should be gated by both model status and matchup data quality:
+
+- Strong/medium data can show probabilities only when model gates pass.
+- Limited data should favor leans, warnings, and scenario context.
+- Dangerous data should hide probability-style claims.
+- Weak, blocked, or not-trained models must stay hidden or context-only.
+
+See `docs/prediction_output_policy.md` for the detailed public-output policy and `docs/model_artifact_packaging_plan.md` for packaging rules.

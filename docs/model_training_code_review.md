@@ -115,3 +115,17 @@ Current interaction audit results:
 - Method and round labels are now decomposed, but finish-type and round-1 finish remain weak until they beat baseline with acceptable balanced metrics.
 - Winner model source-transfer is not uniformly strong; the red-team audit found `ufc_fight_forecast` holdout weakness.
 - High-confidence winner performance should be used as selective evidence only until source-holdout stability is improved.
+
+## Feature Strategy Review
+The feature strategy now includes dedicated modules for prior-history style scores and opponent-weakness proxies. These modules are intentionally limited to rolling pre-fight history and are safe to use as candidate model features or interaction inputs. They do not read current-fight labels.
+
+The interaction audit should specifically report whether it tested:
+
+- striking x opponent weakness
+- grappling x opponent weakness
+- finishing x durability
+- pace x age/activity
+- scheduled rounds x pace/duration
+- fighter strength vs opponent weakness
+
+Any selected interactions must remain runtime-computable and must not be selected using final-test performance.
