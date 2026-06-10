@@ -5,17 +5,17 @@ The winner model is no longer blocked by winner-oriented rows. Historical fights
 
 ## Current Status
 - `winner_model`: unblocked for evaluation with safe deterministic orientation, but red-team audit status is `high_confidence_only`, not `production_ready`.
-- `fight_duration_model`: strong held-out performance; this is now the umbrella source for finish and goes-distance probabilities.
+- `fight_duration_model`: strong chronological held-out performance, but source-holdout transfer is unstable, so it is experimental until that improves.
 - `finish_model`: compatibility output backed by `fight_duration_model`.
 - `goes_distance_model`: compatibility output where probability is derived as `1 - finish_probability`.
-- `over_2_5_model` and `ends_before_round_3_model`: useful binary round targets that beat baseline.
-- `over_1_5_model`: currently a production candidate, but still blocked from production-ready status until source-holdout runs.
-- `finish_in_round_1_model`: currently a production candidate on the latest report, but should stay cautious because the metric lift is modest and source-holdout has not run.
+- `over_2_5_model` and `ends_before_round_3_model`: useful binary round targets that beat baseline, but source-holdout transfer is unstable.
+- `over_1_5_model`: beats baseline, but source-holdout transfer is unstable.
+- `finish_in_round_1_model`: beats baseline, but should stay cautious because metric lift is modest and source-holdout needs review.
 - `finish_type_model`: experimental when trained only on finished fights; it improved versus baseline but balanced method separation remains modest.
 - `method_umbrella_model`: improves accuracy versus baseline, but balanced method metrics remain modest because finish-type separation is weak.
 - `round_phase_model`: legacy compatibility summary backed by binary round submodels, not a preferred flat multiclass model.
 - `strike_volume_model`: improved but still experimental.
-- `takedown_control_model`: currently a production candidate, but should stay cautious because it previously hovered near baseline and still lacks source-holdout.
+- `takedown_control_model`: beats baseline, but should stay cautious because it previously hovered near baseline and source-holdout needs review.
 - `odds_calibration_model`: blocked until pre-fight odds timestamps are trusted.
 
 ## Safety Rules
@@ -26,7 +26,7 @@ The winner model is no longer blocked by winner-oriented rows. Historical fights
 - Do not label high-confidence slices as overall model accuracy.
 
 ## Next Steps
-1. Investigate source-transfer weakness, especially the `ufc_fight_forecast` source holdout result.
+1. Investigate source-transfer weakness, especially the `ufc_stats_complete` source-holdout drop across non-winner models and the winner-model transfer/audit weakness.
 2. Save versioned artifacts only after the red-team audit remains stable across source holdouts and runtime parity.
 3. Add artifact-level metadata for selected algorithm, feature schema, source datasets, and high-confidence thresholds.
 4. Improve weak or fragile hierarchy members, especially `finish_type_model` and `finish_in_round_1_model`, before public confidence claims.
@@ -74,5 +74,7 @@ Prediction output should be gated by both model status and matchup data quality:
 
 See `docs/prediction_output_policy.md` for the detailed public-output policy and `docs/model_artifact_packaging_plan.md` for packaging rules.
 
-## Metric Jump Audit
-The latest metric-jump audit compares current results against commit `a955ca9`. It found that fight rows, date range, and held-out row counts stayed stable, while feature count increased from 136 to 157. This makes the jumps more likely to come from feature/schema and interaction changes than from split churn, but the audit still marks improvements as `needs_review` until source-holdout validation runs for all production candidates.
+## Metric Jump And Source-Holdout Audit
+The latest metric-jump audit compares current results against commit `a955ca9`. It found that fight rows, date range, and held-out row counts stayed stable, while feature count increased from 136 to 157. This makes the jumps more likely to come from feature/schema and interaction changes than from split churn.
+
+The new source-holdout pass then tested non-winner transfer by training on train/validation rows with a source excluded and scoring that held-out source. The weakest transfer source was usually `ufc_stats_complete`, and the drops were large enough to downgrade the former non-winner production candidates back to experimental until transfer improves.

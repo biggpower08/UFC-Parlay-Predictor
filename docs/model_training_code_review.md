@@ -111,7 +111,10 @@ Current interaction audit results:
 - Models that only perform well on narrow high-confidence slices should be treated as selective, not globally reliable.
 
 ## Metric Jump Review
-The metric-jump audit compares the current report against commit `a955ca9`. It found stable fight rows, stable date range, and stable held-out row counts, while feature count increased from 136 to 157. That points toward the style/weakness feature expansion and validation-selected interactions as the likely cause of metric movement, not obvious row filtering or split churn. The audit still marks the improvements as needing review because source-holdout has not run for most non-winner candidates.
+The metric-jump audit compares the current report against commit `a955ca9`. It found stable fight rows, stable date range, and stable held-out row counts, while feature count increased from 136 to 157. That points toward the style/weakness feature expansion and validation-selected interactions as the likely cause of metric movement, not obvious row filtering or split churn. The audit still marks the improvements as needing review because the new source-holdout pass found unstable transfer for several candidates.
+
+## Source-Holdout Review
+Source-holdout validation now runs for non-winner classifiers by excluding one source from train/validation and scoring that source on final-test rows. The current pass found unstable transfer for the former production-candidate non-winner models, especially on `ufc_stats_complete`, so those models are downgraded to experimental until source transfer improves. The method umbrella now has a composite source-holdout check that retrains the duration and finish-type components without each source, then scores held-out method rows from that source.
 
 ## Remaining Risks
 - Source duplicate quality still needs periodic auditing.

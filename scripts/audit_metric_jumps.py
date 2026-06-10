@@ -94,10 +94,12 @@ def build_audit(current: dict, previous: dict, registry: dict, interactions: dic
             risk = "high"
             verdict = "needs_review"
             reasons.append("row_or_date_range_changed")
-        if "source_holdout_not_run" in failed_gates or "source_holdout_stable" in failed_gates:
+        if any(gate in failed_gates for gate in ["source_holdout_not_run", "source_holdout_stable", "source_holdout_unstable", "source_holdout_regression"]):
             risk = max_risk(risk, "medium")
             verdict = "needs_review"
             reasons.append("source_holdout_not_passing")
+        if "source_holdout_regression" in failed_gates:
+            risk = max_risk(risk, "high")
         if "calibration_acceptable" in failed_gates:
             risk = max_risk(risk, "medium")
             verdict = "needs_review"
@@ -127,6 +129,7 @@ def build_audit(current: dict, previous: dict, registry: dict, interactions: dic
                 "failed_gates": failed_gates,
                 "interaction_candidates": interaction.get("candidate_count", 0),
                 "interactions_selected": interaction.get("selected_count", 0),
+                "source_holdout": entry.get("source_holdout", {}),
                 "likely_reason": likely_reason(feature_count_delta, interaction, row_changed),
                 "risk_level": risk,
                 "verdict": verdict,
@@ -142,7 +145,7 @@ def build_audit(current: dict, previous: dict, registry: dict, interactions: dic
             "opponent_weakness_features": "prior_history_only_by_dataset_builder_order",
             "interaction_selection": "validation_only_final_test_not_used",
             "calibration": current.get("calibration", {}),
-            "risk": "needs_review_until_source_holdout_runs_for_all_candidates",
+            "risk": "needs_review_until_source_holdout_stabilizes_for_all_candidates",
         },
         "models": audits,
     }
@@ -206,17 +209,25 @@ def markdown(payload: dict) -> str:
             f"{item['interactions_selected']} / {item['interaction_candidates']} | {item['risk_level']} | "
             f"{item['verdict']} | {item['likely_reason']} |"
         )
+    lines.extend(["", "## Source-Holdout Readiness"])
+    lines.append("| Model | Source-Holdout Status | Worst Source | Worst Metric | Drop | Production Status |")
+    lines.append("|---|---|---|---:|---:|---|")
+    for item in payload["models"]:
+        holdout = item.get("source_holdout") or {}
+        lines.append(
+            f"| {item['model']} | {holdout.get('status', 'not_run')} | {holdout.get('worst_source', '')} | {holdout.get('worst_source_metric', '')} | {holdout.get('worst_metric_drop', '')} | {item['production_status']} |"
+        )
     lines.extend(
         [
             "",
-            "## Source-Holdout Readiness",
-            "Non-winner production candidates still carry `source_holdout_not_run`. That means they may remain candidates for internal validation, but they must not become `production_ready` until source-holdout validation is implemented and passes.",
+            "Most non-winner candidates now have source-holdout results. Several were downgraded because transfer to the weakest source was unstable.",
             "",
             "## Production Decision",
             "- Do not package artifacts from this audit alone.",
             "- Keep `winner_model` as `high_confidence_only`.",
             "- Keep odds calibration blocked.",
-            "- Treat `finish_in_round_1_model` and `takedown_control_model` cautiously until source-holdout confirms the metric gains.",
+            "- Keep downgraded non-winner models experimental until source-holdout stabilizes.",
+            "- Treat `finish_in_round_1_model` and `takedown_control_model` cautiously because their source-holdout status is still `needs_review` or worse.",
         ]
     )
     return "\n".join(lines) + "\n"

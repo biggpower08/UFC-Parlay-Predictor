@@ -40,7 +40,8 @@ def test_metric_jump_audit_doc_exists_after_report_generation():
     text = path.read_text(encoding="utf-8")
     assert "Metric Jump Audit" in text
     assert "basic_probability_scores_only" in text
-    assert "source_holdout_not_run" in text
+    assert "Source-Holdout Readiness" in text
+    assert "source-holdout" in text.lower()
 
 
 def test_current_report_can_compare_to_previous_git_report():

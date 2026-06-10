@@ -8,7 +8,7 @@ import pandas as pd
 import yaml
 from packaging.requirements import Requirement
 
-from scripts.evaluate_model_accuracy import feature_names_for_model, production_gate_result
+from scripts.evaluate_model_accuracy import feature_names_for_model, production_gate_result, source_holdout_classification_report
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -149,6 +149,26 @@ def test_source_holdout_not_run_blocks_production_ready_for_non_winner():
     assert "source_holdout_not_run" in gates["failed_gates"]
 
 
+def test_source_holdout_unstable_downgrades_candidate_status():
+    gates = production_gate_result(
+        "fight_duration_model",
+        {
+            "status": "evaluated",
+            "beats_baseline": True,
+            "feature_names": ["a_prior_fights"],
+            "metrics": {"balanced_accuracy": 0.9, "brier_score": 0.1},
+            "selective_prediction": {"best_accuracy": {"sample_count": 200, "coverage_percent": 10}},
+            "source_holdout": {"status": "unstable", "source_holdout_regression_detected": True},
+        },
+        {"no_cross_split_fight_leakage": True},
+        {},
+    )
+
+    assert gates["production_status"] == "experimental"
+    assert "source_holdout_unstable" in gates["failed_gates"]
+    assert "source_holdout_regression" in gates["failed_gates"]
+
+
 def test_calibration_gate_distinguishes_probability_scoring_from_true_calibration():
     gates = production_gate_result(
         "strike_volume_model",
@@ -165,3 +185,38 @@ def test_calibration_gate_distinguishes_probability_scoring_from_true_calibratio
 
     assert gates["production_status"] != "production_ready"
     assert "calibration_acceptable" in gates["failed_gates"]
+
+
+def test_source_holdout_report_counts_rows_and_small_sample_warning():
+    rows_train = pd.DataFrame(
+        {
+            "a_prior_fights": [1, 2, 3, 4, 5, 6],
+            "finish_binary": ["0", "1", "0", "1", "0", "1"],
+            "source_dataset": ["source_a", "source_a", "source_b", "source_b", "source_b", "source_b"],
+        }
+    )
+    rows_validation = rows_train.copy()
+    rows_test = pd.DataFrame(
+        {
+            "a_prior_fights": list(range(120)),
+            "finish_binary": ["0", "1"] * 60,
+            "source_dataset": ["source_a"] * 120,
+        }
+    )
+
+    report = source_holdout_classification_report(
+        model_name="fight_duration_model",
+        target="finish_binary",
+        rows_train=rows_train,
+        rows_validation=rows_validation,
+        rows_test=rows_test,
+        feature_names=["a_prior_fights"],
+        classes=["0", "1"],
+        algorithm="logistic_regression_balanced",
+        normal_metrics={"accuracy": 0.8, "balanced_accuracy": 0.8},
+    )
+
+    assert report["status"] in {"stable", "needs_review", "unstable"}
+    assert report["worst_source"] == "source_a"
+    assert report["worst_source_rows"] == 120
+    assert report["by_source"][0]["unstable_sample_warning"] is True

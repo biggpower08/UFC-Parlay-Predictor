@@ -262,6 +262,22 @@ def evaluate_classification_model(
         else None
     )
     annotate_interaction_final_results(selected_bundle["interaction_report"], metrics, base_final_metrics)
+    source_holdout = source_holdout_classification_report(
+        model_name=model_name,
+        target=target,
+        rows_train=rows_train,
+        rows_validation=rows_validation,
+        rows_test=rows_test,
+        feature_names=feature_names,
+        classes=classes,
+        algorithm=selected["algorithm"],
+        normal_metrics=metrics,
+    )
+    if source_holdout.get("source_holdout_regression_detected"):
+        selected_bundle["interaction_report"]["source_holdout_regression_detected"] = bool(selected_bundle["selected_interactions"])
+    if selected_bundle["interaction_report"].get("selected_interactions"):
+        for item in selected_bundle["interaction_report"]["selected_interactions"]:
+            item["source_holdout_impact"] = source_holdout.get("worst_metric_drop")
     main = metrics["accuracy"]
     baseline = majority["accuracy"]
     improvement = round(main - baseline, 4) if baseline is not None else None
@@ -290,8 +306,9 @@ def evaluate_classification_model(
             metrics if selected_bundle["selected_interactions"] else None,
             selected_bundle.get("base_validation_metrics"),
             selected_bundle.get("interaction_validation_metrics"),
-            None,
+            source_holdout,
         ),
+        "source_holdout": source_holdout,
         "source_contribution": source_contribution_report(pd.concat([rows_train, rows_test], ignore_index=True), rows_train, validation.dropna(subset=[target]).copy(), rows_test.iloc[0:0].copy(), rows_test),
         "feature_coverage": feature_coverage(pd.concat([rows_train, rows_test], ignore_index=True), feature_names + [target]),
         "final_test_metric_name": "accuracy",
@@ -366,6 +383,7 @@ def round_family_summary_model(models: dict[str, dict]) -> dict:
         "interaction_feature_count": 0,
         "selected_interactions": [],
         "interaction_discovery": {"selection_status": "not_run_composite_summary"},
+        "source_holdout": best.get("source_holdout", {"status": "not_run", "reason": "no round submodel source-holdout available"}),
         "limitations": ["Legacy round_phase_model is replaced by separate binary round-phase submodels."]
         + ([f"Weak members: {', '.join(weakest)}"] if weakest else []),
     }
@@ -420,6 +438,20 @@ def evaluate_method_umbrella_model(train: pd.DataFrame, validation: pd.DataFrame
     y_true = duration_test["method_class"].astype(str).tolist()
     majority = majority_baseline(y_true)
     metrics = classification_metrics(y_true, preds, combined_probs, method_classes)
+    source_holdout = source_holdout_method_umbrella_report(
+        duration_train=duration_train,
+        duration_validation=duration_validation,
+        duration_test=duration_test,
+        type_train=type_train,
+        type_validation=type_validation,
+        feature_names=feature_names,
+        duration_classes=duration_classes,
+        type_classes=type_classes,
+        method_classes=method_classes,
+        duration_algorithm=duration_selected["algorithm"],
+        type_algorithm=type_selected["algorithm"],
+        normal_metrics=metrics,
+    )
     main = metrics["accuracy"]
     baseline = majority["accuracy"]
     improvement = round(main - baseline, 4) if baseline is not None else None
@@ -457,6 +489,7 @@ def evaluate_method_umbrella_model(train: pd.DataFrame, validation: pd.DataFrame
         "majority_baseline": majority,
         "split_type": "chronological",
         "segment_metrics": segment_metrics(duration_test.assign(_pred=preds), "method_class") if by_segment else {},
+        "source_holdout": source_holdout,
         "limitations": limitations(beats, metrics) + ["Umbrella method output combines duration probability with conditional finish type probabilities."],
     }
 
@@ -672,6 +705,239 @@ def selected_interactions_runtime_computable(specs: list[dict], base_features: l
     return all(set(item.get("input_features", [])).issubset(base) for item in specs)
 
 
+def source_holdout_classification_report(
+    *,
+    model_name: str,
+    target: str,
+    rows_train: pd.DataFrame,
+    rows_validation: pd.DataFrame,
+    rows_test: pd.DataFrame,
+    feature_names: list[str],
+    classes: list[str],
+    algorithm: str,
+    normal_metrics: dict,
+) -> dict:
+    if "source_dataset" not in rows_test.columns or "source_dataset" not in rows_train.columns:
+        return {"status": "not_run", "reason": "source_dataset column missing"}
+    training_pool = pd.concat([rows_train, rows_validation], ignore_index=True)
+    sources = [
+        source
+        for source in sorted(rows_test["source_dataset"].dropna().astype(str).unique())
+        if source and source.lower() != "unknown"
+    ]
+    results = []
+    for source in sources:
+        holdout = rows_test[rows_test["source_dataset"].astype(str) == source].copy()
+        train_without_source = training_pool[training_pool["source_dataset"].astype(str) != source].copy()
+        source_rows = int(len(holdout))
+        if source_rows < 100:
+            results.append(
+                {
+                    "source": source,
+                    "rows": source_rows,
+                    "status": "skipped_small_sample",
+                    "unstable_sample_warning": True,
+                }
+            )
+            continue
+        if train_without_source.empty or train_without_source[target].nunique() < 2 or holdout[target].nunique() < 2:
+            results.append(
+                {
+                    "source": source,
+                    "rows": source_rows,
+                    "status": "skipped_insufficient_class_variety",
+                    "unstable_sample_warning": source_rows < 300,
+                }
+            )
+            continue
+        model = source_holdout_classifier(algorithm)
+        if model is None:
+            results.append(
+                {
+                    "source": source,
+                    "rows": source_rows,
+                    "status": "skipped_unknown_algorithm",
+                    "algorithm": algorithm,
+                    "unstable_sample_warning": source_rows < 300,
+                }
+            )
+            continue
+        fitted = model.fit(train_without_source[feature_names], train_without_source[target].astype(str))
+        probs = align_probabilities(np.asarray(fitted.predict_proba(holdout[feature_names])), list(fitted.classes_), classes)
+        preds = [classes[int(np.argmax(row))] for row in probs]
+        metrics = classification_metrics(holdout[target].astype(str).tolist(), preds, probs, classes)
+        metric_drop = round(float(normal_metrics.get("accuracy") or 0) - float(metrics.get("accuracy") or 0), 4)
+        balanced_drop = round(float(normal_metrics.get("balanced_accuracy") or 0) - float(metrics.get("balanced_accuracy") or 0), 4)
+        results.append(
+            {
+                "source": source,
+                "rows": source_rows,
+                "status": "evaluated",
+                "algorithm": algorithm,
+                "audit_estimator": "bounded_source_holdout_refit",
+                "accuracy": metrics.get("accuracy"),
+                "balanced_accuracy": metrics.get("balanced_accuracy"),
+                "roc_auc": metrics.get("roc_auc"),
+                "brier_score": metrics.get("brier_score"),
+                "log_loss": metrics.get("log_loss"),
+                "metric_drop": metric_drop,
+                "balanced_accuracy_drop": balanced_drop,
+                "unstable_sample_warning": source_rows < 300,
+            }
+        )
+    evaluated = [item for item in results if item.get("status") == "evaluated"]
+    if not evaluated:
+        return {
+            "status": "not_run",
+            "reason": "no source had enough held-out rows and class variety",
+            "by_source": results,
+        }
+    worst = max(evaluated, key=lambda item: (item.get("balanced_accuracy_drop") or 0, item.get("metric_drop") or 0))
+    worst_metric_drop = float(worst.get("metric_drop") or 0)
+    worst_balanced_drop = float(worst.get("balanced_accuracy_drop") or 0)
+    stable = worst_metric_drop <= 0.08 and worst_balanced_drop <= 0.12 and float(worst.get("balanced_accuracy") or 0) >= 0.55
+    severe = worst_metric_drop > 0.15 or worst_balanced_drop > 0.20 or float(worst.get("balanced_accuracy") or 0) < 0.45
+    status = "stable" if stable else ("unstable" if severe else "needs_review")
+    return {
+        "status": status,
+        "method": "train_validation_without_source_scored_on_final_test_source",
+        "audit_estimator": "bounded_source_holdout_refit",
+        "normal_accuracy": normal_metrics.get("accuracy"),
+        "normal_balanced_accuracy": normal_metrics.get("balanced_accuracy"),
+        "worst_source": worst.get("source"),
+        "worst_source_rows": worst.get("rows"),
+        "worst_source_metric": worst.get("accuracy"),
+        "worst_source_balanced_accuracy": worst.get("balanced_accuracy"),
+        "worst_metric_drop": round(worst_metric_drop, 4),
+        "worst_balanced_accuracy_drop": round(worst_balanced_drop, 4),
+        "source_holdout_stable": stable,
+        "source_holdout_regression_detected": severe,
+        "by_source": results,
+    }
+
+
+def method_umbrella_probabilities_from_info(info: dict[str, Any], rows: pd.DataFrame) -> np.ndarray:
+    duration_classes = info["duration_classes"]
+    duration_probs = align_probabilities(
+        np.asarray(info["duration_model"].predict_proba(rows)),
+        list(info["duration_model"].classes_),
+        duration_classes,
+    )
+    finish_index = duration_classes.index("1") if "1" in duration_classes else len(duration_classes) - 1
+    finish_probability = duration_probs[:, finish_index]
+    finish_type_classes = info["finish_type_classes"]
+    type_probs = align_probabilities(
+        np.asarray(info["finish_type_model"].predict_proba(rows)),
+        list(info["finish_type_model"].classes_),
+        finish_type_classes,
+    )
+    method_classes = list(info["classes"])
+    method_index = {label: index for index, label in enumerate(method_classes)}
+    combined = np.zeros((len(rows), len(method_classes)))
+    combined[:, method_index["Decision"]] = 1 - finish_probability
+    for class_index, label in enumerate(finish_type_classes):
+        if label in method_index:
+            combined[:, method_index[label]] = finish_probability * type_probs[:, class_index]
+    row_sums = combined.sum(axis=1)
+    if "Other" in method_index:
+        combined[:, method_index["Other"]] += np.maximum(0, 1 - row_sums)
+    row_sums = combined.sum(axis=1)
+    row_sums[row_sums == 0] = 1
+    return combined / row_sums[:, None]
+
+
+def source_holdout_method_umbrella_report(
+    *,
+    duration_train: pd.DataFrame,
+    duration_validation: pd.DataFrame,
+    duration_test: pd.DataFrame,
+    type_train: pd.DataFrame,
+    type_validation: pd.DataFrame,
+    feature_names: list[str],
+    duration_classes: list[str],
+    type_classes: list[str],
+    method_classes: list[str],
+    duration_algorithm: str,
+    type_algorithm: str,
+    normal_metrics: dict,
+) -> dict:
+    if "source_dataset" not in duration_test.columns:
+        return {"status": "not_run", "reason": "source_dataset column missing"}
+    duration_pool = pd.concat([duration_train, duration_validation], ignore_index=True)
+    type_pool = pd.concat([type_train, type_validation], ignore_index=True)
+    results = []
+    for source in sorted(duration_test["source_dataset"].dropna().astype(str).unique()):
+        if not source or source.lower() == "unknown":
+            continue
+        holdout = duration_test[duration_test["source_dataset"].astype(str) == source].copy()
+        duration_without_source = duration_pool[duration_pool["source_dataset"].astype(str) != source].copy()
+        type_without_source = type_pool[type_pool["source_dataset"].astype(str) != source].copy()
+        rows = int(len(holdout))
+        if rows < 100:
+            results.append({"source": source, "rows": rows, "status": "skipped_small_sample", "unstable_sample_warning": True})
+            continue
+        if duration_without_source.empty or type_without_source.empty or duration_without_source["finish_binary"].nunique() < 2 or type_without_source["finish_type_class"].nunique() < 2 or holdout["method_class"].nunique() < 2:
+            results.append({"source": source, "rows": rows, "status": "skipped_insufficient_class_variety", "unstable_sample_warning": rows < 300})
+            continue
+        duration_estimator = source_holdout_classifier(duration_algorithm)
+        type_estimator = source_holdout_classifier(type_algorithm)
+        if duration_estimator is None or type_estimator is None:
+            results.append({"source": source, "rows": rows, "status": "skipped_unknown_algorithm", "unstable_sample_warning": rows < 300})
+            continue
+        duration_model = duration_estimator.fit(duration_without_source[feature_names], duration_without_source["finish_binary"].astype(str))
+        type_model = type_estimator.fit(type_without_source[feature_names], type_without_source["finish_type_class"].astype(str))
+        info = {
+            "duration_model": duration_model,
+            "duration_classes": duration_classes,
+            "finish_type_model": type_model,
+            "finish_type_classes": type_classes,
+            "classes": method_classes,
+        }
+        probs = method_umbrella_probabilities_from_info(info, holdout[feature_names])
+        preds = [method_classes[int(np.argmax(row))] for row in probs]
+        metrics = classification_metrics(holdout["method_class"].astype(str).tolist(), preds, probs, method_classes)
+        metric_drop = round(float(normal_metrics.get("accuracy") or 0) - float(metrics.get("accuracy") or 0), 4)
+        balanced_drop = round(float(normal_metrics.get("balanced_accuracy") or 0) - float(metrics.get("balanced_accuracy") or 0), 4)
+        results.append(
+            {
+                "source": source,
+                "rows": rows,
+                "status": "evaluated",
+                "audit_estimator": "bounded_source_holdout_refit",
+                "accuracy": metrics.get("accuracy"),
+                "balanced_accuracy": metrics.get("balanced_accuracy"),
+                "log_loss": metrics.get("log_loss"),
+                "metric_drop": metric_drop,
+                "balanced_accuracy_drop": balanced_drop,
+                "unstable_sample_warning": rows < 300,
+            }
+        )
+    evaluated = [item for item in results if item.get("status") == "evaluated"]
+    if not evaluated:
+        return {"status": "not_run", "reason": "no source had enough held-out rows and class variety", "by_source": results}
+    worst = max(evaluated, key=lambda item: (item.get("balanced_accuracy_drop") or 0, item.get("metric_drop") or 0))
+    worst_metric_drop = float(worst.get("metric_drop") or 0)
+    worst_balanced_drop = float(worst.get("balanced_accuracy_drop") or 0)
+    stable = worst_metric_drop <= 0.08 and worst_balanced_drop <= 0.12 and float(worst.get("balanced_accuracy") or 0) >= 0.55
+    severe = worst_metric_drop > 0.15 or worst_balanced_drop > 0.20 or float(worst.get("balanced_accuracy") or 0) < 0.45
+    return {
+        "status": "stable" if stable else ("unstable" if severe else "needs_review"),
+        "method": "composite_duration_and_finish_type_without_source_scored_on_final_test_source",
+        "audit_estimator": "bounded_source_holdout_refit",
+        "normal_accuracy": normal_metrics.get("accuracy"),
+        "normal_balanced_accuracy": normal_metrics.get("balanced_accuracy"),
+        "worst_source": worst.get("source"),
+        "worst_source_rows": worst.get("rows"),
+        "worst_source_metric": worst.get("accuracy"),
+        "worst_source_balanced_accuracy": worst.get("balanced_accuracy"),
+        "worst_metric_drop": round(worst_metric_drop, 4),
+        "worst_balanced_accuracy_drop": round(worst_balanced_drop, 4),
+        "source_holdout_stable": stable,
+        "source_holdout_regression_detected": severe,
+        "by_source": results,
+    }
+
+
 def merge_counts(left: dict, right: dict) -> dict:
     keys = set(left) | set(right)
     return {key: int(left.get(key, 0) or 0) + int(right.get(key, 0) or 0) for key in sorted(keys)}
@@ -786,22 +1052,56 @@ def classifier_candidates() -> dict[str, Pipeline]:
         "random_forest_balanced": Pipeline(
             [
                 ("imputer", SimpleImputer(strategy="median")),
-                ("model", RandomForestClassifier(n_estimators=100, min_samples_leaf=8, random_state=42, n_jobs=-1)),
+                ("model", RandomForestClassifier(n_estimators=40, min_samples_leaf=10, random_state=42, n_jobs=1)),
             ]
         ),
         "extra_trees_balanced": Pipeline(
             [
                 ("imputer", SimpleImputer(strategy="median")),
-                ("model", ExtraTreesClassifier(n_estimators=100, min_samples_leaf=8, random_state=42, n_jobs=-1)),
+                ("model", ExtraTreesClassifier(n_estimators=40, min_samples_leaf=10, random_state=42, n_jobs=1)),
             ]
         ),
         "hist_gradient_boosting": Pipeline(
             [
                 ("imputer", SimpleImputer(strategy="median")),
-                ("model", HistGradientBoostingClassifier(max_iter=100, learning_rate=0.06, l2_regularization=0.01, random_state=42)),
+                ("model", HistGradientBoostingClassifier(max_iter=50, learning_rate=0.06, l2_regularization=0.01, random_state=42)),
             ]
         ),
     }
+
+
+def source_holdout_classifier(algorithm: str) -> Pipeline | None:
+    """Return a bounded estimator for repeated source-holdout audit refits."""
+    if algorithm == "logistic_regression_balanced":
+        return Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("scaler", StandardScaler()),
+                ("model", LogisticRegression(max_iter=300, class_weight="balanced", random_state=42)),
+            ]
+        )
+    if algorithm == "random_forest_balanced":
+        return Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("model", RandomForestClassifier(n_estimators=40, min_samples_leaf=10, random_state=42, n_jobs=1)),
+            ]
+        )
+    if algorithm == "extra_trees_balanced":
+        return Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("model", ExtraTreesClassifier(n_estimators=40, min_samples_leaf=10, random_state=42, n_jobs=1)),
+            ]
+        )
+    if algorithm == "hist_gradient_boosting":
+        return Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("model", HistGradientBoostingClassifier(max_iter=50, learning_rate=0.06, l2_regularization=0.01, random_state=42)),
+            ]
+        )
+    return None
 
 
 def align_probabilities(probs: np.ndarray, model_classes: list[str], classes: list[str]) -> np.ndarray:
@@ -1103,6 +1403,11 @@ def update_registry_with_evaluation(models, split_report: dict | None = None):
                 "interaction_selection_status": (result.get("interaction_discovery") or {}).get("selection_status"),
                 "interaction_audit_summary": (result.get("interaction_discovery") or {}).get("summary_judgment", {}),
                 "interaction_safety_checks": (result.get("interaction_discovery") or {}).get("safety_checks", {}),
+                "source_holdout": result.get("source_holdout", {}),
+                "source_holdout_status": (result.get("source_holdout") or {}).get("status"),
+                "source_holdout_worst_source": (result.get("source_holdout") or {}).get("worst_source"),
+                "source_holdout_worst_metric": (result.get("source_holdout") or {}).get("worst_source_metric"),
+                "source_holdout_worst_drop": (result.get("source_holdout") or {}).get("worst_metric_drop"),
                 "final_test_metric": result.get("final_test_metric"),
                 "final_test_metric_name": result.get("final_test_metric_name"),
                 "baseline_metric": result.get("baseline_metric"),
@@ -1235,7 +1540,16 @@ def production_gate_result(model_name: str, result: dict, split_report: dict | N
         if audit_status.get("status") in {"high_confidence_only", "production_candidate"} and "source_holdout_stable" in passed:
             failed.append("source_holdout_manual_review_required")
     else:
-        failed.append("source_holdout_not_run")
+        holdout = result.get("source_holdout") or {}
+        holdout_status = holdout.get("status")
+        if holdout_status == "stable":
+            passed.append("source_holdout_stable")
+        elif holdout_status in {"unstable", "needs_review"}:
+            failed.append("source_holdout_unstable")
+            if holdout.get("source_holdout_regression_detected"):
+                failed.append("source_holdout_regression")
+        else:
+            failed.append("source_holdout_not_run")
         if model_name == "odds_calibration_model":
             failed.append("trusted_prefight_odds_timestamps_missing")
 
@@ -1257,6 +1571,10 @@ def production_gate_result(model_name: str, result: dict, split_report: dict | N
         status = "high_confidence_only"
         recommended = "research/high-confidence selective predictions only"
         warning = "Use only as selective model evidence; winner audit gates are not strong enough for production-ready status."
+    elif "source_holdout_regression" in failed or "source_holdout_unstable" in failed:
+        status = "experimental"
+        recommended = "research only until source-holdout stabilizes"
+        warning = "Model source-holdout transfer is not stable enough for production candidate use."
     elif (result.get("metrics") or {}).get("balanced_accuracy", 0) >= 0.7 and "high_confidence_not_tiny_sample_noise" in passed:
         status = "production_candidate"
         recommended = "candidate for limited internal validation"
@@ -1416,7 +1734,7 @@ def interaction_discovery_payload(payload: dict) -> dict:
             "relative_improvement": result.get("relative_improvement"),
             "high_confidence_accuracy": ((result.get("selective_prediction") or {}).get("best_accuracy") or {}).get("accuracy"),
             "high_confidence_coverage": ((result.get("selective_prediction") or {}).get("best_accuracy") or {}).get("coverage_percent"),
-            "source_holdout": {"status": "not_run"},
+            "source_holdout": result.get("source_holdout", {"status": "not_run"}),
             "cold_start_low_history_segment": (result.get("segment_metrics") or {}).get("minimum_history_count"),
             "runtime_parity": "passed" if not result.get("selected_interactions") else "passed_training_schema_generated",
             "leakage_check": "passed_forbidden_feature_filter",
@@ -1603,6 +1921,16 @@ def markdown_report(payload):
         lines.append(
             f"| {item['model']} | {model.get('status')} | {model.get('test_rows', 0)} | {model.get('final_test_metric', '')} | {model.get('baseline_metric', '')} | {model.get('relative_improvement', '')} | {model.get('beats_baseline', False)} | {'; '.join(model.get('limitations', []))} |"
         )
+    lines.extend(["", "## Source-Holdout Transfer Summary"])
+    lines.append("| Model | Normal Metric | Worst Source Metric | Drop | Worst Source | Rows | Source-Holdout Status | Production Status |")
+    lines.append("|---|---:|---:|---:|---|---:|---|---|")
+    winner_audit = load_winner_audit()
+    for name, model in payload["models"].items():
+        holdout = model.get("source_holdout") or {}
+        gates = production_gate_result(name, model, payload.get("split", {}), winner_audit)
+        lines.append(
+            f"| {name} | {model.get('final_test_metric', '')} | {holdout.get('worst_source_metric', '')} | {holdout.get('worst_metric_drop', '')} | {holdout.get('worst_source', '')} | {holdout.get('worst_source_rows', '')} | {holdout.get('status', 'not_run')} | {gates['production_status']} |"
+        )
     lines.append("")
     lines.append("## Segment Performance")
     for name, model in payload["models"].items():
@@ -1630,7 +1958,6 @@ def markdown_report(payload):
     lines.extend(["", "## Production Readiness Gates"])
     lines.append("| Model | Production Status | Passed Gates | Failed Gates | Recommended Use |")
     lines.append("|---|---|---|---|---|")
-    winner_audit = load_winner_audit()
     for name, model in payload["models"].items():
         gates = production_gate_result(name, model, payload.get("split", {}), winner_audit)
         lines.append(

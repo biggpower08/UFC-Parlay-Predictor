@@ -46,13 +46,20 @@ def test_reports_include_source_holdout_gate_for_production_candidates():
         for name, entry in registry.items()
         if entry.get("production_status") == "production_candidate"
     ]
-    assert candidates
-    assert any(
-        "source_holdout_not_run" in registry[name].get("failed_gates", [])
-        for name in candidates
-    )
     report_text = _read("docs/model_accuracy_report.md")
-    assert "source_holdout_not_run" in report_text
+    assert "Source-Holdout Transfer Summary" in report_text
+    if candidates:
+        for name in candidates:
+            gates = registry[name].get("passed_gates", []) + registry[name].get("failed_gates", [])
+            assert any(str(gate).startswith("source_holdout") for gate in gates), name
+    else:
+        downgraded = [
+            entry
+            for entry in registry.values()
+            if entry.get("production_status") == "experimental"
+            and any(str(gate).startswith("source_holdout") for gate in entry.get("failed_gates", []))
+        ]
+        assert downgraded
 
 
 def test_report_segment_keys_do_not_keep_bout_suffix_variants():

@@ -13,18 +13,18 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ## Model Summary
 | Model | Candidates | Accepted | Selected | Enough Tested | Selection Status | Base Validation | Interaction Validation |
 |---|---:|---:|---:|---|---|---|---|
-| winner_model | 240 | 80 | 0 | True | base_features_kept | 0.9984 | None |
-| fight_duration_model | 240 | 80 | 10 | True | selected | 0.8942 | 0.8993 |
-| over_1_5_model | 240 | 80 | 5 | True | selected | 0.7746 | 0.7845 |
-| over_2_5_model | 240 | 80 | 0 | True | base_features_kept | 0.8419 | None |
-| ends_before_round_3_model | 240 | 80 | 5 | True | selected | 0.811 | 0.8175 |
-| finish_in_round_1_model | 240 | 80 | 0 | True | base_features_kept | 0.8153 | None |
-| finish_type_model | 240 | 80 | 5 | True | selected | 0.7237 | 0.7549 |
+| winner_model | 240 | 80 | 0 | True | base_features_kept | 0.9986 | None |
+| fight_duration_model | 240 | 80 | 5 | True | selected | 0.8796 | 0.8845 |
+| over_1_5_model | 240 | 80 | 0 | True | base_features_kept | 0.762 | None |
+| over_2_5_model | 240 | 80 | 0 | True | base_features_kept | 0.8349 | None |
+| ends_before_round_3_model | 240 | 80 | 10 | True | selected | 0.7906 | 0.7941 |
+| finish_in_round_1_model | 240 | 80 | 0 | True | base_features_kept | 0.7979 | None |
+| finish_type_model | 240 | 80 | 5 | True | selected | 0.7112 | 0.7442 |
 | method_umbrella_model | 0 | 0 | 0 | None | not_run_composite_model | None | None |
-| strike_volume_model | 240 | 80 | 20 | True | selected | 0.6691 | 0.6747 |
-| takedown_control_model | 240 | 80 | 0 | True | base_features_kept | 0.7375 | None |
-| finish_model | 240 | 80 | 10 | True | selected | 0.8942 | 0.8993 |
-| goes_distance_model | 240 | 80 | 10 | True | selected | 0.8942 | 0.8993 |
+| strike_volume_model | 240 | 80 | 10 | True | selected | 0.6567 | 0.6714 |
+| takedown_control_model | 240 | 80 | 0 | True | base_features_kept | 0.7266 | None |
+| finish_model | 240 | 80 | 5 | True | selected | 0.8796 | 0.8845 |
+| goes_distance_model | 240 | 80 | 5 | True | selected | 0.8796 | 0.8845 |
 | method_model | 0 | 0 | 0 | None | not_run_composite_model | None | None |
 | round_phase_model | 0 | 0 | 0 | None | not_run_composite_summary | None | None |
 | round_model | 0 | 0 | 0 | None | not_run_composite_summary | None | None |
@@ -242,7 +242,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 - missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 228
+- validation_did_not_improve: 233
 ### over_1_5_model
 - calibration_got_worse: 0
 - high_correlation: 0
@@ -251,7 +251,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 - missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 233
+- validation_did_not_improve: 238
 ### over_2_5_model
 - calibration_got_worse: 0
 - high_correlation: 0
@@ -269,7 +269,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 - missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 233
+- validation_did_not_improve: 228
 ### finish_in_round_1_model
 - calibration_got_worse: 0
 - high_correlation: 0
@@ -298,7 +298,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 - missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 218
+- validation_did_not_improve: 228
 ### takedown_control_model
 - calibration_got_worse: 0
 - high_correlation: 0
@@ -316,7 +316,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 - missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 228
+- validation_did_not_improve: 233
 ### goes_distance_model
 - calibration_got_worse: 0
 - high_correlation: 0
@@ -325,7 +325,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 - missingness: 2
 - runtime_incompatibility: 0
 - source_holdout_got_worse: 0
-- validation_did_not_improve: 228
+- validation_did_not_improve: 233
 ### method_model
 - No rejection counts were recorded.
 ### round_phase_model
@@ -341,85 +341,61 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ### winner_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### fight_duration_model
-- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
 ### over_1_5_model
-- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0099, final-test impact=-0.002, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0099)
-- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0099, final-test impact=-0.002, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0099)
-- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0099, final-test impact=-0.002, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0099)
-- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0099, final-test impact=-0.002, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0099)
-- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0099, final-test impact=-0.002, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0099)
+- None selected; base features remained stronger or validation support was insufficient.
 ### over_2_5_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### ends_before_round_3_model
-- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0065, final-test impact=-0.0047, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0065)
-- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0065, final-test impact=-0.0047, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0065)
-- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0065, final-test impact=-0.0047, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0065)
-- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0065, final-test impact=-0.0047, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0065)
-- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0065, final-test impact=-0.0047, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0065)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
+- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0035, final-test impact=0.0069, source-holdout impact=0.189, runtime=training_schema_computable, importance=0.0035)
 ### finish_in_round_1_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### finish_type_model
-- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0312, final-test impact=-0.0252, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0312)
-- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0312, final-test impact=-0.0252, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0312)
-- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0312, final-test impact=-0.0252, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0312)
-- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0312, final-test impact=-0.0252, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0312)
-- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0312, final-test impact=-0.0252, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0312)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.033, final-test impact=-0.037, source-holdout impact=0.2915, runtime=training_schema_computable, importance=0.033)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.033, final-test impact=-0.037, source-holdout impact=0.2915, runtime=training_schema_computable, importance=0.033)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.033, final-test impact=-0.037, source-holdout impact=0.2915, runtime=training_schema_computable, importance=0.033)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.033, final-test impact=-0.037, source-holdout impact=0.2915, runtime=training_schema_computable, importance=0.033)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.033, final-test impact=-0.037, source-holdout impact=0.2915, runtime=training_schema_computable, importance=0.033)
 ### method_umbrella_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### strike_volume_model
-- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_2_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_2_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__striker_score_diff_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__striker_score_diff_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__striker_score_diff_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__striker_score_diff_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__striker_score_diff_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__striker_score_diff_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_1_high_volume_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
-- `int__fighter_1_high_volume_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0056, final-test impact=-0.0017, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0056)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
+- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=('striking', 'opponent_weakness'), validation improvement=0.0147, final-test impact=0.0036, source-holdout impact=0.1594, runtime=training_schema_computable, importance=0.0147)
 ### takedown_control_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### finish_model
-- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
 ### goes_distance_model
-- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_1_striker_score_x_low_activity_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
-- `int__fighter_2_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0051, final-test impact=0.0029, source-holdout impact=not_run, runtime=training_schema_computable, importance=0.0051)
+- `int__fighter_1_striker_score_x_fighter_1_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_2_strike_absorption_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_strike_absorption_weakness_diff` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_1_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
+- `int__fighter_1_striker_score_x_fighter_2_low_activity_weakness` (strength_vs_weakness, groups=['striking', 'opponent_weakness'], validation improvement=0.0049, final-test impact=0.0014, source-holdout impact=0.2525, runtime=training_schema_computable, importance=0.0049)
 ### method_model
 - None selected; base features remained stronger or validation support was insufficient.
 ### round_phase_model
@@ -434,21 +410,21 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ## Base Vs Interaction Comparison
 | Model | Base Final Balanced | Interaction Final Balanced | Final Impact | Base Validation Balanced | Interaction Validation Balanced | High-Confidence Accuracy | High-Confidence Coverage | Source Holdout |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| winner_model | 0.9634 | None | None | 0.9984 | None | 0.9883 | 92.7 | not_run |
-| fight_duration_model | 0.8422 | 0.8451 | 0.0029 | 0.8942 | 0.8993 | 0.9206 | 67.13 | not_run |
-| over_1_5_model | 0.7166 | 0.7146 | -0.002 | 0.7746 | 0.7845 | 0.8956 | 61.66 | not_run |
-| over_2_5_model | 0.796 | None | None | 0.8419 | None | 0.9122 | 59.71 | not_run |
-| ends_before_round_3_model | 0.7649 | 0.7602 | -0.0047 | 0.811 | 0.8175 | 0.8978 | 57.94 | not_run |
-| finish_in_round_1_model | 0.7136 | None | None | 0.8153 | None | 0.915 | 72.5 | not_run |
-| finish_type_model | 0.6527 | 0.6275 | -0.0252 | 0.7237 | 0.7549 | 0.8702 | 72.49 | not_run |
-| method_umbrella_model | None | None | None | None | None | 0.906 | 55.55 | not_run |
-| strike_volume_model | 0.5631 | 0.5614 | -0.0017 | 0.6691 | 0.6747 | 0.7374 | 37.44 | not_run |
-| takedown_control_model | 0.7065 | None | None | 0.7375 | None | 0.8701 | 45.21 | not_run |
-| finish_model | 0.8422 | 0.8451 | 0.0029 | 0.8942 | 0.8993 | 0.9206 | 67.13 | not_run |
-| goes_distance_model | 0.8422 | 0.8451 | 0.0029 | 0.8942 | 0.8993 | 0.9206 | 67.13 | not_run |
-| method_model | None | None | None | None | None | 0.906 | 55.55 | not_run |
-| round_phase_model | None | None | None | None | None | 0.9122 | 59.71 | not_run |
-| round_model | None | None | None | None | None | 0.9122 | 59.71 | not_run |
+| winner_model | 0.9622 | None | None | 0.9986 | None | 0.9891 | 93.75 | needs_review |
+| fight_duration_model | 0.8268 | 0.8282 | 0.0014 | 0.8796 | 0.8845 | 0.9234 | 57.58 | unstable |
+| over_1_5_model | 0.7009 | None | None | 0.762 | None | 0.9147 | 52.84 | needs_review |
+| over_2_5_model | 0.7916 | None | None | 0.8349 | None | 0.9226 | 49.47 | unstable |
+| ends_before_round_3_model | 0.7434 | 0.7503 | 0.0069 | 0.7906 | 0.7941 | 0.916 | 45.91 | unstable |
+| finish_in_round_1_model | 0.6966 | None | None | 0.7979 | None | 0.9229 | 66.87 | needs_review |
+| finish_type_model | 0.6532 | 0.6162 | -0.037 | 0.7112 | 0.7442 | 0.8995 | 65.37 | unstable |
+| method_umbrella_model | None | None | None | None | None | 0.9233 | 46.19 | unstable |
+| strike_volume_model | 0.5562 | 0.5598 | 0.0036 | 0.6567 | 0.6714 | 0.7644 | 30.18 | unstable |
+| takedown_control_model | 0.6893 | None | None | 0.7266 | None | 0.8697 | 39.5 | needs_review |
+| finish_model | 0.8268 | 0.8282 | 0.0014 | 0.8796 | 0.8845 | 0.9234 | 57.58 | unstable |
+| goes_distance_model | 0.8268 | 0.8282 | 0.0014 | 0.8796 | 0.8845 | 0.9234 | 57.58 | unstable |
+| method_model | None | None | None | None | None | 0.9233 | 46.19 | unstable |
+| round_phase_model | None | None | None | None | None | 0.9226 | 49.47 | unstable |
+| round_model | None | None | None | None | None | 0.9226 | 49.47 | unstable |
 | strike_volume_regression | None | None | None | None | None | None | None | not_run |
 | odds_calibration_model | None | None | None | None | None | None | None | not_run |
 
@@ -548,7 +524,7 @@ Candidate interactions are generated from safe pre-fight feature groups, selecte
 ### over_1_5_model
 - Enough interactions tested: True
 - Coverage gaps: ['ratios', 'absolute_differences', 'squared_clipped_log_transforms', 'physical x style']
-- Model improved: True
+- Model improved: False
 - Model worsened: False
 - Next groups to try: ['ratios', 'absolute_differences', 'squared_clipped_log_transforms', 'physical x style']
 ### over_2_5_model

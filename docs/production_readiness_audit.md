@@ -78,13 +78,25 @@ Key result:
 - Feature count increased from 136 to 157.
 - The final date range did not change.
 - Several gains are plausible feature/interaction improvements, but they are not production-safe until source-holdout validation runs.
+- Source-holdout validation now runs for non-winner classifiers and downgraded unstable candidates.
 - `--calibrate` still means `basic_probability_scores_only`, not true validation-only calibration.
+
+## Source-Holdout Result
+The new source-holdout method trains each eligible non-winner model on train/validation rows excluding one source, then scores the held-out final-test rows from that source. This is a transfer robustness check, not a feature-selection step.
+
+Current result:
+- `fight_duration_model`, `finish_model`, and `goes_distance_model` dropped on `ufc_stats_complete` and are now experimental.
+- `over_1_5_model`, `over_2_5_model`, and `ends_before_round_3_model` also dropped on `ufc_stats_complete` and are now experimental.
+- `finish_in_round_1_model` and `takedown_control_model` are not stable enough for production-candidate use.
+- `finish_type_model` and `strike_volume_model` remain experimental.
+- `method_umbrella_model` now runs a dedicated composite source-holdout check and is experimental because the weakest source transfer is unstable.
+- `odds_calibration_model` remains blocked.
 
 ## Remaining Production Blockers
 - Untrack `ufc_predictor/data/processed/fighters.db`.
 - Keep raw Kaggle/import datasets out of Git.
 - Keep `normalized_fights_combined.csv` and `backtest_predictions.json` out of Git.
 - Resolve winner-model source-holdout instability before production-ready claims.
-- Run source-holdout validation for all non-winner production candidates before packaging artifacts.
+- Improve source-holdout transfer before packaging any non-winner artifacts.
 - Improve weak method/finish-type and round-1 finish models before public confidence claims.
 - Add trusted pre-fight odds timestamps before odds calibration or betting-edge modeling.
