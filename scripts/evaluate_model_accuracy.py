@@ -100,6 +100,24 @@ REGRESSION_MODELS = {
     "strike_volume_regression": "combined_sig_strikes",
 }
 
+ELO_PREFIGHT_FEATURES = {
+    "fighter_1_elo_before_fight",
+    "fighter_2_elo_before_fight",
+    "elo_diff",
+    "elo_expected_fighter_1",
+    "fighter_1_elo_fights_count_before",
+    "fighter_2_elo_fights_count_before",
+    "fighter_1_elo_available",
+    "fighter_2_elo_available",
+    "fighter_a_elo_pre",
+    "fighter_b_elo_pre",
+    "elo_diff_pre",
+    "elo_expected_fighter_a_pre",
+    "fighter_a_elo_fights_before",
+    "fighter_b_elo_fights_before",
+}
+ELO_FORBIDDEN_NAME_PARTS = ("elo_after", "post_fight_elo", "current_elo", "latest_elo", "final_elo")
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Evaluate UFC/MMA models on chronological held-out historical data.")
@@ -160,6 +178,7 @@ def main() -> int:
         "input_data": str(input_path),
         "force_rebuild_requested": bool(args.force_rebuild),
         "audit": audit.to_dict(),
+        "elo_leakage_audit": build_elo_leakage_audit_summary(models),
         "split": split_report,
         "source_contribution": source_contribution_report(dataset, train, validation, test),
         "models": models,
@@ -561,10 +580,17 @@ def feature_names_for_model(train: pd.DataFrame, validation: pd.DataFrame, test:
     for name in schema.all_features():
         if name not in combined.columns or name in forbidden:
             continue
+        if is_forbidden_elo_feature(name):
+            continue
         values = pd.to_numeric(combined[name], errors="coerce")
         if values.notna().any():
             features.append(name)
     return features or FEATURE_NAMES
+
+
+def is_forbidden_elo_feature(name: str) -> bool:
+    lowered = str(name).lower()
+    return any(part in lowered for part in ELO_FORBIDDEN_NAME_PARTS)
 
 
 def dedupe_model_rows(rows: pd.DataFrame, target: str, feature_names: list[str]) -> pd.DataFrame:
@@ -1391,6 +1417,7 @@ def update_registry_with_evaluation(models, split_report: dict | None = None):
         selective = result.get("selective_prediction") or {}
         best_accuracy = selective.get("best_accuracy") or {}
         gates = production_gate_result(name, result, split_report or {}, winner_audit)
+        elo_audit = elo_audit_fields(result)
         entry.update(
             {
                 "target": result.get("target"),
@@ -1434,6 +1461,7 @@ def update_registry_with_evaluation(models, split_report: dict | None = None):
                 "data_quality_requirements": data_quality_requirements_for_model(name, gates["production_status"]),
                 "selective_prediction_policy": selective_policy_for_model(name, gates["production_status"]),
                 "segment_metrics_available": bool(result.get("segment_metrics")),
+                **elo_audit,
                 "evaluated_at": now,
             }
         )
@@ -1457,9 +1485,13 @@ def backfill_registry_gate_fields(registry: dict, models: dict, split_report: di
         "selective_prediction_policy",
     }
     for name, entry in registry.items():
+        model_result = models.get(name) or models.get(legacy_aliases.get(name, ""))
+        if model_result:
+            entry.update(elo_audit_fields(model_result))
+        else:
+            entry.update(default_elo_audit_fields(entry))
         if required_fields.issubset(entry):
             continue
-        model_result = models.get(name) or models.get(legacy_aliases.get(name, ""))
         if model_result:
             gate_name = legacy_aliases.get(name, name)
             gates = production_gate_result(gate_name, model_result, split_report, winner_audit)
@@ -1487,6 +1519,64 @@ def backfill_registry_gate_fields(registry: dict, models: dict, split_report: di
                 "evaluated_at": entry.get("evaluated_at", evaluated_at),
             }
         )
+
+
+def elo_audit_fields(result: dict) -> dict:
+    feature_names = [str(name) for name in result.get("feature_names", [])]
+    uses_pre = any(name in ELO_PREFIGHT_FEATURES for name in feature_names)
+    forbidden = sorted(name for name in feature_names if is_forbidden_elo_feature(name))
+    status = "passed" if not forbidden else "failed"
+    failed = [] if not forbidden else ["post_fight_or_current_elo_feature_selected"]
+    return {
+        "elo_leakage_audit_status": status,
+        "elo_feature_mode": "strict_pre_event_prefight" if uses_pre else "no_elo_features_selected",
+        "uses_pre_fight_elo": uses_pre,
+        "uses_post_fight_elo": bool(forbidden),
+        "elo_ablation_summary": {
+            "current_or_previous_mode": "legacy_placeholder_or_current_report",
+            "strict_pre_fight_mode": "enabled",
+            "no_elo_mode": "available_via_audit_script",
+            "summary": "Historical training rows use pre-fight Elo snapshots; same-event fights use pre-event Elo by default.",
+        },
+        "elo_audit_failed_gates": failed,
+    }
+
+
+def default_elo_audit_fields(entry: dict) -> dict:
+    feature_names = [str(name) for name in entry.get("feature_names", [])]
+    uses_pre = any(name in ELO_PREFIGHT_FEATURES for name in feature_names)
+    forbidden = sorted(name for name in feature_names if is_forbidden_elo_feature(name))
+    return {
+        "elo_leakage_audit_status": "passed" if not forbidden else "failed",
+        "elo_feature_mode": "strict_pre_event_prefight" if uses_pre else "no_elo_features_selected",
+        "uses_pre_fight_elo": uses_pre,
+        "uses_post_fight_elo": bool(forbidden),
+        "elo_ablation_summary": entry.get("elo_ablation_summary")
+        or {
+            "strict_pre_fight_mode": "enabled",
+            "no_elo_mode": "not_run_for_legacy_entry",
+            "summary": "Legacy registry entry backfilled with Elo feature-name audit only.",
+        },
+        "elo_audit_failed_gates": [] if not forbidden else ["post_fight_or_current_elo_feature_selected"],
+    }
+
+
+def build_elo_leakage_audit_summary(models: dict) -> dict:
+    model_summaries = {}
+    failed_models = []
+    for name, result in models.items():
+        audit = elo_audit_fields(result)
+        model_summaries[name] = audit
+        if audit["elo_leakage_audit_status"] != "passed":
+            failed_models.append(name)
+    return {
+        "status": "passed" if not failed_models else "failed",
+        "feature_mode": "strict_pre_event_prefight",
+        "same_event_policy": "all same-event rows use pre-event Elo by default",
+        "runtime_policy": "live predictions may use current computed Elo only for future user-selected fights",
+        "failed_models": failed_models,
+        "models": model_summaries,
+    }
 
 
 def load_winner_audit() -> dict:
@@ -1898,6 +1988,13 @@ def markdown_report(payload):
             "- Decision probability comes from the duration model's goes-distance output.",
             "- KO/TKO and submission probabilities are conditional on the fight first being projected to finish.",
             "- The combined method output improved over majority baseline on accuracy, but balanced method metrics remain modest, so it is not production-ready.",
+        "",
+        "## Elo Leakage Audit",
+        f"- Status: {(payload.get('elo_leakage_audit') or {}).get('status', 'not_run')}",
+        f"- Feature mode: {(payload.get('elo_leakage_audit') or {}).get('feature_mode', 'unknown')}",
+        f"- Same-event policy: {(payload.get('elo_leakage_audit') or {}).get('same_event_policy', 'unknown')}",
+        f"- Runtime policy: {(payload.get('elo_leakage_audit') or {}).get('runtime_policy', 'unknown')}",
+        f"- Failed models: {', '.join((payload.get('elo_leakage_audit') or {}).get('failed_models', [])) or 'None'}",
         "",
         "## Split",
         f"- Train: {payload['split']['train_rows']} rows, {payload['split']['date_range_train']}",

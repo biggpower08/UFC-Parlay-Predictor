@@ -60,6 +60,15 @@ Current automated gates still enforce:
 - Duplicate/mirrored fight leakage must be prevented.
 - Calibration status must be explicit.
 - Final-test rows must not decide model feature schema.
+- Elo leakage audit must pass: historical rows can use pre-fight/pre-event Elo only, never latest/current/post-fight Elo.
+
+## Elo Leakage Result
+- Status: passed.
+- Historical feature mode: strict pre-fight Elo with same-event pre-event cutoff.
+- Unsafe current/latest Elo historical mode: blocked, not run.
+- Winner-model strict Elo ablation: 0.9606 accuracy, 0.9604 balanced accuracy.
+- Winner-model no-Elo ablation: 0.9585 accuracy, 0.9588 balanced accuracy.
+- Registry entries now expose Elo audit fields so this is automatically checked in reports instead of living only as prose.
 
 ## Metric Jump Audit
 The current metric-jump audit is documented in `docs/metric_jump_audit.md`.

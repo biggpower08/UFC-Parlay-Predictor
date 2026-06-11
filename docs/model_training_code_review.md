@@ -62,6 +62,17 @@ If source holdout fails while other metrics are strong, status must be `high_con
 - Mirrored or duplicate fight rows stay in the same split.
 - Algorithm selection uses validation data, not final test data.
 
+## Elo Leakage Audit
+- Historical training rows now use strict pre-fight Elo snapshots.
+- Same-event fights use pre-event Elo by default, so one fight on a card cannot update Elo before another fight on that same card is featurized.
+- Runtime predictions may still use current computed Elo because they are future user-selected matchups, not historical backtest rows.
+- Unsafe current/latest Elo on historical rows is blocked rather than benchmarked.
+- Latest ablation:
+  - Strict pre-fight Elo winner accuracy: 0.9606, balanced accuracy: 0.9604, ROC AUC: 0.9892.
+  - No-Elo winner accuracy: 0.9585, balanced accuracy: 0.9588, ROC AUC: 0.9901.
+  - Unsafe current/latest Elo historical variant: blocked, not run.
+- Registry fields now record `elo_leakage_audit_status`, `elo_feature_mode`, `uses_pre_fight_elo`, `uses_post_fight_elo`, `elo_ablation_summary`, and `elo_audit_failed_gates`.
+
 ## Algorithms Compared
 - Balanced logistic regression.
 - Random forest.

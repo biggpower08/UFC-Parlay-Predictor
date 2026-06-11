@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from scripts.evaluate_model_accuracy import backfill_registry_gate_fields
+from scripts.evaluate_model_accuracy import backfill_registry_gate_fields, elo_audit_fields
 from ufc_predictor.features.data_quality import score_matchup_data_quality
 
 
@@ -59,6 +59,24 @@ def test_registry_backfill_adds_policy_fields_to_legacy_entries():
     assert "public_warning_text" in entry
     assert "data_quality_requirements" in entry
     assert "selective_prediction_policy" in entry
+    assert "elo_leakage_audit_status" in entry
+    assert "elo_feature_mode" in entry
+    assert "uses_pre_fight_elo" in entry
+    assert "uses_post_fight_elo" in entry
+    assert "elo_ablation_summary" in entry
+    assert "elo_audit_failed_gates" in entry
+
+
+def test_elo_audit_fields_pass_for_prefight_elo_and_fail_for_postfight_elo():
+    passed = elo_audit_fields({"feature_names": ["fighter_1_elo_before_fight", "elo_diff"]})
+    failed = elo_audit_fields({"feature_names": ["fighter_1_elo_after_fight", "a_prior_fights"]})
+
+    assert passed["elo_leakage_audit_status"] == "passed"
+    assert passed["uses_pre_fight_elo"] is True
+    assert passed["uses_post_fight_elo"] is False
+    assert failed["elo_leakage_audit_status"] == "failed"
+    assert failed["uses_post_fight_elo"] is True
+    assert "post_fight_or_current_elo_feature_selected" in failed["elo_audit_failed_gates"]
 
 
 def test_prediction_policy_doc_keeps_weak_models_context_only():

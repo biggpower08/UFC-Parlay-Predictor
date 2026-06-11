@@ -1,6 +1,6 @@
 # UFC/MMA AI Predictor Master Project Status
 
-_Generated: 2026-06-11T04:58:11.285990+00:00_
+_Generated: 2026-06-11T13:44:42.991192+00:00_
 
 ## 1. Plain-English Project Summary
 The app has working winner predictions, Elo support, analysis pages, betting-read scaffolding, and a growing model audit system. The current priority is production readiness: source eligibility, label quality, source-transfer stability, calibration, and safe runtime output. No model is currently marked production-ready, and no model artifacts are packaged yet.
@@ -16,19 +16,19 @@ The app has working winner predictions, Elo support, analysis pages, betting-rea
 ## 3. Current Model Status Table
 | Model | Production Status | Main Metric | Baseline | Source Holdout | Public Use |
 |---|---|---:|---:|---|---|
-| winner_model | high_confidence_only | 0.9621 | 0.52 | needs_review | research/high-confidence selective predictions only |
+| winner_model | high_confidence_only | 0.9606 | 0.52 | needs_review | research/high-confidence selective predictions only |
 | fight_duration_model | production_candidate | 0.8596 | 0.5191 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
 | finish_model | production_candidate | 0.8596 | 0.5191 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
 | goes_distance_model | production_candidate | 0.8596 | 0.5191 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
-| over_1_5_model | production_candidate | 0.7947 | 0.6976 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
-| over_2_5_model | production_candidate | 0.8197 | 0.5621 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
-| ends_before_round_3_model | production_candidate | 0.7926 | 0.609 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
-| finish_in_round_1_model | production_candidate | 0.8437 | 0.7628 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
+| over_1_5_model | production_candidate | 0.8064 | 0.6976 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
+| over_2_5_model | production_candidate | 0.813 | 0.5621 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
+| ends_before_round_3_model | production_candidate | 0.7911 | 0.609 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
+| finish_in_round_1_model | production_candidate | 0.8467 | 0.7628 | stable | candidate for limited internal validation; artifact packaging still requires explicit review |
 | finish_type_model | experimental | 0.7956 | 0.6412 | needs_review | research only until source-holdout stabilizes |
 | method_umbrella_model | weak_or_failed_baseline | 0.5191 | 0.5191 | unstable | research only |
 | method_model | weak_or_failed_baseline | 0.5191 | 0.5191 | unstable | research only |
-| strike_volume_model | experimental | 0.5749 | 0.3623 | unstable | research only until source-holdout stabilizes |
-| takedown_control_model | experimental | 0.7285 | 0.5897 | needs_review | research only until source-holdout stabilizes |
+| strike_volume_model | experimental | 0.5908 | 0.3623 | unstable | research only until source-holdout stabilizes |
+| takedown_control_model | experimental | 0.7349 | 0.5897 | needs_review | research only until source-holdout stabilizes |
 | odds_calibration_model | blocked | not available yet | not available yet | not available yet | not available |
 
 ## 4. Current Dataset / Source Status
@@ -66,17 +66,17 @@ The app has working winner predictions, Elo support, analysis pages, betting-rea
 | Model | Candidates | Selected | Selection Status | MMA Family Coverage |
 |---|---:|---:|---|---|
 | winner_model | 240 | 0 | base_features_kept | limited/zero |
-| fight_duration_model | 240 | 20 | selected | limited/zero |
-| over_1_5_model | 240 | 10 | selected | limited/zero |
-| over_2_5_model | 240 | 5 | selected | limited/zero |
-| ends_before_round_3_model | 240 | 0 | base_features_kept | limited/zero |
-| finish_in_round_1_model | 240 | 5 | selected | limited/zero |
+| fight_duration_model | 240 | 5 | selected | limited/zero |
+| over_1_5_model | 240 | 20 | selected | limited/zero |
+| over_2_5_model | 240 | 0 | base_features_kept | limited/zero |
+| ends_before_round_3_model | 240 | 20 | selected | limited/zero |
+| finish_in_round_1_model | 240 | 0 | base_features_kept | limited/zero |
 | finish_type_model | 240 | 0 | base_features_kept | limited/zero |
 | method_umbrella_model | 0 | 0 | not_run_composite_model | limited/zero |
-| strike_volume_model | 240 | 10 | selected | limited/zero |
-| takedown_control_model | 240 | 0 | base_features_kept | limited/zero |
-| finish_model | 240 | 20 | selected | limited/zero |
-| goes_distance_model | 240 | 20 | selected | limited/zero |
+| strike_volume_model | 240 | 5 | selected | limited/zero |
+| takedown_control_model | 240 | 10 | selected | limited/zero |
+| finish_model | 240 | 5 | selected | limited/zero |
+| goes_distance_model | 240 | 5 | selected | limited/zero |
 | method_model | 0 | 0 | not_run_composite_model | limited/zero |
 | round_phase_model | 0 | 0 | not_run_composite_summary | limited/zero |
 | round_model | 0 | 0 | not_run_composite_summary | limited/zero |

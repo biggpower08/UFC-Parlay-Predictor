@@ -14,10 +14,12 @@ from typing import Any
 
 import pandas as pd
 
+from ufc_predictor.config import settings
 from ufc_predictor.features.feature_schema import get_feature_schema
 from ufc_predictor.features.matchup_features import build_features_from_snapshots
 from ufc_predictor.features.opponent_weakness_features import compute_opponent_weakness_scores
 from ufc_predictor.features.style_features import compute_style_scores
+from ufc_predictor.models.elo.elo_engine import expected_score, update_elo_draw, update_elo_win
 from ufc_predictor.utils.helpers import normalize_name
 
 
@@ -86,6 +88,7 @@ def build_training_rows(
         df["_event_date"] = pd.NaT
 
     history: dict[str, dict[str, Any]] = defaultdict(_empty_history)
+    elo_state: dict[str, dict[str, Any]] = defaultdict(_empty_elo_state)
     rows: list[dict[str, Any]] = []
     warnings: list[str] = []
     if not has_event_date:
@@ -93,112 +96,166 @@ def build_training_rows(
         if assume_reverse_chronological:
             warnings.append("Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.")
 
-    for _, fight in df.iterrows():
-        result = normalize_result_type(fight.get("result"))
-        source_fighter_1 = str(fight.get("fighter_1") or "").strip()
-        source_fighter_2 = str(fight.get("fighter_2") or "").strip()
-        if not source_fighter_1 or not source_fighter_2:
-            continue
-        fighter_a, fighter_b, orientation = deterministic_fighter_orientation(source_fighter_1, source_fighter_2)
-        winner_name = _clean_name(fight.get("winner_name"))
-        if not winner_name and result == "win":
-            winner_name = source_fighter_1
-        loser_name = _clean_name(fight.get("loser_name"))
-        if not loser_name and result == "win":
-            loser_name = source_fighter_2
-        f1_wins_safe = safe_winner_target(fighter_a, fighter_b, winner_name)
-
-        method = normalize_method(fight.get("method_group") or fight.get("method"))
-        outcome_has_labels = result == "win" and winner_name is not None
-        is_decision = method == "Decision" if outcome_has_labels else None
-        finish_round = _safe_int(fight.get("round"))
-        finish_time_seconds = parse_round_time_seconds(fight.get("time") or fight.get("finish_time"))
-        round_phase = round_phase_label(fight.get("round"), bool(is_decision)) if outcome_has_labels else None
-        a_hist = history[fighter_a]
-        b_hist = history[fighter_b]
-        feature_set = build_features_from_snapshots(
-            _snapshot_from_running_history(fighter_a, a_hist),
-            _snapshot_from_running_history(fighter_b, b_hist),
-            schema=get_feature_schema("finish"),
-            as_of_date=_date_string(fight.get("_event_date")),
-            mode="historical",
-            feature_mode="actual_fight",
-            scheduled_rounds=_safe_int(fight.get("scheduled_rounds")),
-            weight_class=fight.get("weight_class"),
-        )
-        if not feature_set.validation["valid"]:
-            warnings.append(f"Feature validation warning for {fighter_a} vs {fighter_b}: {feature_set.validation['warnings']}")
-        rows.append(
-            {
-                "event": fight.get("event"),
-                "event_date": _date_string(fight.get("_event_date")),
-                "fight_key": fight.get("fight_key") or fight.get("source_row_id") or fight.get("source_id"),
-                "source_dataset": fight.get("source_dataset") or source,
-                "source_file": fight.get("source_file"),
-                "weight_class": fight.get("weight_class"),
-                "fighter_a": fighter_a,
-                "fighter_b": fighter_b,
-                "source_fighter_1": source_fighter_1,
-                "source_fighter_2": source_fighter_2,
-                "safe_orientation": orientation,
-                "source": source,
-                **feature_set.features,
-                "source_order": int(fight.get("_source_order", len(rows))),
-                "winner": winner_name,
-                "f1_wins_safe": f1_wins_safe,
-                "result_type": result,
-                "finish_binary": (0 if is_decision else 1) if outcome_has_labels else None,
-                "goes_distance_binary": (1 if is_decision else 0) if outcome_has_labels else None,
-                "method_class": method if outcome_has_labels else None,
-                "finish_type_class": None if (not outcome_has_labels or is_decision) else method,
-                "round_number": finish_round if outcome_has_labels else None,
-                "round_phase_class": round_phase,
-                "over_1_5_binary": over_round_half_label(finish_round, finish_time_seconds, bool(is_decision), threshold_round=1) if outcome_has_labels else None,
-                "over_2_5_binary": over_round_half_label(finish_round, finish_time_seconds, bool(is_decision), threshold_round=2) if outcome_has_labels else None,
-                "ends_before_round_3_binary": ends_before_round_3_label(finish_round, bool(is_decision)) if outcome_has_labels else None,
-                "finish_in_round_1_binary": finish_in_round_1_label(finish_round, bool(is_decision)) if outcome_has_labels else None,
-                "fighter_a_sig_strikes": _oriented_value(fight, "fighter_a_sig_strikes", "fighter_b_sig_strikes", orientation),
-                "fighter_b_sig_strikes": _oriented_value(fight, "fighter_b_sig_strikes", "fighter_a_sig_strikes", orientation),
-                "combined_sig_strikes": fight.get("combined_sig_strikes"),
-                "fighter_a_strike_volume_bucket": _oriented_value(fight, "fighter_a_strike_volume_bucket", "fighter_b_strike_volume_bucket", orientation),
-                "fighter_b_strike_volume_bucket": _oriented_value(fight, "fighter_b_strike_volume_bucket", "fighter_a_strike_volume_bucket", orientation),
-                "combined_strike_volume_bucket": fight.get("strike_volume_bucket") or fight.get("combined_strike_volume_bucket"),
-                "fighter_a_50plus_sig_strikes": _oriented_value(fight, "fighter_a_50plus_sig_strikes", "fighter_b_50plus_sig_strikes", orientation),
-                "fighter_b_50plus_sig_strikes": _oriented_value(fight, "fighter_b_50plus_sig_strikes", "fighter_a_50plus_sig_strikes", orientation),
-                "combined_100plus_sig_strikes": fight.get("combined_100plus_sig_strikes"),
-                "fighter_a_takedowns": _oriented_value(fight, "fighter_a_takedowns", "fighter_b_takedowns", orientation),
-                "fighter_b_takedowns": _oriented_value(fight, "fighter_b_takedowns", "fighter_a_takedowns", orientation),
-                "fighter_a_takedown_1plus": _oriented_value(fight, "fighter_a_takedown_1plus", "fighter_b_takedown_1plus", orientation),
-                "fighter_b_takedown_1plus": _oriented_value(fight, "fighter_b_takedown_1plus", "fighter_a_takedown_1plus", orientation),
-                "grappling_heavy_binary": fight.get("grappling_heavy_binary"),
-                "takedown_control_bucket": fight.get("takedown_control_bucket"),
-            }
-        )
-
-        a_won = f1_wins_safe is True or f1_wins_safe == 1
-        b_won = f1_wins_safe is False or f1_wins_safe == 0
-        _update_history(
-            history[fighter_a],
-            won=a_won if outcome_has_labels else None,
-            method=method,
-            fight=fight,
-            orientation=orientation,
-            side="a",
-            finish_round=finish_round,
-        )
-        _update_history(
-            history[fighter_b],
-            won=b_won if outcome_has_labels else None,
-            method=method,
-            fight=fight,
-            orientation=orientation,
-            side="b",
-            finish_round=finish_round,
-        )
+    df["_elo_event_key"] = _elo_event_keys(df, has_event_date)
+    for _, event_group in df.groupby("_elo_event_key", sort=False):
+        elo_pre_event = {name: state.copy() for name, state in elo_state.items()}
+        pending_elo_updates: list[dict[str, Any]] = []
+        for _, fight in event_group.iterrows():
+            pending = _build_training_row(
+                fight=fight,
+                source=source,
+                history=history,
+                elo_pre_event=elo_pre_event,
+                rows=rows,
+                warnings=warnings,
+                has_event_date=has_event_date,
+            )
+            if pending:
+                pending_elo_updates.append(pending)
+        for pending in pending_elo_updates:
+            _apply_pending_elo_update(elo_state, pending)
 
     dataset = pd.DataFrame(rows)
     audit = audit_training_dataset(dataset, fights, source, warnings)
     return dataset, audit
+
+
+def _build_training_row(
+    fight: pd.Series,
+    source: str,
+    history: dict[str, dict[str, Any]],
+    elo_pre_event: dict[str, dict[str, Any]],
+    rows: list[dict[str, Any]],
+    warnings: list[str],
+    has_event_date: bool,
+) -> dict[str, Any] | None:
+    result = normalize_result_type(fight.get("result"))
+    source_fighter_1 = str(fight.get("fighter_1") or "").strip()
+    source_fighter_2 = str(fight.get("fighter_2") or "").strip()
+    if not source_fighter_1 or not source_fighter_2:
+        return None
+    fighter_a, fighter_b, orientation = deterministic_fighter_orientation(source_fighter_1, source_fighter_2)
+    winner_name = _clean_name(fight.get("winner_name"))
+    if not winner_name and result == "win":
+        winner_name = source_fighter_1
+    loser_name = _clean_name(fight.get("loser_name"))
+    if not loser_name and result == "win":
+        loser_name = source_fighter_2
+    f1_wins_safe = safe_winner_target(fighter_a, fighter_b, winner_name)
+
+    method = normalize_method(fight.get("method_group") or fight.get("method"))
+    outcome_has_labels = result == "win" and winner_name is not None
+    is_decision = method == "Decision" if outcome_has_labels else None
+    finish_round = _safe_int(fight.get("round"))
+    finish_time_seconds = parse_round_time_seconds(fight.get("time") or fight.get("finish_time"))
+    round_phase = round_phase_label(fight.get("round"), bool(is_decision)) if outcome_has_labels else None
+    a_hist = history[fighter_a]
+    b_hist = history[fighter_b]
+    a_elo = _elo_snapshot(fighter_a, elo_pre_event)
+    b_elo = _elo_snapshot(fighter_b, elo_pre_event)
+    elo_quality_flag = "pre_event" if has_event_date else "source_order_inferred"
+    elo_expected_a = round(expected_score(a_elo["elo"], b_elo["elo"]), 6)
+    feature_set = build_features_from_snapshots(
+        _snapshot_from_running_history(fighter_a, a_hist, a_elo),
+        _snapshot_from_running_history(fighter_b, b_hist, b_elo),
+        schema=get_feature_schema("finish"),
+        as_of_date=_date_string(fight.get("_event_date")),
+        mode="historical",
+        feature_mode="actual_fight",
+        scheduled_rounds=_safe_int(fight.get("scheduled_rounds")),
+        weight_class=fight.get("weight_class"),
+    )
+    if not feature_set.validation["valid"]:
+        warnings.append(f"Feature validation warning for {fighter_a} vs {fighter_b}: {feature_set.validation['warnings']}")
+    rows.append(
+        {
+            "event": fight.get("event"),
+            "event_date": _date_string(fight.get("_event_date")),
+            "fight_key": fight.get("fight_key") or fight.get("source_row_id") or fight.get("source_id"),
+            "source_dataset": fight.get("source_dataset") or source,
+            "source_file": fight.get("source_file"),
+            "weight_class": fight.get("weight_class"),
+            "fighter_a": fighter_a,
+            "fighter_b": fighter_b,
+            "source_fighter_1": source_fighter_1,
+            "source_fighter_2": source_fighter_2,
+            "safe_orientation": orientation,
+            "source": source,
+            **feature_set.features,
+            "fighter_a_elo_pre": a_elo["elo"],
+            "fighter_b_elo_pre": b_elo["elo"],
+            "elo_diff_pre": round(a_elo["elo"] - b_elo["elo"], 6),
+            "elo_expected_fighter_a_pre": elo_expected_a,
+            "fighter_a_elo_fights_before": a_elo["fights"],
+            "fighter_b_elo_fights_before": b_elo["fights"],
+            "elo_quality_flag": elo_quality_flag,
+            "elo_feature_mode": "strict_pre_event" if has_event_date else "strict_source_order_pre_fight",
+            "source_order": int(fight.get("_source_order", len(rows))),
+            "winner": winner_name,
+            "f1_wins_safe": f1_wins_safe,
+            "result_type": result,
+            "finish_binary": (0 if is_decision else 1) if outcome_has_labels else None,
+            "goes_distance_binary": (1 if is_decision else 0) if outcome_has_labels else None,
+            "method_class": method if outcome_has_labels else None,
+            "finish_type_class": None if (not outcome_has_labels or is_decision) else method,
+            "round_number": finish_round if outcome_has_labels else None,
+            "round_phase_class": round_phase,
+            "over_1_5_binary": over_round_half_label(finish_round, finish_time_seconds, bool(is_decision), threshold_round=1) if outcome_has_labels else None,
+            "over_2_5_binary": over_round_half_label(finish_round, finish_time_seconds, bool(is_decision), threshold_round=2) if outcome_has_labels else None,
+            "ends_before_round_3_binary": ends_before_round_3_label(finish_round, bool(is_decision)) if outcome_has_labels else None,
+            "finish_in_round_1_binary": finish_in_round_1_label(finish_round, bool(is_decision)) if outcome_has_labels else None,
+            "fighter_a_sig_strikes": _oriented_value(fight, "fighter_a_sig_strikes", "fighter_b_sig_strikes", orientation),
+            "fighter_b_sig_strikes": _oriented_value(fight, "fighter_b_sig_strikes", "fighter_a_sig_strikes", orientation),
+            "combined_sig_strikes": fight.get("combined_sig_strikes"),
+            "fighter_a_strike_volume_bucket": _oriented_value(fight, "fighter_a_strike_volume_bucket", "fighter_b_strike_volume_bucket", orientation),
+            "fighter_b_strike_volume_bucket": _oriented_value(fight, "fighter_b_strike_volume_bucket", "fighter_a_strike_volume_bucket", orientation),
+            "combined_strike_volume_bucket": fight.get("strike_volume_bucket") or fight.get("combined_strike_volume_bucket"),
+            "fighter_a_50plus_sig_strikes": _oriented_value(fight, "fighter_a_50plus_sig_strikes", "fighter_b_50plus_sig_strikes", orientation),
+            "fighter_b_50plus_sig_strikes": _oriented_value(fight, "fighter_b_50plus_sig_strikes", "fighter_a_50plus_sig_strikes", orientation),
+            "combined_100plus_sig_strikes": fight.get("combined_100plus_sig_strikes"),
+            "fighter_a_takedowns": _oriented_value(fight, "fighter_a_takedowns", "fighter_b_takedowns", orientation),
+            "fighter_b_takedowns": _oriented_value(fight, "fighter_b_takedowns", "fighter_a_takedowns", orientation),
+            "fighter_a_takedown_1plus": _oriented_value(fight, "fighter_a_takedown_1plus", "fighter_b_takedown_1plus", orientation),
+            "fighter_b_takedown_1plus": _oriented_value(fight, "fighter_b_takedown_1plus", "fighter_a_takedown_1plus", orientation),
+            "grappling_heavy_binary": fight.get("grappling_heavy_binary"),
+            "takedown_control_bucket": fight.get("takedown_control_bucket"),
+        }
+    )
+
+    a_won = f1_wins_safe is True or f1_wins_safe == 1
+    b_won = f1_wins_safe is False or f1_wins_safe == 0
+    _update_history(
+        history[fighter_a],
+        won=a_won if outcome_has_labels else None,
+        method=method,
+        fight=fight,
+        orientation=orientation,
+        side="a",
+        finish_round=finish_round,
+    )
+    _update_history(
+        history[fighter_b],
+        won=b_won if outcome_has_labels else None,
+        method=method,
+        fight=fight,
+        orientation=orientation,
+        side="b",
+        finish_round=finish_round,
+    )
+
+    if result == "draw":
+        actual_a = 0.5
+    elif outcome_has_labels and a_won:
+        actual_a = 1.0
+    elif outcome_has_labels and b_won:
+        actual_a = 0.0
+    else:
+        return None
+    return {
+        "fighter_a": fighter_a,
+        "fighter_b": fighter_b,
+        "actual_a": actual_a,
+    }
 
 
 def audit_training_dataset(dataset: pd.DataFrame, raw_fights: pd.DataFrame, source: str, warnings: list[str] | None = None) -> TrainingDatasetAudit:
@@ -446,13 +503,58 @@ def _empty_history() -> dict[str, Any]:
     }
 
 
-def _snapshot_from_running_history(fighter_name: str, history: dict[str, int]) -> dict[str, Any]:
+def _empty_elo_state() -> dict[str, Any]:
+    return {"elo": float(settings.ELO_INITIAL), "fights": 0}
+
+
+def _elo_event_keys(df: pd.DataFrame, has_event_date: bool) -> pd.Series:
+    if not has_event_date:
+        return df["_source_order"].astype(str)
+    event_name = df["event"].fillna("").astype(str) if "event" in df.columns else pd.Series([""] * len(df), index=df.index)
+    event_dates = df["_event_date"].dt.strftime("%Y-%m-%d").fillna("missing-date")
+    return event_dates + "|" + event_name
+
+
+def _elo_snapshot(fighter_name: str, elo_state: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    state = elo_state.get(fighter_name) or _empty_elo_state()
+    return {"elo": float(state.get("elo", settings.ELO_INITIAL)), "fights": int(state.get("fights", 0) or 0)}
+
+
+def _apply_pending_elo_update(elo_state: dict[str, dict[str, Any]], pending: dict[str, Any]) -> None:
+    fighter_a = pending["fighter_a"]
+    fighter_b = pending["fighter_b"]
+    a_state = elo_state[fighter_a]
+    b_state = elo_state[fighter_b]
+    a_elo = float(a_state.get("elo", settings.ELO_INITIAL))
+    b_elo = float(b_state.get("elo", settings.ELO_INITIAL))
+    actual_a = pending.get("actual_a")
+    if actual_a == 1.0:
+        new_a, new_b = update_elo_win(a_elo, b_elo)
+    elif actual_a == 0.0:
+        new_b, new_a = update_elo_win(b_elo, a_elo)
+    elif actual_a == 0.5:
+        new_a, new_b = update_elo_draw(a_elo, b_elo)
+    else:
+        return
+    a_state["elo"] = float(new_a)
+    b_state["elo"] = float(new_b)
+    a_state["fights"] = int(a_state.get("fights", 0) or 0) + 1
+    b_state["fights"] = int(b_state.get("fights", 0) or 0) + 1
+
+
+def _snapshot_from_running_history(
+    fighter_name: str,
+    history: dict[str, int],
+    elo_state: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     fights = int(history.get("fights", 0) or 0)
     wins = int(history.get("wins", 0) or 0)
     finishes = int(history.get("finishes", 0) or 0)
     decisions = int(history.get("decisions", 0) or 0)
     losses = int(history.get("losses", 0) or 0)
     recent = list(history.get("recent_results", []))
+    elo_state = elo_state or _empty_elo_state()
+    elo_fights = int(elo_state.get("fights", 0) or 0)
     snapshot = {
         "fighter_name": fighter_name,
         "normalized_name": str(fighter_name).lower(),
@@ -470,10 +572,10 @@ def _snapshot_from_running_history(fighter_name: str, history: dict[str, int]) -
         "decision_loss_rate_before": _rate(int(history.get("decision_losses", 0) or 0), losses),
         "recent_3_win_rate": _recent_rate(recent, 3),
         "recent_5_win_rate": _recent_rate(recent, 5),
-        "elo_before_fight": None,
-        "elo_fights_count_before": 0,
-        "elo_source": "baseline",
-        "elo_available": False,
+        "elo_before_fight": float(elo_state.get("elo", settings.ELO_INITIAL)),
+        "elo_fights_count_before": elo_fights,
+        "elo_source": "computed" if elo_fights > 0 else "baseline",
+        "elo_available": elo_fights > 0,
     }
     snapshot.update(_style_weakness_scores(history))
     return snapshot
