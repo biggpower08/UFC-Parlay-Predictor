@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-06-11T13:57:10.299434+00:00",
+  "input_dir": "data\\imports\\kaggle\\ufc_betting_odds_daily",
+  "status": "blocked_no_files",
+  "plain_english_summary": "No local odds files were found. Download or place raw Kaggle odds files locally before auditing.",
+  "odds_calibration_model_status": "blocked",
+  "safe_for": {
+    "research_only": "allowed_for_manual_review",
+    "opening_odds_model": "blocked",
+    "24h_prefight_model": "blocked",
+    "closing_line_model": "blocked_or_manual_review_only",
+    "production_odds_model": "blocked"
+  },
+  "totals": {
+    "available_files": 0,
+    "audited_files": 0,
+    "total_rows": 0,
+    "missing_snapshot_timestamp_rows": 0,
+    "missing_event_date_rows": 0,
+    "snapshot_after_event_rows": 0,
+    "timezone_ambiguous_files": 0,
+    "moneyline_rows": 0,
+    "method_prop_rows": 0,
+    "duplicate_snapshots": 0,
+    "append_only_history_supported": false
+  },
+  "files": [],
+  "decision_rules": [
+    "Rows without trusted snapshot timestamps cannot train production odds models.",
+    "Rows where snapshot timestamps are after event/fight dates are blocked for pre-fight prediction.",
+    "Closing odds can only train closing-line mode unless earlier collection timestamps exist.",
+    "odds_calibration_model remains blocked until timestamp safety passes and production modeling review is complete."
+  ]
+}

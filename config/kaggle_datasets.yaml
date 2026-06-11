@@ -1,0 +1,96 @@
+datasets:
+  - id: mdabbert_2010_2020_odds
+    kaggle_ref: mdabbert/ufc-fights-2010-2020-with-betting-odds
+    category: fight_results_with_odds
+    enabled: true
+    train_usage: research_only_until_audited
+    requires_timestamp_audit: true
+    odds_source: true
+    result_source: true
+    stat_source: false
+    expected_files: []
+    license_notes: Review Kaggle dataset license before commercial redistribution.
+
+  - id: mdabbert_ultimate
+    kaggle_ref: mdabbert/ultimate-ufc-dataset
+    category: fight_results_stats_odds
+    enabled: true
+    train_usage: audited_result_source
+    requires_timestamp_audit: true
+    odds_source: true
+    result_source: true
+    stat_source: true
+    expected_files: []
+    license_notes: Review Kaggle dataset license before commercial redistribution.
+
+  - id: ufc_1994_2025
+    kaggle_ref: neelagiriaditya/ufc-datasets-1994-2025
+    category: fight_results
+    enabled: true
+    train_usage: audited_result_source
+    requires_timestamp_audit: false
+    odds_source: false
+    result_source: true
+    stat_source: true
+    expected_files: []
+    license_notes: Review Kaggle dataset license before commercial redistribution.
+
+  - id: ufc_1994_2026
+    kaggle_ref: jossilva3110/ufc-dataset-1994-2026
+    category: fight_results
+    enabled: true
+    train_usage: audited_result_source
+    requires_timestamp_audit: false
+    odds_source: false
+    result_source: true
+    stat_source: true
+    expected_files: []
+    license_notes: Review Kaggle dataset license before commercial redistribution.
+
+  - id: ufc_fight_forecast
+    kaggle_ref: jerzyszocik/ufc-fight-forecast-complete-gold-modeling-dataset
+    category: fight_stats_gold
+    enabled: true
+    train_usage: audited_result_source
+    requires_timestamp_audit: false
+    odds_source: false
+    result_source: true
+    stat_source: true
+    expected_files: []
+    license_notes: Review Kaggle dataset license before commercial redistribution.
+
+  - id: ufc_stats_complete
+    kaggle_ref: leandroiber/ufc-stats-complete-dataset
+    category: stat_labels
+    enabled: true
+    train_usage: stat_source_not_universal_result_source
+    requires_timestamp_audit: false
+    odds_source: false
+    result_source: false
+    stat_source: true
+    expected_files: []
+    license_notes: Review Kaggle dataset license before commercial redistribution.
+
+  - id: ufc_betting_odds_daily
+    kaggle_ref: jerzyszocik/ufc-betting-odds-daily-dataset
+    category: timestamped_odds_candidate
+    enabled: true
+    train_usage: blocked_until_timestamp_audit_passes
+    requires_timestamp_audit: true
+    odds_source: true
+    result_source: false
+    stat_source: false
+    expected_files: []
+    license_notes: Candidate daily odds snapshots; audit timestamps locally before odds modeling.
+
+  - id: ufc_closing_odds_multisport_sample
+    kaggle_ref: oliviersportsdata/us-sports-master-historical-closing-odds
+    category: closing_odds_sample
+    enabled: false
+    train_usage: research_only_closing_line_mode
+    requires_timestamp_audit: true
+    odds_source: true
+    result_source: false
+    stat_source: false
+    expected_files: []
+    license_notes: Closing odds cannot train early-prediction mode without earlier snapshots.

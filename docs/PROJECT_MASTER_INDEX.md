@@ -22,3 +22,8 @@ Use `PROJECT_MASTER_STATUS.md` as the main source of truth. The files below are 
 - [dataset_recovery_plan.md](dataset_recovery_plan.md) - available
 - [neural_network_experiment_plan.md](neural_network_experiment_plan.md) - available
 - [development_run_modes.md](development_run_modes.md) - available
+- [weekly_kaggle_refresh_automation.md](weekly_kaggle_refresh_automation.md) - available
+- [odds_timestamp_audit.md](odds_timestamp_audit.md) - available
+- [odds_ingestion_plan.md](odds_ingestion_plan.md) - available
+- [odds_leakage_audit.md](odds_leakage_audit.md) - available
+- [odds_feature_schema.md](odds_feature_schema.md) - available
