@@ -1562,9 +1562,9 @@ def production_gate_result(model_name: str, result: dict, split_report: dict | N
         recommended = "not available"
         warning = "Odds calibration is blocked until pre-fight odds timestamps are trusted."
     elif not failed:
-        status = "production_ready"
-        recommended = "eligible for production after artifact deployment review"
-        warning = "Model passed automated production gates, but fight predictions remain uncertain."
+        status = "production_candidate"
+        recommended = "candidate for limited internal validation; artifact packaging still requires explicit review"
+        warning = "Model passed automated gates for candidate status, but it is not packaged or production-ready yet."
     elif model_name == "winner_model" and (
         "source_holdout_stable" not in passed or "winner_leakage_audit_passes" not in passed
     ):

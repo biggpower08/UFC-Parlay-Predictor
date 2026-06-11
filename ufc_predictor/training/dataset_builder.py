@@ -22,6 +22,8 @@ from ufc_predictor.utils.helpers import normalize_name
 
 
 DECISION_METHODS = {"u-dec", "s-dec", "m-dec", "dec", "decision", "majority decision", "split decision"}
+NO_CONTEST_RESULTS = {"nc", "no contest", "no-contest", "no_contest", "overturned"}
+DRAW_RESULTS = {"draw", "majority draw", "split draw"}
 
 
 @dataclass
@@ -92,7 +94,7 @@ def build_training_rows(
             warnings.append("Rows were processed in reverse source order for experimental training because the cached CSV appears newest-first.")
 
     for _, fight in df.iterrows():
-        result = str(fight.get("result") or "").lower().strip().split("\n")[0]
+        result = normalize_result_type(fight.get("result"))
         source_fighter_1 = str(fight.get("fighter_1") or "").strip()
         source_fighter_2 = str(fight.get("fighter_2") or "").strip()
         if not source_fighter_1 or not source_fighter_2:
@@ -107,10 +109,11 @@ def build_training_rows(
         f1_wins_safe = safe_winner_target(fighter_a, fighter_b, winner_name)
 
         method = normalize_method(fight.get("method_group") or fight.get("method"))
-        is_decision = method == "Decision"
+        outcome_has_labels = result == "win" and winner_name is not None
+        is_decision = method == "Decision" if outcome_has_labels else None
         finish_round = _safe_int(fight.get("round"))
         finish_time_seconds = parse_round_time_seconds(fight.get("time") or fight.get("finish_time"))
-        round_phase = round_phase_label(fight.get("round"), is_decision)
+        round_phase = round_phase_label(fight.get("round"), bool(is_decision)) if outcome_has_labels else None
         a_hist = history[fighter_a]
         b_hist = history[fighter_b]
         feature_set = build_features_from_snapshots(
@@ -143,16 +146,17 @@ def build_training_rows(
                 "source_order": int(fight.get("_source_order", len(rows))),
                 "winner": winner_name,
                 "f1_wins_safe": f1_wins_safe,
-                "finish_binary": 0 if is_decision else 1,
-                "goes_distance_binary": 1 if is_decision else 0,
-                "method_class": method,
-                "finish_type_class": None if is_decision else method,
-                "round_number": finish_round,
+                "result_type": result,
+                "finish_binary": (0 if is_decision else 1) if outcome_has_labels else None,
+                "goes_distance_binary": (1 if is_decision else 0) if outcome_has_labels else None,
+                "method_class": method if outcome_has_labels else None,
+                "finish_type_class": None if (not outcome_has_labels or is_decision) else method,
+                "round_number": finish_round if outcome_has_labels else None,
                 "round_phase_class": round_phase,
-                "over_1_5_binary": over_round_half_label(finish_round, finish_time_seconds, is_decision, threshold_round=1),
-                "over_2_5_binary": over_round_half_label(finish_round, finish_time_seconds, is_decision, threshold_round=2),
-                "ends_before_round_3_binary": ends_before_round_3_label(finish_round, is_decision),
-                "finish_in_round_1_binary": finish_in_round_1_label(finish_round, is_decision),
+                "over_1_5_binary": over_round_half_label(finish_round, finish_time_seconds, bool(is_decision), threshold_round=1) if outcome_has_labels else None,
+                "over_2_5_binary": over_round_half_label(finish_round, finish_time_seconds, bool(is_decision), threshold_round=2) if outcome_has_labels else None,
+                "ends_before_round_3_binary": ends_before_round_3_label(finish_round, bool(is_decision)) if outcome_has_labels else None,
+                "finish_in_round_1_binary": finish_in_round_1_label(finish_round, bool(is_decision)) if outcome_has_labels else None,
                 "fighter_a_sig_strikes": _oriented_value(fight, "fighter_a_sig_strikes", "fighter_b_sig_strikes", orientation),
                 "fighter_b_sig_strikes": _oriented_value(fight, "fighter_b_sig_strikes", "fighter_a_sig_strikes", orientation),
                 "combined_sig_strikes": fight.get("combined_sig_strikes"),
@@ -175,7 +179,7 @@ def build_training_rows(
         b_won = f1_wins_safe is False or f1_wins_safe == 0
         _update_history(
             history[fighter_a],
-            won=a_won if winner_name else None,
+            won=a_won if outcome_has_labels else None,
             method=method,
             fight=fight,
             orientation=orientation,
@@ -184,7 +188,7 @@ def build_training_rows(
         )
         _update_history(
             history[fighter_b],
-            won=b_won if winner_name else None,
+            won=b_won if outcome_has_labels else None,
             method=method,
             fight=fight,
             orientation=orientation,
@@ -305,7 +309,22 @@ def audit_training_dataset(dataset: pd.DataFrame, raw_fights: pd.DataFrame, sour
 
 
 def load_fights_csv(path: str | Path) -> pd.DataFrame:
-    return pd.read_csv(path)
+    return pd.read_csv(path, low_memory=False)
+
+
+def normalize_result_type(value) -> str:
+    text = str(value or "").lower().strip().split("\n")[0]
+    if not text:
+        return "unknown"
+    if text in NO_CONTEST_RESULTS or "no contest" in text or "overturned" in text:
+        return "nc"
+    if text in DRAW_RESULTS or text == "d" or "draw" in text:
+        return "draw"
+    if text in {"win", "w", "winner"}:
+        return "win"
+    if "win" in text:
+        return "win"
+    return "unknown"
 
 
 def normalize_method(value) -> str:

@@ -1,0 +1,1948 @@
+{
+  "generated_at": "2026-06-11T04:41:16.192334+00:00",
+  "input_summary": {
+    "rows": 49355,
+    "sources": [
+      "mdabbert_ultimate",
+      "ufc_1994_2025",
+      "ufc_1994_2026",
+      "ufc_fight_forecast",
+      "ufc_stats_complete"
+    ],
+    "audit": {
+      "source": "imported_csv",
+      "fight_rows": 49355,
+      "fighter_count": 2804,
+      "feature_count": 157,
+      "date_range": {
+        "min": "1993-11-12",
+        "max": "2026-05-16"
+      },
+      "source_coverage": {
+        "raw_rows": 49355,
+        "has_event_history": true,
+        "has_fight_results": true,
+        "has_method_round_time": true,
+        "has_event_date": true,
+        "has_significant_strike_totals": true,
+        "has_takedown_control_labels": true
+      },
+      "label_availability": {
+        "winner": 32140,
+        "finish_binary": 32140,
+        "goes_distance_binary": 32140,
+        "method_class": 32140,
+        "finish_type_class": 17039,
+        "round_number": 31518,
+        "round_phase_class": 32140,
+        "over_1_5_binary": 31708,
+        "over_2_5_binary": 31708,
+        "ends_before_round_3_binary": 31708,
+        "finish_in_round_1_binary": 31708,
+        "fighter_a_sig_strikes": 33530,
+        "fighter_b_sig_strikes": 33530,
+        "combined_sig_strikes": 33530,
+        "fighter_a_strike_volume_bucket": 0,
+        "fighter_b_strike_volume_bucket": 0,
+        "combined_strike_volume_bucket": 33530,
+        "fighter_a_50plus_sig_strikes": 33530,
+        "fighter_b_50plus_sig_strikes": 33530,
+        "combined_100plus_sig_strikes": 33530,
+        "fighter_a_takedowns": 42081,
+        "fighter_b_takedowns": 42081,
+        "fighter_a_takedown_1plus": 42081,
+        "fighter_b_takedown_1plus": 42081,
+        "grappling_heavy_binary": 42081,
+        "takedown_control_bucket": 42081
+      },
+      "class_distributions": {
+        "finish_binary": {
+          "1.0": 17039,
+          "0.0": 15101
+        },
+        "goes_distance_binary": {
+          "0.0": 17039,
+          "1.0": 15101
+        },
+        "method_class": {
+          "Submission": 6160,
+          "KO/TKO": 10460,
+          "Other": 419,
+          "Decision": 15101
+        },
+        "finish_type_class": {
+          "Submission": 6160,
+          "KO/TKO": 10460,
+          "Other": 419
+        },
+        "round_phase_class": {
+          "early": 8682,
+          "middle": 7608,
+          "decision": 15101,
+          "late": 317,
+          "unknown": 432
+        },
+        "over_1_5_binary": {
+          "0.0": 10960,
+          "1.0": 20748
+        },
+        "over_2_5_binary": {
+          "0.0": 14950,
+          "1.0": 16758
+        },
+        "ends_before_round_3_binary": {
+          "1.0": 13784,
+          "0.0": 17924
+        },
+        "finish_in_round_1_binary": {
+          "1.0": 8682,
+          "0.0": 23026
+        },
+        "combined_strike_volume_bucket": {
+          "low": 14009,
+          "medium": 10534,
+          "high": 8987
+        },
+        "grappling_heavy_binary": {
+          "0.0": 24105,
+          "1.0": 17976
+        }
+      },
+      "missingness_report": {
+        "a_prior_fights": 0,
+        "b_prior_fights": 0,
+        "a_prior_wins": 0,
+        "b_prior_wins": 0,
+        "a_prior_finishes": 0,
+        "b_prior_finishes": 0,
+        "a_prior_decisions": 0,
+        "b_prior_decisions": 0,
+        "fighter_1_age": 49355,
+        "fighter_2_age": 49355,
+        "age_diff": 49355,
+        "fighter_1_height": 49355,
+        "fighter_2_height": 49355,
+        "height_diff": 49355,
+        "fighter_1_reach": 49355,
+        "fighter_2_reach": 49355,
+        "reach_diff": 49355,
+        "fighter_1_stance_known": 0,
+        "fighter_2_stance_known": 0,
+        "fighter_1_history_count": 0,
+        "fighter_2_history_count": 0,
+        "minimum_history_count": 0,
+        "fighter_1_win_rate_before": 1399,
+        "fighter_2_win_rate_before": 1405,
+        "win_rate_diff": 2301,
+        "fighter_1_finish_win_rate_before": 7329,
+        "fighter_2_finish_win_rate_before": 7024,
+        "finish_rate_diff": 13187,
+        "fighter_1_decision_win_rate_before": 7329,
+        "fighter_2_decision_win_rate_before": 7024,
+        "decision_rate_diff": 13187,
+        "fighter_1_ko_tko_win_rate_before": 7329,
+        "fighter_2_ko_tko_win_rate_before": 7024,
+        "ko_tko_rate_diff": 13187,
+        "fighter_1_submission_win_rate_before": 7329,
+        "fighter_2_submission_win_rate_before": 7024,
+        "submission_rate_diff": 13187,
+        "fighter_1_finish_loss_rate_before": 7719,
+        "fighter_2_finish_loss_rate_before": 7596,
+        "fighter_1_decision_loss_rate_before": 7719,
+        "fighter_2_decision_loss_rate_before": 7596,
+        "fighter_1_recent_3_win_rate": 6576,
+        "fighter_2_recent_3_win_rate": 6610,
+        "recent_3_win_rate_diff": 9379,
+        "fighter_1_recent_5_win_rate": 5237,
+        "fighter_2_recent_5_win_rate": 5173,
+        "recent_5_win_rate_diff": 7973,
+        "fighter_1_recent_3_finish_rate": 49355,
+        "fighter_2_recent_3_finish_rate": 49355,
+        "fighter_1_recent_5_finish_rate": 49355,
+        "fighter_2_recent_5_finish_rate": 49355,
+        "fighter_1_days_since_last_fight": 49355,
+        "fighter_2_days_since_last_fight": 49355,
+        "days_since_last_fight_diff": 49355,
+        "fighter_1_fights_last_12_months": 49355,
+        "fighter_2_fights_last_12_months": 49355,
+        "fighter_1_fights_last_24_months": 49355,
+        "fighter_2_fights_last_24_months": 49355,
+        "fighter_1_elo_before_fight": 49355,
+        "fighter_2_elo_before_fight": 49355,
+        "elo_diff": 49355,
+        "elo_expected_fighter_1": 49355,
+        "fighter_1_elo_fights_count_before": 0,
+        "fighter_2_elo_fights_count_before": 0,
+        "fighter_1_elo_available": 0,
+        "fighter_2_elo_available": 0,
+        "fighter_1_striker_score": 1399,
+        "fighter_2_striker_score": 1405,
+        "striker_score_diff": 2301,
+        "fighter_1_high_volume_striker_score": 1399,
+        "fighter_2_high_volume_striker_score": 1405,
+        "high_volume_striker_score_diff": 2301,
+        "fighter_1_power_finisher_score": 1399,
+        "fighter_2_power_finisher_score": 1405,
+        "power_finisher_score_diff": 2301,
+        "fighter_1_wrestler_score": 1399,
+        "fighter_2_wrestler_score": 1405,
+        "wrestler_score_diff": 2301,
+        "fighter_1_grappler_score": 1399,
+        "fighter_2_grappler_score": 1405,
+        "grappler_score_diff": 2301,
+        "fighter_1_submission_threat_score": 1399,
+        "fighter_2_submission_threat_score": 1405,
+        "submission_threat_score_diff": 2301,
+        "fighter_1_control_fighter_score": 1399,
+        "fighter_2_control_fighter_score": 1405,
+        "control_fighter_score_diff": 2301,
+        "fighter_1_high_pace_score": 1399,
+        "fighter_2_high_pace_score": 1405,
+        "high_pace_score_diff": 2301,
+        "fighter_1_durability_score": 1399,
+        "fighter_2_durability_score": 1405,
+        "durability_score_diff": 2301,
+        "fighter_1_decision_tendency_score": 1399,
+        "fighter_2_decision_tendency_score": 1405,
+        "decision_tendency_score_diff": 2301,
+        "fighter_1_early_finish_threat_score": 1399,
+        "fighter_2_early_finish_threat_score": 1405,
+        "early_finish_threat_score_diff": 2301,
+        "fighter_1_low_volume_control_score": 1399,
+        "fighter_2_low_volume_control_score": 1405,
+        "low_volume_control_score_diff": 2301,
+        "fighter_1_volatility_score": 1399,
+        "fighter_2_volatility_score": 1405,
+        "volatility_score_diff": 2301,
+        "fighter_1_strike_absorption_weakness": 1399,
+        "fighter_2_strike_absorption_weakness": 1405,
+        "strike_absorption_weakness_diff": 2301,
+        "fighter_1_takedown_defense_weakness_proxy": 1399,
+        "fighter_2_takedown_defense_weakness_proxy": 1405,
+        "takedown_defense_weakness_proxy_diff": 2301,
+        "fighter_1_low_defensive_volume_weakness": 1399,
+        "fighter_2_low_defensive_volume_weakness": 1405,
+        "low_defensive_volume_weakness_diff": 2301,
+        "fighter_1_submission_defense_weakness_proxy": 1399,
+        "fighter_2_submission_defense_weakness_proxy": 1405,
+        "submission_defense_weakness_proxy_diff": 2301,
+        "fighter_1_grappling_exposure_weakness": 1399,
+        "fighter_2_grappling_exposure_weakness": 1405,
+        "grappling_exposure_weakness_diff": 2301,
+        "fighter_1_control_vulnerability_proxy": 1399,
+        "fighter_2_control_vulnerability_proxy": 1405,
+        "control_vulnerability_proxy_diff": 2301,
+        "fighter_1_durability_weakness": 1399,
+        "fighter_2_durability_weakness": 1405,
+        "durability_weakness_diff": 2301,
+        "fighter_1_early_finish_vulnerability": 1399,
+        "fighter_2_early_finish_vulnerability": 1405,
+        "early_finish_vulnerability_diff": 2301,
+        "fighter_1_low_activity_weakness": 1399,
+        "fighter_2_low_activity_weakness": 1405,
+        "low_activity_weakness_diff": 2301,
+        "fighter_1_poor_recent_form_weakness": 5237,
+        "fighter_2_poor_recent_form_weakness": 5173,
+        "poor_recent_form_weakness_diff": 7973,
+        "fighter_1_pace_breakdown_risk": 1399,
+        "fighter_2_pace_breakdown_risk": 1405,
+        "pace_breakdown_risk_diff": 2301,
+        "fighter_1_cardio_late_fight_risk_proxy": 1399,
+        "fighter_2_cardio_late_fight_risk_proxy": 1405,
+        "cardio_late_fight_risk_proxy_diff": 2301,
+        "same_division": 0,
+        "cross_division": 0,
+        "catchweight": 0,
+        "weight_class_gap": 573,
+        "estimated_weight_gap_lbs": 573,
+        "scheduled_rounds": 17322,
+        "height_gap": 0,
+        "reach_gap": 0,
+        "unknown_size_context": 0,
+        "size_context_quality": 0,
+        "pound_for_pound_mode": 0,
+        "size_features_used": 0,
+        "low_sample_warning": 0,
+        "missing_profile_warning": 0,
+        "missing_stats_warning": 0,
+        "cross_division_warning": 0,
+        "winner": 17215,
+        "finish_binary": 17215,
+        "goes_distance_binary": 17215,
+        "method_class": 17215,
+        "finish_type_class": 32316,
+        "round_number": 17837,
+        "round_phase_class": 17215,
+        "over_1_5_binary": 17647,
+        "over_2_5_binary": 17647,
+        "ends_before_round_3_binary": 17647,
+        "finish_in_round_1_binary": 17647,
+        "fighter_a_sig_strikes": 15825,
+        "fighter_b_sig_strikes": 15825,
+        "combined_sig_strikes": 15825,
+        "fighter_a_strike_volume_bucket": 49355,
+        "fighter_b_strike_volume_bucket": 49355,
+        "combined_strike_volume_bucket": 15825,
+        "fighter_a_50plus_sig_strikes": 15825,
+        "fighter_b_50plus_sig_strikes": 15825,
+        "combined_100plus_sig_strikes": 15825,
+        "fighter_a_takedowns": 7274,
+        "fighter_b_takedowns": 7274,
+        "fighter_a_takedown_1plus": 7274,
+        "fighter_b_takedown_1plus": 7274,
+        "grappling_heavy_binary": 7274,
+        "takedown_control_bucket": 7274
+      },
+      "feature_schema_name": "finish_v1",
+      "feature_schema_version": "1.0",
+      "feature_validation": {
+        "forbidden_features_present": [],
+        "labels_kept_separate": [
+          "combined_sig_strikes",
+          "ends_before_round_3_binary",
+          "fighter_a_sig_strikes",
+          "fighter_a_takedowns",
+          "fighter_b_sig_strikes",
+          "fighter_b_takedowns",
+          "finish_binary",
+          "finish_in_round_1_binary",
+          "finish_type_class",
+          "goes_distance_binary",
+          "grappling_heavy_binary",
+          "method_class",
+          "over_1_5_binary",
+          "over_2_5_binary",
+          "round_number",
+          "round_phase_class",
+          "winner"
+        ],
+        "required_features": [
+          "a_prior_fights",
+          "b_prior_fights",
+          "a_prior_wins",
+          "b_prior_wins",
+          "a_prior_finishes",
+          "b_prior_finishes",
+          "a_prior_decisions",
+          "b_prior_decisions"
+        ]
+      },
+      "runtime_compatibility": {
+        "schema_name": "finish_v1",
+        "schema_version": "1.0",
+        "rows": 49355,
+        "required_features_available": true,
+        "required_feature_missing_rates": {
+          "a_prior_fights": 0.0,
+          "b_prior_fights": 0.0,
+          "a_prior_wins": 0.0,
+          "b_prior_wins": 0.0,
+          "a_prior_finishes": 0.0,
+          "b_prior_finishes": 0.0,
+          "a_prior_decisions": 0.0,
+          "b_prior_decisions": 0.0
+        },
+        "optional_feature_coverage": 0.8389,
+        "missing_runtime_features": []
+      },
+      "warnings": [
+        "Some fights are missing event dates."
+      ],
+      "training_data_ready": true
+    },
+    "split": {
+      "split_type": "chronological",
+      "train_rows": 29347,
+      "validation_rows": 6134,
+      "test_rows": 5537,
+      "train_fight_groups": 17253,
+      "validation_fight_groups": 3696,
+      "test_fight_groups": 3696,
+      "canonical_group_key": "fight_key_or_stable_pair_key",
+      "no_cross_split_fight_leakage": true,
+      "cross_split_fight_keys": [],
+      "date_range_train": {
+        "min": "1993-11-12",
+        "max": "2021-07-10"
+      },
+      "date_range_validation": {
+        "min": "2021-07-10",
+        "max": "2023-11-18"
+      },
+      "date_range_test": {
+        "min": "2023-11-18",
+        "max": "2026-05-16"
+      },
+      "final_test_held_out": true
+    }
+  },
+  "source_reports": {
+    "mdabbert_ultimate": {
+      "row_count": 7190,
+      "date_range": {
+        "min": "2010-03-21",
+        "max": "2026-04-04"
+      },
+      "final_test_row_count": 1210,
+      "train_validation_row_count": 5980,
+      "target_coverage_by_model": {
+        "winner_model": 7169,
+        "fight_duration_model": 7169,
+        "finish_model": 7169,
+        "goes_distance_model": 7169,
+        "over_1_5_model": 6737,
+        "over_2_5_model": 6737,
+        "ends_before_round_3_model": 6737,
+        "finish_in_round_1_model": 6737,
+        "finish_type_model": 3741,
+        "method_umbrella_model": 7169,
+        "method_model": 7169,
+        "strike_volume_model": 0,
+        "takedown_control_model": 0
+      },
+      "missingness_by_feature_group": {
+        "profile": 0.8182,
+        "record": 0.1193,
+        "recent_form": 0.6508,
+        "elo": 0.5,
+        "striking": 1.0,
+        "grappling": 1.0,
+        "style": 0.0092,
+        "opponent_weakness": 0.0093,
+        "size_context": 0.0,
+        "data_quality": 0.0
+      },
+      "method_label_distribution": {
+        "Decision": 3428,
+        "KO/TKO": 2223,
+        "Other": 258,
+        "Submission": 1260
+      },
+      "finish_goes_distance_distribution": {
+        "finish_binary": {
+          "0.0": 3428,
+          "1.0": 3741
+        },
+        "goes_distance_binary": {
+          "0.0": 3741,
+          "1.0": 3428
+        }
+      },
+      "round_distribution": {
+        "over_1_5_binary": {
+          "0.0": 2117,
+          "1.0": 4620
+        },
+        "over_2_5_binary": {
+          "0.0": 2962,
+          "1.0": 3775
+        },
+        "ends_before_round_3_binary": {
+          "0.0": 4026,
+          "1.0": 2711
+        },
+        "finish_in_round_1_binary": {
+          "0.0": 5076,
+          "1.0": 1661
+        },
+        "round_phase_class": {
+          "decision": 3428,
+          "early": 1661,
+          "late": 69,
+          "middle": 1579,
+          "unknown": 432
+        }
+      },
+      "finish_type_distribution": {
+        "KO/TKO": 2223,
+        "Other": 258,
+        "Submission": 1260
+      },
+      "strike_takedown_control_distribution": {
+        "combined_strike_volume_bucket": {},
+        "grappling_heavy_binary": {},
+        "takedown_control_bucket": {}
+      },
+      "fighter_name_normalization_issues": {
+        "raw_name_count": 28718,
+        "empty_after_normalization": 0,
+        "punctuation_variant_examples": [
+          "Abdul-Kareem Al-Selwady",
+          "Abdul-Kerim Edilov",
+          "Allen Frye Jr.",
+          "Ashlee Evans-Smith",
+          "Brendan O'Reilly",
+          "Casey O'Neill",
+          "Chuck O'Neil",
+          "Da'Mon Blackshear",
+          "Da-Un Jung",
+          "Don'Tale Mayes",
+          "Don'tale Mayes",
+          "Georges St-Pierre",
+          "Isaac Vallie-Flagg",
+          "Jamey-Lyn Horth",
+          "Jean-Paul Lebosnoyani",
+          "Jessica-Rose Clark",
+          "Jocelyn Jones-Lybarger",
+          "Kai Kara-France",
+          "Khalil Rountree Jr.",
+          "Lance Gibson Jr."
+        ]
+      },
+      "weight_class_normalization_issues": {
+        "variant_count": 0,
+        "raw_examples": [
+          "Bantamweight",
+          "Catch Weight",
+          "Featherweight",
+          "Flyweight",
+          "Heavyweight",
+          "Light Heavyweight",
+          "Lightweight",
+          "Middleweight",
+          "Welterweight",
+          "Women's Bantamweight",
+          "Women's Featherweight",
+          "Women's Flyweight",
+          "Women's Strawweight"
+        ],
+        "normalized_examples": [
+          "bantamweight",
+          "catch weight",
+          "featherweight",
+          "flyweight",
+          "heavyweight",
+          "light heavyweight",
+          "lightweight",
+          "middleweight",
+          "welterweight",
+          "women's bantamweight",
+          "women's featherweight",
+          "women's flyweight",
+          "women's strawweight"
+        ]
+      },
+      "method_label_normalization_issues": {
+        "raw_distribution": {
+          "U-DEC": "2681",
+          "KO/TKO": "2223",
+          "SUB": "1260",
+          "S-DEC": "699",
+          "M-DEC": "52",
+          "DQ": "18",
+          "CNC": "3",
+          "Overturned": "3"
+        },
+        "canonical_distribution": {
+          "Decision": "3432",
+          "KO/TKO": "2223",
+          "Submission": "1260",
+          "Other": "24"
+        },
+        "noncanonical_count": 4716
+      },
+      "finish_time_round_parsing_issues": {
+        "rows": 7190,
+        "missing_round_count": 635,
+        "missing_or_unparsed_time_count": 635,
+        "over_1_5_missing_labels": 453,
+        "over_2_5_missing_labels": 453
+      },
+      "no_contest_dq_overturned_handling": {
+        "raw_result_distribution": {
+          "win": "7169"
+        },
+        "normalized_result_distribution": {
+          "win": "7169"
+        },
+        "non_win_rows_with_model_labels": 0
+      },
+      "mirrored_duplicate_patterns": {
+        "rows": 7190,
+        "unique_fight_keys": 7190,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      },
+      "source_priority_deduping_impact": {
+        "rows_before_training_builder": 7190,
+        "rows_after_training_builder": 7190,
+        "difference": 0
+      },
+      "suspicious_columns_or_leakage_risks": [
+        "ends_before_round_2",
+        "ends_before_round_3",
+        "ends_round_1",
+        "ends_round_2",
+        "ends_round_3",
+        "fight_finished",
+        "fighter_1_control_time_over_300_seconds",
+        "fighter_1_control_time_seconds",
+        "fighter_1_moneyline",
+        "fighter_2_control_time_over_300_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_2_moneyline",
+        "fighter_a_control_time_seconds",
+        "fighter_b_control_time_seconds",
+        "finish_binary",
+        "finish_round",
+        "finish_time",
+        "loser_name",
+        "method",
+        "method_class",
+        "method_group",
+        "odds_is_prefight",
+        "odds_snapshot_date",
+        "odds_source",
+        "result",
+        "round",
+        "round_phase_class",
+        "scheduled_rounds",
+        "time",
+        "winner_name"
+      ],
+      "feature_distribution_drift_vs_others": {
+        "profile": 0.0,
+        "record": 0.0153,
+        "recent_form": 0.0101,
+        "elo": 0.0,
+        "striking": 0.0,
+        "grappling": 0.0,
+        "style": 0.0131,
+        "opponent_weakness": 0.0122,
+        "size_context": 0.0099,
+        "data_quality": 0.0515
+      },
+      "models_failing_hardest": [
+        {
+          "model": "fight_duration_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.831,
+          "balanced_accuracy": 0.832,
+          "metric_drop": 0.0286,
+          "balanced_accuracy_drop": 0.0266,
+          "rows": 1189,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "finish_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.831,
+          "balanced_accuracy": 0.832,
+          "metric_drop": 0.0286,
+          "balanced_accuracy_drop": 0.0266,
+          "rows": 1189,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "goes_distance_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.831,
+          "balanced_accuracy": 0.832,
+          "metric_drop": 0.0286,
+          "balanced_accuracy_drop": 0.0266,
+          "rows": 1189,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "method_umbrella_model",
+          "production_status": "weak_or_failed_baseline",
+          "source_holdout_status": "unstable",
+          "accuracy": 0.5181,
+          "balanced_accuracy": 0.25,
+          "metric_drop": 0.001,
+          "balanced_accuracy_drop": 0.0,
+          "rows": 1189,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "method_model",
+          "production_status": "weak_or_failed_baseline",
+          "source_holdout_status": "unstable",
+          "accuracy": 0.5181,
+          "balanced_accuracy": 0.25,
+          "metric_drop": 0.001,
+          "balanced_accuracy_drop": 0.0,
+          "rows": 1189,
+          "unstable_sample_warning": false
+        }
+      ],
+      "drift_grade": "medium drift",
+      "root_cause_summary": [
+        "missing or sparse labels",
+        "high missingness/stat distribution drift"
+      ]
+    },
+    "ufc_1994_2025": {
+      "row_count": 16674,
+      "date_range": {
+        "min": "1994-03-11",
+        "max": "2025-09-06"
+      },
+      "final_test_row_count": 922,
+      "train_validation_row_count": 7415,
+      "target_coverage_by_model": {
+        "winner_model": 8190,
+        "fight_duration_model": 8190,
+        "finish_model": 8190,
+        "goes_distance_model": 8190,
+        "over_1_5_model": 8190,
+        "over_2_5_model": 8190,
+        "ends_before_round_3_model": 8190,
+        "finish_in_round_1_model": 8190,
+        "finish_type_model": 4361,
+        "method_umbrella_model": 8190,
+        "method_model": 8190,
+        "strike_volume_model": 16632,
+        "takedown_control_model": 16632
+      },
+      "missingness_by_feature_group": {
+        "profile": 0.8182,
+        "record": 0.0945,
+        "recent_form": 0.7537,
+        "elo": 0.5,
+        "striking": 1.0,
+        "grappling": 1.0,
+        "style": 0.0,
+        "opponent_weakness": 0.0218,
+        "size_context": 0.0026,
+        "data_quality": 0.0
+      },
+      "method_label_distribution": {
+        "Decision": 3829,
+        "KO/TKO": 2719,
+        "Other": 23,
+        "Submission": 1619
+      },
+      "finish_goes_distance_distribution": {
+        "finish_binary": {
+          "0.0": 3829,
+          "1.0": 4361
+        },
+        "goes_distance_binary": {
+          "0.0": 4361,
+          "1.0": 3829
+        }
+      },
+      "round_distribution": {
+        "over_1_5_binary": {
+          "0.0": 2907,
+          "1.0": 5283
+        },
+        "over_2_5_binary": {
+          "0.0": 3937,
+          "1.0": 4253
+        },
+        "ends_before_round_3_binary": {
+          "0.0": 4552,
+          "1.0": 3638
+        },
+        "finish_in_round_1_binary": {
+          "0.0": 5880,
+          "1.0": 2310
+        },
+        "round_phase_class": {
+          "decision": 3829,
+          "early": 2310,
+          "late": 82,
+          "middle": 1969
+        }
+      },
+      "finish_type_distribution": {
+        "KO/TKO": 2719,
+        "Other": 23,
+        "Submission": 1619
+      },
+      "strike_takedown_control_distribution": {
+        "combined_strike_volume_bucket": {
+          "high": 4450,
+          "low": 6946,
+          "medium": 5236
+        },
+        "grappling_heavy_binary": {
+          "0.0": 9138,
+          "1.0": 7494
+        },
+        "takedown_control_bucket": {
+          "heavy": 5562,
+          "moderate": 6496,
+          "none": 4574
+        }
+      },
+      "fighter_name_normalization_issues": {
+        "raw_name_count": 49728,
+        "empty_after_normalization": 0,
+        "punctuation_variant_examples": [
+          "Abdul-Kareem Al-Selwady",
+          "Abdul-Kerim Edilov",
+          "Ashlee Evans-Smith",
+          "Brendan O'Reilly",
+          "Carlo Pedersoli Jr.",
+          "Casey O'Neill",
+          "Chan-Mi Jeon",
+          "Chuck O'Neil",
+          "Da'Mon Blackshear",
+          "Don'Tale Mayes",
+          "Georges St-Pierre",
+          "He-Man Gipson",
+          "Isaac Vallie-Flagg",
+          "Jake O'Brien",
+          "Jamey-Lyn Horth",
+          "Jessica-Rose Clark",
+          "Jocelyn Jones-Lybarger",
+          "Kai Kara-France",
+          "Khalil Rountree Jr.",
+          "Lone'er Kavanagh"
+        ]
+      },
+      "weight_class_normalization_issues": {
+        "variant_count": 0,
+        "raw_examples": [
+          "10 tournament",
+          "13 heavyweight tournament",
+          "13 lightweight tournament",
+          "14 heavyweight tournament",
+          "14 middleweight tournament",
+          "15 heavyweight tournament",
+          "17 middleweight tournament",
+          "2 tournament",
+          "3 tournament",
+          "4 tournament",
+          "5 tournament",
+          "6 tournament",
+          "7 tournament",
+          "8 tournament",
+          "bantamweight",
+          "catch weight",
+          "featherweight",
+          "flyweight",
+          "heavyweight",
+          "interim bantamweight",
+          "interim featherweight",
+          "interim flyweight",
+          "interim heavyweight",
+          "interim light heavyweight",
+          "interim lightweight",
+          "interim middleweight",
+          "interim welterweight",
+          "light heavyweight",
+          "lightweight",
+          "middleweight"
+        ],
+        "normalized_examples": [
+          "10 tournament",
+          "13 heavyweight tournament",
+          "13 lightweight tournament",
+          "14 heavyweight tournament",
+          "14 middleweight tournament",
+          "15 heavyweight tournament",
+          "17 middleweight tournament",
+          "2 tournament",
+          "3 tournament",
+          "4 tournament",
+          "5 tournament",
+          "6 tournament",
+          "7 tournament",
+          "8 tournament",
+          "bantamweight",
+          "catch weight",
+          "featherweight",
+          "flyweight",
+          "heavyweight",
+          "interim bantamweight",
+          "interim featherweight",
+          "interim flyweight",
+          "interim heavyweight",
+          "interim light heavyweight",
+          "interim lightweight",
+          "interim middleweight",
+          "interim welterweight",
+          "light heavyweight",
+          "lightweight",
+          "middleweight"
+        ]
+      },
+      "method_label_normalization_issues": {
+        "raw_distribution": {
+          "Decision - Unanimous": "5982",
+          "KO/TKO": "5242",
+          "Submission": "3238",
+          "Decision - Split": "1600",
+          "TKO - Doctor's Stoppage": "196",
+          "Decision - Majority": "190",
+          "Overturned": "116",
+          "Could Not Continue": "60",
+          "DQ": "46",
+          "Other": "4"
+        },
+        "canonical_distribution": {
+          "Decision": "7772",
+          "KO/TKO": "5438",
+          "Submission": "3238",
+          "Other": "226"
+        },
+        "noncanonical_count": 8190
+      },
+      "finish_time_round_parsing_issues": {
+        "rows": 16674,
+        "missing_round_count": 0,
+        "missing_or_unparsed_time_count": 0,
+        "over_1_5_missing_labels": 8484,
+        "over_2_5_missing_labels": 8484
+      },
+      "no_contest_dq_overturned_handling": {
+        "raw_result_distribution": {
+          "win": "8190"
+        },
+        "normalized_result_distribution": {
+          "win": "8190"
+        },
+        "non_win_rows_with_model_labels": 16926
+      },
+      "mirrored_duplicate_patterns": {
+        "rows": 16674,
+        "unique_fight_keys": 16674,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 402
+      },
+      "source_priority_deduping_impact": {
+        "rows_before_training_builder": 16674,
+        "rows_after_training_builder": 16674,
+        "difference": 0
+      },
+      "suspicious_columns_or_leakage_risks": [
+        "ends_before_round_2",
+        "ends_before_round_3",
+        "ends_round_1",
+        "ends_round_2",
+        "ends_round_3",
+        "fight_finished",
+        "fighter_1_control_time_over_300_seconds",
+        "fighter_1_control_time_seconds",
+        "fighter_1_moneyline",
+        "fighter_2_control_time_over_300_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_2_moneyline",
+        "fighter_a_control_time_seconds",
+        "fighter_b_control_time_seconds",
+        "finish_binary",
+        "finish_round",
+        "finish_time",
+        "loser_name",
+        "method",
+        "method_class",
+        "method_group",
+        "odds_is_prefight",
+        "odds_snapshot_date",
+        "odds_source",
+        "result",
+        "round",
+        "round_phase_class",
+        "scheduled_rounds",
+        "time",
+        "winner_name"
+      ],
+      "feature_distribution_drift_vs_others": {
+        "profile": 0.0,
+        "record": 0.0422,
+        "recent_form": 0.067,
+        "elo": 0.0,
+        "striking": 0.0,
+        "grappling": 0.0,
+        "style": 0.0095,
+        "opponent_weakness": 0.0272,
+        "size_context": 0.0031,
+        "data_quality": 0.0673
+      },
+      "models_failing_hardest": [
+        {
+          "model": "strike_volume_model",
+          "production_status": "experimental",
+          "source_holdout_status": "unstable",
+          "accuracy": 0.5011,
+          "balanced_accuracy": 0.4919,
+          "metric_drop": 0.0738,
+          "balanced_accuracy_drop": 0.0679,
+          "rows": 922,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "takedown_control_model",
+          "production_status": "experimental",
+          "source_holdout_status": "needs_review",
+          "accuracy": 0.6822,
+          "balanced_accuracy": 0.6608,
+          "metric_drop": 0.0463,
+          "balanced_accuracy_drop": 0.0285,
+          "rows": 922,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "finish_in_round_1_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.8534,
+          "balanced_accuracy": 0.7261,
+          "metric_drop": -0.0097,
+          "balanced_accuracy_drop": -0.022,
+          "rows": 914,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "method_umbrella_model",
+          "production_status": "weak_or_failed_baseline",
+          "source_holdout_status": "unstable",
+          "accuracy": 0.5295,
+          "balanced_accuracy": 0.25,
+          "metric_drop": -0.0104,
+          "balanced_accuracy_drop": 0.0,
+          "rows": 914,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "method_model",
+          "production_status": "weak_or_failed_baseline",
+          "source_holdout_status": "unstable",
+          "accuracy": 0.5295,
+          "balanced_accuracy": 0.25,
+          "metric_drop": -0.0104,
+          "balanced_accuracy_drop": 0.0,
+          "rows": 914,
+          "unstable_sample_warning": false
+        }
+      ],
+      "drift_grade": "high drift",
+      "root_cause_summary": [
+        "missing or sparse labels",
+        "high missingness/stat distribution drift"
+      ]
+    },
+    "ufc_1994_2026": {
+      "row_count": 8551,
+      "date_range": {
+        "min": "1994-03-11",
+        "max": "2026-03-07"
+      },
+      "final_test_row_count": 1164,
+      "train_validation_row_count": 7387,
+      "target_coverage_by_model": {
+        "winner_model": 8551,
+        "fight_duration_model": 8551,
+        "finish_model": 8551,
+        "goes_distance_model": 8551,
+        "over_1_5_model": 8551,
+        "over_2_5_model": 8551,
+        "ends_before_round_3_model": 8551,
+        "finish_in_round_1_model": 8551,
+        "finish_type_model": 4555,
+        "method_umbrella_model": 8551,
+        "method_model": 8551,
+        "strike_volume_model": 0,
+        "takedown_control_model": 8551
+      },
+      "missingness_by_feature_group": {
+        "profile": 0.8182,
+        "record": 0.1283,
+        "recent_form": 0.6495,
+        "elo": 0.5,
+        "striking": 1.0,
+        "grappling": 1.0,
+        "style": 0.0001,
+        "opponent_weakness": 0.0006,
+        "size_context": 0.0853,
+        "data_quality": 0.0
+      },
+      "method_label_distribution": {
+        "Decision": 3996,
+        "KO/TKO": 2785,
+        "Other": 115,
+        "Submission": 1655
+      },
+      "finish_goes_distance_distribution": {
+        "finish_binary": {
+          "0.0": 3996,
+          "1.0": 4555
+        },
+        "goes_distance_binary": {
+          "0.0": 4555,
+          "1.0": 3996
+        }
+      },
+      "round_distribution": {
+        "over_1_5_binary": {
+          "0.0": 3014,
+          "1.0": 5537
+        },
+        "over_2_5_binary": {
+          "0.0": 4095,
+          "1.0": 4456
+        },
+        "ends_before_round_3_binary": {
+          "0.0": 4771,
+          "1.0": 3780
+        },
+        "finish_in_round_1_binary": {
+          "0.0": 6162,
+          "1.0": 2389
+        },
+        "round_phase_class": {
+          "decision": 3996,
+          "early": 2389,
+          "late": 84,
+          "middle": 2082
+        }
+      },
+      "finish_type_distribution": {
+        "KO/TKO": 2785,
+        "Other": 115,
+        "Submission": 1655
+      },
+      "strike_takedown_control_distribution": {
+        "combined_strike_volume_bucket": {},
+        "grappling_heavy_binary": {
+          "0.0": 5677,
+          "1.0": 2874
+        },
+        "takedown_control_bucket": {
+          "heavy": 2874,
+          "moderate": 3322,
+          "none": 2355
+        }
+      },
+      "fighter_name_normalization_issues": {
+        "raw_name_count": 34204,
+        "empty_after_normalization": 0,
+        "punctuation_variant_examples": [
+          "Abdul-Kareem Al-Selwady",
+          "Abdul-Kerim Edilov",
+          "Allen Frye Jr.",
+          "Ashlee Evans-Smith",
+          "Brendan O'Reilly",
+          "Carlo Pedersoli Jr.",
+          "Casey O'Neill",
+          "Chan-Mi Jeon",
+          "Chuck O'Neil",
+          "Da'Mon Blackshear",
+          "Don'Tale Mayes",
+          "Georges St-Pierre",
+          "Isaac Vallie-Flagg",
+          "Jake O'Brien",
+          "Jamey-Lyn Horth",
+          "Jean-Paul Lebosnoyani",
+          "Jessica-Rose Clark",
+          "Jocelyn Jones-Lybarger",
+          "Kai Kara-France",
+          "Khalil Rountree Jr."
+        ]
+      },
+      "weight_class_normalization_issues": {
+        "variant_count": 0,
+        "raw_examples": [
+          "Bantamweight Bout",
+          "Catch Weight Bout",
+          "Featherweight Bout",
+          "Flyweight Bout",
+          "Heavyweight Bout",
+          "Light Heavyweight Bout",
+          "Lightweight Bout",
+          "Middleweight Bout",
+          "Open Weight Bout",
+          "Road To UFC 1 Bantamweight Tournament Title Bout",
+          "Road To UFC 1 Featherweight Tournament Title Bout",
+          "Road To UFC 1 Lightweight Tournament Title Bout",
+          "Road to UFC 1 Flyweight Tournament Title Bout",
+          "Road to UFC 3 Bantamweight Tournament Title  Bout",
+          "Road to UFC 3 Flyweight Tournament Title  Bout",
+          "Road to UFC 3 Women's Strawweight Tournament Title  Bout",
+          "Road to UFC 4 Bantamweight Tournament Title Bout",
+          "Road to UFC 4 Featherweight Tournament Title Bout",
+          "Road to UFC 4 Lightweight Tournament Title Bout",
+          "Super Heavyweight Bout",
+          "TUF Nations Canada vs. Australia Middleweight Tournament Title Bout",
+          "TUF Nations Canada vs. Australia Welterweight Tournament Title Bout",
+          "UFC 10 Tournament Title Bout",
+          "UFC 13 Heavyweight Tournament Title Bout",
+          "UFC 13 Lightweight Tournament Title Bout",
+          "UFC 14 Heavyweight Tournament Title Bout",
+          "UFC 14 Middleweight Tournament Title Bout",
+          "UFC 15 Heavyweight Tournament Title Bout",
+          "UFC 17 Middleweight Tournament Title Bout",
+          "UFC 2 Tournament Title Bout"
+        ],
+        "normalized_examples": [
+          "bantamweight",
+          "catch weight",
+          "featherweight",
+          "flyweight",
+          "heavyweight",
+          "light heavyweight",
+          "lightweight",
+          "middleweight",
+          "open weight",
+          "road to ufc 1 bantamweight tournament title",
+          "road to ufc 1 featherweight tournament title",
+          "road to ufc 1 flyweight tournament title",
+          "road to ufc 1 lightweight tournament title",
+          "road to ufc 3 bantamweight tournament title",
+          "road to ufc 3 flyweight tournament title",
+          "road to ufc 3 women's strawweight tournament title",
+          "road to ufc 4 bantamweight tournament title",
+          "road to ufc 4 featherweight tournament title",
+          "road to ufc 4 lightweight tournament title",
+          "super heavyweight",
+          "tuf nations canada vs. australia middleweight tournament title",
+          "tuf nations canada vs. australia welterweight tournament title",
+          "ufc 10 tournament title",
+          "ufc 13 heavyweight tournament title",
+          "ufc 13 lightweight tournament title",
+          "ufc 14 heavyweight tournament title",
+          "ufc 14 middleweight tournament title",
+          "ufc 15 heavyweight tournament title",
+          "ufc 17 middleweight tournament title",
+          "ufc 2 tournament title"
+        ]
+      },
+      "method_label_normalization_issues": {
+        "raw_distribution": {
+          "Decision - Unanimous": "3083",
+          "KO/TKO": "2688",
+          "Submission": "1655",
+          "Decision - Split": "815",
+          "Decision - Majority": "98",
+          "TKO - Doctor's Stoppage": "97",
+          "Overturned": "58",
+          "Could Not Continue": "32",
+          "DQ": "23",
+          "Other": "2"
+        },
+        "canonical_distribution": {
+          "Decision": "3996",
+          "KO/TKO": "2785",
+          "Submission": "1655",
+          "Other": "115"
+        },
+        "noncanonical_count": 4206
+      },
+      "finish_time_round_parsing_issues": {
+        "rows": 8551,
+        "missing_round_count": 0,
+        "missing_or_unparsed_time_count": 0,
+        "over_1_5_missing_labels": 0,
+        "over_2_5_missing_labels": 0
+      },
+      "no_contest_dq_overturned_handling": {
+        "raw_result_distribution": {
+          "win": "8551"
+        },
+        "normalized_result_distribution": {
+          "win": "8551"
+        },
+        "non_win_rows_with_model_labels": 0
+      },
+      "mirrored_duplicate_patterns": {
+        "rows": 8551,
+        "unique_fight_keys": 8551,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      },
+      "source_priority_deduping_impact": {
+        "rows_before_training_builder": 8551,
+        "rows_after_training_builder": 8551,
+        "difference": 0
+      },
+      "suspicious_columns_or_leakage_risks": [
+        "ends_before_round_2",
+        "ends_before_round_3",
+        "ends_round_1",
+        "ends_round_2",
+        "ends_round_3",
+        "fight_finished",
+        "fighter_1_control_time_over_300_seconds",
+        "fighter_1_control_time_seconds",
+        "fighter_1_moneyline",
+        "fighter_2_control_time_over_300_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_2_moneyline",
+        "fighter_a_control_time_seconds",
+        "fighter_b_control_time_seconds",
+        "finish_binary",
+        "finish_round",
+        "finish_time",
+        "loser_name",
+        "method",
+        "method_class",
+        "method_group",
+        "odds_is_prefight",
+        "odds_snapshot_date",
+        "odds_source",
+        "result",
+        "round",
+        "round_phase_class",
+        "scheduled_rounds",
+        "time",
+        "winner_name"
+      ],
+      "feature_distribution_drift_vs_others": {
+        "profile": 0.0,
+        "record": 0.015,
+        "recent_form": 0.0222,
+        "elo": 0.0,
+        "striking": 0.0,
+        "grappling": 0.0,
+        "style": 0.0101,
+        "opponent_weakness": 0.0243,
+        "size_context": 0.0002,
+        "data_quality": 0.0558
+      },
+      "models_failing_hardest": [
+        {
+          "model": "winner_model",
+          "production_status": "high_confidence_only",
+          "source_holdout_status": "needs_review",
+          "accuracy": 0.8222,
+          "balanced_accuracy": 0.8227,
+          "metric_drop": 0.1399,
+          "balanced_accuracy_drop": 0.1395,
+          "rows": 1164,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "fight_duration_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.7826,
+          "balanced_accuracy": 0.7834,
+          "metric_drop": 0.077,
+          "balanced_accuracy_drop": 0.0752,
+          "rows": 1164,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "finish_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.7826,
+          "balanced_accuracy": 0.7834,
+          "metric_drop": 0.077,
+          "balanced_accuracy_drop": 0.0752,
+          "rows": 1164,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "goes_distance_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.7826,
+          "balanced_accuracy": 0.7834,
+          "metric_drop": 0.077,
+          "balanced_accuracy_drop": 0.0752,
+          "rows": 1164,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "over_2_5_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": 0.7534,
+          "balanced_accuracy": 0.743,
+          "metric_drop": 0.0663,
+          "balanced_accuracy_drop": 0.0652,
+          "rows": 1164,
+          "unstable_sample_warning": false
+        }
+      ],
+      "drift_grade": "high drift",
+      "root_cause_summary": [
+        "missing or sparse labels",
+        "high missingness/stat distribution drift"
+      ]
+    },
+    "ufc_fight_forecast": {
+      "row_count": 8231,
+      "date_range": {
+        "min": "1994-03-11",
+        "max": "2025-10-04"
+      },
+      "final_test_row_count": 955,
+      "train_validation_row_count": 7276,
+      "target_coverage_by_model": {
+        "winner_model": 8230,
+        "fight_duration_model": 8230,
+        "finish_model": 8230,
+        "goes_distance_model": 8230,
+        "over_1_5_model": 8230,
+        "over_2_5_model": 8230,
+        "ends_before_round_3_model": 8230,
+        "finish_in_round_1_model": 8230,
+        "finish_type_model": 4382,
+        "method_umbrella_model": 8230,
+        "method_model": 8230,
+        "strike_volume_model": 8210,
+        "takedown_control_model": 8210
+      },
+      "missingness_by_feature_group": {
+        "profile": 0.8182,
+        "record": 0.2378,
+        "recent_form": 0.714,
+        "elo": 0.5,
+        "striking": 1.0,
+        "grappling": 1.0,
+        "style": 0.1885,
+        "opponent_weakness": 0.1886,
+        "size_context": 0.0023,
+        "data_quality": 0.0
+      },
+      "method_label_distribution": {
+        "Decision": 3848,
+        "KO/TKO": 2733,
+        "Other": 23,
+        "Submission": 1626
+      },
+      "finish_goes_distance_distribution": {
+        "finish_binary": {
+          "0.0": 3848,
+          "1.0": 4382
+        },
+        "goes_distance_binary": {
+          "0.0": 4382,
+          "1.0": 3848
+        }
+      },
+      "round_distribution": {
+        "over_1_5_binary": {
+          "0.0": 2922,
+          "1.0": 5308
+        },
+        "over_2_5_binary": {
+          "0.0": 3956,
+          "1.0": 4274
+        },
+        "ends_before_round_3_binary": {
+          "0.0": 4575,
+          "1.0": 3655
+        },
+        "finish_in_round_1_binary": {
+          "0.0": 5908,
+          "1.0": 2322
+        },
+        "round_phase_class": {
+          "decision": 3848,
+          "early": 2322,
+          "late": 82,
+          "middle": 1978
+        }
+      },
+      "finish_type_distribution": {
+        "KO/TKO": 2733,
+        "Other": 23,
+        "Submission": 1626
+      },
+      "strike_takedown_control_distribution": {
+        "combined_strike_volume_bucket": {
+          "high": 2194,
+          "low": 3441,
+          "medium": 2575
+        },
+        "grappling_heavy_binary": {
+          "0.0": 4515,
+          "1.0": 3695
+        },
+        "takedown_control_bucket": {
+          "heavy": 2749,
+          "moderate": 3205,
+          "none": 2256
+        }
+      },
+      "fighter_name_normalization_issues": {
+        "raw_name_count": 32922,
+        "empty_after_normalization": 0,
+        "punctuation_variant_examples": [
+          "Abdul-Kareem Al-Selwady",
+          "Abdul-Kerim Edilov",
+          "Ashlee Evans-Smith",
+          "Brendan O'Reilly",
+          "Carlo Pedersoli Jr.",
+          "Casey O'Neill",
+          "Chan-Mi Jeon",
+          "Chuck O'Neil",
+          "Da'Mon Blackshear",
+          "Don'Tale Mayes",
+          "Georges St-Pierre",
+          "He-Man Gipson",
+          "Isaac Vallie-Flagg",
+          "Jake O'Brien",
+          "Jamey-Lyn Horth",
+          "Jessica-Rose Clark",
+          "Jocelyn Jones-Lybarger",
+          "Kai Kara-France",
+          "Khalil Rountree Jr.",
+          "Lone'er Kavanagh"
+        ]
+      },
+      "weight_class_normalization_issues": {
+        "variant_count": 0,
+        "raw_examples": [
+          "Bantamweight",
+          "Catch Weight",
+          "Featherweight",
+          "Flyweight",
+          "Heavyweight",
+          "Light Heavyweight",
+          "Lightweight",
+          "Middleweight",
+          "Nieznana",
+          "Open Weight",
+          "UFC 2 Tournament Title",
+          "UFC 3 Tournament Title",
+          "UFC 4 Tournament Title",
+          "UFC Bantamweight Title",
+          "UFC Light Heavyweight Title",
+          "UFC Middleweight Title",
+          "Welterweight",
+          "Women's Bantamweight",
+          "Women's Featherweight",
+          "Women's Flyweight",
+          "Women's Strawweight"
+        ],
+        "normalized_examples": [
+          "bantamweight",
+          "catch weight",
+          "featherweight",
+          "flyweight",
+          "heavyweight",
+          "light heavyweight",
+          "lightweight",
+          "middleweight",
+          "nieznana",
+          "open weight",
+          "ufc 2 tournament title",
+          "ufc 3 tournament title",
+          "ufc 4 tournament title",
+          "ufc bantamweight title",
+          "ufc light heavyweight title",
+          "ufc middleweight title",
+          "welterweight",
+          "women's bantamweight",
+          "women's featherweight",
+          "women's flyweight",
+          "women's strawweight"
+        ]
+      },
+      "method_label_normalization_issues": {
+        "raw_distribution": {
+          "Decision": "3698",
+          "KO/TKO": "2635",
+          "Submission": "1626",
+          "Decision - Unanimous": "131",
+          "TKO - Doctor's Stoppage": "98",
+          "DQ": "23",
+          "Decision - Split": "19",
+          "Could Not Continue": "1"
+        },
+        "canonical_distribution": {
+          "Decision": "3848",
+          "KO/TKO": "2733",
+          "Submission": "1626",
+          "Other": "24"
+        },
+        "noncanonical_count": 272
+      },
+      "finish_time_round_parsing_issues": {
+        "rows": 8231,
+        "missing_round_count": 0,
+        "missing_or_unparsed_time_count": 0,
+        "over_1_5_missing_labels": 1,
+        "over_2_5_missing_labels": 1
+      },
+      "no_contest_dq_overturned_handling": {
+        "raw_result_distribution": {
+          "win": "8230"
+        },
+        "normalized_result_distribution": {
+          "win": "8230"
+        },
+        "non_win_rows_with_model_labels": 2
+      },
+      "mirrored_duplicate_patterns": {
+        "rows": 8231,
+        "unique_fight_keys": 8231,
+        "duplicate_fight_rows": 0,
+        "mirrored_candidates": 0
+      },
+      "source_priority_deduping_impact": {
+        "rows_before_training_builder": 8231,
+        "rows_after_training_builder": 8231,
+        "difference": 0
+      },
+      "suspicious_columns_or_leakage_risks": [
+        "ends_before_round_2",
+        "ends_before_round_3",
+        "ends_round_1",
+        "ends_round_2",
+        "ends_round_3",
+        "fight_finished",
+        "fighter_1_control_time_over_300_seconds",
+        "fighter_1_control_time_seconds",
+        "fighter_1_moneyline",
+        "fighter_2_control_time_over_300_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_2_moneyline",
+        "fighter_a_control_time_seconds",
+        "fighter_b_control_time_seconds",
+        "finish_binary",
+        "finish_round",
+        "finish_time",
+        "loser_name",
+        "method",
+        "method_class",
+        "method_group",
+        "odds_is_prefight",
+        "odds_snapshot_date",
+        "odds_source",
+        "result",
+        "round",
+        "round_phase_class",
+        "scheduled_rounds",
+        "time",
+        "winner_name"
+      ],
+      "feature_distribution_drift_vs_others": {
+        "profile": 0.0,
+        "record": 0.0253,
+        "recent_form": 0.0389,
+        "elo": 0.0,
+        "striking": 0.0,
+        "grappling": 0.0,
+        "style": 0.0112,
+        "opponent_weakness": 0.0269,
+        "size_context": 0.0031,
+        "data_quality": 0.2899
+      },
+      "models_failing_hardest": [
+        {
+          "model": "winner_model",
+          "production_status": "high_confidence_only",
+          "source_holdout_status": "needs_review",
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "metric_drop": null,
+          "balanced_accuracy_drop": null,
+          "rows": 60,
+          "unstable_sample_warning": true
+        },
+        {
+          "model": "fight_duration_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "metric_drop": null,
+          "balanced_accuracy_drop": null,
+          "rows": 60,
+          "unstable_sample_warning": true
+        },
+        {
+          "model": "over_1_5_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "metric_drop": null,
+          "balanced_accuracy_drop": null,
+          "rows": 60,
+          "unstable_sample_warning": true
+        },
+        {
+          "model": "over_2_5_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "metric_drop": null,
+          "balanced_accuracy_drop": null,
+          "rows": 60,
+          "unstable_sample_warning": true
+        },
+        {
+          "model": "ends_before_round_3_model",
+          "production_status": "production_candidate",
+          "source_holdout_status": "stable",
+          "accuracy": null,
+          "balanced_accuracy": null,
+          "metric_drop": null,
+          "balanced_accuracy_drop": null,
+          "rows": 60,
+          "unstable_sample_warning": true
+        }
+      ],
+      "drift_grade": "medium drift",
+      "root_cause_summary": [
+        "missing or sparse labels",
+        "high missingness/stat distribution drift"
+      ]
+    },
+    "ufc_stats_complete": {
+      "row_count": 8709,
+      "date_range": {
+        "min": "1993-11-12",
+        "max": "2026-05-16"
+      },
+      "final_test_row_count": 1286,
+      "train_validation_row_count": 7423,
+      "target_coverage_by_model": {
+        "winner_model": 0,
+        "fight_duration_model": 0,
+        "finish_model": 0,
+        "goes_distance_model": 0,
+        "over_1_5_model": 0,
+        "over_2_5_model": 0,
+        "ends_before_round_3_model": 0,
+        "finish_in_round_1_model": 0,
+        "finish_type_model": 0,
+        "method_umbrella_model": 0,
+        "method_model": 0,
+        "strike_volume_model": 8688,
+        "takedown_control_model": 8688
+      },
+      "missingness_by_feature_group": {
+        "profile": 0.8182,
+        "record": 0.1313,
+        "recent_form": 0.6507,
+        "elo": 0.5,
+        "striking": 1.0,
+        "grappling": 1.0,
+        "style": 0.0095,
+        "opponent_weakness": 0.0096,
+        "size_context": 0.0857,
+        "data_quality": 0.0
+      },
+      "method_label_distribution": {},
+      "finish_goes_distance_distribution": {
+        "finish_binary": {},
+        "goes_distance_binary": {}
+      },
+      "round_distribution": {
+        "over_1_5_binary": {},
+        "over_2_5_binary": {},
+        "ends_before_round_3_binary": {},
+        "finish_in_round_1_binary": {},
+        "round_phase_class": {}
+      },
+      "finish_type_distribution": {},
+      "strike_takedown_control_distribution": {
+        "combined_strike_volume_bucket": {
+          "high": 2343,
+          "low": 3622,
+          "medium": 2723
+        },
+        "grappling_heavy_binary": {
+          "0.0": 4775,
+          "1.0": 3913
+        },
+        "takedown_control_bucket": {
+          "heavy": 2921,
+          "moderate": 3372,
+          "none": 2395
+        }
+      },
+      "fighter_name_normalization_issues": {
+        "raw_name_count": 17418,
+        "empty_after_normalization": 0,
+        "punctuation_variant_examples": [
+          "Abdul-Kareem Al-Selwady",
+          "Abdul-Kerim Edilov",
+          "Allen Frye Jr.",
+          "Ashlee Evans-Smith",
+          "Brendan O'Reilly",
+          "Carlo Pedersoli Jr.",
+          "Casey O'Neill",
+          "Chan-Mi Jeon",
+          "Chuck O'Neil",
+          "Da'Mon Blackshear",
+          "Don'Tale Mayes",
+          "Georges St-Pierre",
+          "He-Man Gipson",
+          "Isaac Vallie-Flagg",
+          "Jake O'Brien",
+          "Jamey-Lyn Horth",
+          "Jean-Paul Lebosnoyani",
+          "Jessica-Rose Clark",
+          "Jocelyn Jones-Lybarger",
+          "Kai Kara-France"
+        ]
+      },
+      "weight_class_normalization_issues": {
+        "variant_count": 0,
+        "raw_examples": [
+          "Bantamweight",
+          "Catch Weight",
+          "Featherweight",
+          "Flyweight",
+          "Heavyweight",
+          "Light Heavyweight",
+          "Lightweight",
+          "Middleweight",
+          "Open Weight",
+          "Super Heavyweight",
+          "Welterweight",
+          "Women's Bantamweight",
+          "Women's Featherweight",
+          "Women's Flyweight",
+          "Women's Strawweight"
+        ],
+        "normalized_examples": [
+          "bantamweight",
+          "catch weight",
+          "featherweight",
+          "flyweight",
+          "heavyweight",
+          "light heavyweight",
+          "lightweight",
+          "middleweight",
+          "open weight",
+          "super heavyweight",
+          "welterweight",
+          "women's bantamweight",
+          "women's featherweight",
+          "women's flyweight",
+          "women's strawweight"
+        ]
+      },
+      "method_label_normalization_issues": {
+        "raw_distribution": {
+          "Decision - Unanimous": "3134",
+          "KO/TKO": "2742",
+          "Submission": "1690",
+          "Decision - Split": "825",
+          "Decision - Majority": "104",
+          "TKO - Doctor's Stoppage": "98",
+          "Overturned": "59",
+          "Could Not Continue": "32",
+          "DQ": "23",
+          "Other": "2"
+        },
+        "canonical_distribution": {
+          "Decision": "4063",
+          "KO/TKO": "2840",
+          "Submission": "1690",
+          "Other": "116"
+        },
+        "noncanonical_count": 4275
+      },
+      "finish_time_round_parsing_issues": {
+        "rows": 8709,
+        "missing_round_count": 0,
+        "missing_or_unparsed_time_count": 0,
+        "over_1_5_missing_labels": 8709,
+        "over_2_5_missing_labels": 8709
+      },
+      "no_contest_dq_overturned_handling": {
+        "raw_result_distribution": {},
+        "normalized_result_distribution": {},
+        "non_win_rows_with_model_labels": 17376
+      },
+      "mirrored_duplicate_patterns": {
+        "rows": 8709,
+        "unique_fight_keys": 8708,
+        "duplicate_fight_rows": 2,
+        "mirrored_candidates": 2
+      },
+      "source_priority_deduping_impact": {
+        "rows_before_training_builder": 8709,
+        "rows_after_training_builder": 8709,
+        "difference": 0
+      },
+      "suspicious_columns_or_leakage_risks": [
+        "ends_before_round_2",
+        "ends_before_round_3",
+        "ends_round_1",
+        "ends_round_2",
+        "ends_round_3",
+        "fight_finished",
+        "fighter_1_control_time_over_300_seconds",
+        "fighter_1_control_time_seconds",
+        "fighter_1_moneyline",
+        "fighter_2_control_time_over_300_seconds",
+        "fighter_2_control_time_seconds",
+        "fighter_2_moneyline",
+        "fighter_a_control_time_seconds",
+        "fighter_b_control_time_seconds",
+        "finish_binary",
+        "finish_round",
+        "finish_time",
+        "loser_name",
+        "method",
+        "method_class",
+        "method_group",
+        "odds_is_prefight",
+        "odds_snapshot_date",
+        "odds_source",
+        "result",
+        "round",
+        "round_phase_class",
+        "scheduled_rounds",
+        "time",
+        "winner_name"
+      ],
+      "feature_distribution_drift_vs_others": {
+        "profile": 0.0,
+        "record": 0.0226,
+        "recent_form": 0.022,
+        "elo": 0.0,
+        "striking": 0.0,
+        "grappling": 0.0,
+        "style": 0.0056,
+        "opponent_weakness": 0.0296,
+        "size_context": 0.0022,
+        "data_quality": 0.0549
+      },
+      "models_failing_hardest": [
+        {
+          "model": "strike_volume_model",
+          "production_status": "experimental",
+          "source_holdout_status": "unstable",
+          "accuracy": 0.4155,
+          "balanced_accuracy": 0.4029,
+          "metric_drop": 0.1594,
+          "balanced_accuracy_drop": 0.1569,
+          "rows": 361,
+          "unstable_sample_warning": false
+        },
+        {
+          "model": "takedown_control_model",
+          "production_status": "experimental",
+          "source_holdout_status": "needs_review",
+          "accuracy": 0.6343,
+          "balanced_accuracy": 0.5998,
+          "metric_drop": 0.0942,
+          "balanced_accuracy_drop": 0.0895,
+          "rows": 361,
+          "unstable_sample_warning": false
+        }
+      ],
+      "drift_grade": "high drift",
+      "root_cause_summary": [
+        "source-holdout regression",
+        "missing or sparse labels",
+        "high missingness/stat distribution drift",
+        "models trained on other sources do not transfer cleanly to this source"
+      ]
+    }
+  },
+  "ufc_stats_complete_answer": {
+    "present": true,
+    "likely_failure_mode": [
+      "source-holdout regression",
+      "missing or sparse labels",
+      "high missingness/stat distribution drift",
+      "models trained on other sources do not transfer cleanly to this source"
+    ],
+    "is_noisy": true,
+    "label_difference_suspected": false,
+    "normalization_issue_suspected": true,
+    "duplicate_issue_suspected": true,
+    "target_definition_difference_suspected": false
+  }
+}

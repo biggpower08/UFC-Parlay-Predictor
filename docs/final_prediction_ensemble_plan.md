@@ -15,9 +15,9 @@ Prediction responses should continue moving toward an `ensemble_breakdown` objec
 
 - `winner_model_signal`
 - `elo_signal`
-- `finish_model_signal`
-- `method_model_signal`
-- `round_model_signal`
+- `duration_signal`
+- `round_signal`
+- `method_signal`
 - `strike_volume_signal`
 - `takedown_control_signal`
 - `odds_calibration_signal`
@@ -25,6 +25,9 @@ Prediction responses should continue moving toward an `ensemble_breakdown` objec
 - `confidence`
 - `data_quality`
 - `unavailable_models`
+- `unstable_models`
+- `data_quality_reasons`
+- `public_warning_text`
 
 ## Guardrails
 - Do not let experimental prop models overpower winner/Elo evidence.
@@ -32,3 +35,5 @@ Prediction responses should continue moving toward an `ensemble_breakdown` objec
 - Do not expose formulas or implementation details publicly.
 - Do not use current-fight outcome stats as prediction features.
 - Keep fallback text honest when model evidence is unavailable.
+- Source-transfer unstable models may influence scenario text, but must not become strong numeric scoring factors.
+- Full probability output requires stable source-holdout, acceptable calibration, runtime parity, and non-dangerous data quality.

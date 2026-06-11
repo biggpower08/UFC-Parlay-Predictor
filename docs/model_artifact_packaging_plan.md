@@ -17,12 +17,13 @@ Commit only when each artifact has:
 Small JSON artifacts can be committed when the deployed app needs them.
 
 ## Do Not Package Weak Models As Production
-Do not package `weak_or_failed_baseline`, `blocked`, or `not_trained` models as production artifacts. They may remain in reports or research outputs, but public scoring should ignore them or use them only as labeled context.
+Do not package `weak_or_failed_baseline`, `blocked`, `not_trained`, or source-transfer-unstable models as production artifacts. They may remain in reports or research outputs, but public scoring should ignore them or use them only as labeled context.
 
 ## Current Guidance
 - `winner_model`: package only after artifact/runtime gate review; current public use should be selective.
-- `fight_duration_model`: candidate for careful artifact packaging if generated reports support it.
-- `finish_type_model`, weak round members, and weak prop models: report only, not production artifacts.
+- `fight_duration_model`: candidate only; do not package until artifact/runtime review is explicitly approved.
+- Stable round members: candidate only; do not package until artifact/runtime review is explicitly approved.
+- `finish_type_model`, strike-volume, takedown/control, and method outputs: report/context only until source transfer and baseline behavior improve.
 - `odds_calibration_model`: do not package until pre-fight odds timestamps are trusted.
 
 ## Never Commit

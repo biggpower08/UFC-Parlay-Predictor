@@ -11,13 +11,13 @@ The app should show useful fight intelligence without overstating model strength
 
 ## Current Policy By Model
 - `winner_model`: high-confidence selective output only until source-holdout stability improves.
-- `fight_duration_model`: may support finish/goes-distance context when gates pass.
+- `fight_duration_model`: production candidate after the latest source-holdout pass, but public full-probability output still requires artifact/runtime review.
 - `finish_model` and `goes_distance_model`: compatibility outputs should follow the duration model.
-- `method_umbrella_model`: context only until method submodels are stronger.
-- `finish_type_model`: context only while weak or failed baseline.
-- `round_phase_model` and round submodels: context or selective output only by gate status.
-- `strike_volume_model`: experimental context until stronger validation and runtime coverage.
-- `takedown_control_model`: experimental context until stronger validation.
+- `method_umbrella_model`: experimental context only until method components transfer across sources.
+- `finish_type_model`: experimental context only while method-label transfer remains unstable.
+- `round_phase_model` and round submodels: production candidates where source-holdout is stable, but public full-probability output still requires artifact/runtime review.
+- `strike_volume_model`: experimental context until source transfer, calibration, and runtime coverage improve.
+- `takedown_control_model`: experimental context until source transfer and stat definitions improve.
 - `odds_calibration_model`: blocked until trusted pre-fight odds timestamps exist.
 
 ## Required Warnings
@@ -28,3 +28,8 @@ High-confidence or betting-read text must include uncertainty. Do not use guaran
 - `medium`: show leans and probabilities cautiously.
 - `limited`: show warnings and prefer context.
 - `dangerous`: hide probability-style output and show a data-quality warning.
+
+## Source-Transfer Behavior
+- Experimental models can provide scenario context, but should not display full probability-style prop outputs.
+- `ensemble_breakdown` should include `unavailable_models`, `unstable_models`, `data_quality`, `data_quality_reasons`, and `public_warning_text`.
+- Any model with `source_holdout_unstable`, `source_holdout_not_run`, or severe source regression must be hidden or downgraded in public output.

@@ -5,6 +5,7 @@ from ufc_predictor.training.dataset_builder import (
     ends_before_round_3_label,
     finish_in_round_1_label,
     normalize_method,
+    normalize_result_type,
     over_round_half_label,
     parse_round_time_seconds,
     round_phase_label,
@@ -17,6 +18,9 @@ def test_label_normalization_for_prop_models():
     assert normalize_method("SUB") == "Submission"
     assert normalize_method("U-DEC") == "Decision"
     assert normalize_method("DQ") == "Other"
+    assert normalize_result_type("No Contest") == "nc"
+    assert normalize_result_type("Overturned") == "nc"
+    assert normalize_result_type("Draw") == "draw"
     assert round_phase_label(1, False) == "early"
     assert round_phase_label(2, False) == "middle"
     assert round_phase_label(5, False) == "late"
@@ -76,6 +80,40 @@ def test_dataset_builder_uses_prior_history_only():
     assert dataset.iloc[1]["finish_in_round_1_binary"] == 0
     assert audit.label_availability["finish_binary"] == 2
     assert audit.label_availability["fighter_a_sig_strikes"] == 0
+
+
+def test_non_win_results_do_not_create_prop_model_labels():
+    fights = pd.DataFrame(
+        [
+            {
+                "event": "Event 1",
+                "event_date": "2024-01-01",
+                "fighter_1": "Alpha",
+                "fighter_2": "Beta",
+                "result": "No Contest",
+                "method": "No Contest",
+                "round": 1,
+                "time": "1:00",
+            },
+            {
+                "event": "Event 2",
+                "event_date": "2024-06-01",
+                "fighter_1": "Gamma",
+                "fighter_2": "Delta",
+                "result": "Draw",
+                "method": "Decision - Majority",
+                "round": 3,
+                "time": "5:00",
+            },
+        ]
+    )
+
+    dataset, audit = build_training_rows(fights)
+
+    assert audit.label_availability["finish_binary"] == 0
+    assert dataset["finish_binary"].isna().all()
+    assert dataset["method_class"].isna().all()
+    assert dataset["round_phase_class"].isna().all()
 
 
 def test_style_and_weakness_scores_use_prior_fights_only():

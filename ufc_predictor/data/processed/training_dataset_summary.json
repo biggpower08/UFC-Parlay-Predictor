@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T04:28:44.641950+00:00",
+  "generated_at": "2026-06-11T04:34:08.240406+00:00",
   "input_data": "C:\\dev\\mma-ai\\ufc_predictor\\data\\processed\\imports\\normalized_fights_combined.csv",
   "fight_rows": 49355,
   "fighter_count": 2804,
@@ -9,16 +9,16 @@
   },
   "label_availability": {
     "winner": 32140,
-    "finish_binary": 49355,
-    "goes_distance_binary": 49355,
-    "method_class": 49355,
-    "finish_type_class": 26244,
-    "round_number": 48720,
-    "round_phase_class": 49355,
-    "over_1_5_binary": 48910,
-    "over_2_5_binary": 48910,
-    "ends_before_round_3_binary": 48910,
-    "finish_in_round_1_binary": 48910,
+    "finish_binary": 32140,
+    "goes_distance_binary": 32140,
+    "method_class": 32140,
+    "finish_type_class": 17039,
+    "round_number": 31518,
+    "round_phase_class": 32140,
+    "over_1_5_binary": 31708,
+    "over_2_5_binary": 31708,
+    "ends_before_round_3_binary": 31708,
+    "finish_in_round_1_binary": 31708,
     "fighter_a_sig_strikes": 33530,
     "fighter_b_sig_strikes": 33530,
     "combined_sig_strikes": 33530,
@@ -37,46 +37,46 @@
   },
   "class_distributions": {
     "finish_binary": {
-      "1": 26244,
-      "0": 23111
+      "1.0": 17039,
+      "0.0": 15101
     },
     "goes_distance_binary": {
-      "0": 26244,
-      "1": 23111
+      "0.0": 17039,
+      "1.0": 15101
     },
     "method_class": {
-      "Submission": 9469,
-      "KO/TKO": 16019,
-      "Other": 756,
-      "Decision": 23111
+      "Submission": 6160,
+      "KO/TKO": 10460,
+      "Other": 419,
+      "Decision": 15101
     },
     "finish_type_class": {
-      "Submission": 9469,
-      "KO/TKO": 16019,
-      "Other": 756
+      "Submission": 6160,
+      "KO/TKO": 10460,
+      "Other": 419
     },
     "round_phase_class": {
-      "early": 13510,
-      "middle": 11803,
-      "decision": 23111,
-      "late": 486,
-      "unknown": 445
+      "early": 8682,
+      "middle": 7608,
+      "decision": 15101,
+      "late": 317,
+      "unknown": 432
     },
     "over_1_5_binary": {
-      "0.0": 17048,
-      "1.0": 31862
+      "0.0": 10960,
+      "1.0": 20748
     },
     "over_2_5_binary": {
-      "0.0": 23199,
-      "1.0": 25711
+      "0.0": 14950,
+      "1.0": 16758
     },
     "ends_before_round_3_binary": {
-      "1.0": 21406,
-      "0.0": 27504
+      "1.0": 13784,
+      "0.0": 17924
     },
     "finish_in_round_1_binary": {
-      "1.0": 13510,
-      "0.0": 35400
+      "1.0": 8682,
+      "0.0": 23026
     },
     "combined_strike_volume_bucket": {
       "low": 14009,

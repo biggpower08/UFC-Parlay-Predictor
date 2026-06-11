@@ -181,6 +181,8 @@ def build_backtest_models(train: pd.DataFrame, validation: pd.DataFrame, test: p
         source_test = finish_rows(test) if model_name == "finish_type_model" else test
         rows_train = dedupe_model_rows(source_train.dropna(subset=[target]).copy(), target, feature_names)
         rows_test = dedupe_model_rows(source_test.dropna(subset=[target]).copy(), target, feature_names)
+        rows_train[target] = rows_train[target].apply(normalize_class_label)
+        rows_test[target] = rows_test[target].apply(normalize_class_label)
         if len(rows_train) < min_train_rows or len(rows_test) < min_test_rows or rows_train[target].nunique() < 2:
             models[model_name] = {
                 "available": False,
@@ -190,8 +192,9 @@ def build_backtest_models(train: pd.DataFrame, validation: pd.DataFrame, test: p
                 "test_rows": int(len(rows_test)),
             }
             continue
-        classes = sorted(str(value) for value in set(rows_train[target].astype(str)) | set(rows_test[target].astype(str)))
+        classes = sorted({normalize_class_label(value) for value in rows_train[target].dropna().tolist()} | {normalize_class_label(value) for value in rows_test[target].dropna().tolist()})
         rows_validation = dedupe_model_rows(source_validation.dropna(subset=[target]).copy(), target, feature_names)
+        rows_validation[target] = rows_validation[target].apply(normalize_class_label)
         selected_bundle = select_classifier_with_interactions(model_name, rows_train, rows_validation, target, feature_names, classes)
         selected = selected_bundle["selected"]
         feature_names = selected_bundle["feature_names"]
@@ -277,6 +280,11 @@ def build_method_umbrella_backtest_model(train: pd.DataFrame, validation: pd.Dat
     duration_test = dedupe_model_rows(test.dropna(subset=["method_class", "finish_binary"]).copy(), "method_class", feature_names)
     type_train = dedupe_model_rows(finish_rows(train).dropna(subset=["finish_type_class"]).copy(), "finish_type_class", feature_names)
     type_validation = dedupe_model_rows(finish_rows(validation).dropna(subset=["finish_type_class"]).copy(), "finish_type_class", feature_names)
+    duration_train["finish_binary"] = duration_train["finish_binary"].apply(normalize_class_label)
+    duration_validation["finish_binary"] = duration_validation["finish_binary"].apply(normalize_class_label)
+    duration_test["method_class"] = duration_test["method_class"].apply(normalize_class_label)
+    type_train["finish_type_class"] = type_train["finish_type_class"].apply(normalize_class_label)
+    type_validation["finish_type_class"] = type_validation["finish_type_class"].apply(normalize_class_label)
     if len(duration_train) < min_train_rows or len(duration_test) < min_test_rows or len(type_train) < 300 or type_train["finish_type_class"].nunique() < 2:
         return {
             "available": False,
@@ -285,11 +293,14 @@ def build_method_umbrella_backtest_model(train: pd.DataFrame, validation: pd.Dat
             "train_rows": int(min(len(duration_train), len(type_train))),
             "test_rows": int(len(duration_test)),
         }
-    duration_classes = sorted(str(value) for value in set(duration_train["finish_binary"].astype(str)) | {"0", "1"})
-    finish_type_classes = sorted(str(value) for value in set(type_train["finish_type_class"].astype(str)) | set(type_validation.get("finish_type_class", pd.Series(dtype=str)).dropna().astype(str)))
+    duration_classes = sorted({normalize_class_label(value) for value in duration_train["finish_binary"].dropna().tolist()} | {"0", "1"})
+    finish_type_classes = sorted(
+        {normalize_class_label(value) for value in type_train["finish_type_class"].dropna().tolist()}
+        | {normalize_class_label(value) for value in type_validation.get("finish_type_class", pd.Series(dtype=str)).dropna().tolist()}
+    )
     duration_selected = select_classifier(duration_train, duration_validation, "finish_binary", feature_names, duration_classes)
     finish_type_selected = select_classifier(type_train, type_validation, "finish_type_class", feature_names, finish_type_classes)
-    method_classes = sorted(set(duration_test["method_class"].dropna().astype(str)) | {"Decision"} | set(finish_type_classes))
+    method_classes = sorted({normalize_class_label(value) for value in duration_test["method_class"].dropna().tolist()} | {"Decision"} | set(finish_type_classes))
     return {
         "available": True,
         "target": "method_class",
@@ -354,7 +365,11 @@ def precompute_model_predictions(test: pd.DataFrame, models: dict[str, dict[str,
                 "predicted_classes": [classes[int(np.argmax(row))] for row in probabilities],
             }
             continue
-        probabilities = align_probabilities(np.asarray(info["model"].predict_proba(model_rows[feature_names])), list(info["model"].classes_), info["classes"])
+        probabilities = align_probabilities(
+            np.asarray(info["model"].predict_proba(model_rows[feature_names])),
+            [normalize_class_label(value) for value in info["model"].classes_],
+            info["classes"],
+        )
         classes = info["classes"]
         precomputed[model_name] = {
             "probabilities": probabilities,
@@ -365,11 +380,19 @@ def precompute_model_predictions(test: pd.DataFrame, models: dict[str, dict[str,
 
 def method_umbrella_probabilities(info: dict[str, Any], X: pd.DataFrame) -> np.ndarray:
     duration_classes = info["duration_classes"]
-    duration_probs = align_probabilities(np.asarray(info["duration_model"].predict_proba(X)), list(info["duration_model"].classes_), duration_classes)
+    duration_probs = align_probabilities(
+        np.asarray(info["duration_model"].predict_proba(X)),
+        [normalize_class_label(value) for value in info["duration_model"].classes_],
+        duration_classes,
+    )
     finish_index = duration_classes.index("1") if "1" in duration_classes else len(duration_classes) - 1
     finish_probability = duration_probs[:, finish_index]
     finish_type_classes = info["finish_type_classes"]
-    type_probs = align_probabilities(np.asarray(info["finish_type_model"].predict_proba(X)), list(info["finish_type_model"].classes_), finish_type_classes)
+    type_probs = align_probabilities(
+        np.asarray(info["finish_type_model"].predict_proba(X)),
+        [normalize_class_label(value) for value in info["finish_type_model"].classes_],
+        finish_type_classes,
+    )
     method_classes = list(info["classes"])
     method_index = {label: index for index, label in enumerate(method_classes)}
     combined = np.zeros((len(X), len(method_classes)))
@@ -477,12 +500,16 @@ def score_models(predictions: list[dict[str, Any]], models: dict[str, dict[str, 
             continue
         rows = dedupe_model_rows(test.dropna(subset=[target]).copy(), target, [feature for feature in feature_names if feature in test.columns])
         rows = add_backtest_interactions(rows, info.get("selected_interactions", []))
-        y_true = rows[target].astype(str).tolist()
+        y_true = [normalize_class_label(value) for value in rows[target].tolist()]
         if info.get("algorithm") == "duration_x_conditional_finish_type":
             probs = method_umbrella_probabilities(info, rows[feature_names])
             classes = info["classes"]
         else:
-            probs = align_probabilities(np.asarray(info["model"].predict_proba(rows[feature_names])), list(info["model"].classes_), info["classes"])
+            probs = align_probabilities(
+                np.asarray(info["model"].predict_proba(rows[feature_names])),
+                [normalize_class_label(value) for value in info["model"].classes_],
+                info["classes"],
+            )
             classes = info["classes"]
             if model_name == "goes_distance_model":
                 finish_index = classes.index("1") if "1" in classes else len(classes) - 1
@@ -512,6 +539,18 @@ def score_models(predictions: list[dict[str, Any]], models: dict[str, dict[str, 
             "interaction_selection_status": info.get("interaction_selection_status", "not_run"),
         }
     return results
+
+
+def normalize_class_label(value) -> str:
+    if value is None or (isinstance(value, float) and math.isnan(value)):
+        return ""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    if math.isfinite(number) and number.is_integer():
+        return str(int(number))
+    return str(value)
 
 
 def backtest_segments(rows: pd.DataFrame, target: str) -> dict[str, Any]:
