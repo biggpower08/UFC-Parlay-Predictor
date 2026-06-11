@@ -2,6 +2,7 @@
 
 import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ModelSignalGrid from "./components/ModelSignalGrid";
 import { clearLatestPrediction, saveLatestPrediction } from "../lib/latestPrediction";
 
 const API_CANDIDATES = Array.from(
@@ -79,6 +80,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [health, setHealth] = useState(null);
   const [creditStatus, setCreditStatus] = useState(null);
+  const [modelStatus, setModelStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [resolver, setResolver] = useState(null);
@@ -119,6 +121,7 @@ export default function App() {
   useEffect(() => {
     checkHealth();
     loadCreditStatus();
+    loadModelStatus();
     const closeSearchOnOutsideClick = (event) => {
       if (!event.target.closest?.(".fighter-input")) {
         setActiveSearchSlot(null);
@@ -167,6 +170,15 @@ export default function App() {
       setCreditStatus(data);
     } catch {
       setCreditStatus(null);
+    }
+  }
+
+  async function loadModelStatus() {
+    try {
+      const data = await apiFetchJson("/models/status", { cache: "no-store", force: true });
+      setModelStatus(data.models || null);
+    } catch {
+      setModelStatus(null);
     }
   }
 
@@ -389,10 +401,15 @@ export default function App() {
       <header className="topbar">
         <div>
           <p className="eyebrow">AI UFC and MMA matchup intelligence</p>
-          <h1>Compare fighters before the fight.</h1>
+          <h1>FightScope</h1>
           <p className="hero-copy">
-            Generate winner predictions, confidence scores, fighter stats, Elo ratings, and model-informed fight reads from one clean matchup view.
+            A cyberpunk fight-intelligence scroll for winner predictions, confidence, Elo context, matchup stats, and honest model-informed reads.
           </p>
+        </div>
+        <div className="intro-sigil" aria-hidden="true">
+          <span />
+          <b>FS</b>
+          <small>scan</small>
         </div>
         <div className="status-stack">
           <CreditBalanceBadge creditStatus={creditStatus} />
@@ -447,6 +464,20 @@ export default function App() {
         </span>
         <b className={`matchup-mini-badge ${matchupType.severity}`}>{compactMatchupLabel(matchupType)}</b>
       </section>
+
+      {loading && (
+        <section className="loading-scroll" aria-live="polite">
+          <div className="loading-kata" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div>
+            <strong>Reading the matchup scroll</strong>
+            <p>Checking available signals without using blocked odds or unsupported models.</p>
+          </div>
+        </section>
+      )}
 
       {message && (
         <div className="message">
@@ -556,8 +587,8 @@ export default function App() {
                 <a href="/analysis">Full Analysis</a>
                 <a href="/stats">Matchup Stats</a>
                 <a href="/odds">Odds / Betting Reads</a>
-                <a href="/pricing">Pricing</a>
               </div>
+              <ModelSignalGrid prediction={result.prediction} modelStatus={modelStatus || result.analysis?.prop_model_status} compact />
               <button className="analysis-link" type="button" onClick={clearCurrentLatestPrediction}>
                 Clear latest prediction
               </button>

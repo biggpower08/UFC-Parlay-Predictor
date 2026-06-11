@@ -1,6 +1,7 @@
 "use client";
 
 import { useLatestPrediction } from "../../lib/latestPrediction";
+import ModelSignalGrid from "../components/ModelSignalGrid";
 
 export default function AnalysisPage() {
   const result = useLatestPrediction();
@@ -46,6 +47,7 @@ export default function AnalysisPage() {
             {analysis.warnings.map((warning) => <p key={warning}>{warning}</p>)}
           </div>
         )}
+        <ModelSignalGrid prediction={result.prediction} modelStatus={analysis.prop_model_status} compact />
       </section>
 
       <section className="analysis-page-grid">

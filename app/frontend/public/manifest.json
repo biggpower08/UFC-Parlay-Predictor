@@ -1,6 +1,6 @@
 {
-  "name": "UFC Predictor",
-  "short_name": "UFC AI",
+  "name": "FightScope",
+  "short_name": "FightScope",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#071019",

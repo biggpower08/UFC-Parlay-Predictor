@@ -7,7 +7,6 @@ const LINKS = [
   { href: "/analysis", label: "Analysis" },
   { href: "/stats", label: "Stats" },
   { href: "/odds", label: "Odds" },
-  { href: "/pricing", label: "Pricing" },
 ];
 
 export default function SiteNav() {
@@ -15,14 +14,20 @@ export default function SiteNav() {
 
   return (
     <nav className="site-nav" aria-label="Primary">
-      {LINKS.map((link) => {
-        const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
-        return (
-          <a className={active ? "active" : ""} href={link.href} key={link.href}>
-            {link.label}
-          </a>
-        );
-      })}
+      <a className="brand-link" href="/" aria-label="FightScope home">
+        <span className="brand-mark">FS</span>
+        <strong>FightScope</strong>
+      </a>
+      <div className="site-nav-links">
+        {LINKS.map((link) => {
+          const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+          return (
+            <a className={active ? "active" : ""} href={link.href} key={link.href}>
+              {link.label}
+            </a>
+          );
+        })}
+      </div>
     </nav>
   );
 }

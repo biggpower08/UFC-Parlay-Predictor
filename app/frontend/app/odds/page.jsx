@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLatestPrediction } from "../../lib/latestPrediction";
+import ModelSignalGrid from "../components/ModelSignalGrid";
 
 const API_BASE = "/api";
 
@@ -60,19 +61,7 @@ export default function OddsPage() {
         <p>These betting reads are informational model analysis only. They are not guarantees or financial advice. Fight outcomes are uncertain.</p>
       </section>
 
-      {bettingReads?.prop_model_status && (
-        <section className="panel">
-          <p className="eyebrow">Dedicated model status</p>
-          <div className="ready-grid">
-            {Object.values(bettingReads.prop_model_status).slice(0, 6).map((model) => (
-              <div key={model.name}>
-                <strong>{model.name.replaceAll("_", " ")}</strong>
-                <span>{model.status}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <ModelSignalGrid prediction={latest?.prediction} modelStatus={bettingReads?.prop_model_status || latest?.analysis?.prop_model_status} />
 
       <section className="prop-panel">
         <div className="prop-panel-header">

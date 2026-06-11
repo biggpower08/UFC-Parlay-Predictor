@@ -4,28 +4,28 @@ import SiteNav from "./components/SiteNav";
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mma-ai.onrender.com"),
   title: {
-    default: "UFC MMA AI Predictor",
-    template: "%s | UFC MMA AI Predictor",
+    default: "FightScope",
+    template: "%s | FightScope",
   },
   description:
-    "Compare UFC and MMA fighters with AI-powered predictions, confidence scores, Elo ratings, matchup stats, fight analysis, and model-informed prop reads.",
+    "Compare UFC and MMA fighters with prediction signals, confidence scores, Elo ratings, matchup stats, fight analysis, and model-informed prop reads.",
   manifest: "/manifest.json",
   openGraph: {
-    title: "UFC MMA AI Predictor",
+    title: "FightScope",
     description:
-      "AI-powered UFC and MMA matchup analysis with winner predictions, confidence scores, fighter stats, Elo ratings, and model-informed betting reads.",
+      "UFC and MMA matchup analysis with winner predictions, confidence scores, fighter stats, Elo ratings, and model-informed betting reads.",
     type: "website",
     url: "/",
   },
   twitter: {
     card: "summary",
-    title: "UFC MMA AI Predictor",
+    title: "FightScope",
     description:
-      "Compare UFC and MMA fighters with AI-powered predictions, confidence scores, Elo ratings, matchup stats, fight analysis, and model-informed prop reads.",
+      "Compare UFC and MMA fighters with prediction signals, confidence scores, Elo ratings, matchup stats, fight analysis, and model-informed prop reads.",
   },
   appleWebApp: {
     capable: true,
-    title: "UFC Predictor",
+    title: "FightScope",
     statusBarStyle: "black-translucent",
   },
 };
@@ -44,10 +44,10 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              name: "UFC MMA AI Predictor",
+              name: "FightScope",
               applicationCategory: "SportsApplication",
               description:
-                "AI-powered UFC and MMA matchup analysis with winner predictions, confidence scores, fighter stats, Elo ratings, and model-informed betting reads.",
+                "UFC and MMA matchup analysis with winner predictions, confidence scores, fighter stats, Elo ratings, and model-informed betting reads.",
               offers: {
                 "@type": "Offer",
                 price: "0",
