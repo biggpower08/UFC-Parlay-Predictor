@@ -1,7 +1,7 @@
 # Odds Leakage Audit
 
 ## Plain-English Summary
-Odds data is powerful but risky because archived odds may be closing lines or post-fight records. Until timestamps prove odds were collected before the prediction cutoff, odds-aware models remain blocked.
+The downloaded UFC daily odds file now has a research-only normalized preview, but odds modeling is still blocked. The safe subset only includes rows where `adding_date` is present and no later than `event_date`; this prevents obvious post-event leakage, but fight mapping and prediction-cutoff review are still required.
 
 ## Hard Rules
 - `snapshot_timestamp` must be trusted.
@@ -10,16 +10,19 @@ Odds data is powerful but risky because archived odds may be closing lines or po
 - Rows without trusted timestamps cannot train production odds models.
 - Closing odds can only train closing-line mode.
 - Historical backtests must simulate a prediction cutoff.
-- `odds_calibration_model` cannot be `production_ready` until timestamp audit passes and model review is complete.
+- `odds_calibration_model` cannot be `production_ready` until timestamp audit, fight mapping, and model review are complete.
 
-## Current Status
-- `ufc_betting_odds_daily` is a timestamped candidate, not approved production data.
-- `odds_calibration_model` remains blocked.
-- The audit script writes `ufc_predictor/data/processed/odds_timestamp_audit.json` and `docs/odds_timestamp_audit.md`.
-- The downloaded daily odds file has parseable `event_date` and `adding_date` columns, but audit status remains `blocked_missing_snapshot_timestamps`.
-- The file contains 140,842 rows where `adding_date <= event_date`, 40,240 rows where `adding_date > event_date`, and 684 rows missing snapshot timestamps.
-- Rows where `adding_date > event_date` are post-event/archive snapshots and cannot be used for early prediction mode.
-- Timestamp-safe rows may be normalized for research-only mapping review, not production odds modeling.
+## Current Preview Decision
+- Source file: `data/imports/kaggle/ufc_betting_odds_daily/UFC_betting_odds.csv`.
+- Raw rows: 181,766.
+- Accepted pre-fight raw rows: 140,842.
+- Rejected raw rows: 40,924.
+- Accepted normalized snapshots: 281,608.
+- Missing snapshot timestamp rows rejected: 684.
+- Post-event snapshot rows rejected: 40,240.
+- Duplicate snapshots rejected: 76.
+- Normalized markets: moneyline only.
+- Status: `research_only`.
 
 ## Failure Cases
 - Missing collection timestamp: blocked.
@@ -27,3 +30,13 @@ Odds data is powerful but risky because archived odds may be closing lines or po
 - Snapshot timestamp after event/fight date: blocked.
 - Ambiguous timezone: research-only.
 - Closing-only odds: closing-line research only.
+
+## Still Blocked
+- `odds_calibration_model` remains blocked.
+- Production odds features remain blocked.
+- Method-prop odds modeling remains blocked because no timestamp-safe prop snapshots were normalized in the current preview.
+- No odds artifacts should be packaged.
+- Raw Kaggle odds data must stay local and uncommitted.
+
+## Next Required Gate
+Map `fight_url` / `fight_key_candidate` to normalized fight records, then define strict prediction cutoffs before any odds-aware training.

@@ -107,5 +107,26 @@
     "Rows where snapshot timestamps are after event/fight dates are blocked for pre-fight prediction.",
     "Closing odds can only train closing-line mode unless earlier collection timestamps exist.",
     "odds_calibration_model remains blocked until timestamp safety passes and production modeling review is complete."
-  ]
+  ],
+  "odds_snapshots_preview": {
+    "status": "research_only",
+    "accepted_raw_rows": 140842,
+    "rejected_raw_rows": 40924,
+    "accepted_snapshots": 281608,
+    "normalized_market_counts": {
+      "moneyline": 281608,
+      "ko_tko_prop": 0,
+      "submission_prop": 0,
+      "decision_prop": 0
+    },
+    "safe_modes": {
+      "research_only": 281608,
+      "early_prefight_candidate": 134111,
+      "day_before_candidate": 260219,
+      "closing_line_candidate": 21389,
+      "future_event_candidate": 23462
+    },
+    "production_odds_model": "blocked",
+    "reason": "Timestamp-safe preview exists, but fight mapping, cutoff policy, and modeling review are incomplete."
+  }
 }

@@ -38,6 +38,20 @@ Odds features are not live yet. This schema describes how odds can be normalized
 
 Current status: useful for a research-only normalized preview after row-level timestamp filtering; blocked for production odds modeling.
 
+## Current Normalized Preview
+- Preview status: `research_only`.
+- Accepted pre-fight raw rows: 140,842.
+- Accepted normalized snapshots: 281,608.
+- Rejected raw rows: 40,924.
+- Normalized moneyline snapshots: 281,608.
+- Normalized KO/TKO prop snapshots: 0.
+- Normalized submission prop snapshots: 0.
+- Normalized decision prop snapshots: 0.
+- Full generated CSV stays local under `ufc_predictor/data/processed/training_imports/` and is ignored by Git.
+- Small committed preview files live under `ufc_predictor/data/processed/`.
+
+The preview proves a timestamp-safe moneyline subset exists, but it does not make odds features production-ready.
+
 ## Feature Families
 - Moneyline snapshots.
 - Method props: KO/TKO, submission, decision.

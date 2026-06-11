@@ -21,7 +21,15 @@ Odds data is being prepared as a future research source, not as a live sportsboo
 - Method prop columns: `f1_ko_odds`, `f2_ko_odds`, `f1_sub_odds`, `f2_sub_odds`, `f1_dec_odds`, `f2_dec_odds`.
 - Current audit status: `blocked_missing_snapshot_timestamps`.
 - Reason: 684 rows are missing snapshot timestamps and 40,240 rows have snapshots after the event date.
-- Next step: normalize only timestamp-safe rows into a dry-run `odds_snapshots` preview for mapping review.
+- Timestamp-safe normalization preview: `research_only`.
+- Accepted pre-fight raw rows: 140,842.
+- Rejected raw rows: 40,924.
+- Accepted normalized snapshots: 281,608.
+- Normalized market coverage: 281,608 moneyline snapshots.
+- Method prop coverage after timestamp filtering: 0 normalized snapshots in the current preview.
+- Full local preview CSV: `ufc_predictor/data/processed/training_imports/odds_snapshots_preview.csv` and must not be committed.
+- Committed preview/summary files: `ufc_predictor/data/processed/odds_snapshots_preview.json` and `ufc_predictor/data/processed/odds_snapshots_preview_summary.json`.
+- Next step: map preview fight keys to normalized fight records and review cutoff-specific prediction modes before any odds model training.
 
 ## Future Normalized Table: odds_snapshots
 - `id`
@@ -51,4 +59,5 @@ Odds data is being prepared as a future research source, not as a live sportsboo
 - Normalized odds snapshots should be append-only.
 - Do not overwrite old snapshots without preserving collection timestamps.
 - Do not train odds models until timestamp audit passes.
+- Do not train odds models from the preview until fight mapping, cutoff policy, and modeling review pass.
 - Do not show fake sportsbook odds in the app.

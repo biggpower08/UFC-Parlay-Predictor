@@ -45,3 +45,14 @@ Odds timestamp safety is not proven, so odds modeling remains blocked.
 - Rows without trusted timestamps cannot train production odds models.
 - Closing odds are only safe for closing-line mode.
 - Odds snapshots should be append-only and preserve collection history.
+
+## Normalized Preview Follow-Up
+- Normalizer: `scripts/normalize_kaggle_odds_snapshots.py`.
+- Preview status: `research_only`.
+- Accepted raw rows after row-level timestamp filtering: 140,842.
+- Rejected raw rows: 40,924.
+- Accepted normalized snapshots: 281,608.
+- Normalized markets: moneyline only in the current timestamp-safe preview.
+- Full generated CSV: `ufc_predictor/data/processed/training_imports/odds_snapshots_preview.csv` and must not be committed.
+- Small committed outputs: `ufc_predictor/data/processed/odds_snapshots_preview.json` and `ufc_predictor/data/processed/odds_snapshots_preview_summary.json`.
+- `odds_calibration_model` remains blocked until fight mapping, prediction cutoff policy, and modeling review pass.

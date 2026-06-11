@@ -3916,7 +3916,8 @@
     "feature_names": [],
     "class_distribution": {},
     "limitations": [
-      "Historical odds snapshots are not available, so odds calibration/value modeling is blocked."
+      "A research-only timestamp-safe moneyline preview exists, but odds calibration/value modeling remains blocked.",
+      "Fight mapping, prediction cutoff review, method-prop coverage, and modeling review have not passed."
     ],
     "trained_at": null,
     "final_test_metric": null,
@@ -3937,7 +3938,7 @@
     "backtest_baseline": null,
     "backtest_relative_improvement": null,
     "backtest_beats_baseline": false,
-    "biggest_limitations": "Trusted pre-fight odds snapshots are not available.",
+    "biggest_limitations": "Timestamp-safe moneyline preview exists for research review, but trusted mapped pre-fight odds modeling is not approved.",
     "backtested_at": "2026-06-11T04:20:51.182420+00:00",
     "target": null,
     "algorithm": null,
@@ -3996,6 +3997,26 @@
     },
     "elo_audit_failed_gates": [],
     "odds_timestamp_audit_status": "blocked_missing_snapshot_timestamps",
+    "odds_snapshots_preview_status": "research_only",
+    "odds_snapshots_preview_summary": {
+      "accepted_raw_rows": 140842,
+      "rejected_raw_rows": 40924,
+      "accepted_snapshots": 281608,
+      "normalized_market_counts": {
+        "moneyline": 281608,
+        "ko_tko_prop": 0,
+        "submission_prop": 0,
+        "decision_prop": 0
+      },
+      "safe_modes": [
+        "research_only",
+        "early_prefight_candidate",
+        "day_before_candidate",
+        "closing_line_candidate"
+      ],
+      "production_odds_model": "blocked",
+      "reason": "Timestamp-safe preview exists, but fight mapping, cutoff policy, and modeling review are incomplete."
+    },
     "odds_timestamp_audit_summary": {
       "input_dir": "data\\imports\\kaggle\\ufc_betting_odds_daily",
       "files_found": 1,
