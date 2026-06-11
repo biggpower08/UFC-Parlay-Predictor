@@ -1,6 +1,6 @@
 # UFC/MMA AI Predictor Master Project Status
 
-_Generated: 2026-06-11T13:57:55.925438+00:00_
+_Generated: 2026-06-11T14:43:02.343654+00:00_
 
 ## 1. Plain-English Project Summary
 The app has working winner predictions, Elo support, analysis pages, betting-read scaffolding, and a growing model audit system. The current priority is production readiness: source eligibility, label quality, source-transfer stability, calibration, and safe runtime output. No model is currently marked production-ready, and no model artifacts are packaged yet.
@@ -94,7 +94,8 @@ The app has working winner predictions, Elo support, analysis pages, betting-rea
 - Local download manifest location: `data/imports/kaggle/_download_manifest.json`.
 - Raw Kaggle files remain local-only under `data/imports/kaggle/` and must not be committed.
 - Timestamped odds candidate: `jerzyszocik/ufc-betting-odds-daily-dataset`.
-- Latest odds timestamp audit: `blocked_no_files` because local raw odds files have not been downloaded into the expected folder yet.
+- Latest odds timestamp audit: `blocked_missing_snapshot_timestamps` after auditing `UFC_betting_odds.csv` with 181,766 rows.
+- Daily odds audit detail: `event_date` and `adding_date` were detected, but 684 rows are missing snapshot timestamps and 40,240 rows have snapshots after event date. Timestamp-safe rows are research-only until mapping/modeling review.
 - `odds_calibration_model` remains blocked until trusted pre-fight timestamps pass audit and modeling review.
 
 ## 9. Current UI / Product Status

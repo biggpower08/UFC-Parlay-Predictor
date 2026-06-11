@@ -3953,10 +3953,11 @@
     "production_status_reason": "Pre-fight odds snapshots are not yet safely matched to outcomes and timestamps.",
     "passed_gates": [],
     "failed_gates": [
-      "model_blocked"
+      "model_blocked",
+      "trusted_prefight_odds_timestamps_missing"
     ],
     "recommended_use": "not available",
-    "public_warning_text": "This model is blocked until required data quality gates pass.",
+    "public_warning_text": "Odds calibration is blocked until timestamp-safe pre-fight odds mapping and modeling review pass.",
     "interaction_feature_count": 0,
     "selected_interactions": [],
     "interaction_selection_status": null,
@@ -3993,7 +3994,20 @@
       "no_elo_mode": "available_via_audit_script",
       "summary": "Historical training rows use pre-fight Elo snapshots; same-event fights use pre-event Elo by default."
     },
-    "elo_audit_failed_gates": []
+    "elo_audit_failed_gates": [],
+    "odds_timestamp_audit_status": "blocked_missing_snapshot_timestamps",
+    "odds_timestamp_audit_summary": {
+      "input_dir": "data\\imports\\kaggle\\ufc_betting_odds_daily",
+      "files_found": 1,
+      "rows_audited": 181766,
+      "missing_snapshot_timestamp_rows": 684,
+      "snapshot_after_event_rows": 40240,
+      "snapshot_before_or_equal_event_rows": 140842,
+      "earliest_snapshot_timestamp": "2025-07-26T07:05:52.715662+00:00",
+      "latest_snapshot_timestamp": "2026-06-10T16:53:27+00:00",
+      "earliest_event_date": "2010-03-21T00:00:00+00:00",
+      "latest_event_date": "2027-07-02T00:00:00+00:00"
+    }
   },
   "round_phase_model": {
     "model_name": "round_phase_model",

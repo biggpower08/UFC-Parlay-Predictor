@@ -16,6 +16,10 @@ Odds data is powerful but risky because archived odds may be closing lines or po
 - `ufc_betting_odds_daily` is a timestamped candidate, not approved production data.
 - `odds_calibration_model` remains blocked.
 - The audit script writes `ufc_predictor/data/processed/odds_timestamp_audit.json` and `docs/odds_timestamp_audit.md`.
+- The downloaded daily odds file has parseable `event_date` and `adding_date` columns, but audit status remains `blocked_missing_snapshot_timestamps`.
+- The file contains 140,842 rows where `adding_date <= event_date`, 40,240 rows where `adding_date > event_date`, and 684 rows missing snapshot timestamps.
+- Rows where `adding_date > event_date` are post-event/archive snapshots and cannot be used for early prediction mode.
+- Timestamp-safe rows may be normalized for research-only mapping review, not production odds modeling.
 
 ## Failure Cases
 - Missing collection timestamp: blocked.

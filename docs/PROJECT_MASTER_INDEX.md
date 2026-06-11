@@ -27,3 +27,4 @@ Use `PROJECT_MASTER_STATUS.md` as the main source of truth. The files below are 
 - [odds_ingestion_plan.md](odds_ingestion_plan.md) - available
 - [odds_leakage_audit.md](odds_leakage_audit.md) - available
 - [odds_feature_schema.md](odds_feature_schema.md) - available
+- [odds_snapshot_normalization_plan.md](odds_snapshot_normalization_plan.md) - available

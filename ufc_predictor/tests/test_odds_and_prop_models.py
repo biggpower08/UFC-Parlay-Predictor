@@ -1,6 +1,8 @@
 from ufc_predictor.config import settings
 from ufc_predictor.models.props import prop_model_status
 from ufc_predictor.odds import get_odds_events, get_odds_status
+import json
+from pathlib import Path
 
 
 def test_odds_status_disabled_by_default():
@@ -40,3 +42,20 @@ def test_prop_model_registry_reports_current_training_status():
     assert statuses["odds_calibration_model"]["status"] in {"not_trained", "blocked", "insufficient_data"}
     for model_name in ("odds_calibration_model",):
         assert statuses[model_name]["support_level"] == "not_available"
+
+
+def test_odds_registry_stays_blocked_after_timestamp_audit():
+    path = Path("ufc_predictor/data/processed/model_registry.json")
+    if not path.is_file():
+        return
+    registry = json.loads(path.read_text(encoding="utf-8"))
+    odds = registry.get("odds_calibration_model", {})
+
+    assert odds.get("production_status") == "blocked"
+    assert odds.get("odds_timestamp_audit_status") in {
+        "blocked_missing_snapshot_timestamps",
+        "blocked_no_files",
+        "blocked_post_event_snapshots",
+        "research_only_timezone_ambiguous",
+        None,
+    }

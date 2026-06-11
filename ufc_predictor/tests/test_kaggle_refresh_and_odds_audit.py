@@ -129,8 +129,62 @@ def test_odds_timestamp_audit_keeps_ambiguous_timezone_research_only(tmp_path):
     assert report["safe_for"]["production_odds_model"] == "blocked"
 
 
+def test_odds_timestamp_audit_detects_daily_odds_columns(tmp_path):
+    odds_dir = tmp_path / "odds"
+    odds_dir.mkdir()
+    pd.DataFrame(
+        [
+            {
+                "fight_url": "http://ufcstats.com/fight-details/test",
+                "fighter_1": "Alpha",
+                "fighter_2": "Beta",
+                "odds_1": 1.8,
+                "odds_2": 2.1,
+                "f1_ko_odds": 4.0,
+                "f2_sub_odds": 5.5,
+                "event_date": "2026-01-10",
+                "adding_date": "2026-01-09T12:00:00Z",
+                "source": "ExampleBook",
+                "region": "us",
+            }
+        ]
+    ).to_csv(odds_dir / "UFC_betting_odds.csv", index=False)
+
+    report = audit_odds_directory(odds_dir)
+    file_report = report["files"][0]
+
+    assert file_report["selected_event_date_column"] == "event_date"
+    assert file_report["selected_snapshot_timestamp_column"] == "adding_date"
+    assert "source" in file_report["bookmaker_columns"]
+    assert file_report["moneyline_rows"] == 1
+    assert file_report["method_prop_rows"] == 1
+    assert report["totals"]["snapshot_before_or_equal_event_rows"] == 1
+
+
+def test_downloaded_daily_odds_file_audits_if_present():
+    path = Path("data/imports/kaggle/ufc_betting_odds_daily/UFC_betting_odds.csv")
+    if not path.is_file():
+        return
+
+    report = audit_odds_directory(path.parent)
+    file_report = next(item for item in report["files"] if item["source_file"].endswith("UFC_betting_odds.csv"))
+
+    assert file_report["rows"] > 1000
+    assert file_report["selected_event_date_column"] == "event_date"
+    assert file_report["selected_snapshot_timestamp_column"] == "adding_date"
+    assert report["status"] != "timestamp_audit_passed_research_only"
+    assert report["odds_calibration_model_status"] == "blocked"
+
+
 def test_weekly_powershell_script_exists():
     assert Path("scripts/run_weekly_kaggle_refresh.ps1").is_file()
+
+
+def test_master_status_records_current_odds_audit_status():
+    text = Path("docs/PROJECT_MASTER_STATUS.md").read_text(encoding="utf-8")
+
+    assert "blocked_missing_snapshot_timestamps" in text
+    assert "UFC_betting_odds.csv" in text
 
 
 def test_raw_kaggle_data_paths_are_ignored():

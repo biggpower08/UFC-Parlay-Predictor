@@ -10,6 +10,19 @@ Odds data is being prepared as a future research source, not as a live sportsboo
 - `oliviersportsdata/us-sports-master-historical-closing-odds`: closing-line research only.
 - `jasonkwm/ufc-mens-betting-odds-20152020`: research-only unless timestamp safety passes.
 
+## Downloaded Daily Odds Audit
+- File: `data/imports/kaggle/ufc_betting_odds_daily/UFC_betting_odds.csv`.
+- Rows: 181,766.
+- Event date column: `event_date`.
+- Snapshot timestamp column: `adding_date`.
+- Bookmaker/source column: `source`.
+- Region column: `region`.
+- Moneyline odds columns: `odds_1`, `odds_2`.
+- Method prop columns: `f1_ko_odds`, `f2_ko_odds`, `f1_sub_odds`, `f2_sub_odds`, `f1_dec_odds`, `f2_dec_odds`.
+- Current audit status: `blocked_missing_snapshot_timestamps`.
+- Reason: 684 rows are missing snapshot timestamps and 40,240 rows have snapshots after the event date.
+- Next step: normalize only timestamp-safe rows into a dry-run `odds_snapshots` preview for mapping review.
+
 ## Future Normalized Table: odds_snapshots
 - `id`
 - `fight_key`

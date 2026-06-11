@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-11T13:57:10.299434+00:00",
+  "generated_at": "2026-06-11T14:39:03.430295+00:00",
   "input_dir": "data\\imports\\kaggle\\ufc_betting_odds_daily",
-  "status": "blocked_no_files",
-  "plain_english_summary": "No local odds files were found. Download or place raw Kaggle odds files locally before auditing.",
+  "status": "blocked_missing_snapshot_timestamps",
+  "plain_english_summary": "Odds timestamp safety is not proven, so odds modeling remains blocked.",
   "odds_calibration_model_status": "blocked",
   "safe_for": {
     "research_only": "allowed_for_manual_review",
@@ -12,19 +12,96 @@
     "production_odds_model": "blocked"
   },
   "totals": {
-    "available_files": 0,
-    "audited_files": 0,
-    "total_rows": 0,
-    "missing_snapshot_timestamp_rows": 0,
+    "available_files": 1,
+    "audited_files": 1,
+    "total_rows": 181766,
+    "total_size_bytes": 29620834,
+    "missing_snapshot_timestamp_rows": 684,
     "missing_event_date_rows": 0,
-    "snapshot_after_event_rows": 0,
+    "snapshot_after_event_rows": 40240,
+    "snapshot_before_or_equal_event_rows": 140842,
     "timezone_ambiguous_files": 0,
-    "moneyline_rows": 0,
-    "method_prop_rows": 0,
-    "duplicate_snapshots": 0,
-    "append_only_history_supported": false
+    "moneyline_rows": 181551,
+    "method_prop_rows": 5376,
+    "duplicate_snapshots": 85044,
+    "multiple_snapshots_per_fight": 175253,
+    "append_only_history_supported": true,
+    "earliest_snapshot_timestamp": "2025-07-26T07:05:52.715662+00:00",
+    "latest_snapshot_timestamp": "2026-06-10T16:53:27+00:00",
+    "earliest_event_date": "2010-03-21T00:00:00+00:00",
+    "latest_event_date": "2027-07-02T00:00:00+00:00"
   },
-  "files": [],
+  "files": [
+    {
+      "source_file": "data\\imports\\kaggle\\ufc_betting_odds_daily\\UFC_betting_odds.csv",
+      "file_size_bytes": 29620834,
+      "status": "audited",
+      "rows": 181766,
+      "sha256": "7714722cc33db8cd1519115e6c276e104b7f3c363bb8bf356e4b147be917e533",
+      "columns_present": [
+        "fight_url",
+        "fighter_1_url",
+        "fighter_2_url",
+        "fighter_1",
+        "fighter_2",
+        "odds_1",
+        "odds_2",
+        "f1_ko_odds",
+        "f2_ko_odds",
+        "f1_sub_odds",
+        "f2_sub_odds",
+        "f1_dec_odds",
+        "f2_dec_odds",
+        "event_date",
+        "adding_date",
+        "source",
+        "region"
+      ],
+      "event_date_columns": [
+        "event_date"
+      ],
+      "fight_date_columns": [],
+      "collection_timestamp_columns": [
+        "adding_date"
+      ],
+      "selected_event_date_column": "event_date",
+      "selected_snapshot_timestamp_column": "adding_date",
+      "bookmaker_columns": [
+        "source"
+      ],
+      "market_type_columns": [],
+      "fighter_selection_columns": [
+        "fighter_1_url",
+        "fighter_2_url",
+        "fighter_1",
+        "fighter_2"
+      ],
+      "odds_columns": [
+        "odds_1",
+        "odds_2",
+        "f1_ko_odds",
+        "f2_ko_odds",
+        "f1_sub_odds",
+        "f2_sub_odds",
+        "f1_dec_odds",
+        "f2_dec_odds"
+      ],
+      "moneyline_rows": 181551,
+      "method_prop_rows": 5376,
+      "missing_snapshot_timestamp_rows": 684,
+      "missing_event_date_rows": 0,
+      "snapshot_after_event_rows": 40240,
+      "snapshot_before_or_equal_event_rows": 140842,
+      "timestamp_timezone_ambiguous": false,
+      "duplicate_snapshots": 85044,
+      "multiple_snapshots_per_fight": 175253,
+      "append_only_history_supported": true,
+      "earliest_snapshot_timestamp": "2025-07-26T07:05:52.715662+00:00",
+      "latest_snapshot_timestamp": "2026-06-10T16:53:27+00:00",
+      "earliest_event_date": "2010-03-21T00:00:00+00:00",
+      "latest_event_date": "2027-07-02T00:00:00+00:00"
+    }
+  ],
   "decision_rules": [
     "Rows without trusted snapshot timestamps cannot train production odds models.",
     "Rows where snapshot timestamps are after event/fight dates are blocked for pre-fight prediction.",

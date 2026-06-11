@@ -24,6 +24,20 @@ Odds features are not live yet. This schema describes how odds can be normalized
 - `is_live`
 - `timestamp_audit_status`
 
+## Downloaded Daily Odds Column Mapping
+- `fight_url` -> candidate fight key / external fight ID.
+- `fighter_1`, `fighter_2` -> matchup fighters.
+- `odds_1`, `odds_2` -> moneyline decimal odds.
+- `f1_ko_odds`, `f2_ko_odds` -> KO/TKO prop decimal odds.
+- `f1_sub_odds`, `f2_sub_odds` -> submission prop decimal odds.
+- `f1_dec_odds`, `f2_dec_odds` -> decision prop decimal odds.
+- `event_date` -> event date.
+- `adding_date` -> candidate snapshot timestamp.
+- `source` -> bookmaker/source.
+- `region` -> market region.
+
+Current status: useful for a research-only normalized preview after row-level timestamp filtering; blocked for production odds modeling.
+
 ## Feature Families
 - Moneyline snapshots.
 - Method props: KO/TKO, submission, decision.

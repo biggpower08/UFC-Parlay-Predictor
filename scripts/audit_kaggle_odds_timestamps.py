@@ -17,9 +17,9 @@ if str(ROOT) not in sys.path:
 from ufc_predictor.config import settings  # noqa: E402
 
 
-EVENT_DATE_HINTS = ("event_date", "fight_date", "date", "commence_time", "event_start")
-SNAPSHOT_HINTS = ("snapshot", "scrape", "collected", "collection", "downloaded", "timestamp", "last_update", "last_updated")
-BOOKMAKER_HINTS = ("bookmaker", "sportsbook", "book", "provider", "site")
+EVENT_DATE_HINTS = ("event_date", "fight_date", "commence_time", "event_start")
+SNAPSHOT_HINTS = ("snapshot", "scrape", "collected", "collection", "downloaded", "timestamp", "last_update", "last_updated", "adding_date", "added_at")
+BOOKMAKER_HINTS = ("bookmaker", "sportsbook", "book", "provider", "site", "source")
 MARKET_HINTS = ("market", "prop", "bet_type", "outcome_type")
 SELECTION_HINTS = ("fighter", "selection", "outcome", "participant", "name")
 ODDS_HINTS = ("american", "decimal", "odds", "price", "moneyline")
@@ -92,8 +92,18 @@ def audit_odds_file(path: Path) -> dict[str, Any]:
     duplicate_subset = [col for col in [event_col, snapshot_col, *(market_cols[:2]), *(selection_cols[:2]), *(bookmaker_cols[:1])] if col]
     duplicate_snapshots = int(frame.duplicated(subset=duplicate_subset).sum()) if duplicate_subset else 0
     timezone_ambiguous = timestamp_col_timezone_ambiguous(frame, snapshot_col)
+    moneyline_rows = int((frame.get("odds_1", pd.Series(dtype=float)).notna() | frame.get("odds_2", pd.Series(dtype=float)).notna()).sum())
+    method_prop_rows = int(
+        frame[[col for col in ("f1_ko_odds", "f2_ko_odds", "f1_sub_odds", "f2_sub_odds", "f1_dec_odds", "f2_dec_odds") if col in frame.columns]]
+        .notna()
+        .any(axis=1)
+        .sum()
+    ) if any(col in frame.columns for col in ("f1_ko_odds", "f2_ko_odds", "f1_sub_odds", "f2_sub_odds", "f1_dec_odds", "f2_dec_odds")) else 0
+    market_moneyline_rows = int(market_values.str.contains("|".join(MONEYLINE_TERMS), case=False, na=False).sum()) if not market_values.empty else int(odds_values.str.contains("moneyline", case=False, na=False).sum())
+    market_method_rows = int(market_values.str.contains("|".join(METHOD_MARKET_TERMS), case=False, na=False).sum()) if not market_values.empty else 0
     return {
         "source_file": str(path),
+        "file_size_bytes": path.stat().st_size,
         "status": "audited",
         "rows": int(len(frame)),
         "sha256": sha256(path),
@@ -107,14 +117,20 @@ def audit_odds_file(path: Path) -> dict[str, Any]:
         "market_type_columns": market_cols,
         "fighter_selection_columns": selection_cols,
         "odds_columns": odds_cols,
-        "moneyline_rows": int(market_values.str.contains("|".join(MONEYLINE_TERMS), case=False, na=False).sum()) if not market_values.empty else int(odds_values.str.contains("moneyline", case=False, na=False).sum()),
-        "method_prop_rows": int(market_values.str.contains("|".join(METHOD_MARKET_TERMS), case=False, na=False).sum()) if not market_values.empty else 0,
+        "moneyline_rows": max(moneyline_rows, market_moneyline_rows),
+        "method_prop_rows": max(method_prop_rows, market_method_rows),
         "missing_snapshot_timestamp_rows": int(snapshot_dates.isna().sum()) if snapshot_col else int(len(frame)),
         "missing_event_date_rows": int(event_dates.isna().sum()) if event_col else int(len(frame)),
         "snapshot_after_event_rows": timestamp_after_event,
+        "snapshot_before_or_equal_event_rows": int(((snapshot_dates.notna()) & (event_dates.notna()) & (snapshot_dates <= event_dates)).sum()),
         "timestamp_timezone_ambiguous": timezone_ambiguous,
         "duplicate_snapshots": duplicate_snapshots,
+        "multiple_snapshots_per_fight": int(frame.duplicated(subset=[col for col in ["fight_url"] if col in frame.columns]).sum()) if "fight_url" in frame.columns else 0,
         "append_only_history_supported": bool(snapshot_col and snapshot_dates.nunique(dropna=True) > 1),
+        "earliest_snapshot_timestamp": iso_or_none(snapshot_dates.min()),
+        "latest_snapshot_timestamp": iso_or_none(snapshot_dates.max()),
+        "earliest_event_date": iso_or_none(event_dates.min()),
+        "latest_event_date": iso_or_none(event_dates.max()),
     }
 
 
@@ -141,7 +157,7 @@ def first_parseable_datetime_column(frame: pd.DataFrame, candidates: list[str]) 
     best = None
     best_count = 0
     for column in candidates:
-        parsed = pd.to_datetime(frame[column], errors="coerce", utc=True)
+        parsed = parse_datetime_series(frame[column])
         count = int(parsed.notna().sum())
         if count > best_count:
             best = column
@@ -150,7 +166,10 @@ def first_parseable_datetime_column(frame: pd.DataFrame, candidates: list[str]) 
 
 
 def parse_datetime_series(series: pd.Series) -> pd.Series:
-    return pd.to_datetime(series, errors="coerce", utc=True)
+    try:
+        return pd.to_datetime(series, errors="coerce", utc=True, format="mixed")
+    except TypeError:
+        return pd.to_datetime(series, errors="coerce", utc=True)
 
 
 def empty_datetime_series(length: int) -> pd.Series:
@@ -179,14 +198,21 @@ def summarize_reports(reports: list[dict[str, Any]]) -> dict[str, Any]:
         "available_files": len(reports),
         "audited_files": len(audited),
         "total_rows": sum(int(report.get("rows", 0)) for report in audited),
+        "total_size_bytes": sum(int(report.get("file_size_bytes", 0)) for report in audited),
         "missing_snapshot_timestamp_rows": sum(int(report.get("missing_snapshot_timestamp_rows", 0)) for report in audited),
         "missing_event_date_rows": sum(int(report.get("missing_event_date_rows", 0)) for report in audited),
         "snapshot_after_event_rows": sum(int(report.get("snapshot_after_event_rows", 0)) for report in audited),
+        "snapshot_before_or_equal_event_rows": sum(int(report.get("snapshot_before_or_equal_event_rows", 0)) for report in audited),
         "timezone_ambiguous_files": sum(1 for report in audited if report.get("timestamp_timezone_ambiguous")),
         "moneyline_rows": sum(int(report.get("moneyline_rows", 0)) for report in audited),
         "method_prop_rows": sum(int(report.get("method_prop_rows", 0)) for report in audited),
         "duplicate_snapshots": sum(int(report.get("duplicate_snapshots", 0)) for report in audited),
+        "multiple_snapshots_per_fight": sum(int(report.get("multiple_snapshots_per_fight", 0)) for report in audited),
         "append_only_history_supported": any(report.get("append_only_history_supported") for report in audited),
+        "earliest_snapshot_timestamp": min_non_empty(report.get("earliest_snapshot_timestamp") for report in audited),
+        "latest_snapshot_timestamp": max_non_empty(report.get("latest_snapshot_timestamp") for report in audited),
+        "earliest_event_date": min_non_empty(report.get("earliest_event_date") for report in audited),
+        "latest_event_date": max_non_empty(report.get("latest_event_date") for report in audited),
     }
 
 
@@ -232,6 +258,22 @@ def summary_text(status: str) -> str:
     return "Odds timestamp safety is not proven, so odds modeling remains blocked."
 
 
+def iso_or_none(value) -> str | None:
+    if pd.isna(value):
+        return None
+    return value.isoformat()
+
+
+def min_non_empty(values) -> str | None:
+    filtered = [value for value in values if value]
+    return min(filtered) if filtered else None
+
+
+def max_non_empty(values) -> str | None:
+    filtered = [value for value in values if value]
+    return max(filtered) if filtered else None
+
+
 def write_outputs(payload: dict[str, Any], output_json: Path, output_md: Path) -> None:
     output_json.parent.mkdir(parents=True, exist_ok=True)
     output_json.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
@@ -251,13 +293,21 @@ def markdown_report(payload: dict[str, Any]) -> str:
         f"- Status: {payload['status']}",
         f"- Odds calibration model: {payload['odds_calibration_model_status']}",
         f"- Files found: {totals['available_files']}",
+        f"- File size bytes: {totals['total_size_bytes']}",
         f"- Rows audited: {totals['total_rows']}",
+        f"- Earliest snapshot timestamp: {totals.get('earliest_snapshot_timestamp')}",
+        f"- Latest snapshot timestamp: {totals.get('latest_snapshot_timestamp')}",
+        f"- Earliest event date: {totals.get('earliest_event_date')}",
+        f"- Latest event date: {totals.get('latest_event_date')}",
         f"- Missing snapshot timestamp rows: {totals['missing_snapshot_timestamp_rows']}",
         f"- Missing event date rows: {totals['missing_event_date_rows']}",
         f"- Snapshot-after-event rows: {totals['snapshot_after_event_rows']}",
+        f"- Snapshot-before-or-equal-event rows: {totals['snapshot_before_or_equal_event_rows']}",
         f"- Timezone ambiguous files: {totals['timezone_ambiguous_files']}",
         f"- Moneyline rows detected: {totals['moneyline_rows']}",
         f"- Method prop rows detected: {totals['method_prop_rows']}",
+        f"- Duplicate snapshots: {totals['duplicate_snapshots']}",
+        f"- Multiple snapshots per fight: {totals['multiple_snapshots_per_fight']}",
         "",
         "## Safe Modes",
     ]
@@ -268,6 +318,12 @@ def markdown_report(payload: dict[str, Any]) -> str:
         lines.append("- No files found.")
     for report in payload["files"]:
         lines.append(f"- `{report.get('source_file')}`: {report.get('status')}, rows={report.get('rows', 0)}")
+        lines.append(f"  - Columns: {', '.join(report.get('columns_present', [])[:60])}")
+        lines.append(f"  - Event date column: {report.get('selected_event_date_column')}")
+        lines.append(f"  - Snapshot timestamp column: {report.get('selected_snapshot_timestamp_column')}")
+        lines.append(f"  - Bookmaker/source columns: {', '.join(report.get('bookmaker_columns', [])) or 'None detected'}")
+        lines.append(f"  - Fighter/selection columns: {', '.join(report.get('fighter_selection_columns', [])) or 'None detected'}")
+        lines.append(f"  - Odds columns: {', '.join(report.get('odds_columns', [])) or 'None detected'}")
     lines.extend(
         [
             "",
