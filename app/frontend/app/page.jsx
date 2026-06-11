@@ -474,7 +474,7 @@ export default function App() {
           </div>
           <div>
             <strong>Reading the matchup scroll</strong>
-            <p>Checking available signals without using blocked odds or unsupported models.</p>
+            <p>Checking available signals while keeping unavailable market and support models out of the read.</p>
           </div>
         </section>
       )}

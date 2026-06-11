@@ -3,6 +3,23 @@
 ## Plain-English Summary
 The app should show useful fight intelligence without overstating model strength. Strong models can support probabilities when data-quality gates pass; weak, blocked, or experimental models should appear only as clearly labeled context or be hidden.
 
+## Customer-Facing Language Policy
+- Use polished user-facing labels instead of raw internal statuses.
+- `high_confidence_only` should appear as "High-confidence research signal."
+- `production_candidate` should appear as "Validated candidate signal."
+- `experimental` should appear as "Experimental insight."
+- `weak_or_failed_baseline` should appear as "Under review."
+- `blocked` or `not_trained` should appear as "Not yet available."
+- Avoid raw model names such as `odds_calibration_model` in customer-facing card titles.
+- Market comparison should be described as inactive while odds mapping and timing checks are completed.
+
+## Model-Specific Narratives
+- Each visible model/signal card should include a short matchup read paragraph, not just a badge or number.
+- Narratives should be deterministic from existing response fields and status metadata.
+- Narratives should sound like sports analysis while preserving uncertainty.
+- Experimental and under-review signals may provide context, but should not be framed as final-grade forecasts.
+- Odds/market narratives must stay inactive until odds mapping, cutoff policy, and modeling review pass.
+
 ## Output Levels
 - Full probability: allowed only when model gates, data-quality gates, runtime parity, and selective confidence policy pass.
 - Lean: allowed when the model is available but not strong enough for a hard probability.

@@ -90,6 +90,9 @@ The app has working winner predictions, Elo support, analysis pages, betting-rea
 
 ## 9. Current UI / Product Status
 - Home, Analysis, Stats, and Odds pages exist as product surfaces.
+- Customer-facing copy has been polished under the FightScope brand.
+- Model-specific narrative cards explain the winner, fight shape, style, and market-read signals in product-safe language.
+- Raw model statuses are translated into user-facing labels such as high-confidence research signal, validated candidate signal, experimental insight, under review, and not yet available.
 - Odds page remains model-informed/read-only; no fake sportsbook odds or bet placement.
 - Public output should show model status badges and source/data-quality warnings before strong claims.
 

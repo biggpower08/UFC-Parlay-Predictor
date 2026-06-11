@@ -46,8 +46,8 @@ export default function OddsPage() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">Infrastructure mode</p>
-          <h1>Betting Odds</h1>
+          <p className="eyebrow">Market intelligence</p>
+          <h1>Market Reads</h1>
         </div>
       </header>
 
@@ -55,10 +55,10 @@ export default function OddsPage() {
 
       <section className="panel odds-status-panel">
         <div>
-          <strong>{status?.odds_enabled ? "Live odds connected" : "Live odds not connected"}</strong>
-          <span>{status?.message || "Live sportsbook odds are not connected yet. These are model-informed betting reads, not sportsbook lines."}</span>
+          <strong>{status?.odds_enabled ? "Live market feed connected" : "Market comparison is not active yet"}</strong>
+          <span>{status?.message || "Market comparison is not active yet while odds mapping and timing checks are completed."}</span>
         </div>
-        <p>These betting reads are informational model analysis only. They are not guarantees or financial advice. Fight outcomes are uncertain.</p>
+        <p>FightScope is an independent MMA analytics platform. It is not affiliated with UFC, any promotion, sportsbook, or betting operator. Model outputs are informational and research-oriented, not financial advice.</p>
       </section>
 
       <ModelSignalGrid prediction={latest?.prediction} modelStatus={bettingReads?.prop_model_status || latest?.analysis?.prop_model_status} />
@@ -67,9 +67,9 @@ export default function OddsPage() {
         <div className="prop-panel-header">
           <div>
             <span>Model-informed</span>
-            <h2>Betting Reads</h2>
+            <h2>Model-Informed Reads</h2>
           </div>
-          <p>No fake odds, edge, units, ROI, or bet placement is shown here.</p>
+          <p>Market comparison is held back until odds mapping and timing checks are complete. No sportsbook lines, edge, units, ROI, or bet placement are shown here.</p>
         </div>
         {!latest ? (
           <div className="empty-page">

@@ -103,6 +103,16 @@ input {
   padding: 28px 0 96px;
 }
 
+.site-footer {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto 28px;
+  padding: 16px 0 0;
+  color: rgba(201, 216, 226, 0.74);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -874,7 +884,7 @@ input::placeholder {
 
 .model-signal-panel {
   display: grid;
-  gap: 14px;
+  gap: 18px;
   padding: 16px;
   border: 1px solid rgba(36, 246, 255, 0.18);
   border-radius: 8px;
@@ -903,6 +913,19 @@ input::placeholder {
   line-height: 1.45;
 }
 
+.model-signal-section {
+  display: grid;
+  gap: 10px;
+}
+
+.model-signal-section h3 {
+  margin: 0;
+  color: #ffcc66;
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
 .model-signal-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -910,7 +933,7 @@ input::placeholder {
 }
 
 .model-signal-card {
-  min-height: 132px;
+  min-height: 190px;
   display: grid;
   align-content: start;
   gap: 10px;
@@ -920,7 +943,7 @@ input::placeholder {
   background: rgba(255, 255, 255, 0.055);
 }
 
-.model-signal-card > div {
+.model-signal-topline {
   display: grid;
   gap: 8px;
 }
@@ -936,8 +959,13 @@ input::placeholder {
 
 .model-signal-card p {
   color: #c9d8e2;
-  font-size: 0.84rem;
-  line-height: 1.4;
+  font-size: 0.88rem;
+  line-height: 1.48;
+}
+
+.model-signal-card small {
+  color: rgba(237, 248, 255, 0.68);
+  line-height: 1.38;
 }
 
 .model-status-badge {

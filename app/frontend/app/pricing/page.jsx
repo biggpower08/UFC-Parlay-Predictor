@@ -18,8 +18,8 @@ const PLANS = [
   {
     name: "Premium",
     price: "Coming soon",
-    status: "Stripe-ready",
-    description: "Prediction-credit packs once checkout launches.",
+    status: "Prepared",
+    description: "Prediction-credit packs are planned for a later checkout launch.",
     features: [
       "5, 10, 15, or 20 prediction credits",
       "Full fight analysis",
@@ -34,7 +34,7 @@ const PLANS = [
     name: "Pro",
     price: "Future",
     status: "Planned",
-    description: "Research workflow tools for heavier analysis use.",
+    description: "Expanded research workflow tools for deeper matchup analysis.",
     features: [
       "Historical model performance",
       "Line movement research",
@@ -64,9 +64,9 @@ export default function PricingPage() {
       <header className="topbar pricing-hero">
         <div>
           <p className="eyebrow">Pricing</p>
-          <h1>Free now. Premium tools coming soon.</h1>
+          <h1>Access options are being prepared.</h1>
           <p className="hero-copy">
-            The app is being prepared for prediction credits, but real checkout is not active yet. Upgrade buttons are disabled until billing launches.
+            FightScope currently focuses on the free prediction experience. Paid prediction credits are planned, but checkout is not active yet.
           </p>
         </div>
       </header>
@@ -96,7 +96,7 @@ export default function PricingPage() {
         <div>
           <p className="eyebrow">Prediction credits</p>
           <h2>Future credit packs</h2>
-          <p className="helper-text">Each generated matchup will use one prediction credit after the free allowance is used. Checkout is not connected yet.</p>
+          <p className="helper-text">Each generated matchup is expected to use one prediction credit after the free allowance. Checkout will stay disabled until billing is ready.</p>
         </div>
         <div className="credit-pack-grid">
           {CREDIT_PACKS.map((count) => (
@@ -129,8 +129,8 @@ export default function PricingPage() {
       </section>
 
       <section className="premium-placeholder-grid">
-        <PremiumFeatureCard title="Billing placeholder" body="Billing will be available after subscriptions launch." />
-        <PremiumFeatureCard title="Stripe status" body="Stripe environment variables are documented only and are not required for startup." />
+        <PremiumFeatureCard title="Billing access" body="Billing will be introduced only after the credit flow is ready for users." />
+        <PremiumFeatureCard title="Launch status" body="Checkout is intentionally disabled while the product experience is finalized." />
         <PremiumFeatureCard title="Responsible rollout" body="Premium betting reads will stay model-informed and will not show fake sportsbook lines." />
       </section>
     </main>
