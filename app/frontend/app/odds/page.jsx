@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLatestPrediction } from "../../lib/latestPrediction";
-
 const API_BASE = "/api";
 
 async function fetchJson(path) {
@@ -14,7 +12,6 @@ async function fetchJson(path) {
 export default function OddsPage() {
   const [status, setStatus] = useState(null);
   const [message, setMessage] = useState("");
-  const latest = useLatestPrediction();
 
   useEffect(() => {
     fetchJson("/odds/status").then(setStatus).catch((error) => setMessage(`Odds status unavailable: ${error.message}`));
@@ -39,7 +36,7 @@ export default function OddsPage() {
         <p>Independent MMA analytics only. Not affiliated with UFC, any promotion, sportsbook, or betting operator. Outputs are informational and research-oriented, not financial advice.</p>
       </section>
 
-      <section className="odds-simple-grid">
+      <section className="odds-simple-grid market-only">
         <article className="panel">
           <p className="eyebrow">Research preview</p>
           <h2>Timestamp-safe moneyline snapshots</h2>
@@ -51,14 +48,6 @@ export default function OddsPage() {
           <p className="eyebrow">Safety</p>
           <h2>No active market outputs</h2>
           <p>No sportsbook lines, edge, units, ROI, or bet placement are shown. Market comparison stays inactive until review passes.</p>
-        </article>
-        <article className="panel">
-          <p className="eyebrow">Model reads</p>
-          <h2>{latest ? "View this matchup's model reads" : "Generate a matchup first"}</h2>
-          <p>
-            Detailed winner, timing, method, volume, and control reads now live on the Models page so Odds can stay focused on market readiness.
-          </p>
-          <a className="analysis-link" href={latest ? "/models" : "/"}>{latest ? "View model reads" : "Go to Home"}</a>
         </article>
       </section>
     </main>
