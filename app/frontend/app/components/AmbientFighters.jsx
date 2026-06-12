@@ -1,10 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const MANIFEST_URL = "/sprites/sprite-actions.json";
-const PLACEMENTS = ["lower-left", "lower-right", "top-skim", "center-cross"];
-const FALLBACK_DELAY_MS = 4200;
+const PLACEMENTS = [
+  { name: "bottom-left", x: 8, y: 78, scale: 0.88 },
+  { name: "bottom-right", x: 74, y: 78, scale: 0.88 },
+  { name: "left-mid", x: 4, y: 48, scale: 0.78 },
+  { name: "right-mid", x: 78, y: 48, scale: 0.78 },
+  { name: "upper-right", x: 70, y: 20, scale: 0.7 },
+  { name: "lower-center", x: 42, y: 82, scale: 0.82 },
+];
+const INITIAL_DELAY_RANGE = [800, 3500];
+const EVENT_DELAY_RANGE = [3500, 11000];
+const LONG_PAUSE_RANGE = [12000, 18000];
+const LONG_PAUSE_CHANCE = 0.12;
 
 function weightedPick(items) {
   const total = items.reduce((sum, item) => sum + Math.max(1, item.weight || 1), 0);
@@ -16,10 +26,31 @@ function weightedPick(items) {
   return items[0];
 }
 
-function pickPlacement(action, placementMode) {
-  if (placementMode !== "random") return placementMode;
-  const choices = action.recommendedPlacement?.length ? action.recommendedPlacement : PLACEMENTS;
-  return choices[Math.floor(Math.random() * choices.length)] || "lower-left";
+function randomBetween([min, max]) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function createEventDelay() {
+  return Math.random() < LONG_PAUSE_CHANCE ? randomBetween(LONG_PAUSE_RANGE) : randomBetween(EVENT_DELAY_RANGE);
+}
+
+function pickPlacement(placementMode, recentPlacements) {
+  const safePlacements = placementMode === "random"
+    ? PLACEMENTS
+    : PLACEMENTS.filter((placement) => placement.name === placementMode);
+  const pool = safePlacements.length ? safePlacements : PLACEMENTS;
+  const filtered = pool.filter((placement) => !recentPlacements.includes(placement.name));
+  const placement = weightedPick((filtered.length ? filtered : pool).map((item) => ({ ...item, weight: 1 })));
+  return {
+    ...placement,
+    x: clamp(placement.x + (Math.random() * 8 - 4), 2, 82),
+    y: clamp(placement.y + (Math.random() * 8 - 4), 14, 84),
+    scale: placement.scale * (0.92 + Math.random() * 0.16),
+  };
 }
 
 function getMove(manifest, characterId, moveName) {
@@ -31,8 +62,13 @@ function getMoveFrame(move, index) {
   return move.frames[Math.min(index, move.frames.length - 1)];
 }
 
-function buildEncounter(manifest, placementMode) {
+function remember(list, value, max = 5) {
+  return [value, ...list.filter((item) => item !== value)].slice(0, max);
+}
+
+function buildEncounter(manifest, placementMode, recentActions, recentPlacements) {
   const actions = (manifest?.actions || []).filter((action) => {
+    if (action.enabled === false) return false;
     if (action.sequenceCharacter && action.sequenceMove) {
       return Boolean(getMove(manifest, action.sequenceCharacter, action.sequenceMove)?.frames?.length);
     }
@@ -40,7 +76,8 @@ function buildEncounter(manifest, placementMode) {
   });
   if (!actions.length) return null;
 
-  const action = weightedPick(actions);
+  const actionPool = actions.filter((action) => !recentActions.includes(action.id));
+  const action = weightedPick(actionPool.length ? actionPool : actions);
   const isSequence = Boolean(action.sequenceCharacter && action.sequenceMove);
   const sequenceMove = isSequence ? getMove(manifest, action.sequenceCharacter, action.sequenceMove) : null;
   const characterIds = Object.keys(manifest.characters || {}).filter((id) => id !== action.sequenceCharacter);
@@ -60,9 +97,8 @@ function buildEncounter(manifest, placementMode) {
     sequenceMove,
     isSequence,
     frameCount,
-    placement: pickPlacement(action, placementMode),
+    placement: pickPlacement(placementMode, recentPlacements),
     durationMs: action.totalDuration || 1120,
-    delayMs: FALLBACK_DELAY_MS + Math.floor(Math.random() * 3600),
     flip: Math.random() > 0.5,
   };
 }
@@ -76,11 +112,16 @@ export default function AmbientFighters({
   const [mounted, setMounted] = useState(false);
   const [manifest, setManifest] = useState(null);
   const [encounter, setEncounter] = useState(null);
-  const [cycle, setCycle] = useState(0);
   const [frameIndex, setFrameIndex] = useState(0);
+  const [canAnimate, setCanAnimate] = useState(false);
+  const recentActions = useRef([]);
+  const recentPlacements = useRef([]);
 
   useEffect(() => {
     setMounted(true);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const narrowScreen = window.matchMedia("(max-width: 640px)").matches;
+    setCanAnimate(!reducedMotion && !narrowScreen);
   }, []);
 
   useEffect(() => {
@@ -100,13 +141,34 @@ export default function AmbientFighters({
   }, [mounted, enabled]);
 
   useEffect(() => {
-    if (!mounted || !enabled || !manifest) return undefined;
-    const next = buildEncounter(manifest, placementMode);
-    if (!next) return undefined;
-    setEncounter(next);
-    const timer = window.setTimeout(() => setCycle((value) => value + 1), next.durationMs + next.delayMs);
-    return () => window.clearTimeout(timer);
-  }, [mounted, enabled, manifest, placementMode, cycle]);
+    if (!mounted || !enabled || !canAnimate || !manifest) return undefined;
+    let cancelled = false;
+    let showTimer;
+    let hideTimer;
+
+    const scheduleNext = (delayMs) => {
+      showTimer = window.setTimeout(() => {
+        if (cancelled) return;
+        const next = buildEncounter(manifest, placementMode, recentActions.current, recentPlacements.current);
+        if (!next) return;
+        recentActions.current = remember(recentActions.current, next.action.id);
+        recentPlacements.current = remember(recentPlacements.current, next.placement.name, 3);
+        setEncounter(next);
+        hideTimer = window.setTimeout(() => {
+          if (cancelled) return;
+          setEncounter(null);
+          scheduleNext(createEventDelay());
+        }, next.durationMs);
+      }, delayMs);
+    };
+
+    scheduleNext(randomBetween(INITIAL_DELAY_RANGE));
+    return () => {
+      cancelled = true;
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, [mounted, enabled, canAnimate, manifest, placementMode]);
 
   useEffect(() => {
     if (!encounter?.frameCount) return undefined;
@@ -125,7 +187,6 @@ export default function AmbientFighters({
     () =>
       [
         "ambient-fighters",
-        encounter?.placement,
         encounter?.isSequence ? "sequence-mode" : "paired-mode",
         encounter?.action?.category,
         encounter?.flip ? "flip" : "",
@@ -136,14 +197,24 @@ export default function AmbientFighters({
     [encounter, intensity],
   );
 
-  if (!mounted || !enabled || !encounter) return null;
+  if (!mounted || !enabled || !canAnimate || !encounter) return null;
 
   const sequenceFrame = getMoveFrame(encounter.sequenceMove, frameIndex);
   const attackerFrame = getMoveFrame(encounter.attackerMove, frameIndex);
   const defenderFrame = getMoveFrame(encounter.defenderMove, frameIndex);
 
   return (
-    <div className={className} data-reduced-motion={reducedMotionMode} aria-hidden="true">
+    <div
+      className={className}
+      data-reduced-motion={reducedMotionMode}
+      style={{
+        "--sprite-x": `${encounter.placement.x}vw`,
+        "--sprite-y": `${encounter.placement.y}vh`,
+        "--sprite-scale": encounter.placement.scale,
+        "--sprite-duration": `${encounter.durationMs}ms`,
+      }}
+      aria-hidden="true"
+    >
       <div className="ambient-action-stage">
         {encounter.isSequence && sequenceFrame ? (
           <img alt="" className="ambient-sequence-frame" src={sequenceFrame} />

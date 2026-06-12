@@ -287,8 +287,8 @@
       "move": "sprawlGoBehind",
       "path": "/sprites/frames/green/sprawlGoBehind/000.png",
       "transparent": true,
-      "width": 180,
-      "height": 168
+      "width": 168,
+      "height": 100
     },
     {
       "character": "green",
@@ -296,7 +296,7 @@
       "path": "/sprites/frames/green/sprawlGoBehind/001.png",
       "transparent": true,
       "width": 180,
-      "height": 169
+      "height": 101
     },
     {
       "character": "green",
@@ -312,7 +312,7 @@
       "path": "/sprites/frames/green/scrambleReset/000.png",
       "transparent": true,
       "width": 150,
-      "height": 171
+      "height": 116
     },
     {
       "character": "green",
@@ -320,7 +320,7 @@
       "path": "/sprites/frames/green/scrambleReset/001.png",
       "transparent": true,
       "width": 150,
-      "height": 162
+      "height": 125
     },
     {
       "character": "green",
@@ -328,7 +328,7 @@
       "path": "/sprites/frames/green/recovery/000.png",
       "transparent": true,
       "width": 150,
-      "height": 171
+      "height": 116
     },
     {
       "character": "green",
@@ -336,7 +336,7 @@
       "path": "/sprites/frames/green/recovery/001.png",
       "transparent": true,
       "width": 150,
-      "height": 162
+      "height": 125
     },
     {
       "character": "duo_reference",

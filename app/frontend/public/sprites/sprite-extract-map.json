@@ -382,21 +382,21 @@
           "frames": [
             {
               "x": 70,
-              "y": 820,
+              "y": 868,
               "w": 180,
-              "h": 175
+              "h": 127
             },
             {
               "x": 250,
-              "y": 820,
+              "y": 868,
               "w": 180,
-              "h": 175
+              "h": 127
             },
             {
               "x": 640,
-              "y": 820,
+              "y": 868,
               "w": 180,
-              "h": 175
+              "h": 127
             }
           ],
           "frameDurations": [
@@ -410,15 +410,15 @@
           "frames": [
             {
               "x": 950,
-              "y": 820,
+              "y": 868,
               "w": 150,
-              "h": 175
+              "h": 127
             },
             {
               "x": 1130,
-              "y": 820,
+              "y": 868,
               "w": 150,
-              "h": 175
+              "h": 127
             }
           ],
           "frameDurations": [
@@ -431,15 +431,15 @@
           "frames": [
             {
               "x": 950,
-              "y": 820,
+              "y": 868,
               "w": 150,
-              "h": 175
+              "h": 127
             },
             {
               "x": 1130,
-              "y": 820,
+              "y": 868,
               "w": 150,
-              "h": 175
+              "h": 127
             }
           ],
           "frameDurations": [
@@ -752,13 +752,12 @@
       "category": "striking",
       "weight": 9,
       "attackerMove": "jabCross",
-      "defenderMove": "recovery",
+      "defenderMove": "stance",
       "totalDuration": 1120,
       "recommendedPlacement": [
-        "lower-left",
-        "top-skim"
+        "lower-left"
       ],
-      "notes": "Step in, jab-cross, small hit-stop, reset."
+      "notes": "Step in, jab-cross, small hit-stop, reset. Defender uses clean stance frames for UI readability."
     },
     {
       "id": "roundKickBlock",
@@ -766,12 +765,12 @@
       "category": "striking",
       "weight": 8,
       "attackerMove": "roundKick",
-      "defenderMove": "recovery",
+      "defenderMove": "stance",
       "totalDuration": 1240,
       "recommendedPlacement": [
         "lower-right"
       ],
-      "notes": "Kick lands on guard with small clash."
+      "notes": "Kick lands on guard with small clash. Defender uses clean stance frames for UI readability."
     },
     {
       "id": "clinchKnee",
@@ -779,12 +778,12 @@
       "category": "standing grappling",
       "weight": 7,
       "attackerMove": "clinchKnee",
-      "defenderMove": "recovery",
+      "defenderMove": "stance",
       "totalDuration": 1280,
       "recommendedPlacement": [
         "center-cross"
       ],
-      "notes": "Short clinch entry, knee, break."
+      "notes": "Short clinch entry, knee, break. Defender uses clean stance frames for UI readability."
     },
     {
       "id": "doubleLegLiftMatReturn",
@@ -792,13 +791,13 @@
       "category": "wrestling",
       "weight": 10,
       "attackerMove": "doubleLeg",
-      "defenderMove": "recovery",
+      "defenderMove": "stance",
       "totalDuration": 1320,
       "recommendedPlacement": [
         "lower-left",
         "center-cross"
       ],
-      "notes": "Level change, drive, mat return."
+      "notes": "Level change, drive, mat return. Defender uses clean stance frames for UI readability."
     },
     {
       "id": "sprawlGoBehind",
@@ -817,14 +816,15 @@
       "id": "scrambleReset",
       "label": "Scramble reset",
       "category": "defense",
-      "weight": 4,
+      "weight": 3,
       "attackerMove": "scrambleReset",
-      "defenderMove": "recovery",
+      "defenderMove": "stance",
       "totalDuration": 980,
       "recommendedPlacement": [
-        "top-skim"
+        "lower-left",
+        "lower-right"
       ],
-      "notes": "Low clash, post, turn out, reset."
+      "notes": "Low clash, post, turn out, reset. Defender uses clean stance frames for UI readability."
     },
     {
       "id": "seq-over-under-pummeling",
@@ -838,7 +838,9 @@
         "lower-left",
         "center-cross"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-collar-tie-snap-down",
@@ -851,7 +853,9 @@
       "recommendedPlacement": [
         "lower-right"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-single-leg-run-pipe",
@@ -864,7 +868,9 @@
       "recommendedPlacement": [
         "lower-left"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-double-leg-return",
@@ -878,7 +884,9 @@
         "lower-left",
         "center-cross"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-firemans-carry",
@@ -891,7 +899,9 @@
       "recommendedPlacement": [
         "center-cross"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-hip-throw",
@@ -905,7 +915,9 @@
         "lower-right",
         "center-cross"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-body-lock-trip",
@@ -918,7 +930,9 @@
       "recommendedPlacement": [
         "lower-left"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-arm-drag-body-lock",
@@ -931,7 +945,9 @@
       "recommendedPlacement": [
         "top-skim"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-sprawl-go-behind",
@@ -944,7 +960,9 @@
       "recommendedPlacement": [
         "lower-right"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-guillotine",
@@ -957,7 +975,9 @@
       "recommendedPlacement": [
         "center-cross"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-rnc",
@@ -970,7 +990,9 @@
       "recommendedPlacement": [
         "lower-left"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-triangle-armbar",
@@ -983,7 +1005,9 @@
       "recommendedPlacement": [
         "lower-right"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-clinch-knee",
@@ -996,7 +1020,9 @@
       "recommendedPlacement": [
         "center-cross"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-short-elbow",
@@ -1009,7 +1035,9 @@
       "recommendedPlacement": [
         "top-skim"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-palm-sweep",
@@ -1022,7 +1050,9 @@
       "recommendedPlacement": [
         "lower-right"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     },
     {
       "id": "seq-recovery-reset",
@@ -1035,7 +1065,9 @@
       "recommendedPlacement": [
         "top-skim"
       ],
-      "notes": "Preserves the ordered move string from the source sheet."
+      "notes": "Preserved in source order, but disabled in the UI because the full string reads too wide as a live action.",
+      "enabled": false,
+      "uiStatus": "disabled_until_windowed_frame_slicing_is_clean"
     }
   ]
 }
