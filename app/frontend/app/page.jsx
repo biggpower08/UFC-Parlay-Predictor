@@ -80,6 +80,7 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [health, setHealth] = useState(null);
   const [creditStatus, setCreditStatus] = useState(null);
+  const [usageToast, setUsageToast] = useState(null);
   const [modelStatus, setModelStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -93,6 +94,7 @@ export default function App() {
   const userEditedSearch = useRef({ a: false, b: false });
   const searchRequestId = useRef({ a: 0, b: 0 });
   const appRef = useRef(null);
+  const usageToastTimer = useRef(null);
 
   const searchFighters = useCallback(async (slot, value) => {
     const trimmed = value.trim();
@@ -141,6 +143,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    return () => {
+      if (usageToastTimer.current) clearTimeout(usageToastTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
     if (activeSearchSlot === "a" && userEditedSearch.current.a && debouncedFighterA === fighterAQuery) {
       searchFighters("a", debouncedFighterA);
     }
@@ -171,6 +179,22 @@ export default function App() {
     } catch {
       setCreditStatus(null);
     }
+  }
+
+  function showUsageToast(text, tone = "info") {
+    if (usageToastTimer.current) clearTimeout(usageToastTimer.current);
+    setUsageToast({ text, tone });
+    usageToastTimer.current = setTimeout(() => setUsageToast(null), 4200);
+  }
+
+  function usageText(status) {
+    if (!status || !status.enabled) return "Prediction updated.";
+    const free = Number(status.free_predictions_remaining ?? 0);
+    const credits = Number(status.credits_remaining ?? 0);
+    const total = free + credits;
+    if (total <= 0) return "Prediction limit reached for now.";
+    if (total === 1) return "Prediction saved. 1 remaining.";
+    return `Prediction saved. ${total} remaining.`;
   }
 
   async function loadModelStatus() {
@@ -224,12 +248,20 @@ export default function App() {
       }
       if (response.status === 402) {
         const problem = await response.json();
-        setMessage(problem.detail?.message || "You have used your free predictions. Buy prediction credits to continue.");
+        const detail = problem.detail || {};
+        setCreditStatus(detail);
+        showUsageToast("Prediction limit reached for now.", "warning");
+        setMessage("Prediction limit reached for now.");
         return;
       }
       if (!response.ok) throw new Error(await readApiError(response));
       const data = await response.json();
-      if (data.credit_status) setCreditStatus(data.credit_status);
+      if (data.credit_status) {
+        setCreditStatus(data.credit_status);
+        showUsageToast(usageText(data.credit_status), lowUsageTone(data.credit_status));
+      } else {
+        showUsageToast("Prediction updated.");
+      }
       const saved = saveLatestPrediction(data, { fighter_a: fighterMeta.a || selectedFighterA, fighter_b: fighterMeta.b || selectedFighterB });
       setResult(saved?.result || data);
       setActiveTab("prediction");
@@ -395,6 +427,10 @@ export default function App() {
     ? `${selectedFighterA.name} vs ${selectedFighterB.name}`
     : "Search for two fighters to generate a prediction.";
   const matchupType = result?.analysis?.matchup_type || localMatchupType(fighterMeta.a, fighterMeta.b);
+  const usageLimitReached = Boolean(
+    creditStatus?.enabled &&
+      Number(creditStatus?.free_predictions_remaining ?? 0) + Number(creditStatus?.credits_remaining ?? 0) <= 0,
+  );
 
   return (
     <main className="app-shell" ref={appRef}>
@@ -406,19 +442,22 @@ export default function App() {
             A cyberpunk fight-intelligence scroll for winner predictions, confidence, Elo context, matchup stats, and honest model-informed reads.
           </p>
         </div>
-        <div className="intro-sigil" aria-hidden="true">
-          <span />
-          <b>FS</b>
-          <small>scan</small>
-        </div>
         <div className="status-stack">
-          <CreditBalanceBadge creditStatus={creditStatus} />
           <div className={health?.ok ? "status online" : "status offline"}>
             <Activity size={18} />
             {health?.ok ? "Engine connected" : "Engine offline"}
           </div>
         </div>
       </header>
+
+      {usageToast && (
+        <div className={`usage-toast ${usageToast.tone}`} role="status">
+          <span>{usageToast.text}</span>
+          <button type="button" onClick={() => setUsageToast(null)} aria-label="Dismiss usage status">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       <section className="match-card">
         <FighterInput
@@ -457,6 +496,10 @@ export default function App() {
           {loading ? "Analyzing" : canPredict ? "Predict Fight" : "Select two fighters"}
         </button>
       </section>
+
+      {usageLimitReached && (
+        <p className="usage-inline-note">Prediction limit reached for now. Upgrade options are not active yet.</p>
+      )}
 
       <section className="matchup-strip">
         <span>
@@ -685,20 +728,6 @@ function summaryPreview(text) {
   return sentences.slice(0, 3).join(" ").trim();
 }
 
-function CreditBalanceBadge({ creditStatus }) {
-  if (!creditStatus) {
-    return <div className="status credit-status">3 free predictions included</div>;
-  }
-  if (!creditStatus.enabled) {
-    return <div className="status credit-status">{creditStatus.free_prediction_limit} free predictions included</div>;
-  }
-  return (
-    <div className="status credit-status">
-      {creditStatus.free_predictions_remaining} free / {creditStatus.credits_remaining} credits
-    </div>
-  );
-}
-
 const FighterInput = memo(function FighterInput({
   label,
   value,
@@ -739,3 +768,10 @@ const FighterInput = memo(function FighterInput({
     </label>
   );
 });
+
+function lowUsageTone(status) {
+  if (!status?.enabled) return "info";
+  const remaining = Number(status.free_predictions_remaining ?? 0) + Number(status.credits_remaining ?? 0);
+  if (remaining <= 1) return "warning";
+  return "info";
+}

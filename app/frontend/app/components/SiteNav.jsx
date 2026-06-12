@@ -15,7 +15,6 @@ export default function SiteNav() {
   return (
     <nav className="site-nav" aria-label="Primary">
       <a className="brand-link" href="/" aria-label="FightScope home">
-        <span className="brand-mark">FS</span>
         <strong>FightScope</strong>
       </a>
       <div className="site-nav-links">
