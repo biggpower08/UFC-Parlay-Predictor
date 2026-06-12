@@ -11,10 +11,10 @@ const PLACEMENTS = [
   { name: "upper-right", x: 70, y: 20, scale: 0.7 },
   { name: "lower-center", x: 42, y: 82, scale: 0.82 },
 ];
-const INITIAL_DELAY_RANGE = [800, 3500];
-const EVENT_DELAY_RANGE = [3500, 11000];
-const LONG_PAUSE_RANGE = [12000, 18000];
-const LONG_PAUSE_CHANCE = 0.12;
+const INITIAL_DELAY_RANGE = [500, 1500];
+const EVENT_DELAY_RANGE = [2500, 5500];
+const LONG_PAUSE_RANGE = [6000, 8500];
+const LONG_PAUSE_CHANCE = 0.1;
 
 function weightedPick(items) {
   const total = items.reduce((sum, item) => sum + Math.max(1, item.weight || 1), 0);
@@ -154,10 +154,21 @@ export default function AmbientFighters({
         recentActions.current = remember(recentActions.current, next.action.id);
         recentPlacements.current = remember(recentPlacements.current, next.placement.name, 3);
         setEncounter(next);
+        if (process.env.NODE_ENV === "development") {
+          console.debug("[FightScope sprites]", {
+            action: next.action.id,
+            placement: next.placement.name,
+            durationMs: next.durationMs,
+          });
+        }
         hideTimer = window.setTimeout(() => {
           if (cancelled) return;
           setEncounter(null);
-          scheduleNext(createEventDelay());
+          const nextDelay = createEventDelay();
+          if (process.env.NODE_ENV === "development") {
+            console.debug("[FightScope sprites] next delay", { delayMs: nextDelay });
+          }
+          scheduleNext(nextDelay);
         }, next.durationMs);
       }, delayMs);
     };
