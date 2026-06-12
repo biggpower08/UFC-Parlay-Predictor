@@ -1,0 +1,470 @@
+{
+  "frames_exported": 58,
+  "missing_source_files": [],
+  "frames": [
+    {
+      "character": "blue",
+      "move": "stance",
+      "path": "/sprites/frames/blue/stance/000.png",
+      "transparent": true,
+      "width": 108,
+      "height": 169
+    },
+    {
+      "character": "blue",
+      "move": "stance",
+      "path": "/sprites/frames/blue/stance/001.png",
+      "transparent": true,
+      "width": 108,
+      "height": 169
+    },
+    {
+      "character": "blue",
+      "move": "jabCross",
+      "path": "/sprites/frames/blue/jabCross/000.png",
+      "transparent": true,
+      "width": 193,
+      "height": 140
+    },
+    {
+      "character": "blue",
+      "move": "jabCross",
+      "path": "/sprites/frames/blue/jabCross/001.png",
+      "transparent": true,
+      "width": 174,
+      "height": 139
+    },
+    {
+      "character": "blue",
+      "move": "jabCross",
+      "path": "/sprites/frames/blue/jabCross/002.png",
+      "transparent": true,
+      "width": 108,
+      "height": 101
+    },
+    {
+      "character": "blue",
+      "move": "roundKick",
+      "path": "/sprites/frames/blue/roundKick/000.png",
+      "transparent": true,
+      "width": 229,
+      "height": 147
+    },
+    {
+      "character": "blue",
+      "move": "roundKick",
+      "path": "/sprites/frames/blue/roundKick/001.png",
+      "transparent": true,
+      "width": 215,
+      "height": 147
+    },
+    {
+      "character": "blue",
+      "move": "recovery",
+      "path": "/sprites/frames/blue/recovery/000.png",
+      "transparent": true,
+      "width": 108,
+      "height": 101
+    },
+    {
+      "character": "blue",
+      "move": "recovery",
+      "path": "/sprites/frames/blue/recovery/001.png",
+      "transparent": true,
+      "width": 107,
+      "height": 109
+    },
+    {
+      "character": "purple",
+      "move": "stance",
+      "path": "/sprites/frames/purple/stance/000.png",
+      "transparent": true,
+      "width": 158,
+      "height": 178
+    },
+    {
+      "character": "purple",
+      "move": "stance",
+      "path": "/sprites/frames/purple/stance/001.png",
+      "transparent": true,
+      "width": 129,
+      "height": 85
+    },
+    {
+      "character": "purple",
+      "move": "jabCross",
+      "path": "/sprites/frames/purple/jabCross/000.png",
+      "transparent": true,
+      "width": 230,
+      "height": 146
+    },
+    {
+      "character": "purple",
+      "move": "jabCross",
+      "path": "/sprites/frames/purple/jabCross/001.png",
+      "transparent": true,
+      "width": 248,
+      "height": 146
+    },
+    {
+      "character": "purple",
+      "move": "jabCross",
+      "path": "/sprites/frames/purple/jabCross/002.png",
+      "transparent": true,
+      "width": 230,
+      "height": 71
+    },
+    {
+      "character": "purple",
+      "move": "roundKick",
+      "path": "/sprites/frames/purple/roundKick/000.png",
+      "transparent": true,
+      "width": 250,
+      "height": 154
+    },
+    {
+      "character": "purple",
+      "move": "roundKick",
+      "path": "/sprites/frames/purple/roundKick/001.png",
+      "transparent": true,
+      "width": 250,
+      "height": 154
+    },
+    {
+      "character": "purple",
+      "move": "recovery",
+      "path": "/sprites/frames/purple/recovery/000.png",
+      "transparent": true,
+      "width": 230,
+      "height": 71
+    },
+    {
+      "character": "purple",
+      "move": "recovery",
+      "path": "/sprites/frames/purple/recovery/001.png",
+      "transparent": true,
+      "width": 200,
+      "height": 71
+    },
+    {
+      "character": "orange",
+      "move": "stance",
+      "path": "/sprites/frames/orange/stance/000.png",
+      "transparent": true,
+      "width": 61,
+      "height": 114
+    },
+    {
+      "character": "orange",
+      "move": "stance",
+      "path": "/sprites/frames/orange/stance/001.png",
+      "transparent": true,
+      "width": 60,
+      "height": 114
+    },
+    {
+      "character": "orange",
+      "move": "jabCross",
+      "path": "/sprites/frames/orange/jabCross/000.png",
+      "transparent": true,
+      "width": 168,
+      "height": 100
+    },
+    {
+      "character": "orange",
+      "move": "jabCross",
+      "path": "/sprites/frames/orange/jabCross/001.png",
+      "transparent": true,
+      "width": 220,
+      "height": 100
+    },
+    {
+      "character": "orange",
+      "move": "jabCross",
+      "path": "/sprites/frames/orange/jabCross/002.png",
+      "transparent": false,
+      "width": 130,
+      "height": 120
+    },
+    {
+      "character": "orange",
+      "move": "roundKick",
+      "path": "/sprites/frames/orange/roundKick/000.png",
+      "transparent": true,
+      "width": 164,
+      "height": 99
+    },
+    {
+      "character": "orange",
+      "move": "roundKick",
+      "path": "/sprites/frames/orange/roundKick/001.png",
+      "transparent": true,
+      "width": 198,
+      "height": 99
+    },
+    {
+      "character": "orange",
+      "move": "clinchKnee",
+      "path": "/sprites/frames/orange/clinchKnee/000.png",
+      "transparent": true,
+      "width": 164,
+      "height": 99
+    },
+    {
+      "character": "orange",
+      "move": "clinchKnee",
+      "path": "/sprites/frames/orange/clinchKnee/001.png",
+      "transparent": true,
+      "width": 198,
+      "height": 99
+    },
+    {
+      "character": "orange",
+      "move": "clinchKnee",
+      "path": "/sprites/frames/orange/clinchKnee/002.png",
+      "transparent": true,
+      "width": 70,
+      "height": 103
+    },
+    {
+      "character": "orange",
+      "move": "recovery",
+      "path": "/sprites/frames/orange/recovery/000.png",
+      "transparent": true,
+      "width": 120,
+      "height": 108
+    },
+    {
+      "character": "orange",
+      "move": "recovery",
+      "path": "/sprites/frames/orange/recovery/001.png",
+      "transparent": false,
+      "width": 130,
+      "height": 120
+    },
+    {
+      "character": "green",
+      "move": "stance",
+      "path": "/sprites/frames/green/stance/000.png",
+      "transparent": true,
+      "width": 78,
+      "height": 162
+    },
+    {
+      "character": "green",
+      "move": "stance",
+      "path": "/sprites/frames/green/stance/001.png",
+      "transparent": true,
+      "width": 78,
+      "height": 162
+    },
+    {
+      "character": "green",
+      "move": "doubleLeg",
+      "path": "/sprites/frames/green/doubleLeg/000.png",
+      "transparent": true,
+      "width": 245,
+      "height": 105
+    },
+    {
+      "character": "green",
+      "move": "doubleLeg",
+      "path": "/sprites/frames/green/doubleLeg/001.png",
+      "transparent": true,
+      "width": 245,
+      "height": 109
+    },
+    {
+      "character": "green",
+      "move": "doubleLeg",
+      "path": "/sprites/frames/green/doubleLeg/002.png",
+      "transparent": true,
+      "width": 235,
+      "height": 107
+    },
+    {
+      "character": "green",
+      "move": "sprawlGoBehind",
+      "path": "/sprites/frames/green/sprawlGoBehind/000.png",
+      "transparent": true,
+      "width": 180,
+      "height": 168
+    },
+    {
+      "character": "green",
+      "move": "sprawlGoBehind",
+      "path": "/sprites/frames/green/sprawlGoBehind/001.png",
+      "transparent": true,
+      "width": 180,
+      "height": 169
+    },
+    {
+      "character": "green",
+      "move": "sprawlGoBehind",
+      "path": "/sprites/frames/green/sprawlGoBehind/002.png",
+      "transparent": true,
+      "width": 167,
+      "height": 111
+    },
+    {
+      "character": "green",
+      "move": "scrambleReset",
+      "path": "/sprites/frames/green/scrambleReset/000.png",
+      "transparent": true,
+      "width": 150,
+      "height": 171
+    },
+    {
+      "character": "green",
+      "move": "scrambleReset",
+      "path": "/sprites/frames/green/scrambleReset/001.png",
+      "transparent": true,
+      "width": 150,
+      "height": 162
+    },
+    {
+      "character": "green",
+      "move": "recovery",
+      "path": "/sprites/frames/green/recovery/000.png",
+      "transparent": true,
+      "width": 150,
+      "height": 171
+    },
+    {
+      "character": "green",
+      "move": "recovery",
+      "path": "/sprites/frames/green/recovery/001.png",
+      "transparent": true,
+      "width": 150,
+      "height": 162
+    },
+    {
+      "character": "duo_reference",
+      "move": "overUnderPummeling",
+      "path": "/sprites/frames/duo_reference/overUnderPummeling/000.png",
+      "transparent": true,
+      "width": 460,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "collarTieSnapDown",
+      "path": "/sprites/frames/duo_reference/collarTieSnapDown/000.png",
+      "transparent": true,
+      "width": 455,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "singleLegRunThePipe",
+      "path": "/sprites/frames/duo_reference/singleLegRunThePipe/000.png",
+      "transparent": true,
+      "width": 465,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "doubleLegMatReturn",
+      "path": "/sprites/frames/duo_reference/doubleLegMatReturn/000.png",
+      "transparent": true,
+      "width": 459,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "firemansCarry",
+      "path": "/sprites/frames/duo_reference/firemansCarry/000.png",
+      "transparent": true,
+      "width": 445,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "hipThrowJudoToss",
+      "path": "/sprites/frames/duo_reference/hipThrowJudoToss/000.png",
+      "transparent": true,
+      "width": 463,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "bodyLockOutsideTrip",
+      "path": "/sprites/frames/duo_reference/bodyLockOutsideTrip/000.png",
+      "transparent": true,
+      "width": 461,
+      "height": 109
+    },
+    {
+      "character": "duo_reference",
+      "move": "armDragRearBodyLock",
+      "path": "/sprites/frames/duo_reference/armDragRearBodyLock/000.png",
+      "transparent": true,
+      "width": 449,
+      "height": 104
+    },
+    {
+      "character": "duo_reference",
+      "move": "sprawlGoBehindReference",
+      "path": "/sprites/frames/duo_reference/sprawlGoBehindReference/000.png",
+      "transparent": true,
+      "width": 463,
+      "height": 98
+    },
+    {
+      "character": "duo_reference",
+      "move": "standingGuillotineAttempt",
+      "path": "/sprites/frames/duo_reference/standingGuillotineAttempt/000.png",
+      "transparent": true,
+      "width": 461,
+      "height": 108
+    },
+    {
+      "character": "duo_reference",
+      "move": "rearNakedChokeSequence",
+      "path": "/sprites/frames/duo_reference/rearNakedChokeSequence/000.png",
+      "transparent": true,
+      "width": 455,
+      "height": 108
+    },
+    {
+      "character": "duo_reference",
+      "move": "triangleArmbarTransition",
+      "path": "/sprites/frames/duo_reference/triangleArmbarTransition/000.png",
+      "transparent": true,
+      "width": 464,
+      "height": 88
+    },
+    {
+      "character": "duo_reference",
+      "move": "muayThaiClinchKnee",
+      "path": "/sprites/frames/duo_reference/muayThaiClinchKnee/000.png",
+      "transparent": true,
+      "width": 331,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "shortElbowFromClinch",
+      "path": "/sprites/frames/duo_reference/shortElbowFromClinch/000.png",
+      "transparent": true,
+      "width": 445,
+      "height": 111
+    },
+    {
+      "character": "duo_reference",
+      "move": "palmStrikeSweep",
+      "path": "/sprites/frames/duo_reference/palmStrikeSweep/000.png",
+      "transparent": true,
+      "width": 464,
+      "height": 108
+    },
+    {
+      "character": "duo_reference",
+      "move": "recoveryResetReference",
+      "path": "/sprites/frames/duo_reference/recoveryResetReference/000.png",
+      "transparent": true,
+      "width": 1269,
+      "height": 106
+    }
+  ]
+}

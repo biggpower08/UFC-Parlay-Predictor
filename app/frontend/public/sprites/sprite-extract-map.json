@@ -1,0 +1,1041 @@
+{
+  "version": 1,
+  "characters": {
+    "blue": {
+      "displayName": "Cyber Ninja",
+      "source": "cyber-ninja-blue.png",
+      "accent": "cyan",
+      "moves": {
+        "stance": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 86,
+              "y": 122,
+              "w": 158,
+              "h": 178
+            },
+            {
+              "x": 300,
+              "y": 122,
+              "w": 158,
+              "h": 178
+            }
+          ],
+          "frameDurations": [
+            140,
+            140
+          ]
+        },
+        "jabCross": {
+          "category": "striking",
+          "frames": [
+            {
+              "x": 80,
+              "y": 754,
+              "w": 230,
+              "h": 146
+            },
+            {
+              "x": 405,
+              "y": 754,
+              "w": 248,
+              "h": 146
+            },
+            {
+              "x": 80,
+              "y": 944,
+              "w": 230,
+              "h": 116
+            }
+          ],
+          "frameDurations": [
+            100,
+            110,
+            150
+          ]
+        },
+        "roundKick": {
+          "category": "striking",
+          "frames": [
+            {
+              "x": 748,
+              "y": 746,
+              "w": 250,
+              "h": 154
+            },
+            {
+              "x": 1104,
+              "y": 746,
+              "w": 250,
+              "h": 154
+            }
+          ],
+          "frameDurations": [
+            150,
+            170
+          ]
+        },
+        "recovery": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 78,
+              "y": 944,
+              "w": 230,
+              "h": 116
+            },
+            {
+              "x": 326,
+              "y": 944,
+              "w": 230,
+              "h": 116
+            }
+          ],
+          "frameDurations": [
+            150,
+            180
+          ]
+        }
+      }
+    },
+    "purple": {
+      "displayName": "Shadow Striker",
+      "source": "shadow-striker-purple.png",
+      "accent": "purple",
+      "moves": {
+        "stance": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 86,
+              "y": 122,
+              "w": 158,
+              "h": 178
+            },
+            {
+              "x": 300,
+              "y": 122,
+              "w": 158,
+              "h": 178
+            }
+          ],
+          "frameDurations": [
+            140,
+            140
+          ]
+        },
+        "jabCross": {
+          "category": "striking",
+          "frames": [
+            {
+              "x": 80,
+              "y": 754,
+              "w": 230,
+              "h": 146
+            },
+            {
+              "x": 405,
+              "y": 754,
+              "w": 248,
+              "h": 146
+            },
+            {
+              "x": 80,
+              "y": 944,
+              "w": 230,
+              "h": 116
+            }
+          ],
+          "frameDurations": [
+            100,
+            110,
+            150
+          ]
+        },
+        "roundKick": {
+          "category": "striking",
+          "frames": [
+            {
+              "x": 748,
+              "y": 746,
+              "w": 250,
+              "h": 154
+            },
+            {
+              "x": 1104,
+              "y": 746,
+              "w": 250,
+              "h": 154
+            }
+          ],
+          "frameDurations": [
+            150,
+            170
+          ]
+        },
+        "recovery": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 78,
+              "y": 944,
+              "w": 230,
+              "h": 116
+            },
+            {
+              "x": 326,
+              "y": 944,
+              "w": 230,
+              "h": 116
+            }
+          ],
+          "frameDurations": [
+            150,
+            180
+          ]
+        }
+      }
+    },
+    "orange": {
+      "displayName": "Cyber Monk",
+      "source": "cyber-monk-orange.png",
+      "accent": "orange",
+      "moves": {
+        "stance": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 300,
+              "y": 92,
+              "w": 95,
+              "h": 132
+            },
+            {
+              "x": 470,
+              "y": 92,
+              "w": 95,
+              "h": 132
+            }
+          ],
+          "frameDurations": [
+            140,
+            140
+          ]
+        },
+        "jabCross": {
+          "category": "striking",
+          "frames": [
+            {
+              "x": 282,
+              "y": 826,
+              "w": 170,
+              "h": 120
+            },
+            {
+              "x": 448,
+              "y": 826,
+              "w": 220,
+              "h": 120
+            },
+            {
+              "x": 1020,
+              "y": 936,
+              "w": 130,
+              "h": 120
+            }
+          ],
+          "frameDurations": [
+            100,
+            110,
+            150
+          ]
+        },
+        "roundKick": {
+          "category": "striking",
+          "frames": [
+            {
+              "x": 270,
+              "y": 472,
+              "w": 190,
+              "h": 120
+            },
+            {
+              "x": 548,
+              "y": 472,
+              "w": 220,
+              "h": 120
+            }
+          ],
+          "frameDurations": [
+            150,
+            170
+          ]
+        },
+        "clinchKnee": {
+          "category": "grappling",
+          "frames": [
+            {
+              "x": 270,
+              "y": 472,
+              "w": 190,
+              "h": 120
+            },
+            {
+              "x": 548,
+              "y": 472,
+              "w": 220,
+              "h": 120
+            },
+            {
+              "x": 292,
+              "y": 356,
+              "w": 100,
+              "h": 126
+            }
+          ],
+          "frameDurations": [
+            130,
+            140,
+            180
+          ]
+        },
+        "recovery": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 292,
+              "y": 936,
+              "w": 120,
+              "h": 120
+            },
+            {
+              "x": 1020,
+              "y": 936,
+              "w": 130,
+              "h": 120
+            }
+          ],
+          "frameDurations": [
+            150,
+            180
+          ]
+        }
+      }
+    },
+    "green": {
+      "displayName": "Neo Operative",
+      "source": "neo-operative-green.png",
+      "accent": "green",
+      "moves": {
+        "stance": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 76,
+              "y": 158,
+              "w": 105,
+              "h": 170
+            },
+            {
+              "x": 248,
+              "y": 158,
+              "w": 105,
+              "h": 170
+            }
+          ],
+          "frameDurations": [
+            140,
+            140
+          ]
+        },
+        "doubleLeg": {
+          "category": "wrestling",
+          "frames": [
+            {
+              "x": 646,
+              "y": 662,
+              "w": 245,
+              "h": 118
+            },
+            {
+              "x": 860,
+              "y": 662,
+              "w": 245,
+              "h": 118
+            },
+            {
+              "x": 1070,
+              "y": 662,
+              "w": 245,
+              "h": 118
+            }
+          ],
+          "frameDurations": [
+            110,
+            140,
+            190
+          ]
+        },
+        "sprawlGoBehind": {
+          "category": "wrestling",
+          "frames": [
+            {
+              "x": 70,
+              "y": 820,
+              "w": 180,
+              "h": 175
+            },
+            {
+              "x": 250,
+              "y": 820,
+              "w": 180,
+              "h": 175
+            },
+            {
+              "x": 640,
+              "y": 820,
+              "w": 180,
+              "h": 175
+            }
+          ],
+          "frameDurations": [
+            120,
+            140,
+            200
+          ]
+        },
+        "scrambleReset": {
+          "category": "defense",
+          "frames": [
+            {
+              "x": 950,
+              "y": 820,
+              "w": 150,
+              "h": 175
+            },
+            {
+              "x": 1130,
+              "y": 820,
+              "w": 150,
+              "h": 175
+            }
+          ],
+          "frameDurations": [
+            150,
+            180
+          ]
+        },
+        "recovery": {
+          "category": "recovery",
+          "frames": [
+            {
+              "x": 950,
+              "y": 820,
+              "w": 150,
+              "h": 175
+            },
+            {
+              "x": 1130,
+              "y": 820,
+              "w": 150,
+              "h": 175
+            }
+          ],
+          "frameDurations": [
+            150,
+            180
+          ]
+        }
+      }
+    },
+    "duo_reference": {
+      "displayName": "Ordered Martial Arts Reference",
+      "source": "martial-arts-move-reference-sheet.png",
+      "accent": "cyan",
+      "moves": {
+        "overUnderPummeling": {
+          "category": "standing grappling",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered over-under pummeling sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 8,
+            "y": 62,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "collarTieSnapDown": {
+          "category": "standing grappling",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered collar-tie snap-down sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 491,
+            "y": 62,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "singleLegRunThePipe": {
+          "category": "wrestling",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered single-leg run-the-pipe finish. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 973,
+            "y": 62,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "doubleLegMatReturn": {
+          "category": "wrestling",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered double-leg lift and mat return. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 8,
+            "y": 243,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "firemansCarry": {
+          "category": "wrestling",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered fireman's carry sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 491,
+            "y": 243,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "hipThrowJudoToss": {
+          "category": "throws",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered hip throw / judo toss sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 973,
+            "y": 243,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "bodyLockOutsideTrip": {
+          "category": "throws",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered body-lock outside trip sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 8,
+            "y": 424,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "armDragRearBodyLock": {
+          "category": "standing grappling",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered arm drag to rear body lock sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 491,
+            "y": 424,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "sprawlGoBehindReference": {
+          "category": "wrestling",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered sprawl and go-behind sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 973,
+            "y": 424,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "standingGuillotineAttempt": {
+          "category": "submission",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered standing guillotine attempt sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 8,
+            "y": 605,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "rearNakedChokeSequence": {
+          "category": "submission",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered rear-naked-choke finish sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 491,
+            "y": 605,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "triangleArmbarTransition": {
+          "category": "submission",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered triangle / armbar transition sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 973,
+            "y": 605,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "muayThaiClinchKnee": {
+          "category": "striking",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered Muay Thai clinch knee sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 8,
+            "y": 786,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "shortElbowFromClinch": {
+          "category": "striking",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered short elbow from clinch sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 491,
+            "y": 786,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "palmStrikeSweep": {
+          "category": "striking",
+          "frameDurations": [
+            920
+          ],
+          "notes": "Ordered palm strike to sweep sequence. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 973,
+            "y": 786,
+            "w": 467,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        },
+        "recoveryResetReference": {
+          "category": "recovery",
+          "frameDurations": [
+            1180
+          ],
+          "notes": "Ordered recovery and reset stance line from left to right. Preserved as one ordered source string.",
+          "autoPanel": {
+            "x": 8,
+            "y": 967,
+            "w": 1432,
+            "h": 111,
+            "expectedFrames": 1,
+            "tolerance": 34,
+            "padding": 8,
+            "overlap": 0,
+            "strategy": "orderedGrid"
+          }
+        }
+      }
+    }
+  },
+  "actions": [
+    {
+      "id": "jabCross",
+      "label": "Jab-cross reset",
+      "category": "striking",
+      "weight": 9,
+      "attackerMove": "jabCross",
+      "defenderMove": "recovery",
+      "totalDuration": 1120,
+      "recommendedPlacement": [
+        "lower-left",
+        "top-skim"
+      ],
+      "notes": "Step in, jab-cross, small hit-stop, reset."
+    },
+    {
+      "id": "roundKickBlock",
+      "label": "Round kick block",
+      "category": "striking",
+      "weight": 8,
+      "attackerMove": "roundKick",
+      "defenderMove": "recovery",
+      "totalDuration": 1240,
+      "recommendedPlacement": [
+        "lower-right"
+      ],
+      "notes": "Kick lands on guard with small clash."
+    },
+    {
+      "id": "clinchKnee",
+      "label": "Clinch knee break",
+      "category": "standing grappling",
+      "weight": 7,
+      "attackerMove": "clinchKnee",
+      "defenderMove": "recovery",
+      "totalDuration": 1280,
+      "recommendedPlacement": [
+        "center-cross"
+      ],
+      "notes": "Short clinch entry, knee, break."
+    },
+    {
+      "id": "doubleLegLiftMatReturn",
+      "label": "Double-leg mat return",
+      "category": "wrestling",
+      "weight": 10,
+      "attackerMove": "doubleLeg",
+      "defenderMove": "recovery",
+      "totalDuration": 1320,
+      "recommendedPlacement": [
+        "lower-left",
+        "center-cross"
+      ],
+      "notes": "Level change, drive, mat return."
+    },
+    {
+      "id": "sprawlGoBehind",
+      "label": "Sprawl go-behind",
+      "category": "wrestling",
+      "weight": 9,
+      "attackerMove": "sprawlGoBehind",
+      "defenderMove": "doubleLeg",
+      "totalDuration": 1300,
+      "recommendedPlacement": [
+        "lower-right"
+      ],
+      "notes": "Shot defended, sprawl, go-behind."
+    },
+    {
+      "id": "scrambleReset",
+      "label": "Scramble reset",
+      "category": "defense",
+      "weight": 4,
+      "attackerMove": "scrambleReset",
+      "defenderMove": "recovery",
+      "totalDuration": 980,
+      "recommendedPlacement": [
+        "top-skim"
+      ],
+      "notes": "Low clash, post, turn out, reset."
+    },
+    {
+      "id": "seq-over-under-pummeling",
+      "label": "Over-under pummeling",
+      "category": "standing grappling",
+      "weight": 6,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "overUnderPummeling",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-left",
+        "center-cross"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-collar-tie-snap-down",
+      "label": "Collar tie snap-down",
+      "category": "standing grappling",
+      "weight": 6,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "collarTieSnapDown",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-right"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-single-leg-run-pipe",
+      "label": "Single-leg finish",
+      "category": "wrestling",
+      "weight": 7,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "singleLegRunThePipe",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-left"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-double-leg-return",
+      "label": "Double-leg mat return",
+      "category": "wrestling",
+      "weight": 8,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "doubleLegMatReturn",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-left",
+        "center-cross"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-firemans-carry",
+      "label": "Fireman's carry",
+      "category": "wrestling",
+      "weight": 5,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "firemansCarry",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "center-cross"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-hip-throw",
+      "label": "Hip throw",
+      "category": "throws",
+      "weight": 6,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "hipThrowJudoToss",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-right",
+        "center-cross"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-body-lock-trip",
+      "label": "Body-lock outside trip",
+      "category": "throws",
+      "weight": 6,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "bodyLockOutsideTrip",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-left"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-arm-drag-body-lock",
+      "label": "Arm drag to body lock",
+      "category": "standing grappling",
+      "weight": 5,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "armDragRearBodyLock",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "top-skim"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-sprawl-go-behind",
+      "label": "Sprawl go-behind",
+      "category": "wrestling",
+      "weight": 7,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "sprawlGoBehindReference",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-right"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-guillotine",
+      "label": "Standing guillotine attempt",
+      "category": "submission",
+      "weight": 4,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "standingGuillotineAttempt",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "center-cross"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-rnc",
+      "label": "Rear choke finish",
+      "category": "submission",
+      "weight": 4,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "rearNakedChokeSequence",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-left"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-triangle-armbar",
+      "label": "Triangle armbar transition",
+      "category": "submission",
+      "weight": 4,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "triangleArmbarTransition",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-right"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-clinch-knee",
+      "label": "Clinch knee",
+      "category": "striking",
+      "weight": 6,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "muayThaiClinchKnee",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "center-cross"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-short-elbow",
+      "label": "Short elbow clinch",
+      "category": "striking",
+      "weight": 6,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "shortElbowFromClinch",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "top-skim"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-palm-sweep",
+      "label": "Palm strike sweep",
+      "category": "striking",
+      "weight": 5,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "palmStrikeSweep",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "lower-right"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    },
+    {
+      "id": "seq-recovery-reset",
+      "label": "Recovery reset",
+      "category": "recovery",
+      "weight": 3,
+      "sequenceCharacter": "duo_reference",
+      "sequenceMove": "recoveryResetReference",
+      "totalDuration": 1180,
+      "recommendedPlacement": [
+        "top-skim"
+      ],
+      "notes": "Preserves the ordered move string from the source sheet."
+    }
+  ]
+}

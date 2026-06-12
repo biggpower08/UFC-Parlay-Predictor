@@ -2,91 +2,159 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const DEFAULT_FIGHTERS = [
-  { id: "blue", stance: "/sprites/crops/blue-stance.png", move: "/sprites/crops/blue-move.png", fight: "/sprites/crops/blue-fight.png" },
-  { id: "purple", stance: "/sprites/crops/purple-stance.png", move: "/sprites/crops/purple-move.png", fight: "/sprites/crops/purple-fight.png" },
-  { id: "orange", stance: "/sprites/crops/orange-stance.png", move: "/sprites/crops/orange-move.png", fight: "/sprites/crops/orange-fight.png" },
-  { id: "green", stance: "/sprites/crops/green-stance.png", move: "/sprites/crops/green-move.png", fight: "/sprites/crops/green-fight.png" },
-];
-
-const SPARRING_STRIPS = [
-  "/sprites/crops/sparring-blue-purple.png",
-  "/sprites/crops/sparring-orange-green.png",
-  "/sprites/crops/sparring-all.png",
-];
-
-const SEED_SEQUENCE = [7, 3, 2, 12, 5, 4, 17, 9, 14, 1, 11];
+const MANIFEST_URL = "/sprites/sprite-actions.json";
 const PLACEMENTS = ["lower-left", "lower-right", "top-skim", "center-cross"];
-const ACTIONS = ["jab-combo", "round-kick", "clinch-throw", "sweep-entry"];
+const FALLBACK_DELAY_MS = 4200;
 
-function createSequence(fighters) {
-  const offset = Math.floor(Math.random() * SEED_SEQUENCE.length);
-  const seeded = SEED_SEQUENCE.map((value, index) => fighters[(value + offset + index) % fighters.length]);
-  return seeded
-    .map((fighter) => ({ fighter, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ fighter }) => fighter);
+function weightedPick(items) {
+  const total = items.reduce((sum, item) => sum + Math.max(1, item.weight || 1), 0);
+  let target = Math.random() * total;
+  for (const item of items) {
+    target -= Math.max(1, item.weight || 1);
+    if (target <= 0) return item;
+  }
+  return items[0];
 }
 
-function createEncounter(fighters) {
-  const sequence = createSequence(fighters);
-  const attacker = sequence[0];
-  const defender = sequence.find((fighter) => fighter.id !== attacker.id) || sequence[1] || fighters[1];
+function pickPlacement(action, placementMode) {
+  if (placementMode !== "random") return placementMode;
+  const choices = action.recommendedPlacement?.length ? action.recommendedPlacement : PLACEMENTS;
+  return choices[Math.floor(Math.random() * choices.length)] || "lower-left";
+}
+
+function getMove(manifest, characterId, moveName) {
+  return manifest?.characters?.[characterId]?.moves?.[moveName] || null;
+}
+
+function getMoveFrame(move, index) {
+  if (!move?.frames?.length) return null;
+  return move.frames[Math.min(index, move.frames.length - 1)];
+}
+
+function buildEncounter(manifest, placementMode) {
+  const actions = (manifest?.actions || []).filter((action) => {
+    if (action.sequenceCharacter && action.sequenceMove) {
+      return Boolean(getMove(manifest, action.sequenceCharacter, action.sequenceMove)?.frames?.length);
+    }
+    return Boolean(action.attackerMove && action.defenderMove);
+  });
+  if (!actions.length) return null;
+
+  const action = weightedPick(actions);
+  const isSequence = Boolean(action.sequenceCharacter && action.sequenceMove);
+  const sequenceMove = isSequence ? getMove(manifest, action.sequenceCharacter, action.sequenceMove) : null;
+  const characterIds = Object.keys(manifest.characters || {}).filter((id) => id !== action.sequenceCharacter);
+  const attackerId = characterIds[Math.floor(Math.random() * characterIds.length)];
+  const defenderId = characterIds.find((id) => id !== attackerId) || characterIds[0];
+  const attackerMove = getMove(manifest, attackerId, action.attackerMove);
+  const defenderMove = getMove(manifest, defenderId, action.defenderMove);
+  const frameCount = isSequence
+    ? sequenceMove.frames.length
+    : Math.max(attackerMove?.frames?.length || 0, defenderMove?.frames?.length || 0);
+
   return {
-    attacker,
-    defender,
-    placement: PLACEMENTS[Math.floor(Math.random() * PLACEMENTS.length)],
-    action: ACTIONS[Math.floor(Math.random() * ACTIONS.length)],
-    strip: SPARRING_STRIPS[Math.floor(Math.random() * SPARRING_STRIPS.length)],
-    durationMs: 900 + Math.floor(Math.random() * 850),
-    delayMs: 2200 + Math.floor(Math.random() * 5200),
+    id: `${action.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    action,
+    attackerMove,
+    defenderMove,
+    sequenceMove,
+    isSequence,
+    frameCount,
+    placement: pickPlacement(action, placementMode),
+    durationMs: action.totalDuration || 1120,
+    delayMs: FALLBACK_DELAY_MS + Math.floor(Math.random() * 3600),
     flip: Math.random() > 0.5,
   };
 }
 
 export default function AmbientFighters({
-  fighters = DEFAULT_FIGHTERS,
   enabled = true,
   intensity = "normal",
   placementMode = "random",
   reducedMotionMode = "hide",
 }) {
   const [mounted, setMounted] = useState(false);
+  const [manifest, setManifest] = useState(null);
   const [encounter, setEncounter] = useState(null);
   const [cycle, setCycle] = useState(0);
+  const [frameIndex, setFrameIndex] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!mounted || !enabled || fighters.length < 2) return undefined;
-    const next = createEncounter(fighters);
+    if (!mounted || !enabled) return undefined;
+    let cancelled = false;
+    fetch(MANIFEST_URL, { cache: "force-cache" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.characters && data?.actions) setManifest(data);
+      })
+      .catch(() => {
+        if (!cancelled) setManifest(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mounted, enabled]);
+
+  useEffect(() => {
+    if (!mounted || !enabled || !manifest) return undefined;
+    const next = buildEncounter(manifest, placementMode);
+    if (!next) return undefined;
     setEncounter(next);
     const timer = window.setTimeout(() => setCycle((value) => value + 1), next.durationMs + next.delayMs);
     return () => window.clearTimeout(timer);
-  }, [mounted, enabled, fighters, cycle]);
+  }, [mounted, enabled, manifest, placementMode, cycle]);
 
-  const className = useMemo(() => {
-    const placement = placementMode === "random" ? encounter?.placement : placementMode;
-    return ["ambient-fighters", placement, encounter?.action, encounter?.flip ? "flip" : "", intensity]
-      .filter(Boolean)
-      .join(" ");
-  }, [encounter, intensity, placementMode]);
+  useEffect(() => {
+    if (!encounter?.frameCount) return undefined;
+    setFrameIndex(0);
+    const timers = [];
+    const durations = encounter.sequenceMove?.frameDurations || encounter.attackerMove?.frameDurations || [];
+    let elapsed = 0;
+    for (let index = 1; index < encounter.frameCount; index += 1) {
+      elapsed += durations[index - 1] || Math.max(90, Math.floor(encounter.durationMs / encounter.frameCount));
+      timers.push(window.setTimeout(() => setFrameIndex(index), elapsed));
+    }
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [encounter]);
+
+  const className = useMemo(
+    () =>
+      [
+        "ambient-fighters",
+        encounter?.placement,
+        encounter?.isSequence ? "sequence-mode" : "paired-mode",
+        encounter?.action?.category,
+        encounter?.flip ? "flip" : "",
+        intensity,
+      ]
+        .filter(Boolean)
+        .join(" "),
+    [encounter, intensity],
+  );
 
   if (!mounted || !enabled || !encounter) return null;
+
+  const sequenceFrame = getMoveFrame(encounter.sequenceMove, frameIndex);
+  const attackerFrame = getMoveFrame(encounter.attackerMove, frameIndex);
+  const defenderFrame = getMoveFrame(encounter.defenderMove, frameIndex);
 
   return (
     <div className={className} data-reduced-motion={reducedMotionMode} aria-hidden="true">
       <div className="ambient-action-stage">
-        <img alt="" className="ambient-combatant ambient-attacker stance-frame" src={encounter.attacker.stance} />
-        <img alt="" className="ambient-combatant ambient-attacker move-frame" src={encounter.attacker.move} />
-        <img alt="" className="ambient-combatant ambient-attacker fight-frame" src={encounter.attacker.fight} />
-        <img alt="" className="ambient-combatant ambient-defender stance-frame" src={encounter.defender.stance} />
-        <img alt="" className="ambient-combatant ambient-defender fight-frame" src={encounter.defender.fight} />
-        <img alt="" className="ambient-strip-action" src={encounter.strip} />
+        {encounter.isSequence && sequenceFrame ? (
+          <img alt="" className="ambient-sequence-frame" src={sequenceFrame} />
+        ) : (
+          <>
+            {attackerFrame ? <img alt="" className="ambient-combatant ambient-attacker" src={attackerFrame} /> : null}
+            {defenderFrame ? <img alt="" className="ambient-combatant ambient-defender" src={defenderFrame} /> : null}
+          </>
+        )}
         <span className="ambient-impact" />
-        <span className="ambient-slash" />
+        <span className="ambient-motion-line" />
         <span className="ambient-dust ambient-dust-a" />
         <span className="ambient-dust ambient-dust-b" />
       </div>
