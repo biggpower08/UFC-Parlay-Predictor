@@ -1,14 +1,14 @@
 "use client";
 
 import {
+  buildModelReadCard,
   formatSignalValue,
-  modelNarrative,
   modelStatusLabel,
   SIGNAL_SECTIONS,
   statusTone,
 } from "../../lib/modelNarratives";
 
-export default function ModelSignalGrid({ prediction, modelStatus, compact = false }) {
+export default function ModelSignalGrid({ latest, prediction, modelStatus, compact = false }) {
   const breakdown = prediction?.ensemble_breakdown || {};
   const unavailable = new Set(breakdown.unavailable_models || []);
   const models = modelStatus || {};
@@ -38,6 +38,7 @@ export default function ModelSignalGrid({ prediction, modelStatus, compact = fal
               const used = Boolean(signal.used_in_score);
               const value = formatSignalValue(signal.probability ?? signal.value ?? signal.score ?? signal.signal ?? null);
               const tone = statusTone(status);
+              const read = buildModelReadCard({ ...config, latest, prediction, signal, model, status, used });
               return (
                 <article className={`model-signal-card ${tone} ${used ? "used" : ""}`} key={config.id}>
                   <div className="model-signal-topline">
@@ -45,8 +46,8 @@ export default function ModelSignalGrid({ prediction, modelStatus, compact = fal
                     <span className="model-status-badge">{used ? "Included in read" : modelStatusLabel(status)}</span>
                   </div>
                   {value && <b>{value}</b>}
-                  <p>{modelNarrative({ ...config, prediction, signal, model, status, used })}</p>
-                  <small>{config.helper}</small>
+                  <p>{read.read}</p>
+                  <small>{read.caution}</small>
                 </article>
               );
             })}

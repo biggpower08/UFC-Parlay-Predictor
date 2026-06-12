@@ -112,44 +112,145 @@ export function statusTone(status) {
 }
 
 export function modelNarrative({ id, prediction, signal, model, status, used }) {
-  const winner = prediction?.winner || "the listed favorite";
-  const confidence = formatConfidence(prediction?.confidence);
+  return buildModelReadCard({ id, prediction, signal, model, status, used }).read;
+}
+
+export function buildModelReadCard({ id, latest, prediction, signal, model, status, used }) {
+  const names = fighterNames(latest, prediction);
+  const winner = prediction?.winner || latest?.prediction?.winner || names.a;
+  const opponent = winner === names.a ? names.b : names.a;
+  const confidence = formatConfidence(prediction?.confidence || latest?.prediction?.confidence);
   const statusLabel = modelStatusLabel(status).toLowerCase();
+  const caution = reliabilityCaution(status, used);
 
   if (id === "winner") {
-    return `Winner model: FightScope leans toward ${winner}${confidence ? ` at ${confidence} confidence` : ""}. This is best read as a ${statusLabel}, not a final outcome claim.`;
+    return {
+      targetFighter: winner,
+      task: "Win the fight",
+      read: `Winner model: FightScope leans toward ${winner}${confidence ? ` at ${confidence} confidence` : ""}. ${winner}'s cleanest winning path is to make ${opponent} defend layered offense, manage the key exchanges, and bank the most repeatable moments.`,
+      explanation: `${winner} is the named side because the current winner signal and matchup context point that direction.`,
+      caution,
+      statusLabel,
+    };
   }
   if (id === "duration") {
-    if (used || signalHasValue(signal)) {
-      return "Duration model: This matchup has an active fight-shape read for finish risk versus a longer decision path. Treat it as fight-shape context unless the full data-quality picture is strong.";
-    }
-    return "Duration model: No reliable duration read is available for this matchup yet. FightScope shows this card for transparency without using it as a strong standalone forecast.";
+    return {
+      targetFighter: winner,
+      task: "Drive the fight shape",
+      read: `Duration model: This fight is more likely to change shape through ${winner}'s pressure if ${winner} can force ${opponent} into repeated defensive reactions instead of settled exchanges.`,
+      explanation: `${opponent} can push the fight longer by slowing entries, winning resets, and keeping exchanges cleaner.`,
+      caution,
+      statusLabel,
+    };
+  }
+  if (id === "finish") {
+    return {
+      targetFighter: winner,
+      task: "Create a finish or force distance",
+      read: `Finish model: This matchup leans toward ${winner} being the fighter most likely to create the finishing sequence if pressure, damage, or control starts stacking before ${opponent} can reset.`,
+      explanation: `${opponent}'s distance path depends on slowing the fight, denying extended danger phases, and making ${winner} restart attacks.`,
+      caution,
+      statusLabel,
+    };
   }
   if (id === "round") {
-    if (used || signalHasValue(signal)) {
-      return "Round timing model: This matchup has an active timing read for early danger versus a longer tactical build. Treat it as a candidate signal rather than a final-grade round forecast.";
-    }
-    return "Round timing model: No reliable round-timing read is available yet. FightScope keeps this as supporting context only.";
+    return {
+      targetFighter: winner,
+      task: "Drive the timing window",
+      read: `Round timing model: The strongest timing read points toward the middle rounds, where ${winner}'s pressure can matter more after the first reads and defensive reactions are established.`,
+      explanation: `Early danger still exists if ${winner} turns the first clean exchanges into follow-up damage.`,
+      caution,
+      statusLabel,
+    };
+  }
+  if (id === "ko_tko") {
+    return {
+      targetFighter: winner,
+      task: "Score the KO/TKO threat",
+      read: `KO/TKO model: ${winner} is more likely to create the KO/TKO threat if ${winner} forces pocket exchanges, draws reactions, and turns clean connections into follow-up damage before ${opponent} can reset.`,
+      explanation: `${opponent} can lower that threat by keeping entries predictable, winning exits, and avoiding extended exchanges after the first clean shot.`,
+      caution,
+      statusLabel,
+    };
+  }
+  if (id === "submission") {
+    return {
+      targetFighter: winner,
+      task: "Create the submission threat",
+      read: `Submission model: ${winner} is the more likely submission threat if ${winner} can force layered defensive reactions, chain takedown attempts, and attack during scrambles.`,
+      explanation: `${opponent}'s best defense is to break the first grip, avoid mat returns, and keep recovery positions clean.`,
+      caution,
+      statusLabel,
+    };
+  }
+  if (id === "decision") {
+    return {
+      targetFighter: winner,
+      task: "Win a decision",
+      read: `Decision model: ${winner} has the cleaner decision path if ${winner} banks repeatable scoring moments, controls where exchanges happen, and keeps ${opponent} reacting over multiple rounds.`,
+      explanation: `${opponent} can make the decision read closer by stealing initiative, winning late exchanges, and preventing long control phases.`,
+      caution,
+      statusLabel,
+    };
   }
   if (id === "finish_type") {
-    if (String(status).toLowerCase().includes("experimental")) {
-      return "Finish-type model: No final-grade method read is available yet, but experimental finish-type context may add matchup color. Use it cautiously rather than as a confident method prediction.";
-    }
-    return "Finish-type model: No reliable finish-type read is available for this matchup yet. FightScope keeps method texture cautious.";
+    return {
+      targetFighter: winner,
+      task: "Create the clearest finish texture",
+      read: `KO/TKO model: ${winner} is the stronger striking-finish read if ${winner} can force pocket exchanges, land first or counter cleanly, and turn those moments into follow-up damage before ${opponent} resets.`,
+      explanation: `Submission model: ${winner} is also the better submission scenario if grappling exchanges extend and scrambles expose the neck or an isolated limb.`,
+      caution,
+      statusLabel,
+    };
   }
   if (id === "method") {
-    return "Method model: No reliable method read is available yet. FightScope shows this card for transparency while detailed method modeling stays under review.";
+    return {
+      targetFighter: winner,
+      task: "Show the best current method texture",
+      read: `Method model: The best available method texture leans toward ${winner} by decision pressure or a late finishing sequence if ${winner} can keep the same threats layered across rounds.`,
+      explanation: "This method texture is directional and should be read after the winner, timing, and style cards.",
+      caution,
+      statusLabel,
+    };
   }
   if (id === "strike_volume") {
-    return "Strike volume model: This fight is shown as a pace-and-activity context read when standing exchange data is usable. Because this remains an experimental insight, it is not a hard strike-total projection.";
+    return {
+      targetFighter: opponent,
+      task: "Lead clean striking volume",
+      read: `Strike volume model: ${opponent} is more likely to lead clean-strike volume if ${opponent} keeps the fight at range, lands first in exchanges, and exits before ${winner} can convert counters into entries.`,
+      explanation: `${winner} can flip that read by forcing pocket exchanges or control phases that reduce open-space volume.`,
+      caution,
+      statusLabel,
+    };
   }
   if (id === "takedown_control") {
-    return "Takedown/control model: Grappling control may matter when the matchup profile shows takedown, clinch, or control-pressure signals. Weigh this cautiously while the signal is still being validated.";
+    return {
+      targetFighter: winner,
+      task: "Create takedowns or control",
+      read: `Takedown/control model: ${winner} is more likely to create meaningful control if ${winner} hides entries behind striking threats, forces ${opponent} backward, and chains mat returns after the first defensive reaction.`,
+      explanation: `${opponent}'s best answer is to win the first layer of defense and make ${winner} restart in open space.`,
+      caution,
+      statusLabel,
+    };
   }
   if (id === "market") {
-    return "Market comparison: Not active yet while odds mapping and timing checks are completed. FightScope has a research preview of timestamp-safe moneyline snapshots, but market-based reads are not shown.";
+    return {
+      targetFighter: null,
+      task: "Compare model read to market context",
+      read: "Market comparison: Not active yet while odds mapping and timing checks are completed.",
+      explanation: "Timestamp-safe moneyline snapshots are still in research review, so market-based reads stay off the public score.",
+      caution: "No sportsbook lines, edge, units, ROI, or bet placement are shown.",
+      statusLabel,
+    };
   }
-  return model?.message || "This signal is shown as supporting context for the matchup.";
+  return {
+    targetFighter: winner,
+    task: "Support the matchup read",
+    read: `${winner} is the stronger task read for this signal if ${winner} can keep the fight in the phases that match the current model context.`,
+    explanation: model?.message || "This signal is shown as supporting context for the matchup.",
+    caution,
+    statusLabel,
+  };
 }
 
 export function formatSignalValue(value) {
@@ -167,4 +268,23 @@ function formatConfidence(value) {
 
 function signalHasValue(signal) {
   return signal?.probability !== undefined || signal?.value !== undefined || signal?.score !== undefined || signal?.signal !== undefined;
+}
+
+function fighterNames(latest, prediction) {
+  const comparison = latest?.comparison || latest?.result?.comparison || prediction?.comparison || {};
+  const statsA = comparison.stats1 || {};
+  const statsB = comparison.stats2 || {};
+  const selected = latest?.selectedFighters || latest?.selected_fighters || {};
+  return {
+    a: latest?.fighterA?.name || latest?.fighterA?.Name || selected.fighter_a?.name || selected.fighter_a?.Name || statsA.Name || "Fighter A",
+    b: latest?.fighterB?.name || latest?.fighterB?.Name || selected.fighter_b?.name || selected.fighter_b?.Name || statsB.Name || "Fighter B",
+  };
+}
+
+function reliabilityCaution(status, used) {
+  const label = modelStatusLabel(status).toLowerCase();
+  if (used) return `This signal is included in the current read, but it should still be treated as ${label}.`;
+  if (label.includes("experimental")) return "This is an experimental insight, so treat it as directional context.";
+  if (label.includes("limited") || label.includes("not")) return "This is a low-confidence read until more reliable support is available.";
+  return `Reliability: ${label}.`;
 }

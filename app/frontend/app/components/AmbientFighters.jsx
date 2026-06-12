@@ -3,55 +3,70 @@
 import { useEffect, useMemo, useState } from "react";
 
 const FIGHTERS = [
-  { id: "blue", src: "/sprites/cyber-ninja-blue.png", alt: "" },
-  { id: "purple", src: "/sprites/shadow-striker-purple.png", alt: "" },
-  { id: "orange", src: "/sprites/cyber-monk-orange.png", alt: "" },
-  { id: "green", src: "/sprites/neo-operative-green.png", alt: "" },
+  { id: "blue", idle: "/sprites/crops/blue-idle.png", move: "/sprites/crops/blue-move.png", fight: "/sprites/crops/blue-fight.png" },
+  { id: "purple", idle: "/sprites/crops/purple-idle.png", move: "/sprites/crops/purple-move.png", fight: "/sprites/crops/purple-fight.png" },
+  { id: "orange", idle: "/sprites/crops/orange-idle.png", move: "/sprites/crops/orange-move.png", fight: "/sprites/crops/orange-fight.png" },
+  { id: "green", idle: "/sprites/crops/green-idle.png", move: "/sprites/crops/green-move.png", fight: "/sprites/crops/green-fight.png" },
+];
+
+const SPARRING_STRIPS = [
+  "/sprites/crops/sparring-blue-purple.png",
+  "/sprites/crops/sparring-orange-green.png",
+  "/sprites/crops/sparring-all.png",
 ];
 
 const SEED_SEQUENCE = [7, 3, 2, 12, 5, 4, 17, 9, 14, 1, 11];
 
-function shuffledFighters(offset) {
-  return SEED_SEQUENCE.map((value, index) => FIGHTERS[(value + offset + index) % FIGHTERS.length]);
+function buildRuntimeSequence() {
+  const offset = Math.floor(Math.random() * SEED_SEQUENCE.length);
+  const pool = SEED_SEQUENCE.map((value, index) => FIGHTERS[(value + offset + index) % FIGHTERS.length]);
+  return pool
+    .map((fighter) => ({ fighter, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ fighter }) => fighter);
 }
 
 export default function AmbientFighters() {
-  const [offset, setOffset] = useState(0);
+  const [sequence, setSequence] = useState([]);
+  const [sparringStrip, setSparringStrip] = useState("");
 
   useEffect(() => {
-    setOffset(Math.floor(Math.random() * FIGHTERS.length));
+    setSequence(buildRuntimeSequence());
+    setSparringStrip(SPARRING_STRIPS[Math.floor(Math.random() * SPARRING_STRIPS.length)]);
   }, []);
 
-  const sequence = useMemo(() => shuffledFighters(offset), [offset]);
-  const duo = sequence.slice(0, 2);
+  const fighters = useMemo(() => (sequence.length ? sequence : []), [sequence]);
+  if (!fighters.length) return null;
+
+  const duo = fighters.slice(0, 2);
 
   return (
     <div className="ambient-fighters" aria-hidden="true">
       <div className="ambient-lane ambient-lane-left">
-        {sequence.slice(0, 4).map((fighter, index) => (
+        {fighters.slice(0, 4).map((fighter, index) => (
           <img
-            alt={fighter.alt}
+            alt=""
             className={`ambient-fighter ambient-fighter-${index + 1}`}
             key={`${fighter.id}-${index}`}
-            src={fighter.src}
+            src={index % 2 === 0 ? fighter.idle : fighter.move}
           />
         ))}
       </div>
       <div className="ambient-lane ambient-lane-right">
-        {sequence.slice(4, 8).map((fighter, index) => (
+        {fighters.slice(4, 8).map((fighter, index) => (
           <img
-            alt={fighter.alt}
+            alt=""
             className={`ambient-fighter ambient-fighter-${index + 5}`}
             key={`${fighter.id}-side-${index}`}
-            src={fighter.src}
+            src={index % 2 === 0 ? fighter.move : fighter.fight}
           />
         ))}
       </div>
       <div className="ambient-sparring">
-        <img alt="" className="ambient-duo ambient-duo-a" src={duo[0]?.src || FIGHTERS[0].src} />
-        <img alt="" className="ambient-duo ambient-duo-b" src={duo[1]?.src || FIGHTERS[1].src} />
+        <img alt="" className="ambient-duo ambient-duo-a" src={duo[0]?.fight || FIGHTERS[0].fight} />
+        <img alt="" className="ambient-duo ambient-duo-b" src={duo[1]?.fight || FIGHTERS[1].fight} />
       </div>
-      <img alt="" className="ambient-sparring-strip" src="/sprites/fighter-sparring-reference.png" />
+      <img alt="" className="ambient-sparring-strip" src={sparringStrip} />
     </div>
   );
 }

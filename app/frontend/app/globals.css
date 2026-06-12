@@ -784,6 +784,55 @@ input::placeholder {
   gap: 12px;
 }
 
+.odds-simple-grid,
+.models-page-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.model-page-intro,
+.model-warning-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.model-page-intro div,
+.model-warning-card {
+  display: grid;
+  gap: 4px;
+}
+
+.model-read-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 230px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(4, 10, 16, 0.5);
+}
+
+.model-read-card.used {
+  border-color: rgba(36, 246, 255, 0.36);
+}
+
+.model-read-card p,
+.model-read-card em,
+.odds-simple-grid p {
+  color: #c9d8e2;
+  line-height: 1.5;
+}
+
+.model-read-card em {
+  font-style: normal;
+  font-size: 0.86rem;
+  opacity: 0.86;
+}
+
 .prop-read {
   display: grid;
   align-content: start;
@@ -1595,5 +1644,16 @@ input::placeholder {
 
   .read-actions {
     display: grid;
+  }
+
+  .odds-simple-grid,
+  .models-page-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .model-page-intro,
+  .model-warning-card {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

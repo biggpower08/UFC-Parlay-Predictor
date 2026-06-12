@@ -47,7 +47,7 @@ export default function AnalysisPage() {
             {analysis.warnings.map((warning) => <p key={warning}>{warning}</p>)}
           </div>
         )}
-        <ModelSignalGrid prediction={result.prediction} modelStatus={analysis.prop_model_status} compact />
+        <ModelSignalGrid latest={result} prediction={result.prediction} modelStatus={analysis.prop_model_status} compact />
       </section>
 
       <section className="analysis-page-grid">

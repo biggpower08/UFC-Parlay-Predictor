@@ -660,7 +660,7 @@ export default function App() {
                 <a href="/stats">Matchup Stats</a>
                 <a href="/odds">Odds / Betting Reads</a>
               </div>
-              <ModelSignalGrid prediction={result.prediction} modelStatus={modelStatus || result.analysis?.prop_model_status} compact />
+              <ModelSignalGrid latest={result} prediction={result.prediction} modelStatus={modelStatus || result.analysis?.prop_model_status} compact />
               <div className="read-actions">
                 <button className="analysis-link" type="button" onClick={refreshCurrentRead} disabled={loading}>
                   Refresh read
