@@ -1009,6 +1009,22 @@ input::placeholder {
   text-align: center;
 }
 
+.read-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.analysis-link.subtle {
+  color: #c9d8e2;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.analysis-link:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .driver,
 .analysis-section,
 .analysis-warnings,
@@ -1411,5 +1427,9 @@ input::placeholder {
 
   .stat-row span:last-child {
     text-align: left;
+  }
+
+  .read-actions {
+    display: grid;
   }
 }

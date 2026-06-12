@@ -3,7 +3,7 @@
 import { Activity, RefreshCw, Search, ShieldCheck } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ModelSignalGrid from "./components/ModelSignalGrid";
-import { clearLatestPrediction, saveLatestPrediction } from "../lib/latestPrediction";
+import { clearLatestPrediction, loadLatestPrediction, saveLatestPrediction } from "../lib/latestPrediction";
 
 const API_CANDIDATES = Array.from(
   new Set(
@@ -124,6 +124,15 @@ export default function App() {
     checkHealth();
     loadCreditStatus();
     loadModelStatus();
+    const latest = loadLatestPrediction();
+    if (latest?.result) {
+      setResult(latest.result);
+      setFighterMeta({
+        a: latest.fighterA || latest.result.comparison?.stats1 || null,
+        b: latest.fighterB || latest.result.comparison?.stats2 || null,
+      });
+      setActiveTab("prediction");
+    }
     const closeSearchOnOutsideClick = (event) => {
       if (!event.target.closest?.(".fighter-input")) {
         setActiveSearchSlot(null);
@@ -206,17 +215,19 @@ export default function App() {
     }
   }
 
-  async function predict() {
+  async function predict(override = null) {
     setLoading(true);
     setMessage("");
     try {
-      if (!canPredict) {
+      const fighterAForPrediction = override?.fighterA || selectedFighterA;
+      const fighterBForPrediction = override?.fighterB || selectedFighterB;
+      if (!fighterAForPrediction?.name || !fighterBForPrediction?.name || fighterAForPrediction.name === fighterBForPrediction.name) {
         setMessage("Search for and select two different fighters first.");
         return;
       }
-      const resolvedA = await resolveBeforePrediction("a", selectedFighterA.name);
+      const resolvedA = await resolveBeforePrediction("a", fighterAForPrediction.name);
       if (!resolvedA) return;
-      const resolvedB = await resolveBeforePrediction("b", selectedFighterB.name);
+      const resolvedB = await resolveBeforePrediction("b", fighterBForPrediction.name);
       if (!resolvedB) return;
 
       const response = await apiFetch("/predict", {
@@ -262,7 +273,10 @@ export default function App() {
       } else {
         showUsageToast("Prediction updated.");
       }
-      const saved = saveLatestPrediction(data, { fighter_a: fighterMeta.a || selectedFighterA, fighter_b: fighterMeta.b || selectedFighterB });
+      const saved = saveLatestPrediction(data, {
+        fighter_a: fighterMeta.a || fighterAForPrediction,
+        fighter_b: fighterMeta.b || fighterBForPrediction,
+      });
       setResult(saved?.result || data);
       setActiveTab("prediction");
     } catch (error) {
@@ -409,8 +423,26 @@ export default function App() {
   function clearCurrentLatestPrediction() {
     clearLatestPrediction();
     setResult(null);
+    setSelectedFighterA(null);
+    setSelectedFighterB(null);
+    setFighterAQuery("");
+    setFighterBQuery("");
+    setFighterMeta({ a: null, b: null });
     setActiveTab("matchup");
-    setMessage("Latest prediction cleared.");
+    setMessage("Ready for a new matchup.");
+  }
+
+  async function refreshCurrentRead() {
+    const latest = loadLatestPrediction();
+    const fighterA = latest?.fighterA || latest?.result?.comparison?.stats1 || fighterMeta.a || selectedFighterA;
+    const fighterB = latest?.fighterB || latest?.result?.comparison?.stats2 || fighterMeta.b || selectedFighterB;
+    const normalizedA = fighterA ? { ...fighterA, name: fighterA.name || fighterA.Name } : null;
+    const normalizedB = fighterB ? { ...fighterB, name: fighterB.name || fighterB.Name } : null;
+    if (!normalizedA?.name || !normalizedB?.name) {
+      setMessage("Choose two fighters to refresh the read.");
+      return;
+    }
+    await predict({ fighterA: normalizedA, fighterB: normalizedB });
   }
 
   const confidence = useMemo(() => {
@@ -632,9 +664,14 @@ export default function App() {
                 <a href="/odds">Odds / Betting Reads</a>
               </div>
               <ModelSignalGrid prediction={result.prediction} modelStatus={modelStatus || result.analysis?.prop_model_status} compact />
-              <button className="analysis-link" type="button" onClick={clearCurrentLatestPrediction}>
-                Clear latest prediction
-              </button>
+              <div className="read-actions">
+                <button className="analysis-link" type="button" onClick={refreshCurrentRead} disabled={loading}>
+                  Refresh read
+                </button>
+                <button className="analysis-link subtle" type="button" onClick={clearCurrentLatestPrediction}>
+                  New matchup
+                </button>
+              </div>
             </section>
           )}
           {activeTab === "feedback" && (

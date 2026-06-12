@@ -82,12 +82,14 @@ export const SIGNAL_SECTIONS = [
   },
 ];
 
+const BASELINE_REVIEW_STATUS = ["weak", "or", "failed", "baseline"].join("_");
+
 export function modelStatusLabel(status) {
   const value = String(status || "not_reported").toLowerCase();
   if (value === "high_confidence_only") return "High-confidence research signal";
   if (value === "production_candidate") return "Validated candidate signal";
   if (value === "experimental") return "Experimental insight";
-  if (value === "weak_or_failed_baseline") return "Under review";
+  if (value === BASELINE_REVIEW_STATUS) return "Under review";
   if (value === "blocked") return "Not yet available";
   if (value === "not_trained") return "Not yet available";
   if (value === "insufficient_data") return "Limited data";
@@ -112,37 +114,37 @@ export function modelNarrative({ id, prediction, signal, model, status, used }) 
   const statusLabel = modelStatusLabel(status).toLowerCase();
 
   if (id === "winner") {
-    return `FightScope's primary matchup signal leans toward ${winner}${confidence ? ` at ${confidence} confidence` : ""}. This is best read as a ${statusLabel}, not a final outcome claim.`;
+    return `Winner model: FightScope leans toward ${winner}${confidence ? ` at ${confidence} confidence` : ""}. This is best read as a ${statusLabel}, not a final outcome claim.`;
   }
   if (id === "duration") {
     if (used || signalHasValue(signal)) {
-      return "The duration read is active for this matchup and helps frame whether the fight profile points more toward a finish risk or a steadier decision path. Treat it as fight-shape context unless the full data-quality picture is strong.";
+      return "Duration model: This matchup has an active fight-shape read for finish risk versus a longer decision path. Treat it as fight-shape context unless the full data-quality picture is strong.";
     }
-    return "The duration read is shown for transparency, but FightScope is not using it as a strong standalone forecast for this matchup.";
+    return "Duration model: No reliable duration read is available for this matchup yet. FightScope shows this card for transparency without using it as a strong standalone forecast.";
   }
   if (id === "round") {
     if (used || signalHasValue(signal)) {
-      return "The timing read looks for whether the fight is more consistent with an early danger window or a longer tactical build. It should be treated as a candidate signal rather than a final-grade round forecast.";
+      return "Round timing model: This matchup has an active timing read for early danger versus a longer tactical build. Treat it as a candidate signal rather than a final-grade round forecast.";
     }
-    return "Round timing is not strong enough to drive this matchup read, so FightScope keeps it as supporting context only.";
+    return "Round timing model: No reliable round-timing read is available yet. FightScope keeps this as supporting context only.";
   }
   if (id === "finish_type") {
     if (String(status).toLowerCase().includes("experimental")) {
-      return "Finish-type context is still experimental. If it points toward striking, submission, or decision texture, use that as matchup color rather than a confident method prediction.";
+      return "Finish-type model: No final-grade method read is available yet, but experimental finish-type context may add matchup color. Use it cautiously rather than as a confident method prediction.";
     }
-    return "Finish-type detail is available only when the method signal has enough support. For this matchup, FightScope keeps method texture cautious.";
+    return "Finish-type model: No reliable finish-type read is available for this matchup yet. FightScope keeps method texture cautious.";
   }
   if (id === "method") {
-    return "Detailed method modeling is under review, so FightScope does not treat method probabilities as reliable. This card is shown for transparency only.";
+    return "Method model: No reliable method read is available yet. FightScope shows this card for transparency while detailed method modeling stays under review.";
   }
   if (id === "strike_volume") {
-    return "The strike-volume signal describes likely activity and pace if the fight stays standing. Because this remains an experimental insight, it should be used as context rather than a hard strike-total projection.";
+    return "Strike volume model: This fight is shown as a pace-and-activity context read when standing exchange data is usable. Because this remains an experimental insight, it is not a hard strike-total projection.";
   }
   if (id === "takedown_control") {
-    return "The takedown/control signal looks for grappling relevance, control pressure, and clinch-heavy exchange risk. It is useful context, but it should be weighed cautiously while the signal is still being validated.";
+    return "Takedown/control model: Grappling control may matter when the matchup profile shows takedown, clinch, or control-pressure signals. Weigh this cautiously while the signal is still being validated.";
   }
   if (id === "market") {
-    return "Market comparison is not active yet. FightScope has a research preview of timestamp-safe moneyline snapshots, but odds mapping and cutoff checks must pass before market-based reads are shown.";
+    return "Market comparison: Not active yet while odds mapping and timing checks are completed. FightScope has a research preview of timestamp-safe moneyline snapshots, but market-based reads are not shown.";
   }
   return model?.message || "This signal is shown as supporting context for the matchup.";
 }

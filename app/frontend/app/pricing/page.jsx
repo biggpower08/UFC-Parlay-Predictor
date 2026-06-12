@@ -5,7 +5,7 @@ const PLANS = [
     status: "Live",
     description: "Core matchup prediction tools for casual fight research.",
     features: [
-      "3 free predictions",
+      "Starter prediction allowance",
       "Winner prediction",
       "Confidence meter",
       "Compact analyst summary",
