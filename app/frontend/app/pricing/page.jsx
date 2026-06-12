@@ -53,7 +53,7 @@ const COMPARISON_ROWS = [
   ["Winner predictions", "Included", "Included", "Included"],
   ["Full analysis page", "Limited", "Included", "Included"],
   ["Elo trend history", "Basic", "Advanced", "Advanced"],
-  ["Prop-style reads", "Model-informed", "Premium reads", "Expanded reads"],
+  ["Model read cards", "Model-informed", "Premium reads", "Expanded reads"],
   ["Saved predictions", "Not included", "Included", "Included"],
   ["Billing", "Not required", "Coming soon", "Coming soon"],
 ];

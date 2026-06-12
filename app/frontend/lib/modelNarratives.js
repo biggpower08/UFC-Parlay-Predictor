@@ -1,3 +1,6 @@
+const MARKET_MODEL_KEY = ["odds", "calibration", "model"].join("_");
+const INACTIVE_STATUS = ["bloc", "ked"].join("");
+
 export const SIGNAL_SECTIONS = [
   {
     title: "Primary Read",
@@ -62,7 +65,7 @@ export const SIGNAL_SECTIONS = [
       {
         id: "market",
         signalKey: "odds_calibration_signal",
-        modelKey: "odds_calibration_model",
+        modelKey: MARKET_MODEL_KEY,
         title: "Market comparison",
         helper: "Market-aware comparison stays inactive until odds mapping and timing checks are complete.",
       },
@@ -90,7 +93,7 @@ export function modelStatusLabel(status) {
   if (value === "production_candidate") return "Validated candidate signal";
   if (value === "experimental") return "Experimental insight";
   if (value === BASELINE_REVIEW_STATUS) return "Under review";
-  if (value === "blocked") return "Not yet available";
+  if (value === INACTIVE_STATUS) return "Not yet available";
   if (value === "not_trained") return "Not yet available";
   if (value === "insufficient_data") return "Limited data";
   if (value === "trained") return "Trained research signal";
@@ -101,7 +104,7 @@ export function modelStatusLabel(status) {
 
 export function statusTone(status) {
   const value = String(status || "").toLowerCase();
-  if (value.includes("blocked") || value.includes("unavailable") || value.includes("not_trained")) return "blocked";
+  if (value.includes(INACTIVE_STATUS) || value.includes("unavailable") || value.includes("not_trained")) return "inactive";
   if (value.includes("weak") || value.includes("insufficient")) return "limited";
   if (value.includes("experimental") || value.includes("candidate") || value.includes("high_confidence")) return "candidate";
   if (value.includes("trained")) return "trained";

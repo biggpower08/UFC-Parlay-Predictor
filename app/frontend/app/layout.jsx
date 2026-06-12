@@ -1,4 +1,5 @@
 import "./globals.css";
+import AmbientFighters from "./components/AmbientFighters";
 import SiteNav from "./components/SiteNav";
 
 export const metadata = {
@@ -57,9 +58,10 @@ export default function RootLayout({ children }) {
           }}
         />
         <SiteNav />
+        <AmbientFighters />
         {children}
         <footer className="site-footer">
-          FightScope is an independent MMA analytics platform. It is not affiliated with UFC, any promotion, sportsbook, or betting operator. Outputs are informational and research-oriented, not financial advice.
+          Independent MMA analytics. Not affiliated with UFC, any promotion, sportsbook, or betting operator. Outputs are informational and research-oriented, not financial advice.
         </footer>
       </body>
     </html>

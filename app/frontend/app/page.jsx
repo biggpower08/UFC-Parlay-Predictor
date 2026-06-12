@@ -470,9 +470,6 @@ export default function App() {
         <div>
           <p className="eyebrow">AI UFC and MMA matchup intelligence</p>
           <h1>FightScope</h1>
-          <p className="hero-copy">
-            A cyberpunk fight-intelligence scroll for winner predictions, confidence, Elo context, matchup stats, and honest model-informed reads.
-          </p>
         </div>
         <div className="status-stack">
           <div className={health?.ok ? "status online" : "status offline"}>
