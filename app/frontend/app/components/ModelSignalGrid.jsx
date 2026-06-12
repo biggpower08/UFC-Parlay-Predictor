@@ -46,7 +46,13 @@ export default function ModelSignalGrid({ latest, prediction, modelStatus, compa
                     <span className="model-status-badge">{used ? "Included in read" : modelStatusLabel(status)}</span>
                   </div>
                   {value && <b>{value}</b>}
+                  {read.targetFighter && <span className="model-task-mini">{read.task}: {read.targetFighter}</span>}
                   <p>{read.read}</p>
+                  {read.evidence?.length > 0 && (
+                    <div className="model-evidence-list compact">
+                      {read.evidence.slice(0, 2).map((item) => <span key={item}>{item}</span>)}
+                    </div>
+                  )}
                   <small>{read.caution}</small>
                 </article>
               );

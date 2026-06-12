@@ -2,20 +2,7 @@
 
 import { useLatestPrediction } from "../../lib/latestPrediction";
 import { buildModelReadCard, modelStatusLabel, statusTone } from "../../lib/modelNarratives";
-
-const MODEL_PAGE_SIGNALS = [
-  { id: "winner", signalKey: "winner_model_signal", modelKey: "winner_model", title: "Winner model" },
-  { id: "duration", signalKey: "finish_model_signal", modelKey: "fight_duration_model", title: "Fight shape / duration" },
-  { id: "finish", signalKey: "finish_model_signal", modelKey: "finish_model", title: "Finish vs decision" },
-  { id: "round", signalKey: "round_model_signal", modelKey: "round_model", title: "Round timing" },
-  { id: "ko_tko", signalKey: "method_model_signal", modelKey: "finish_type_model", title: "KO/TKO read" },
-  { id: "submission", signalKey: "method_model_signal", modelKey: "finish_type_model", title: "Submission read" },
-  { id: "decision", signalKey: "method_model_signal", modelKey: "goes_distance_model", title: "Decision read" },
-  { id: "strike_volume", signalKey: "strike_volume_signal", modelKey: "strike_volume_model", title: "Strike volume" },
-  { id: "takedown_control", signalKey: "takedown_control_signal", modelKey: "takedown_control_model", title: "Takedown/control" },
-  { id: "method", signalKey: "method_model_signal", modelKey: "method_model", title: "Method detail" },
-  { id: "market", signalKey: "odds_calibration_signal", modelKey: ["odds", "calibration", "model"].join("_"), title: "Market comparison" },
-];
+import { MODEL_READ_SIGNALS } from "../../lib/modelRegistry";
 
 export default function ModelsPage() {
   const latest = useLatestPrediction();
@@ -64,7 +51,7 @@ export default function ModelsPage() {
       )}
 
       <section className="models-page-grid">
-        {MODEL_PAGE_SIGNALS.map((config) => {
+        {MODEL_READ_SIGNALS.map((config) => {
           const signal = breakdown[config.signalKey] || {};
           const model = models[config.modelKey] || {};
           const status =
@@ -78,11 +65,31 @@ export default function ModelsPage() {
           return (
             <article className={`model-read-card ${statusTone(status)} ${used ? "used" : ""}`} key={config.id}>
               <div className="model-signal-topline">
-                <strong>{config.title}</strong>
+                <div>
+                  <strong>{read.title}</strong>
+                  <span>{read.category} · {read.modelType}</span>
+                </div>
                 <span className="model-status-badge">{used ? "Included in read" : modelStatusLabel(status)}</span>
+              </div>
+              <div className="model-task-line">
+                <span>{read.task}</span>
+                {read.targetFighter && <b>{read.targetFighter}</b>}
               </div>
               <p className="read-direct">{read.read}</p>
               <p>{read.explanation}</p>
+              {read.evidence?.length > 0 && (
+                <div className="model-evidence-list" aria-label={`${read.title} evidence`}>
+                  {read.evidence.map((item) => <span key={item}>{item}</span>)}
+                </div>
+              )}
+              {read.missingData?.length > 0 && (
+                <p className="model-missing-data">Missing: {read.missingData.join(", ")}</p>
+              )}
+              {read.limitations?.length > 0 && (
+                <ul className="model-limitations">
+                  {read.limitations.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              )}
               <em>{read.caution}</em>
             </article>
           );

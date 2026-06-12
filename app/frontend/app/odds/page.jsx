@@ -47,7 +47,7 @@ export default function OddsPage() {
         <article className="panel">
           <p className="eyebrow">Safety</p>
           <h2>No active market outputs</h2>
-          <p>No sportsbook lines, edge, units, ROI, or bet placement are shown. Market comparison stays inactive until review passes.</p>
+          <p>No wagering actions or market-strength claims are shown. Market comparison stays inactive until review passes.</p>
         </article>
       </section>
     </main>

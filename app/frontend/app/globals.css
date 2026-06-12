@@ -867,6 +867,61 @@ input::placeholder {
   line-height: 1.45;
 }
 
+.model-task-line,
+.model-task-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  color: rgba(201, 216, 226, 0.82);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.model-task-line b,
+.model-task-mini {
+  color: #24f6ff;
+}
+
+.model-evidence-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.model-evidence-list span {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(36, 246, 255, 0.18);
+  border-radius: 999px;
+  padding: 0 8px;
+  color: rgba(237, 248, 255, 0.86);
+  background: rgba(36, 246, 255, 0.07);
+  font-size: 0.74rem;
+  line-height: 1.25;
+}
+
+.model-evidence-list.compact span {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.model-missing-data {
+  color: #ffcc66 !important;
+  font-size: 0.84rem;
+}
+
+.model-limitations {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 18px;
+  color: rgba(201, 216, 226, 0.86);
+  font-size: 0.84rem;
+  line-height: 1.42;
+}
+
 .prop-badges {
   display: flex;
   flex-wrap: wrap;
@@ -1207,6 +1262,17 @@ input::placeholder {
 .model-signal-topline {
   display: grid;
   gap: 8px;
+}
+
+.model-signal-topline div {
+  display: grid;
+  gap: 3px;
+}
+
+.model-signal-topline span:not(.model-status-badge) {
+  color: rgba(201, 216, 226, 0.72);
+  font-size: 0.78rem;
+  line-height: 1.35;
 }
 
 .model-signal-card strong {

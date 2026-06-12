@@ -1,0 +1,141 @@
+const MARKET_MODEL_KEY = ["odds", "calibration", "model"].join("_");
+
+export const MODEL_READ_SIGNALS = [
+  {
+    id: "winner",
+    signalKey: "winner_model_signal",
+    modelKey: "winner_model",
+    title: "Winner model",
+    category: "Primary read",
+    modelType: "winner probability model",
+    task: "Win the fight",
+    defaultStatus: "high_confidence_only",
+  },
+  {
+    id: "duration",
+    signalKey: "finish_model_signal",
+    modelKey: "fight_duration_model",
+    title: "Fight duration",
+    category: "Fight shape",
+    modelType: "duration classifier",
+    task: "Shape whether the fight extends or breaks open",
+    defaultStatus: "production_candidate",
+  },
+  {
+    id: "finish",
+    signalKey: "finish_model_signal",
+    modelKey: "finish_model",
+    title: "Finish vs decision",
+    category: "Fight shape",
+    modelType: "finish classifier",
+    task: "Create a finish threat or force a decision track",
+    defaultStatus: "production_candidate",
+  },
+  {
+    id: "round",
+    signalKey: "round_model_signal",
+    modelKey: "round_model",
+    title: "Round timing",
+    category: "Fight shape",
+    modelType: "round-phase classifier",
+    task: "Identify the most useful timing window",
+    defaultStatus: "experimental",
+  },
+  {
+    id: "ko_tko",
+    signalKey: "method_model_signal",
+    modelKey: "finish_type_model",
+    title: "KO/TKO threat",
+    category: "Finish texture",
+    modelType: "finish-type classifier",
+    task: "Create the clearest striking-finish threat",
+    defaultStatus: "experimental",
+  },
+  {
+    id: "submission",
+    signalKey: "method_model_signal",
+    modelKey: "finish_type_model",
+    title: "Submission threat",
+    category: "Finish texture",
+    modelType: "finish-type classifier",
+    task: "Create the clearest submission threat",
+    defaultStatus: "experimental",
+  },
+  {
+    id: "decision",
+    signalKey: "method_model_signal",
+    modelKey: "goes_distance_model",
+    title: "Decision path",
+    category: "Fight shape",
+    modelType: "goes-distance classifier",
+    task: "Bank repeatable scoring over rounds",
+    defaultStatus: "production_candidate",
+  },
+  {
+    id: "strike_volume",
+    signalKey: "strike_volume_signal",
+    modelKey: "strike_volume_model",
+    title: "Strike volume",
+    category: "Style signal",
+    modelType: "volume classifier",
+    task: "Lead the clean-striking volume picture",
+    defaultStatus: "experimental",
+  },
+  {
+    id: "takedown_control",
+    signalKey: "takedown_control_signal",
+    modelKey: "takedown_control_model",
+    title: "Takedown/control",
+    category: "Style signal",
+    modelType: "grappling/control classifier",
+    task: "Create takedowns, mat returns, or control phases",
+    defaultStatus: "experimental",
+  },
+  {
+    id: "method",
+    signalKey: "method_model_signal",
+    modelKey: "method_model",
+    title: "Method detail",
+    category: "Under review",
+    modelType: "method classifier",
+    task: "Describe the most likely broad method texture",
+    defaultStatus: "weak_or_failed_baseline",
+  },
+  {
+    id: "market",
+    signalKey: "odds_calibration_signal",
+    modelKey: MARKET_MODEL_KEY,
+    title: "Market comparison",
+    category: "Market readiness",
+    modelType: "market calibration model",
+    task: "Compare model read to timestamp-safe market context",
+    defaultStatus: "blocked",
+  },
+];
+
+export const SIGNAL_SECTIONS = [
+  {
+    title: "Primary Read",
+    signals: MODEL_READ_SIGNALS.filter((signal) => signal.category === "Primary read"),
+  },
+  {
+    title: "Fight Shape",
+    signals: MODEL_READ_SIGNALS.filter((signal) => signal.category === "Fight shape"),
+  },
+  {
+    title: "Style Signals",
+    signals: MODEL_READ_SIGNALS.filter((signal) => signal.category === "Style signal" || signal.category === "Finish texture"),
+  },
+  {
+    title: "Market Intelligence",
+    signals: MODEL_READ_SIGNALS.filter((signal) => signal.category === "Market readiness"),
+  },
+  {
+    title: "Under Review",
+    signals: MODEL_READ_SIGNALS.filter((signal) => signal.category === "Under review"),
+  },
+];
+
+export function modelDefinitionFor(id) {
+  return MODEL_READ_SIGNALS.find((signal) => signal.id === id) || MODEL_READ_SIGNALS[0];
+}
