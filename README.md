@@ -127,3 +127,7 @@ $env:MMA_AI_PYTHON="C:\venvs\mma-ai\Scripts\python.exe"
 ```
 
 See `docs/local_dev_windows.md` for full setup and test commands.
+
+## Codex MCP Workflow
+
+This repo can use globally configured Codex MCP servers for browser QA, current documentation lookup, and structured planning. See `docs/MCP_WORKFLOW.md` for the project-specific MCP workflow and normal verification commands.

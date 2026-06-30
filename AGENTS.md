@@ -49,6 +49,28 @@ cd app\frontend
 npm run build
 ```
 
+## MCP Workflow
+
+Use MCP servers only when they clearly improve the work. Do not rewrite project architecture just because an MCP is available.
+
+Check available servers with:
+
+```powershell
+codex mcp list
+```
+
+Current useful MCP roles for this repo:
+
+- Playwright: browser QA, route checks, visual checks, navigation bugs, console errors, and core user flows.
+- Context7: current docs for Next.js, FastAPI, SQLAlchemy/Alembic, Supabase, Playwright, and other library behavior.
+- Sequential Thinking: practical planning for non-trivial debugging, refactors, model/data changes, and architecture decisions.
+- Perplexity: use only if connected, for current public research and external tooling/deployment questions.
+- Firecrawl: use only if connected, for structured extraction from public docs/pages.
+
+Do not use MCPs for secrets, private data transmission, CAPTCHA or anti-bot bypassing, fake data/model claims, or unnecessary broad crawling.
+
+See `docs/MCP_WORKFLOW.md` for the full repo-specific MCP workflow.
+
 ## Raw Data Rules
 
 - Raw Kaggle/GitHub/manual datasets live under `data/imports/`.

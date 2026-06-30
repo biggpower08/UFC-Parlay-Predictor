@@ -1,6 +1,6 @@
 # UFC/MMA AI Predictor Master Project Status
 
-_Generated: 2026-06-11T15:24:39.521126+00:00_
+_Generated: 2026-06-30T03:17:22.341788+00:00_
 
 ## 1. Plain-English Project Summary
 The app has working winner predictions, Elo support, analysis pages, betting-read scaffolding, and a growing model audit system. The current priority is production readiness: source eligibility, label quality, source-transfer stability, calibration, and safe runtime output. No model is currently marked production-ready, and no model artifacts are packaged yet.
@@ -11,6 +11,7 @@ The app has working winner predictions, Elo support, analysis pages, betting-rea
 - `method_umbrella_model` and `method_model` are `weak_or_failed_baseline`.
 - `finish_type_model`, `strike_volume_model`, and `takedown_control_model` are experimental/context-only.
 - `odds_calibration_model` is blocked until trusted pre-fight odds timestamps exist.
+- Current downloaded odds audit status: `blocked_missing_snapshot_timestamps` for `UFC_betting_odds.csv`.
 - No model artifacts are packaged yet.
 
 ## 3. Current Model Status Table
@@ -90,9 +91,6 @@ The app has working winner predictions, Elo support, analysis pages, betting-rea
 
 ## 9. Current UI / Product Status
 - Home, Analysis, Stats, and Odds pages exist as product surfaces.
-- Customer-facing copy has been polished under the FightScope brand.
-- Model-specific narrative cards explain the winner, fight shape, style, and market-read signals in product-safe language.
-- Raw model statuses are translated into user-facing labels such as high-confidence research signal, validated candidate signal, experimental insight, under review, and not yet available.
 - Odds page remains model-informed/read-only; no fake sportsbook odds or bet placement.
 - Public output should show model status badges and source/data-quality warnings before strong claims.
 
